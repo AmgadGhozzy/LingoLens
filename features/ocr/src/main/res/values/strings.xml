@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TextSnap</string>
+    <string name="action_share">Share</string>
+    <string name="action_speak">Speak</string>
+    <string name="action_translate">Translate</string>
+    <string name="action_copy">Copy</string>
+    <string name="more_options">More Options</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+    <string name="show_labels">Show Labels</string>
+    <string name="hide_labels">Hide Labels</string>
+    <string name="show_paragraphs">Show Paragraphs</string>
+    <string name="hide_paragraphs">Hide Paragraphs</string>
+</resources>
