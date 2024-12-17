@@ -16,8 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ui.components.ConfirmationDialog
+import com.venom.lingopro.ui.components.dialogs.ConfirmationDialog
 import com.venom.lingopro.R
 import com.venom.lingopro.data.model.TranslationEntry
 import com.venom.lingopro.domain.model.ViewResources

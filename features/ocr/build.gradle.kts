@@ -17,6 +17,7 @@ android {
         versionCode = 4
         versionName = "4.0"
 
+        buildConfigField("String", "OCR_API_KEY", "\"${project.properties["OCR_API_KEY"] ?: ""}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
         viewBinding = true
     }
 }
