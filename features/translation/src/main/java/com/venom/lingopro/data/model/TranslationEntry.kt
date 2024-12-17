@@ -1,0 +1,22 @@
+package com.venom.lingopro.data.model
+
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+
+@Entity(
+    tableName = "translation_history", indices = [Index(
+        value = ["sourceText", "translatedText", "sourceLang", "targetLang"],
+        unique = true
+    )]
+)
+data class TranslationEntry(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sourceText: String,
+    val translatedText: String,
+    val sourceLang: String,
+    val targetLang: String,
+    val isBookmarked: Boolean = false,
+    val timestamp: Long = System.currentTimeMillis(),
+    val synonyms: List<String>? = null
+)

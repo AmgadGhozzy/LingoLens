@@ -1,0 +1,65 @@
+<resources>
+
+    <!-- App Information -->
+    <string name="app_name">LingoPro</string>
+
+    <!-- Actions -->
+    <string name="action_share">Share</string>
+    <string name="action_speak">Speak</string>
+    <string name="action_translate">Translate</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_paste">Paste</string>
+    <string name="action_save">Save</string>
+    <string name="action_fullscreen">Full Screen</string>
+    <string name="action_speech_to_text">Speech to Text</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_clear_history">Clear All History</string>
+    <string name="action_back">Back</string>
+    <string name="action_select_all">Select All</string>
+    <string name="action_deselect_all">Deselect All</string>
+    <string name="action_swap_languages">Swap Languages</string>
+    <string name="action_show_labels">Show Labels</string>
+    <string name="action_hide_labels">Hide Labels</string>
+    <string name="action_show_paragraphs">Show Paragraphs</string>
+    <string name="action_hide_paragraphs">Hide Paragraphs</string>
+    <string name="action_more_options">More Options</string>
+
+    <!-- Navigation -->
+    <string name="nav_back">Back</string>
+    <string name="nav_search">Search</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_title">Bookmarks</string>
+    <string name="bookmarks_empty_title">No Bookmarks</string>
+    <string name="bookmarks_empty_subtitle">Your saved translations will appear here</string>
+    <string name="bookmark_add">Bookmark</string>
+    <string name="bookmark_remove">Remove Bookmark</string>
+    <string name="bookmarks_search_hint">Search Bookmarks</string>
+    <string name="bookmarks_clear_search">Clear Search</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_empty_subtitle">Your recent activity will appear here</string>
+
+    <!-- Search -->
+    <string name="search_no_results_title">No Results Found</string>
+    <string name="search_no_results_subtitle">Try searching with different keywords</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">Select Language</string>
+    <string name="language_selected">Language Selected</string>
+    <string name="language_no_results">Sorry, no languages found</string>
+    <string name="language_native_name_hint">Native Name</string>
+
+    <!-- Translation -->
+    <string name="translate_type_text">Type text to translate</string>
+    <string name="translate_result_placeholder">Translation will appear here</string>
+
+    <!-- Confirmation Dialog -->
+    <string name="dialog_clear_all_title">Clear All Items</string>
+    <string name="dialog_clear_all_message">Are you sure you want to clear all items? This action cannot be undone.</string>
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="history_empty_title">No History</string>
+
+</resources>
