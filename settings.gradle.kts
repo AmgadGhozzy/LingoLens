@@ -30,4 +30,7 @@ include(":features:ocr")
 
 include(":core:ui")
 include(":core:data")
-
+include(":core:di")
+include(":core:resources")
+include(":core:utils")
+include(":core:domain")
