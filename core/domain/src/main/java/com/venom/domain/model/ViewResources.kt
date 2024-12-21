@@ -1,4 +1,4 @@
-package com.venom.lingopro.domain.model
+package com.venom.domain.model
 
 data class ViewResources(
     val title: String,
