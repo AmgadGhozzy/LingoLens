@@ -1,4 +1,4 @@
-package com.venom.lingopro.utils
+package com.venom.utils
 
 import android.app.Activity
 import android.content.ClipData
@@ -20,12 +20,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 /**
  * Comprehensive utility extensions for Android development
@@ -75,8 +69,7 @@ object Extensions {
     }
 
     fun Context.pasteFromClipboard(): String? = ContextCompat.getSystemService(
-        this,
-        ClipboardManager::class.java
+        this, ClipboardManager::class.java
     )?.primaryClip?.getItemAt(0)?.text?.toString()
 
     /**
@@ -195,18 +188,6 @@ object Extensions {
         })
     }
 
-    /**
-     * Lifecycle Extensions
-     */
-    fun LifecycleOwner.launchAndRepeatWithViewLifecycle(
-        state: Lifecycle.State = Lifecycle.State.STARTED, block: suspend CoroutineScope.() -> Unit
-    ) {
-        lifecycleScope.launch {
-            repeatOnLifecycle(state) {
-                block()
-            }
-        }
-    }
 
     /**
      * Collection Extensions
