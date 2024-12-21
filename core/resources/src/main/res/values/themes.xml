@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.LingoPro" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.LingoLens" parent="android:Theme.Material.Light.NoActionBar">
 
     </style>
 
-    <style name="Theme.QuickTr" parent="Theme.LingoPro">
+    <style name="Theme.QuickTr" parent="Theme.LingoLens">
         <item name="android:backgroundDimEnabled">true</item><!-- background dimming -->
         <item name="android:backgroundDimAmount">0.3</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -29,6 +30,6 @@
 
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowSoftInputMode">adjustNothing</item>
-    </style>
 
+    </style>
 </resources>
