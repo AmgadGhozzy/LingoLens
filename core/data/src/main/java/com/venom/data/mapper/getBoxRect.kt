@@ -1,8 +1,9 @@
-package com.venom.textsnap.utils
+package com.venom.data.mapper
 
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
-import com.venom.textsnap.data.model.BoundingBlock
+import com.venom.data.model.BoundingBlock
+
 
 fun getBoxRect(
     block: BoundingBlock,
