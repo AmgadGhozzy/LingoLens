@@ -1,4 +1,4 @@
-package com.venom.lingopro.utils
+package com.venom.utils
 
 // Check if text is right-to-left
 fun isTextRightToLeft(text: String): Boolean {
