@@ -1,20 +1,19 @@
-package com.venom.textsnap.data.repository
+package com.venom.data.repo
 
-import android.util.Log
-import com.venom.textsnap.BuildConfig
-import com.venom.textsnap.data.api.OcrApiService
-import com.venom.textsnap.data.model.OcrResponse
+import com.venom.data.BuildConfig
+import com.venom.data.api.OcrApiService
+import com.venom.data.model.OcrResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import javax.inject.Inject
 
-class OcrRepository(private val service: OcrApiService) {
+class OcrRepository @Inject constructor(private val service: OcrApiService) {
     suspend fun performOcr(imageFile: File): Result<OcrResponse> {
         return try {
             val authToken = "Bearer ${BuildConfig.OCR_API_KEY}"
-            Log.d("OCR", "API Key: ${BuildConfig.OCR_API_KEY}")
             val showOriginalResponse = "true".toRequestBody("text/plain".toMediaTypeOrNull())
             val fallbackProviders = "".toRequestBody("text/plain".toMediaTypeOrNull())
             val providers = "google".toRequestBody("text/plain".toMediaTypeOrNull())
