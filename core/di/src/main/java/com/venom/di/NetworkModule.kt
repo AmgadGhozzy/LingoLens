@@ -1,6 +1,6 @@
-package com.venom.lingopro.di
+package com.venom.di
 
-import com.venom.lingopro.data.api.TranslationService
+import com.venom.data.api.TranslationService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,8 +20,4 @@ object NetworkModule {
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
 
-    @Provides
-    @Singleton
-    fun provideTranslationService(retrofit: Retrofit): TranslationService =
-        retrofit.create(TranslationService::class.java)
 }
