@@ -1,143 +1,88 @@
 package com.venom.lingolens
 
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.venom.lingopro.ui.screens.TranslationScreen
-import com.venom.resources.R
-import com.venom.textsnap.ui.screens.OcrScreen
-import com.venom.ui.components.bars.TopBar
-import com.venom.ui.components.buttons.CustomIcon
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.content.FileProvider
+import androidx.core.view.WindowInsetsControllerCompat
+import com.venom.lingolens.ui.LingoLensApp
+import com.venom.textsnap.ui.screens.OcrViewModel
 import com.venom.ui.theme.LingoLensTheme
 import dagger.hilt.android.AndroidEntryPoint
-
-sealed class Screen(val route: String) {
-    object Translation : Screen("translation")
-    object Ocr : Screen("ocr")
-    object Bookmarks : Screen("bookmarks")
-}
-
-@Composable
-fun LingoLensApp() {
-    val navController = rememberNavController()
-    var selectedScreen: Screen by remember { mutableStateOf(Screen.Translation) }
-
-    Scaffold(topBar = {
-        TopBar(title = "LingoLens", onNavigationClick = {
-            navController.navigate(Screen.Translation.route) {
-                popUpTo(navController.graph.startDestinationId)
-                launchSingleTop = true
-            }
-        }, actions = {
-            CustomIcon(icon = R.drawable.icon_history,
-                contentDescription = stringResource(R.string.history_title),
-                onClick = { })
-            CustomIcon(icon = R.drawable.icon_bookmark_filled,
-                contentDescription = stringResource(R.string.bookmarks_title),
-                onClick = { })
-        })
-    }, bottomBar = {
-        NavigationBar {
-            NavigationBarItem(icon = {
-                Icon(
-                    Icons.Default.Bookmark, contentDescription = "Bookmarks"
-                )
-            },
-                label = { Text("Bookmarks") },
-                selected = selectedScreen == Screen.Bookmarks,
-                onClick = {
-                    selectedScreen = Screen.Bookmarks
-                    navController.navigate(Screen.Bookmarks.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                })
-
-            NavigationBarItem(icon = {
-                Icon(
-                    Icons.Default.Camera, contentDescription = "OCR"
-                )
-            }, label = { Text("OCR") }, selected = selectedScreen == Screen.Ocr, onClick = {
-                selectedScreen = Screen.Ocr
-                navController.navigate(Screen.Ocr.route) {
-                    popUpTo(navController.graph.startDestinationId)
-                    launchSingleTop = true
-                }
-            })
-
-            NavigationBarItem(icon = {
-                Icon(
-                    Icons.Default.Translate, contentDescription = "Translation"
-                )
-            },
-                label = { Text("Translate") },
-                selected = selectedScreen == Screen.Translation,
-                onClick = {
-                    selectedScreen = Screen.Translation
-                    navController.navigate(Screen.Translation.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                })
-
-        }
-    }) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Translation.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Screen.Translation.route) {
-                TranslationScreen(onNavigateToBookmarks = {
-                    navController.navigate(Screen.Bookmarks.route)
-                }, onNavigateToHistory = { }, onDismiss = {})
-            }
-
-            composable(Screen.Ocr.route) {
-                OcrScreen(onFileClick = { },
-                    onCameraClick = { },
-                    onGalleryClick = { },
-                    onNavigateBack = { navController.navigateUp() })
-            }
-
-            composable(Screen.Bookmarks.route) {}
-        }
-    }
-}
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val ocrViewModel: OcrViewModel by viewModels()
+    private var currentPhotoUri: Uri? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LingoLensTheme {
-                LingoLensApp()
+                updateStatusBarColor(MaterialTheme.colorScheme.background, !isSystemInDarkTheme())
+                LingoLensApp(
+                    ocrViewModel = ocrViewModel,
+                    startCamera = { startCamera() },
+                    imageSelector = { imageSelector.launch("image/*") })
             }
         }
-//        val intent = Intent(this, com.venom.textsnap.MainActivity::class.java)
-//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        startActivity(intent)
+    }
+
+    private val imageSelector =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                ocrViewModel.setUri(it)
+                ocrViewModel.processImage()
+            }
+        }
+
+    private val cameraCapture =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                currentPhotoUri?.let { uri ->
+                    ocrViewModel.setUri(uri)
+                    ocrViewModel.processImage()
+                }
+            }
+        }
+
+    private fun updateStatusBarColor(color: Color, isDarkTheme: Boolean) {
+        val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = isDarkTheme
+        windowInsetsController.isAppearanceLightNavigationBars = isDarkTheme
+        window.statusBarColor = color.toArgb()
+        window.navigationBarColor = color.toArgb()
+    }
+
+    private fun startCamera() {
+        val photoFile = createImageCacheFile()
+        val photoUri = FileProvider.getUriForFile(
+            this, "${packageName}.provider", photoFile
+        )
+        currentPhotoUri = photoUri
+        cameraCapture.launch(photoUri)
+    }
+
+    private fun createImageCacheFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("PHOTO_${timeStamp}_", ".jpg", storageDir).apply {
+            deleteOnExit()
+        }
     }
 }
