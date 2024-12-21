@@ -1,9 +1,9 @@
-package com.venom.lingopro.data.repository
+package com.venom.data.repo
 
 import android.util.Log
-import com.venom.lingopro.data.api.TranslationService
-import com.venom.lingopro.data.local.dao.TranslationDao
-import com.venom.lingopro.data.model.TranslationEntry
+import com.venom.data.api.TranslationService
+import com.venom.data.local.dao.TranslationDao
+import com.venom.data.model.TranslationEntry
 import com.venom.lingopro.data.model.TranslationResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
