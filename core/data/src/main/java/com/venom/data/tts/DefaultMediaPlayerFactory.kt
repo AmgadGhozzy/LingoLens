@@ -1,7 +1,7 @@
-package com.venom.textsnap.data.tts.impl
+package com.venom.data.tts
 
 import android.media.MediaPlayer
-import com.venom.textsnap.data.tts.MediaPlayerFactory
+import com.venom.domain.repo.tts.MediaPlayerFactory
 import javax.inject.Inject
 
 class DefaultMediaPlayerFactory @Inject constructor() : MediaPlayerFactory {
