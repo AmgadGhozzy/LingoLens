@@ -1,12 +1,12 @@
-package com.venom.lingopro.di
+package com.venom.di
 
 import android.content.Context
-import com.venom.lingopro.data.tts.MediaPlayerFactory
-import com.venom.lingopro.data.tts.TTSUrlGenerator
-import com.venom.lingopro.data.tts.TextToSpeechFactory
-import com.venom.lingopro.data.tts.impl.DefaultMediaPlayerFactory
-import com.venom.lingopro.data.tts.impl.DefaultTTSUrlGenerator
-import com.venom.lingopro.data.tts.impl.DefaultTextToSpeechFactory
+import com.venom.domain.repo.tts.MediaPlayerFactory
+import com.venom.domain.repo.tts.TTSUrlGenerator
+import com.venom.domain.repo.tts.TextToSpeechFactory
+import com.venom.data.tts.DefaultMediaPlayerFactory
+import com.venom.data.tts.DefaultTTSUrlGenerator
+import com.venom.data.tts.DefaultTextToSpeechFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
