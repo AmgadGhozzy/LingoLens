@@ -1,9 +1,9 @@
-package com.venom.lingopro.data.di
+package com.venom.di
 
 import android.content.Context
 import androidx.room.Room
-import com.venom.lingopro.data.TranslationDatabase
-import com.venom.lingopro.data.local.dao.TranslationDao
+import com.venom.data.TranslationDatabase
+import com.venom.data.local.dao.TranslationDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,11 +18,8 @@ object DatabaseModule {
     @Singleton
     fun provideTranslationDatabase(@ApplicationContext context: Context): TranslationDatabase {
         return Room.databaseBuilder(
-            context.applicationContext,
-            TranslationDatabase::class.java,
-            "translation_database"
-        ).fallbackToDestructiveMigration()
-            .build()
+            context.applicationContext, TranslationDatabase::class.java, "translation_database"
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
