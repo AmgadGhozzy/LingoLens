@@ -1,4 +1,4 @@
-package com.venom.textsnap.data.tts
+package com.venom.domain.repo.tts
 
 import java.util.Locale
 
