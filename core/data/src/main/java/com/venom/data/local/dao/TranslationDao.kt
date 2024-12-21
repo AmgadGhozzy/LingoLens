@@ -1,4 +1,4 @@
-package com.venom.lingopro.data.local.dao
+package com.venom.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.venom.lingopro.data.model.TranslationEntry
+import com.venom.data.model.TranslationEntry
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,7 +17,7 @@ interface TranslationDao {
     @Query("SELECT * FROM translation_history WHERE isBookmarked = 1 ORDER BY timestamp DESC")
     fun getBookmarkedEntries(): Flow<List<TranslationEntry>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insert(entry: TranslationEntry)
 
     @Update
