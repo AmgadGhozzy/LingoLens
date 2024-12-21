@@ -1,4 +1,4 @@
-package com.venom.lingopro.utils
+package com.venom.utils
 
 import android.Manifest
 import android.content.Context
