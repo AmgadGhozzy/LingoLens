@@ -1,8 +1,8 @@
-package com.venom.textsnap.data.tts.impl
+package com.venom.data.tts
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
-import com.venom.textsnap.data.tts.TextToSpeechFactory
+import com.venom.domain.repo.tts.TextToSpeechFactory
 import javax.inject.Inject
 
 class DefaultTextToSpeechFactory @Inject constructor(
