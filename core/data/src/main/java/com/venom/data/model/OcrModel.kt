@@ -1,4 +1,4 @@
-package com.venom.textsnap.data.model
+package com.venom.data.model
 
 import com.google.gson.annotations.SerializedName
 
@@ -66,4 +66,3 @@ data class Word(
 data class Symbol(
     val text: String
 )
-
