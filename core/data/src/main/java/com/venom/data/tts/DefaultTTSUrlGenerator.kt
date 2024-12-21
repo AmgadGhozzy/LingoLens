@@ -1,6 +1,6 @@
-package com.venom.lingopro.data.tts.impl
+package com.venom.data.tts
 
-import com.venom.lingopro.data.tts.TTSUrlGenerator
+import com.venom.domain.repo.tts.TTSUrlGenerator
 import java.net.URLEncoder
 import java.util.Locale
 import javax.inject.Inject
