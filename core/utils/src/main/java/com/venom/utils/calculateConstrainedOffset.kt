@@ -1,4 +1,4 @@
-package com.venom.textsnap.utils
+package com.venom.utils
 
 import androidx.compose.ui.geometry.Offset
 
