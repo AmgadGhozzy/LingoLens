@@ -1,4 +1,4 @@
-package com.venom.textsnap.utils
+package com.venom.utils
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -102,7 +102,6 @@ class ImageCompressor(private val context: Context) {
         }
         return inSampleSize
     }
-
 
     companion object {
         val TAG = ImageCompressor::class.java.simpleName
