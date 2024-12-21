@@ -1,20 +1,19 @@
 <resources>
 
-    <!-- App Information -->
-    <string name="app_name">LingoPro</string>
+    <string name="app_name">LingoLens</string>
 
     <!-- Actions -->
-    <string name="action_share">Share</string>
-    <string name="action_speak">Speak</string>
-    <string name="action_translate">Translate</string>
+    <string name="action_back">Back</string>
+    <string name="action_clear">Clear</string>
     <string name="action_copy">Copy</string>
     <string name="action_paste">Paste</string>
     <string name="action_save">Save</string>
-    <string name="action_fullscreen">Full Screen</string>
+    <string name="action_share">Share</string>
+    <string name="action_speak">Speak</string>
+    <string name="action_translate">Translate</string>
     <string name="action_speech_to_text">Speech to Text</string>
-    <string name="action_clear">Clear</string>
-    <string name="action_clear_history">Clear All History</string>
-    <string name="action_back">Back</string>
+    <string name="action_fullscreen">Full Screen</string>
+    <string name="action_more_options">More Options</string>
     <string name="action_select_all">Select All</string>
     <string name="action_deselect_all">Deselect All</string>
     <string name="action_swap_languages">Swap Languages</string>
@@ -22,10 +21,11 @@
     <string name="action_hide_labels">Hide Labels</string>
     <string name="action_show_paragraphs">Show Paragraphs</string>
     <string name="action_hide_paragraphs">Hide Paragraphs</string>
-    <string name="action_more_options">More Options</string>
+    <string name="action_clear_history">Clear All History</string>
+
 
     <!-- Navigation -->
-    <string name="nav_back">Back</string>
+    <string name="nav_back">Back</string> <!-- Duplicated entry, kept to avoid breaking code, consider removing one -->
     <string name="nav_search">Search</string>
 
     <!-- Bookmarks -->
@@ -39,7 +39,9 @@
 
     <!-- History -->
     <string name="history_title">History</string>
+    <string name="history_empty_title">No History</string>
     <string name="history_empty_subtitle">Your recent activity will appear here</string>
+
 
     <!-- Search -->
     <string name="search_no_results_title">No Results Found</string>
@@ -60,6 +62,10 @@
     <string name="dialog_clear_all_message">Are you sure you want to clear all items? This action cannot be undone.</string>
     <string name="dialog_confirm">Confirm</string>
     <string name="dialog_cancel">Cancel</string>
-    <string name="history_empty_title">No History</string>
+    <string name="ocr_title">OCR</string>
+    <string name="translate_title">Translate</string>
+    <string name="retry">Retry</string>
+    <string name="error_message">Please try again</string>
+    <string name="empty_state_title">Add an image to start scanning</string>
 
 </resources>
