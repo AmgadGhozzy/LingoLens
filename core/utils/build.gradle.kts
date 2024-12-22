@@ -1,20 +1,14 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
-    id("dagger.hilt.android.plugin")
-    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace = "com.venom.data"
+    namespace = "com.venom.utils"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 24
-
-        buildConfigField("String", "OCR_API_KEY", "\"${project.properties["OCR_API_KEY"] ?: ""}\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -35,35 +29,23 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    buildFeatures {
-        buildConfig = true
-    }
 }
 
 dependencies {
+    // Compose
+    api(libs.compose.ui)
+    api(libs.compose.ui.graphics)
+    api(libs.compose.ui.tooling.preview)
+    api(libs.compose.material3)
+    api(libs.compose.animation)
+    api(libs.coil.compose)
 
-    // Core Modules
-    implementation(project(":core:domain"))
-    implementation(project(":core:utils"))
+    api(libs.androidx.exifinterface)
 
-    // Hilt
-    api(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    api(libs.hilt.navigation.compose)
-
-    // Room
-    api(libs.androidx.room.runtime)
-    api(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-
-    api(libs.converter.gson)
-
-
-    // Testing
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.compose.ui.test.junit4)
 }

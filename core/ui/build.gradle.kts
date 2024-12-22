@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -35,31 +39,62 @@ android {
 
 dependencies {
 
-    // AndroidX
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.kotlin.stdlib)
+    // Core Modules
+    api(project(":core:data"))
+    api(project(":core:utils"))
+    api(project(":core:domain"))
 
-    // Compose related dependencies are grouped for clarity
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // Hilt
+    api(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    api(libs.hilt.navigation.compose)
 
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.extended)
 
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    // Android Jetpack
+    api(libs.androidx.core.ktx)
+    api(libs.androidx.lifecycle.runtime.ktx)
+    api(platform(libs.compose.bom))
+    api(libs.androidx.lifecycle.runtime.compose)
+    api(libs.androidx.lifecycle.viewmodel.compose)
+    api(libs.androidx.lifecycle.viewmodel.ktx)
+    api(libs.androidx.fragment.ktx)
 
-    implementation(libs.androidx.fragment.ktx)
 
-    // Animation (place with other Compose dependencies or in a separate group if you prefer)
-    implementation(libs.androidx.animation)
+    // Networking
+    api(libs.okhttp)
+    api(libs.retrofit)
+    api(libs.converter.gson)
 
-    implementation(libs.androidx.appcompat)
+
+    // Compose
+    api(libs.compose.ui)
+    api(libs.compose.ui.graphics)
+    api(libs.compose.ui.tooling.preview)
+    api(libs.compose.material3)
+    api(libs.compose.animation)
+    api(libs.coil.compose)
+    api(libs.compose.material.icons.extended) {
+        exclude(group = "androidx.compose.material.icons", module = "filled")
+        exclude(group = "androidx.compose.material.icons", module = "outlined")
+        exclude(group = "androidx.compose.material.icons", module = "round")
+        exclude(group = "androidx.compose.material.icons", module = "sharp")
+        exclude(group = "androidx.compose.material.icons", module = "twotone")
+    }
+
+
+    // Kotlin
+    api(libs.kotlin.stdlib)
+    api(project(":core:resources"))
+    implementation(libs.androidx.material.icons.core.android)
+
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+
 }

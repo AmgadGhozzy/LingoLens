@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("dagger.hilt.android.plugin")
@@ -9,26 +8,22 @@ plugins {
 }
 
 android {
-    namespace = "com.venom.textsnap"
+    namespace = "com.venom.di"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 24
 
-        //applicationId = "com.venom.textsnap"
-        //targetSdk = 34
-        //versionCode = 4
-        //versionName = "4.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            isShrinkResources = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -39,28 +34,26 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {
 
     // Core Modules
     implementation(project(":core:data"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:resources"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:utils"))
 
 
     // Hilt
     api(libs.hilt.android)
-    implementation(project(":core:di"))
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
-    // Room
-    api(libs.androidx.room.runtime)
-    api(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

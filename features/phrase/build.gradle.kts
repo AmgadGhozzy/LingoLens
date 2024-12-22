@@ -1,7 +1,11 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("dagger.hilt.android.plugin")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -9,11 +13,12 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.venom.phrase"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+
+//        applicationId = "com.venom.phrase"
+//        targetSdk = 34
+//        versionCode = 1
+//        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,9 +26,9 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -40,22 +45,66 @@ android {
 }
 
 dependencies {
+
+    // Core Modules
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
+    implementation(project(":core:resources"))
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+
+    // Android Jetpack
+    api(libs.androidx.core.ktx)
+    api(libs.androidx.lifecycle.runtime.ktx)
+    api(platform(libs.compose.bom))
+    api(libs.androidx.lifecycle.runtime.compose)
+    api(libs.androidx.lifecycle.viewmodel.compose)
+    api(libs.androidx.lifecycle.viewmodel.ktx)
+    api(libs.androidx.fragment.ktx)
+
+
+    // Hilt
+    api(libs.hilt.android)
+    implementation(project(":core:di"))
+    kapt(libs.hilt.android.compiler)
+    api(libs.hilt.navigation.compose)
+
+    // Networking
+    api(libs.okhttp)
+    api(libs.retrofit)
+    api(libs.converter.gson)
+
+    // Room
+    api(libs.androidx.room.runtime)
+    api(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+
+    // Compose
+    api(libs.compose.ui)
+    api(libs.compose.ui.graphics)
+    api(libs.compose.ui.tooling.preview)
+    api(libs.compose.material3)
+    api(libs.compose.animation)
+    api(libs.coil.compose)
+    api(libs.compose.material.icons.extended) {
+        exclude(group = "androidx.compose.material.icons", module = "filled")
+        exclude(group = "androidx.compose.material.icons", module = "outlined")
+        exclude(group = "androidx.compose.material.icons", module = "round")
+        exclude(group = "androidx.compose.material.icons", module = "sharp")
+        exclude(group = "androidx.compose.material.icons", module = "twotone")
+    }
+
+
+    // Kotlin
+    api(libs.kotlin.stdlib)
+
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 }
