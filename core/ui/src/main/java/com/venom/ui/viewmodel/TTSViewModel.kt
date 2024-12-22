@@ -1,13 +1,13 @@
-package com.venom.textsnap.ui.screens
+package com.venom.ui.viewmodel
 
 import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.textsnap.data.tts.MediaPlayerFactory
-import com.venom.textsnap.data.tts.TTSUrlGenerator
-import com.venom.textsnap.data.tts.TextToSpeechFactory
+import com.venom.domain.repo.tts.MediaPlayerFactory
+import com.venom.domain.repo.tts.TTSUrlGenerator
+import com.venom.domain.repo.tts.TextToSpeechFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
