@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.bars
+package com.venom.ui.components.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.R
-import com.venom.lingopro.ui.components.buttons.CustomIcon
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
 
 /**
  * Bottom action bar with multiple functional icons.
@@ -45,7 +45,7 @@ fun SourceTextActionBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Speak Button
-        CustomIcon(
+        CustomButton(
             icon = R.drawable.icon_sound,
             contentDescription = stringResource(R.string.action_speak),
             onClick = onSpeak
@@ -56,21 +56,21 @@ fun SourceTextActionBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_fullscreen,
                 contentDescription = stringResource(R.string.action_fullscreen),
                 onClick = onFullscreen
             )
 
             // Copy Button
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_copy,
                 contentDescription = stringResource(R.string.action_copy),
                 onClick = onCopy
             )
 
             // Paste Button
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_paste,
                 contentDescription = stringResource(R.string.action_paste),
                 onClick =
@@ -78,12 +78,12 @@ fun SourceTextActionBar(
             )
 
             // OCR Button
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_camera, contentDescription = "OCR", onClick = onOcr
             )
 
             // Speech to Text Button
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_mic,
                 contentDescription = stringResource(R.string.action_speech_to_text),
                 onClick = onSpeechToText
