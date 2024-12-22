@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.bars
+package com.venom.ui.components.bars
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.venom.lingopro.R
+import com.venom.resources.R
 
 /**
  * A top app bar with a title and optional navigation icon and actions.
