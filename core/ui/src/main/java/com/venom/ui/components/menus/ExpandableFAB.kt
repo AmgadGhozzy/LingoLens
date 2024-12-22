@@ -1,4 +1,4 @@
-package com.venom.textsnap.ui.components
+package com.venom.ui.components.menus
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
