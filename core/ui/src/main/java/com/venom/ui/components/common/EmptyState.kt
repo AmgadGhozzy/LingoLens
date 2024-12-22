@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.common
+package com.venom.ui.components.common
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

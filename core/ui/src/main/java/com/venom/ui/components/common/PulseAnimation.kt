@@ -1,4 +1,4 @@
-package com.plcoding.composeloadinganimations
+package com.venom.ui.components.common
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
