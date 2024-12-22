@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.items
+package com.venom.ui.components.items
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -24,8 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.R
-import com.venom.lingopro.domain.model.LanguageItem
+import com.venom.domain.model.LanguageItem
+import com.venom.resources.R
 
 /**
  * LanguageListItem composable with enhanced design and flexibility
@@ -90,7 +90,10 @@ fun LanguageListItem(
 @Composable
 fun LanguageListItemPreview() {
     LanguageListItem(language = LanguageItem(
-        code = "en", name = "English", nativeName = "English", flagResId = R.drawable.flag_en
+        code = "en",
+        name = "English",
+        nativeName = "English",
+        flagResId = R.drawable.flag_en
     ), isSelected = true, onClick = {})
 }
 

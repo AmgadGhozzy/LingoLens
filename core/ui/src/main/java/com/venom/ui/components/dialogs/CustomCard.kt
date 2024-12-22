@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.dialogs
+package com.venom.ui.components.dialogs
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,10 +20,8 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modifier to be applied to the dialog's content
  * @param shape Shape of the dialog's card
  * @param containerColor Background color of the dialog
- * @param contentColor Color of the dialog's content
  * @param elevation Elevation of the dialog card
  * @param contentAlignment Horizontal alignment of the dialog's content
- * @param contentPadding Padding applied to the dialog's content
  * @param content Composable content of the dialog
  */
 @Composable
@@ -36,16 +34,15 @@ fun CustomCard(
     content: @Composable () -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(), shape = shape,
+        modifier = modifier.fillMaxWidth(),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation,
-            pressedElevation = elevation + 2.dp
+            defaultElevation = elevation, pressedElevation = elevation + 2.dp
         )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = contentAlignment,
             verticalArrangement = Arrangement.Center
         ) {

@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.dialogs
+package com.venom.ui.components.dialogs
 
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box

@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.items
+package com.venom.ui.components.items
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
@@ -22,9 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.venom.lingopro.R
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
+import com.venom.resources.R
 
 /**
  * Displays a language item with an optional flag and native name hint, now with added clickability.

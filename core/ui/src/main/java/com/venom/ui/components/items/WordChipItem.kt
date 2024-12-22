@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.items
+package com.venom.ui.components.items
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background

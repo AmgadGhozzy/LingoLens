@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.items
+package com.venom.ui.components.items
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.data.model.TranslationEntry
-import com.venom.lingopro.ui.components.buttons.CustomIcon
+import com.venom.data.model.TranslationEntry
+import com.venom.ui.components.buttons.CustomButton
 
 @Composable
 fun BookmarkHistoryItemView(
@@ -120,7 +120,7 @@ fun BookmarkHistoryItemView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Bookmark Toggle
-            CustomIcon(
+            CustomButton(
                 icon = if (isBookmarked) Icons.Rounded.Bookmark else Icons.Rounded.BookmarkBorder,
                 contentDescription = "Remove Bookmark",
                 onClick = {
@@ -133,7 +133,7 @@ fun BookmarkHistoryItemView(
             Spacer(modifier = Modifier.width(8.dp))
 
             // Copy Action
-            CustomIcon(
+            CustomButton(
                 icon = Icons.Rounded.ContentCopy,
                 contentDescription = "Copy Translation",
                 onClick = {},
@@ -143,7 +143,7 @@ fun BookmarkHistoryItemView(
             Spacer(modifier = Modifier.width(8.dp))
 
             // Share Action
-            CustomIcon(icon = Icons.Rounded.Share,
+            CustomButton(icon = Icons.Rounded.Share,
                 contentDescription = "Share Translation",
                 onClick = { onShareClick(bookmark) })
         }

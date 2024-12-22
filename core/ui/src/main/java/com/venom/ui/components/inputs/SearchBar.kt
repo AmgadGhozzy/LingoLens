@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.inputs
+package com.venom.ui.components.inputs
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -24,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.R
-import com.venom.lingopro.ui.components.buttons.CustomIcon
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
 
 /**
  * A customizable search bar component with enhanced features.
@@ -65,7 +65,7 @@ fun SearchBar(
             modifier = Modifier, verticalAlignment = Alignment.CenterVertically
         ) {
             // Search Icon
-            CustomIcon(
+            CustomButton(
                 icon = R.drawable.icon_search,
                 selectedTint = searchIconTint,
                 contentDescription = stringResource(R.string.nav_search),
@@ -117,7 +117,7 @@ fun SearchBar(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                CustomIcon(
+                CustomButton(
                     icon = R.drawable.icon_clear,
                     contentDescription = stringResource(R.string.action_clear),
                     selectedTint = clearIconTint,
