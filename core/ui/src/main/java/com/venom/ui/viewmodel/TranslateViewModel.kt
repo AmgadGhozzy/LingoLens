@@ -1,10 +1,10 @@
-package com.venom.textsnap.ui.screens
+package com.venom.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.textsnap.data.model.TranslationUiState
-import com.venom.textsnap.data.repository.TranslateRepository
+import com.venom.data.model.TranslationUiState
+import com.venom.data.repo.TranslationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TranslateViewModel @Inject constructor(
-    private val repository: TranslateRepository
+    private val repository: TranslationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TranslationUiState())
