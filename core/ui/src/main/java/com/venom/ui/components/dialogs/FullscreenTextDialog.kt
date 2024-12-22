@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.dialogs
+package com.venom.ui.components.dialogs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,21 +11,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.venom.lingopro.ui.components.bars.TranslatedTextActionBar
-import com.venom.lingopro.ui.components.buttons.CustomIcon
-import com.venom.lingopro.ui.components.inputs.CustomTextField
-import com.venom.lingopro.ui.theme.LingoProTheme
-import com.venom.lingopro.utils.Extensions.getSelectedOrFullText
+import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.inputs.CustomTextField
+import com.venom.ui.theme.LingoLensTheme
+import com.venom.utils.Extensions.getSelectedOrFullText
 
 /**
  * A fullscreen dialog for displaying text with additional actions
  *
- * @param text The text to be displayed in the dialog
+ * @param textValue The text to be displayed in the dialog
  * @param onDismiss Callback triggered when the dialog is dismissed
  * @param onCopy Callback for copying the text
  * @param onShare Callback for sharing the text
  * @param onSpeak Callback for speaking the text
- * @param visible Whether the dialog is currently visible
  * @param properties Optional dialog properties
  */
 @Composable
@@ -46,7 +45,7 @@ fun FullscreenTextDialog(
                 .systemBarsPadding()
         ) {
             // Dismiss Button
-            CustomIcon(
+            CustomButton(
                 icon = Icons.Rounded.Close,
                 contentDescription = "Close",
                 onClick = onDismiss,
@@ -83,7 +82,7 @@ fun FullscreenTextDialog(
 // Preview function
 @Composable
 fun FullscreenTextDialogPreview() {
-    LingoProTheme {
+    LingoLensTheme {
         FullscreenTextDialog(
             textValue = TextFieldValue("Hello"),
             onDismiss = { },
