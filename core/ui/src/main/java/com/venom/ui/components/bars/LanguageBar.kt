@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.bars
+package com.venom.ui.components.bars
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,12 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.R
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.ui.components.buttons.CustomIcon
-import com.venom.lingopro.ui.components.items.LanguageItemView
-import com.venom.lingopro.ui.screens.LanguageSelectorBottomSheet
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.items.LanguageItemView
 
 /**
  * A customizable top bar for language translation.
@@ -62,16 +61,16 @@ fun LanguageBar(
     )
 
     // Language selection bottom sheet
-    if (showLanguageSelector && !isFromBottomSheet) {
-        LanguageSelectorBottomSheet(initialSourceLang = sourceLang,
-            initialTargetLang = targetLang,
-            isSelectingSourceLanguage = isSelectingSourceLanguage,
-            onLanguageSelected = { selectedLanguage ->
-                onLanguageSelect(isSelectingSourceLanguage, selectedLanguage)
-                showLanguageSelector = false
-            },
-            onDismiss = { showLanguageSelector = false })
-    }
+//    if (showLanguageSelector && !isFromBottomSheet) {
+//        LanguageSelectorBottomSheet(initialSourceLang = sourceLang,
+//            initialTargetLang = targetLang,
+//            isSelectingSourceLanguage = isSelectingSourceLanguage,
+//            onLanguageSelected = { selectedLanguage ->
+//                onLanguageSelect(isSelectingSourceLanguage, selectedLanguage)
+//                showLanguageSelector = false
+//            },
+//            onDismiss = { showLanguageSelector = false })
+//    }
 
     val interactionSource = remember { MutableInteractionSource() }
     val backgroundColor = if (isSelectingSourceLanguage) {
@@ -93,7 +92,7 @@ fun LanguageBar(
             showLanguageSelector = true
         })
         // Swap Button
-        CustomIcon(
+        CustomButton(
             icon = R.drawable.icon_swap,
             contentDescription = stringResource(id = R.string.action_swap_languages),
             onClick = onSwapLanguages,
