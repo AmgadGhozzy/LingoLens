@@ -1,6 +1,7 @@
-package com.venom.textsnap.ui.components
+package com.venom.textsnap.ui.components.sections
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -21,32 +22,27 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.google.gson.Gson
-import com.venom.textsnap.R
-import com.venom.textsnap.data.api.OcrApiService
-import com.venom.textsnap.data.model.OcrResponse
-import com.venom.textsnap.data.model.ParagraphBox
-import com.venom.textsnap.data.repository.OcrRepository
-import com.venom.textsnap.ui.screens.OcrViewModel
-import com.venom.textsnap.utils.Constant
-import com.venom.textsnap.utils.Constant.sampleUiState
-import com.venom.textsnap.utils.ImageCompressor
-import com.venom.textsnap.utils.calculateConstrainedOffset
-import com.venom.textsnap.utils.convertToParagraphBoxes
-import com.venom.textsnap.utils.getBoxRect
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.data.mapper.getBoxRect
+import com.venom.data.model.ParagraphBox
+import com.venom.resources.R
+import com.venom.textsnap.ui.components.DrawBoundingBox
+import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.utils.calculateConstrainedOffset
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ZoomableImageWithBoundingBoxes(
-    viewModel: OcrViewModel, imageBitmap: ImageBitmap, modifier: Modifier = Modifier
+    viewModel: OcrViewModel,
+    imageBitmap: ImageBitmap = ImageBitmap.imageResource(id = R.drawable.ocr_test_image),
+    modifier: Modifier = Modifier
 ) {
+    // Collect UI state from the ViewModel
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
-    val uiState = viewModel.uiState.collectAsState().value
+    Log.d("ZoomableImageWithBoundingBoxes", "ZoomableImageWithBoundingBoxes: $uiState")
 
     var containerWidth by remember { mutableFloatStateOf(0f) }
     var containerHeight by remember { mutableFloatStateOf(0f) }
@@ -54,12 +50,14 @@ fun ZoomableImageWithBoundingBoxes(
     // Memoized box rect calculations
     val boxRects = remember(uiState.paragraphBoxes, containerWidth, containerHeight) {
         uiState.paragraphBoxes.associate { box ->
-            box to getBoxRect(
+            val rect = getBoxRect(
                 block = box.boundingBlock,
                 imageBitmap = imageBitmap,
                 containerWidth = containerWidth,
                 containerHeight = containerHeight
             )
+            Log.d("ZoomableImageWithBoundingBoxes", "Box: $box, Rect: $rect")
+            box to rect
         }
     }
 
@@ -71,12 +69,11 @@ fun ZoomableImageWithBoundingBoxes(
     val pathPoints = remember { mutableStateListOf<Offset>() }
 
     // Selection state
-
     var draggedBoxes by remember { mutableStateOf(setOf<ParagraphBox>()) }
 
     // Transformable state with constrained zoom
     val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        scale = (scale * zoomChange).coerceIn(1f, 5f)
+        scale = (scale * zoomChange).coerceIn(0.5f, 5f)
         offset = calculateConstrainedOffset(
             currentOffset = offset,
             panChange = panChange,
@@ -122,8 +119,8 @@ fun ZoomableImageWithBoundingBoxes(
 
         Image(
             bitmap = imageBitmap,
-            contentDescription = "OCR Image",
-            contentScale = ContentScale.Fit,
+            contentDescription = stringResource(id = R.string.ocr_image_content_description),
+            contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.Center)
@@ -146,6 +143,7 @@ fun ZoomableImageWithBoundingBoxes(
                 )
             }
         }
+
         SelectionContainer {
             uiState.paragraphBoxes.forEach { box ->
                 DrawBoundingBox(box = box,
@@ -157,22 +155,4 @@ fun ZoomableImageWithBoundingBoxes(
             }
         }
     }
-
-}
-
-@Preview
-@Composable
-fun PreviewZoomableImageWithBoundingBoxes() {
-    val response: OcrResponse = Gson().fromJson(Constant.OCR_JSON, OcrResponse::class.java)
-    val paragraphBoxes = convertToParagraphBoxes(response.google.originalResponse, false)
-
-    val imageBitmap = ImageBitmap.imageResource(id = R.drawable.ocr_test_image)
-    val context = LocalContext.current
-
-    ZoomableImageWithBoundingBoxes(imageBitmap = imageBitmap, viewModel = object : OcrViewModel(
-        repository = OcrRepository(OcrApiService.create()),
-        imageCompressor = ImageCompressor(context)
-    ) {
-        override val uiState = MutableStateFlow(sampleUiState).asStateFlow()
-    })
 }
