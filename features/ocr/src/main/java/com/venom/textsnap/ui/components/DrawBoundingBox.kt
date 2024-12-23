@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.venom.textsnap.data.model.ParagraphBox
+import com.venom.data.model.ParagraphBox
 
 
 @Composable
@@ -34,7 +34,7 @@ fun DrawBoundingBox(
     onSelect: () -> Unit
 ) {
     val density = LocalDensity.current
-    val textSize = if (isParageraphMode) box.avgWordHeight * 1.25f else rect.height * 0.7f
+    val textSize = if (isParageraphMode) box.avgWordHeight * 1.4f else rect.height * 0.7f
 
     Log.d("BoundingBox", "box=$box, rect=$rect, isSelected=$isSelected")
     Log.d("BoundingBox", "textSize: $textSize")
