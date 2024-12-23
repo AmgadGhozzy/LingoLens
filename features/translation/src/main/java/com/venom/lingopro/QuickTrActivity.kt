@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.venom.lingopro.ui.screens.TranslationScreen
-import com.venom.lingopro.ui.theme.LingoProTheme
+import com.venom.ui.theme.LingoLensTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,7 +25,7 @@ class QuickTrActivity : ComponentActivity() {
         }
 
         setContent {
-            LingoProTheme {
+            LingoLensTheme {
                 TranslationScreen(
                     isDialog = true, onDismiss = { finish() }, initialText = selectedText
                 )
