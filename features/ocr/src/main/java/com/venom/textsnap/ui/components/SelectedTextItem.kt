@@ -1,109 +1,128 @@
 package com.venom.textsnap.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.textsnap.R
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.menus.DropdownMenuTrigger
 
+/**
+ * Represents the actions available for selected text
+ */
+sealed class TextAction {
+    data object Copy : TextAction()
+    data object Share : TextAction()
+    data object Speak : TextAction()
+}
+
+/**
+ * A card component that displays selected text with action buttons.
+ *
+ * @param text The text to be displayed
+ * @param onActionSelected Callback for when an action is selected
+ * @param expanded Whether the text should be fully expanded
+ * @param modifier Optional modifier for the component
+ */
 @Composable
 fun SelectedTextItem(
     text: String,
-    onCopy: () -> Unit,
-    onShare: () -> Unit,
-    onSpeak: () -> Unit,
+    onActionSelected: (TextAction) -> Unit,
+    expanded: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 12.dp)
+            .animateContentSize()
+            .padding(6.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            // More Options Button with Dropdown
-            DropdownMenuTrigger(
-                onOptionSelected = { selectedOption ->
-                    when (selectedOption.text) {
-                        "Show Paragraphs" -> {
-                        }
-
-                        "Show Labels" -> {
-                        }
-
-                        "Select All" -> {
-                        }
-
-                        "Translate" -> {
-                        }
-
-                        "Share" -> {
-                        }
-
-                        "Speak" -> {
-                        }
-                    }
-                }
-
-            )
-
-            // Main text with overflow handling
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 16.dp),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Action buttons
-            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-                ActionIconButton(
-                    icon = R.drawable.icon_copy, contentDescription = "Copy Text", onClick = onCopy
-                )
-            }
-        }
+        SelectedTextContent(
+            text = text,
+            expanded = expanded,
+            onActionSelected = onActionSelected
+        )
     }
 }
 
 @Composable
-private fun ActionIconButton(
-    icon: Int, contentDescription: String, onClick: () -> Unit, modifier: Modifier = Modifier
+private fun SelectedTextContent(
+    text: String,
+    expanded: Boolean,
+    onActionSelected: (TextAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    IconButton(
-        onClick = onClick, modifier = modifier.size(48.dp)
+    Row(
+        modifier = modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(32.dp)
+        // Text content
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp),
+            maxLines = if (expanded) Int.MAX_VALUE else 2,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        // Action buttons
+        ActionButtons(onActionSelected = onActionSelected)
+    }
+}
+
+@Composable
+private fun ActionButtons(
+    onActionSelected: (TextAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(horizontal = 4.dp)
+    ) {
+        // Copy button
+        CustomButton(
+            icon = R.drawable.icon_copy,
+            contentDescription = stringResource(R.string.action_copy),
+            onClick = { onActionSelected(TextAction.Copy) }
+        )
+
+        // More options dropdown
+        DropdownMenuTrigger(
+            onOptionSelected = { option ->
+                when (option.text) {
+                    "share" -> onActionSelected(TextAction.Share)
+                    "speak" -> onActionSelected(TextAction.Speak)
+                }
+            }
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun SelectedTextItemPreview() {
-    SelectedTextItem(text = "This is a sample text for preview purposes",
-        onCopy = {},
-        onShare = {},
-        onSpeak = {})
+private fun SelectedTextItemPreview() {
+    SelectedTextItem(
+        text = "This is a sample text for preview purposes that might be longer than two lines to demonstrate text overflow",
+        onActionSelected = {},
+        expanded = true
+    )
 }
