@@ -16,20 +16,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.venom.lingopro.ui.components.dialogs.ConfirmationDialog
-import com.venom.lingopro.R
-import com.venom.lingopro.data.model.TranslationEntry
-import com.venom.lingopro.domain.model.ViewResources
-import com.venom.lingopro.ui.components.bars.TopBar
-import com.venom.lingopro.ui.components.buttons.CustomIcon
-import com.venom.lingopro.ui.components.common.EmptyState
-import com.venom.lingopro.ui.components.inputs.SearchBar
-import com.venom.lingopro.ui.components.items.BookmarkHistoryItemView
+import com.venom.data.model.TranslationEntry
+import com.venom.ui.components.dialogs.ConfirmationDialog
+import com.venom.resources.R
+import com.venom.domain.model.ViewResources
+import com.venom.ui.components.bars.TopBar
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.EmptyState
+import com.venom.ui.components.inputs.SearchBar
+import com.venom.ui.components.items.BookmarkHistoryItemView
 import com.venom.lingopro.ui.viewmodel.BookmarkViewModel
-import com.venom.lingopro.ui.viewmodel.TTSViewModel
+import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.lingopro.ui.viewmodel.ViewType
-import com.venom.lingopro.utils.Extensions.copyToClipboard
-import com.venom.lingopro.utils.Extensions.shareText
+import com.venom.utils.Extensions.copyToClipboard
+import com.venom.utils.Extensions.shareText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,12 +155,12 @@ private fun BookmarkHistoryTopBar(
         title = title,
         onNavigationClick = onBackClick,
         actions = {
-            CustomIcon(
+            CustomButton(
                 icon = Icons.Rounded.Delete,
                 contentDescription = stringResource(R.string.action_clear_history),
                 onClick = onClearAction
             )
-            CustomIcon(
+            CustomButton(
                 icon = viewResources.stateIcon,
                 contentDescription = viewResources.stateTitle,
                 onClick = onToggleViewType
