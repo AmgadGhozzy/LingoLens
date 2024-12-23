@@ -2,31 +2,25 @@ package com.venom.lingopro.ui.screens
 
 import android.app.Activity
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.lingopro.R
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.ui.components.bars.TopBar
-import com.venom.lingopro.ui.components.buttons.CustomIcon
-import com.venom.lingopro.ui.components.dialogs.CustomCard
-import com.venom.lingopro.ui.components.dialogs.DraggableDialog
-import com.venom.lingopro.ui.components.dialogs.FullscreenTextDialog
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
 import com.venom.lingopro.ui.components.sections.ThesaurusView
 import com.venom.lingopro.ui.components.sections.TranslationSection
-import com.venom.lingopro.ui.viewmodel.TTSViewModel
+import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
-import com.venom.lingopro.utils.Extensions.copyToClipboard
-import com.venom.lingopro.utils.Extensions.pasteFromClipboard
-import com.venom.lingopro.utils.Extensions.shareText
+import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.components.dialogs.DraggableDialog
+import com.venom.ui.components.dialogs.FullscreenTextDialog
+import com.venom.utils.Extensions.copyToClipboard
+import com.venom.utils.Extensions.pasteFromClipboard
+import com.venom.utils.Extensions.shareText
 
 @Composable
 fun TranslationScreen(
@@ -101,8 +95,7 @@ fun TranslationScreen(
     @Composable
     fun TranslationContent(modifier: Modifier = Modifier) {
         Column(modifier = modifier) {
-            TranslationSection(
-                sourceLang = sourceLang,
+            TranslationSection(sourceLang = sourceLang,
                 targetLang = targetLang,
                 sourceTextValue = TextFieldValue(sourceText),
                 translatedTextValue = TextFieldValue(state.translatedText),
@@ -126,8 +119,7 @@ fun TranslationScreen(
                             onSpeak = speakAction
                         )
                     }
-                }
-            )
+                })
 
             // Only show thesaurus in fullScreen mode
             if (!isDialog && state.synonyms.isNotEmpty()) {
@@ -148,30 +140,10 @@ fun TranslationScreen(
             TranslationContent()
         }
     } else {
-        Scaffold(
-            topBar = {
-                TopBar(title = stringResource(R.string.app_name),
-                    onNavigationClick = onDismiss,
-                    actions = {
-                        CustomIcon(
-                            icon = R.drawable.icon_history,
-                            contentDescription = stringResource(R.string.history_title),
-                            onClick = onHistory
-                        )
-                        CustomIcon(
-                            icon = R.drawable.icon_bookmark_filled,
-                            contentDescription = stringResource(R.string.bookmarks_title),
-                            onClick = onBookmark
-                        )
-                    })
-            }, containerColor = MaterialTheme.colorScheme.background
-        ) { paddingValues ->
-            TranslationContent(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(8.dp)
-                    .fillMaxSize()
-            )
-        }
+        TranslationContent(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize()
+        )
     }
 }
