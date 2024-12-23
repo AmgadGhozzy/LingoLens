@@ -13,10 +13,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.plcoding.composeloadinganimations.PulseAnimation
-import com.venom.lingopro.R
-import com.venom.lingopro.ui.components.buttons.CustomIcon
-import com.venom.lingopro.ui.components.inputs.CustomTextField
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.PulseAnimation
+import com.venom.ui.components.inputs.CustomTextField
 
 /**
  * SourceTextSection is a composable function that displays a text input field that can be used
@@ -65,7 +65,7 @@ fun SourceTextSection(
                 enter = fadeIn(animationSpec = tween(300)),
                 exit = fadeOut(animationSpec = tween(300))
             ) {
-                CustomIcon(
+                CustomButton(
                     icon = R.drawable.icon_clear,
                     contentDescription = "Clear",
                     onClick = onClearText,
