@@ -15,20 +15,27 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.textsnap.data.api.OcrApiService
-import com.venom.textsnap.data.repository.OcrRepository
-import com.venom.textsnap.ui.components.ImagePreviewCard
-import com.venom.textsnap.ui.components.OcrBottomSheet
-import com.venom.textsnap.ui.components.OcrTopAppBar
-import com.venom.textsnap.ui.theme.TextsSnapTheme
-import com.venom.textsnap.utils.Constant.sampleUiState
-import com.venom.textsnap.utils.Extensions.copyToClipboard
-import com.venom.textsnap.utils.Extensions.shareText
-import com.venom.textsnap.utils.ImageCompressor
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.venom.textsnap.ui.components.sections.ImagePreviewSection
+import com.venom.textsnap.ui.viewmodel.OcrUiState
+import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.common.CustomDragHandle
+import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.theme.LocalPeekHeight
+import com.venom.ui.viewmodel.TTSViewModel
+import com.venom.utils.Extensions.copyToClipboard
+import com.venom.utils.Extensions.shareText
 import kotlinx.coroutines.launch
 
+
+/**
+ * Main OCR screen that handles image processing and text recognition.
+ *
+ * @param viewModel ViewModel handling OCR business logic
+ * @param ttsViewModel ViewModel for text-to-speech functionality
+ * @param onFileClick Callback when file selection is requested
+ * @param onCameraClick Callback when camera capture is requested
+ * @param onGalleryClick Callback when gallery selection is requested
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrScreen(
@@ -37,12 +44,10 @@ fun OcrScreen(
     onFileClick: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
-    onNavigateBack: () -> Unit
 ) {
 
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val ttsState by ttsViewModel.state.collectAsStateWithLifecycle()
+
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
@@ -50,9 +55,12 @@ fun OcrScreen(
     )
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    val peekHeight = screenHeight * if (uiState.recognizedText.isNullOrEmpty()) 0.235 else 0.325
+    val peekHeight by remember(uiState.recognizedText) {
+        derivedStateOf {
+            screenHeight * if (uiState.recognizedText.isEmpty()) 0.14 else 0.22
+        }
+    }
     val maxHeight = screenHeight * 0.8
-
 
     // back press when bottom sheet is expanded
     BackHandler(enabled = sheetState.currentValue == SheetValue.Expanded) {
@@ -61,44 +69,47 @@ fun OcrScreen(
         }
     }
 
-    BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
-		modifier = Modifier.navigationBarsPadding(),
-        sheetPeekHeight = peekHeight.dp,
-        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        sheetTonalElevation = 12.dp,
-        sheetShadowElevation = 12.dp,
-        sheetDragHandle = { BottomSheetDefaults.DragHandle() },
-        sheetSwipeEnabled = true,
-        topBar = {
-            OcrTopAppBar(onNavigateBack = onNavigateBack, onSettings = { })
-        },
-        content = { paddingValues ->
-            OcrContent(uiState = uiState,
-                viewModel = viewModel,
-                modifier = Modifier.padding(paddingValues),
-                onRetry = viewModel::processImage,
-                onFileClick = onFileClick,
-                onCameraClick = onCameraClick,
-                onGalleryClick = onGalleryClick,
-                onToggleSelected = viewModel::toggleSelection,
-                onToggleLabels = viewModel::toggleLabels,
-                onToggleParagraphs = viewModel::toggleParagraphs,
-                onTranslate = { })
-        },
-        sheetContent = {
-            OcrBottomSheetContent(uiState = uiState,
-                maxHeight = maxHeight.dp,
-                onCopy = { text -> context.copyToClipboard(text) },
-                onShare = { text -> (context as Activity).shareText(text) },
-                onSpeak = { text -> ttsViewModel.speak(text) })
-        })
+    DisposableEffect(Unit) {
+        onDispose {
+            ttsViewModel.stopSpeaking()
+        }
+    }
+
+    LocalPeekHeight provides peekHeight.dp
+
+    CompositionLocalProvider {
+        BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
+            modifier = Modifier.navigationBarsPadding(),
+            sheetPeekHeight = peekHeight.dp,
+            sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+            sheetDragHandle = { CustomDragHandle() },
+            sheetSwipeEnabled = true,
+            content = { paddingValues ->
+                OcrContent(viewModel = viewModel,
+                    modifier = Modifier.padding(paddingValues),
+                    onRetry = viewModel::processOcr,
+                    onFileClick = onFileClick,
+                    onCameraClick = onCameraClick,
+                    onGalleryClick = onGalleryClick,
+                    onToggleSelected = viewModel::toggleSelection,
+                    onToggleLabels = viewModel::toggleLabels,
+                    onToggleParagraphs = viewModel::toggleParagraphs,
+                    onTranslate = { })
+            },
+            sheetContent = {
+                OcrBottomSheetContent(uiState = uiState,
+                    maxHeight = maxHeight.dp,
+                    onCopy = { text -> context.copyToClipboard(text) },
+                    onShare = { text -> (context as Activity).shareText(text) },
+                    onSpeak = { text -> ttsViewModel.speak(text) })
+            })
+    }
 }
 
 @Composable
 private fun OcrContent(
     viewModel: OcrViewModel,
     modifier: Modifier = Modifier,
-    uiState: OcrUiState,
     onRetry: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
@@ -111,12 +122,11 @@ private fun OcrContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(bottom = 6.dp)
+            .padding(horizontal = 8.dp),
     ) {
-        ImagePreviewCard(
+        ImagePreviewSection(
             viewModel = viewModel,
-            uiState = uiState,
             modifier = Modifier.weight(1f),
             onRetry = onRetry,
             onCameraClick = onCameraClick,
@@ -142,8 +152,8 @@ private fun OcrBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxHeight)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+
     ) {
         OcrBottomSheet(
             recognizedText = uiState.recognizedText,
@@ -161,14 +171,8 @@ private fun OcrBottomSheetContent(
 @Preview(showBackground = true, device = "id:pixel_8")
 @Composable
 fun OcrScreenPreview() {
-    TextsSnapTheme {
-        val context = LocalContext.current
-        OcrScreen(viewModel = object : OcrViewModel(
-            repository = OcrRepository(OcrApiService.create()),
-            imageCompressor = ImageCompressor(context)
-        ) {
-            override val uiState = MutableStateFlow(sampleUiState).asStateFlow()
-        }, onNavigateBack = {}, onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
+    LingoLensTheme() {
+        OcrScreen(onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
     }
 }
 
