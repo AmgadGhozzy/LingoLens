@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.venom.lingopro.ui.components.items.WordChipItem
+import com.venom.ui.components.items.WordChipItem
 
 /**
  * A composable function that displays a thesaurus view with a list of synonyms.

@@ -11,14 +11,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.ui.components.bars.LanguageBar
-import com.venom.lingopro.ui.components.bars.SourceTextActionBar
-import com.venom.lingopro.ui.components.bars.TranslatedTextActionBar
-import com.venom.lingopro.ui.components.dialogs.CustomCard
-import com.venom.lingopro.ui.theme.LingoProTheme
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
-import com.venom.lingopro.utils.Extensions.getSelectedOrFullText
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
+import com.venom.ui.components.bars.LanguageBar
+import com.venom.ui.components.bars.SourceTextActionBar
+import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.theme.LingoLensTheme
+import com.venom.utils.Extensions.getSelectedOrFullText
 
 @Composable
 fun TranslationSection(
@@ -96,7 +96,7 @@ fun TranslationSection(
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun TranslationSectionWithoutFlagPreview() {
-    LingoProTheme {
+    LingoLensTheme {
         TranslationSection(
             sourceLang = LANGUAGES_LIST[0],
             targetLang = LANGUAGES_LIST[1],

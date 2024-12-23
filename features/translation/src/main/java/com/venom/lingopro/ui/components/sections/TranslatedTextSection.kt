@@ -8,14 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import com.venom.lingopro.R
-import com.venom.lingopro.ui.components.inputs.CustomTextField
+import com.venom.resources.R
+import com.venom.ui.components.inputs.CustomTextField
 
 /**
  * A composable function that displays a translated text. The text is displayed in a [CustomTextField]
  * which is readonly and has a placeholder text.
  *
- * @param translatedText the translated text to be displayed
+ * @param translatedTextValue the translated text to be displayed
  * @param modifier a modifier that can be used to customize the appearance of the component
  */
 @Composable
