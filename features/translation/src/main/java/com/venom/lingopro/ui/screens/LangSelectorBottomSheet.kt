@@ -11,13 +11,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.lingopro.R
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.ui.components.common.EmptyState
-import com.venom.lingopro.ui.components.bars.LanguageBar
-import com.venom.lingopro.ui.components.items.LanguageListItem
-import com.venom.lingopro.ui.components.inputs.SearchBar
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
+import com.venom.resources.R
+import com.venom.ui.components.bars.LanguageBar
+import com.venom.ui.components.common.EmptyState
+import com.venom.ui.components.inputs.SearchBar
+import com.venom.ui.components.items.LanguageListItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +51,10 @@ fun LanguageSelectorBottomSheet(
     // Filter languages based on search query
     val filteredLanguages = remember(searchQuery, languages) {
         languages.filter {
-            searchQuery.isEmpty() || listOf(it.name, it.nativeName).any { name ->
+            searchQuery.isEmpty() || listOf(
+                it.code,
+                it.name,
+            ).any { name ->
                 name.contains(
                     searchQuery, ignoreCase = true
                 )
@@ -150,7 +153,8 @@ private fun LanguageListSection(
 @Composable
 fun LanguageSelectorBottomSheetPreview() {
     MaterialTheme {
-        LanguageSelectorBottomSheet(onDismiss = {},
+        LanguageSelectorBottomSheet(
+            onDismiss = {},
             onLanguageSelected = { _ -> },
             initialSourceLang = LANGUAGES_LIST[0],
             initialTargetLang = LANGUAGES_LIST[1],
