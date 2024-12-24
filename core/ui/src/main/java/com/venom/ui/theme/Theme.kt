@@ -49,7 +49,7 @@ val DarkColorScheme = ColorScheme(
 
     // Text and Content Colors
     onSurface = Color(0xFFD1D2D3),            // Primary text color on surfaces
-    onSurfaceVariant = Color(0xFF939394),     // Secondary/hint text on surface variants
+    onSurfaceVariant = Color(0xff5f5e5e),     // Secondary/hint text on surface variants
     onBackground = Color(0xFFD1D2D3),         // Text color on background
 
     // Outline and Divider Colors
@@ -131,7 +131,7 @@ val LightColorScheme = ColorScheme(
 fun LingoLensTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
