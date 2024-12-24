@@ -12,28 +12,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.menus.DropdownMenuTrigger
 
 @Composable
 fun ImageActionBar(
     actions: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    elevation: Dp = 4.dp
 ) {
-    Card(
+    CustomCard (
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 6.dp),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
-    ) {
+            .padding(horizontal = 6.dp)
+    ){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp)
+                .padding(vertical = 4.dp)
                 .padding(end = 18.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
