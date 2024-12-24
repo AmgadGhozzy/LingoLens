@@ -38,7 +38,7 @@ fun TranslatedTextActionBar(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -51,7 +51,7 @@ fun TranslatedTextActionBar(
 
         // Action Buttons
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             // Fullscreen Button
             CustomButton(
@@ -89,5 +89,11 @@ fun TranslatedTextActionBar(
 @Preview(showBackground = true)
 @Composable
 fun TranslatedTextActionBarPreview() {
-    TranslatedTextActionBar(onSpeak = { }, onFullscreen = { }, onCopy = { }, onSave = { }, onShare = {},)
+    TranslatedTextActionBar(
+        onSpeak = { },
+        onFullscreen = { },
+        onCopy = { },
+        onSave = { },
+        onShare = {},
+    )
 }
