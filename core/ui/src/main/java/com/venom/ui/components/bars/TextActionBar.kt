@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomTextButton
+import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.menus.DropdownMenuTrigger
 
 /**
@@ -31,15 +32,7 @@ fun TextActionBar(
     containerColor: Color = MaterialTheme.colorScheme.surface,
     elevation: Dp = 2.dp
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 6.dp),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
-    ) {
+    CustomCard {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
