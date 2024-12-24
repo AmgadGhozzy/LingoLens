@@ -2,6 +2,8 @@ package com.venom.ui.components.bars
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,11 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 
 /**
@@ -42,7 +46,6 @@ fun TopBar(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
         )
     }, navigationIcon = {
         navigationIcon?.let {
@@ -57,7 +60,10 @@ fun TopBar(
         navigationIconContentColor = MaterialTheme.colorScheme.primary,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         actionIconContentColor = MaterialTheme.colorScheme.primary
-    ), modifier = modifier.fillMaxWidth()
+    ), modifier = modifier
+        .fillMaxWidth()
+        .height(82.dp)
+        .wrapContentHeight(align = Alignment.CenterVertically)
     )
 }
 
