@@ -3,12 +3,12 @@ package com.venom.lingopro.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.lingopro.data.model.TranslationEntry
-import com.venom.lingopro.data.model.TranslationResponse
-import com.venom.lingopro.data.repository.TranslationRepository
-import com.venom.lingopro.domain.model.LanguageItem
-import com.venom.lingopro.utils.Constants.LANGUAGES_LIST
-import com.venom.lingopro.utils.extractSynonyms
+import com.venom.data.mapper.extractSynonyms
+import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationResponse
+import com.venom.data.repo.TranslationRepository
+import com.venom.domain.model.LANGUAGES_LIST
+import com.venom.domain.model.LanguageItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +18,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TranslationUiState(
-    val sourceLanguage: LanguageItem = LanguageItem("en", "English"),//
-    val targetLanguage: LanguageItem = LanguageItem("ar", "Arabic"),//
+    val sourceLanguage: LanguageItem = LanguageItem(
+        "en", "English"
+    ),//
+    val targetLanguage: LanguageItem = LanguageItem(
+        "ar", "Arabic"
+    ),//
     val sourceText: String = "",///
     val translatedText: String = "",///
     val translationResult: TranslationResponse? = null,///
@@ -98,8 +102,8 @@ class TranslateViewModel @Inject constructor(
                     val translationEntry = TranslationEntry(
                         sourceText = _uiState.value.sourceText,
                         translatedText = _uiState.value.translatedText,
-                        sourceLang = _uiState.value.sourceLanguage.name,
-                        targetLang = _uiState.value.targetLanguage.name,
+                        sourceLang = _uiState.value.sourceLanguage.code,
+                        targetLang = _uiState.value.targetLanguage.code,
                         synonyms = _uiState.value.synonyms
                     )
                     repository.saveTranslationEntry(translationEntry)
