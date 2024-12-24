@@ -27,6 +27,8 @@ import com.venom.utils.isTextRightToLeft
  * @param placeHolderText Optional placeholder text
  * @param minHeight Minimum height of the text field
  * @param maxHeight Maximum height of the text field
+ * @param minFontSize Minimum font size for the text
+ * @param maxFontSize Maximum font size for the text
  * @param colors Custom colors for the text field
  * @param modifier Additional modifier for customization
  */
@@ -37,8 +39,12 @@ fun CustomTextField(
     onTextChange: (TextFieldValue) -> Unit = {},
     isReadOnly: Boolean = false,
     placeHolderText: String = "Type something...",
-    maxLines: Int = 5,
+    maxLines: Int = 12,
     minLines: Int = 1,
+
+    minFontSize: Int = 14,
+    maxFontSize: Int = 22,
+
     minHeight: Dp = 48.dp,
     maxHeight: Dp = 148.dp,
     colors: TextFieldColors = TextFieldDefaults.colors(
@@ -57,13 +63,7 @@ fun CustomTextField(
     modifier: Modifier = Modifier
 ) {
     val dynamicFontSize = remember(textValue.text) {
-        when {
-            textValue.text.length <= 50 -> 22.sp
-            textValue.text.length <= 100 -> 20.sp
-            textValue.text.length <= 200 -> 18.sp
-            textValue.text.length <= 300 -> 16.sp
-            else -> 14.sp
-        }
+        (maxFontSize - (textValue.text.length / 50)).coerceAtLeast(minFontSize).sp
     }
 
     val textDirection = remember(textValue.text) {
@@ -84,15 +84,12 @@ fun CustomTextField(
             onTextChange(TextFieldValue(newText, textValue.selection))
         },
         textStyle = TextStyle(
-            fontSize = dynamicFontSize,
-            textDirection = textDirection
+            fontSize = dynamicFontSize, textDirection = textDirection
         ),
         placeholder = {
             Text(
                 text = placeHolderText,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                    alpha = if (isReadOnly) 0.3f else 0.5f
-                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 fontSize = 20.sp,
                 style = TextStyle(textDirection = textDirection)
             )
