@@ -41,6 +41,8 @@ fun TranslationScreen(
 
     var sourceText by remember { mutableStateOf(initialText ?: state.sourceText) }
 
+    var showFullscreenDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(initialText, isDialog) {
         if (isDialog && !initialText.isNullOrBlank()) {
@@ -109,17 +111,7 @@ fun TranslationScreen(
                 onShare = shareAction,
                 onSpeak = speakAction,
                 onPaste = onPasteAction,
-                onFullscreen = {
-                    @Composable {
-                        FullscreenTextDialog(
-                            textValue = TextFieldValue(state.translatedText),
-                            onDismiss = onDismiss,
-                            onCopy = copyAction,
-                            onShare = shareAction,
-                            onSpeak = speakAction
-                        )
-                    }
-                })
+                onFullscreen = {showFullscreenDialog = true})
 
             // Only show thesaurus in fullScreen mode
             if (!isDialog && state.synonyms.isNotEmpty()) {
@@ -144,6 +136,16 @@ fun TranslationScreen(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxSize()
+        )
+    }
+
+    if (showFullscreenDialog) {
+        FullscreenTextDialog(
+            textValue = TextFieldValue(state.translatedText),
+            onDismiss = { showFullscreenDialog = false },
+            onCopy = copyAction,
+            onShare = shareAction,
+            onSpeak = speakAction
         )
     }
 }
