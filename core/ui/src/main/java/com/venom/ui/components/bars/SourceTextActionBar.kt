@@ -40,7 +40,7 @@ fun SourceTextActionBar(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -53,7 +53,7 @@ fun SourceTextActionBar(
 
         // Additional Action Buttons
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             CustomButton(
