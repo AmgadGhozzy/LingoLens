@@ -1,32 +1,13 @@
 package com.venom.ui.components.menus
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -36,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-
 fun ExpandableFAB(
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
@@ -48,22 +28,16 @@ fun ExpandableFAB(
     // Rotation animation for the main FAB icon
     val rotationAngle by animateFloatAsState(
         targetValue = if (isExpanded) 45f else 0f,
-        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 600),
         label = "FAB Rotation"
     )
 
-    Box(
-        contentAlignment = Alignment.BottomCenter
-    ) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
         // Smaller FABs with animations
         AnimatedVisibility(
             visible = isExpanded,
-            enter = slideInVertically(animationSpec = tween(600), initialOffsetY = { it }) + fadeIn(
-                animationSpec = tween(600)
-            ),
-            exit = slideOutVertically(
-                animationSpec = tween(600),
-                targetOffsetY = { it - 120 }) + fadeOut(animationSpec = tween(600)),
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it - 120 }),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .offset(y = (-68).dp)
@@ -72,15 +46,9 @@ fun ExpandableFAB(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FABOption(icon = Icons.Default.CameraAlt,
-                    contentDescription = "Camera",
-                    onClick = { onCameraClick(); isExpanded = false })
-                FABOption(icon = Icons.Default.PhotoLibrary,
-                    contentDescription = "Gallery",
-                    onClick = { onGalleryClick(); isExpanded = false })
-                FABOption(icon = Icons.Default.Folder,
-                    contentDescription = "Gallery",
-                    onClick = { onGalleryClick(); isExpanded = false })
+                FABOption(icon = Icons.Default.CameraAlt, contentDescription = "Camera", onClick = { onCameraClick(); isExpanded = false })
+                FABOption(icon = Icons.Default.PhotoLibrary, contentDescription = "Gallery", onClick = { onGalleryClick(); isExpanded = false })
+                FABOption(icon = Icons.Default.Folder, contentDescription = "File", onClick = { onFileClick(); isExpanded = false })
             }
         }
 
