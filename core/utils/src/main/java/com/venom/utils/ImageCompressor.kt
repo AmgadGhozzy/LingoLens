@@ -7,7 +7,9 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,15 +17,14 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
-
 class ImageCompressor(private val context: Context) {
 
-    suspend fun compressImage(uri: Uri?): Pair<File?, ImageBitmap?> {
+    suspend fun compressImage(uri: Uri): Triple<File?, ImageBitmap?, Uri?> {
         return withContext(Dispatchers.IO) {
             try {
                 // Decode image dimensions only
                 val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                uri?.let { context.contentResolver.openInputStream(it) }?.use { input ->
+                context.contentResolver.openInputStream(uri)?.use { input ->
                     BitmapFactory.decodeStream(input, null, options)
                 }
 
@@ -32,31 +33,75 @@ class ImageCompressor(private val context: Context) {
                 options.inJustDecodeBounds = false
 
                 // Decode the scaled image as a Bitmap
-                var bitmap =
-                    uri?.let { context.contentResolver.openInputStream(it) }?.use { input ->
-                        BitmapFactory.decodeStream(input, null, options)
-                    }
+                var bitmap = context.contentResolver.openInputStream(uri)?.use { input ->
+                    BitmapFactory.decodeStream(input, null, options)
+                }
 
                 // Rotate the bitmap if needed based on EXIF data
                 bitmap = rotateImageIfRequired(uri, bitmap)
 
-                // Compress Bitmap to JPEG with specified quality and create ImageBitmap
-                val compressedFile =
-                    File(context.cacheDir, "compressed_image_${System.currentTimeMillis()}.jpg")
-                FileOutputStream(compressedFile).use { outputStream ->
-                    bitmap?.compress(Bitmap.CompressFormat.JPEG, QUALITY, outputStream)
-                }
-
-                // Convert bitmap to ImageBitmap
-                val imageBitmap = bitmap?.asImageBitmap()
-
-                // Return pair of compressed file and ImageBitmap
-                Pair(compressedFile, imageBitmap)
+                // Process the bitmap and return results
+                processBitmap(bitmap)
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to compress image", e)
-                Pair(null, null)
+                Log.e(TAG, "Failed to compress image from URI", e)
+                Triple(null, null, null)
             }
         }
+    }
+
+    suspend fun compressImage(imageBitmap: ImageBitmap): Triple<File?, ImageBitmap?, Uri?> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val androidBitmap = imageBitmap.asAndroidBitmap()
+                val scaledBitmap = scaleBitmapIfNeeded(androidBitmap)
+                processBitmap(scaledBitmap)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to compress ImageBitmap", e)
+                Triple(null, null, null)
+            }
+        }
+    }
+
+    private fun scaleBitmapIfNeeded(bitmap: Bitmap): Bitmap {
+        return if (bitmap.width > MAX_WIDTH || bitmap.height > MAX_HEIGHT) {
+            val scaleWidth = MAX_WIDTH.toFloat() / bitmap.width
+            val scaleHeight = MAX_HEIGHT.toFloat() / bitmap.height
+            val scaleFactor = minOf(scaleWidth, scaleHeight)
+
+            Bitmap.createScaledBitmap(
+                bitmap,
+                (bitmap.width * scaleFactor).toInt(),
+                (bitmap.height * scaleFactor).toInt(),
+                true
+            )
+        } else {
+            bitmap
+        }
+    }
+
+    private fun processBitmap(bitmap: Bitmap?): Triple<File?, ImageBitmap?, Uri?> {
+        if (bitmap == null) return Triple(null, null, null)
+
+        val compressedFile = createCompressedFile(bitmap)
+        val contentUri = generateContentUri(compressedFile)
+        val resultImageBitmap = bitmap.asImageBitmap()
+
+        return Triple(compressedFile, resultImageBitmap, contentUri)
+    }
+
+    private fun createCompressedFile(bitmap: Bitmap): File {
+        val compressedFile =
+            File(context.cacheDir, "compressed_image_${System.currentTimeMillis()}.jpg")
+        FileOutputStream(compressedFile).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITY, outputStream)
+        }
+        return compressedFile
+    }
+
+    private fun generateContentUri(file: File): Uri {
+        return FileProvider.getUriForFile(
+            context, "${context.packageName}.provider", file
+        )
     }
 
     private fun rotateImageIfRequired(uri: Uri?, bitmap: Bitmap?): Bitmap? {
@@ -80,7 +125,6 @@ class ImageCompressor(private val context: Context) {
             } else {
                 bitmap
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
             bitmap
