@@ -1,4 +1,4 @@
-package com.venom.textsnap.ui.components
+package com.venom.textsnap.ui.components.sections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,29 +21,29 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.textsnap.R
-import com.venom.textsnap.data.api.OcrApiService
-import com.venom.textsnap.data.repository.OcrRepository
-import com.venom.textsnap.ui.screens.OcrUiState
-import com.venom.textsnap.ui.screens.OcrViewModel
-import com.venom.textsnap.utils.Constant.sampleUiState
-import com.venom.textsnap.utils.ImageCompressor
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.resources.R
+import com.venom.textsnap.ui.viewmodel.ImageInput.FromBitmap
+import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.bars.ActionItem
+import com.venom.ui.components.bars.ImageActionBar
+import com.venom.ui.components.dialogs.ImageCropperDialog
+import com.venom.ui.components.menus.ExpandableFAB
 
 
 @Composable
-fun ImagePreviewCard(
+fun ImagePreviewSection(
     viewModel: OcrViewModel,
-    uiState: OcrUiState,
     modifier: Modifier = Modifier,
     onRetry: () -> Unit,
     onCameraClick: () -> Unit,
@@ -54,57 +54,83 @@ fun ImagePreviewCard(
     onToggleParagraphs: () -> Unit,
     onTranslate: () -> Unit
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    var showImageCropper by remember { mutableStateOf(false) }
+
+    if (showImageCropper && uiState.imageBitmap != null) {
+        ImageCropperDialog(onDismissRequest = { showImageCropper = false; viewModel.reset() },
+            imageBitmap = uiState.imageBitmap,
+            onImageCropped = { croppedBitmap ->
+                viewModel.processImage(FromBitmap(croppedBitmap), processOcrAfter = true)
+                showImageCropper = false
+            })
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
             when {
-                uiState.imageBitmap != null -> {
-                    ZoomableImageWithBoundingBoxes(
-                        viewModel = viewModel,
-                        imageBitmap = uiState.imageBitmap,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                uiState.imageBitmap != null -> ZoomableImageWithBoundingBoxes(
+                    viewModel = viewModel,
+                    imageBitmap = uiState.imageBitmap,
+                    modifier = Modifier.fillMaxSize()
+                )
 
                 else -> EmptyStateContent()
             }
 
             // Loading Overlay
-            if (uiState.isLoading) {
-                LoadingOverlay()
-            }
+            if (uiState.isLoading) LoadingOverlay()
+
 
             // Error Overlay
-            if (uiState.hasError) {
-                ErrorOverlay(onRetry = onRetry)
-            }
+            if (uiState.hasError) ErrorOverlay(onRetry = onRetry)
+
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .padding(12.dp)
+                modifier = Modifier.padding(12.dp)
             ) {
+
                 ImageActionBar(
                     modifier = Modifier.weight(1f),
-                    showLabels = uiState.showLabels && uiState.recognizedText.isNotEmpty(),
-                    isParageraphMode = uiState.isParagraphMode && uiState.recognizedText.isNotEmpty(),
-                    isSelected = uiState.isSelected,
-                    isTranslate = uiState.isTranslate && uiState.recognizedText.isNotEmpty(),
-                    onToggleSelected = onToggleSelected,
-                    onTranslateClick = onTranslate,
-                    onToggleLabels = onToggleLabels,
-                    onToggleParagraphs = onToggleParagraphs
+                    actions = listOf(
+                        ActionItem.Action(
+                            icon = R.drawable.ic_paragraph_on,
+                            textRes = R.string.action_hide_paragraphs,
+                            onClick = onToggleParagraphs,
+                            selected = uiState.isParagraphMode && uiState.recognizedText.isNotEmpty(),
+                        ),
+                        ActionItem.Action(
+                            icon = R.drawable.ic_labels_shown,
+                            textRes = R.string.action_hide_labels,
+                            onClick = onToggleLabels,
+                            selected = uiState.showLabels && uiState.recognizedText.isNotEmpty(),
+                        ),
+                        ActionItem.Action(
+                            icon = R.drawable.ic_select_all,
+                            textRes = R.string.select_language,
+                            onClick = onToggleSelected,
+                            selected = uiState.isSelected && uiState.recognizedText.isNotEmpty(),
+                        ),
+                        ActionItem.Action(
+                            icon = R.drawable.icon_translate,
+                            textRes = R.string.action_translate,
+                            onClick = onTranslate,
+                            enabled = uiState.recognizedText.isNotEmpty(),
+                        ),
+                    ),
                 )
 
-                ExpandableFAB(
-                    modifier = Modifier.wrapContentSize(),
-                    onCameraClick = onCameraClick,
-                    onGalleryClick = onGalleryClick,
-                    onFileClick = onFileClick
-                )
+                ExpandableFAB(modifier = Modifier.wrapContentSize(),
+                    onCameraClick = { onCameraClick();viewModel.reset(); showImageCropper = true },
+                    onGalleryClick = {
+                        onGalleryClick();viewModel.reset(); showImageCropper = true
+                    },
+                    onFileClick = { onFileClick();viewModel.reset(); showImageCropper = true })
             }
         }
     }
@@ -125,7 +151,7 @@ private fun EmptyStateContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Add an image to start scanning",
+            text = stringResource(id = R.string.empty_state_title),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -196,7 +222,7 @@ private fun ErrorOverlay(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Please try again",
+                text = stringResource(id = R.string.error_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -214,7 +240,7 @@ private fun ErrorOverlay(
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Retry")
+                Text(text = stringResource(id = R.string.retry))
             }
         }
     }
@@ -224,22 +250,14 @@ private fun ErrorOverlay(
 @Preview
 @Composable
 fun ImagePreviewCardPreview() {
-    val context = LocalContext.current
-    ImagePreviewCard(
-        viewModel = object : OcrViewModel(
-            repository = OcrRepository(OcrApiService.create()),
-            imageCompressor = ImageCompressor(context)
-        ) {
-            override val uiState = MutableStateFlow(sampleUiState).asStateFlow()
-        },
-        uiState = sampleUiState,
-        onRetry = {},
-        onFileClick = {},
-        onToggleLabels = {},
-        onToggleSelected = {},
-        onToggleParagraphs = {},
-        onTranslate = {},
-        onCameraClick = {},
-        onGalleryClick = {},
-    )
+//    ImagePreviewCard(
+//        onRetry = {},
+//        onFileClick = {},
+//        onToggleLabels = {},
+//        onToggleSelected = {},
+//        onToggleParagraphs = {},
+//        onTranslate = {},
+//        onCameraClick = {},
+//        onGalleryClick = {},
+//    )
 }
