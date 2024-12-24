@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -18,8 +19,9 @@ import com.venom.textsnap.ui.components.SelectedTextItem
 import com.venom.textsnap.ui.components.TextAction
 import com.venom.ui.components.bars.ActionItem
 import com.venom.ui.components.bars.TextActionBar
+import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.inputs.CustomTextField
-import com.venom.ui.theme.LocalPeekHeight
 
 
 @Composable
@@ -85,29 +87,32 @@ fun OcrBottomSheet(
 
     }
 }
-
 @Composable
 private fun RecognizedTextSection(
     text: String, modifier: Modifier = Modifier
 ) {
-
-
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-
-        SelectionContainer {
-            CustomTextField(
-                textValue = TextFieldValue(text),
-                placeHolderText = stringResource(R.string.recognized_text_placeholder),
-                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant),
-                maxLines = 4,
-                maxHeight = 106.dp,
-                minHeight = 106.dp,
-                isReadOnly = true
+    CustomCard {
+        Box {
+            SelectionContainer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                CustomTextField(
+                    textValue = TextFieldValue(text),
+                    placeHolderText = stringResource(R.string.recognized_text_placeholder),
+                    maxLines = 4,
+                    maxHeight = 106.dp,
+                    minHeight = 106.dp,
+                    isReadOnly = true
+                )
+            }
+            CustomButton(
+                icon = R.drawable.icon_fullscreen,
+                contentDescription = stringResource(R.string.action_fullscreen),
+                modifier = Modifier
+                    .align(Alignment.TopEnd),
+                onClick = {},
             )
         }
     }
