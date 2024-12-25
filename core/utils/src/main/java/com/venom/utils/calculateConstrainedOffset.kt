@@ -16,8 +16,12 @@ fun calculateConstrainedOffset(
 
     val scaledPanChange = panChange * scale
 
-    return Offset(
-        x = (currentOffset.x + scaledPanChange.x).coerceIn(-maxX, maxX),
-        y = (currentOffset.y + scaledPanChange.y).coerceIn(-maxY, maxY)
-    )
+    return if (scale > 1f) {
+        Offset(
+            x = (currentOffset.x + scaledPanChange.x).coerceIn(-maxX, maxX),
+            y = (currentOffset.y + scaledPanChange.y).coerceIn(-maxY, maxY)
+        )
+    } else {
+        Offset.Zero
+    }
 }
