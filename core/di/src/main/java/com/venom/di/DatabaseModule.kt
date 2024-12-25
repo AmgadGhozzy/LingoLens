@@ -2,7 +2,9 @@ package com.venom.di
 
 import android.content.Context
 import androidx.room.Room
-import com.venom.data.TranslationDatabase
+import com.venom.data.local.OcrDatabase
+import com.venom.data.local.TranslationDatabase
+import com.venom.data.local.dao.OcrDao
 import com.venom.data.local.dao.TranslationDao
 import dagger.Module
 import dagger.Provides
@@ -20,6 +22,20 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context.applicationContext, TranslationDatabase::class.java, "translation_database"
         ).fallbackToDestructiveMigration().build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOcrDatabase(@ApplicationContext context: Context): OcrDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext, OcrDatabase::class.java, "ocr_database"
+        ).fallbackToDestructiveMigration().build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOcrDao(database: OcrDatabase): OcrDao {
+        return database.ocrDao()
     }
 
     @Provides
