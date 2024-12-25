@@ -1,4 +1,4 @@
-package com.venom.data
+package com.venom.data.local
 
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
