@@ -15,7 +15,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowInsetsControllerCompat
 import com.venom.lingolens.ui.LingoLensApp
-import com.venom.textsnap.ui.screens.OcrViewModel
+import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
+import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.theme.LingoLensTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -35,8 +36,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             LingoLensTheme {
                 updateStatusBarColor(MaterialTheme.colorScheme.background, !isSystemInDarkTheme())
-                LingoLensApp(
-                    ocrViewModel = ocrViewModel,
+                LingoLensApp(ocrViewModel = ocrViewModel,
                     startCamera = { startCamera() },
                     imageSelector = { imageSelector.launch("image/*") })
             }
@@ -46,8 +46,7 @@ class MainActivity : ComponentActivity() {
     private val imageSelector =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
-                ocrViewModel.setUri(it)
-                ocrViewModel.processImage()
+                ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
             }
         }
 
@@ -55,8 +54,7 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 currentPhotoUri?.let { uri ->
-                    ocrViewModel.setUri(uri)
-                    ocrViewModel.processImage()
+                    ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
                 }
             }
         }
