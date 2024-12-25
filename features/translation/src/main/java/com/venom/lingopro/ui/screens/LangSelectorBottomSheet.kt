@@ -17,6 +17,7 @@ import com.venom.resources.R
 import com.venom.ui.components.bars.LanguageBar
 import com.venom.ui.components.common.EmptyState
 import com.venom.ui.components.inputs.SearchBar
+import com.venom.ui.components.inputs.rememberSearchBarState
 import com.venom.ui.components.items.LanguageListItem
 import kotlinx.coroutines.launch
 
@@ -40,7 +41,9 @@ fun LanguageSelectorBottomSheet(
     val maxHeight = screenHeight * 0.9f
     val offsetY = screenHeight * 0.1f
 
-    var searchQuery by remember { mutableStateOf("") }
+    val searchState = rememberSearchBarState(onSearchTriggered = { query ->
+        // Handle search
+    })
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
@@ -49,14 +52,14 @@ fun LanguageSelectorBottomSheet(
     var targetLang by remember { mutableStateOf(initialTargetLang) }
 
     // Filter languages based on search query
-    val filteredLanguages = remember(searchQuery, languages) {
+    val filteredLanguages = remember(searchState.searchQuery, languages) {
         languages.filter {
-            searchQuery.isEmpty() || listOf(
+            searchState.searchQuery.isEmpty() || listOf(
                 it.code,
                 it.name,
             ).any { name ->
                 name.contains(
-                    searchQuery, ignoreCase = true
+                    searchState.searchQuery, ignoreCase = true
                 )
             }
         }
@@ -97,7 +100,9 @@ fun LanguageSelectorBottomSheet(
             )
 
             // Search Bar
-            SearchBar(searchQuery = searchQuery, onSearchQueryChanged = { searchQuery = it })
+            SearchBar(
+                state = searchState,
+            )
 
             // Language List Section
             LanguageListSection(filteredLanguages = filteredLanguages,
@@ -153,8 +158,7 @@ private fun LanguageListSection(
 @Composable
 fun LanguageSelectorBottomSheetPreview() {
     MaterialTheme {
-        LanguageSelectorBottomSheet(
-            onDismiss = {},
+        LanguageSelectorBottomSheet(onDismiss = {},
             onLanguageSelected = { _ -> },
             initialSourceLang = LANGUAGES_LIST[0],
             initialTargetLang = LANGUAGES_LIST[1],
