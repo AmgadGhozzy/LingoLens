@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -24,7 +25,6 @@ object TranslationModule {
 
     @Provides
     @Singleton
-    fun provideTranslationService(retrofit: Retrofit): TranslationService =
+    fun provideTranslationService(@Named("TranslationRetrofit") retrofit: Retrofit): TranslationService =
         retrofit.create(TranslationService::class.java)
 }
-
