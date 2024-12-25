@@ -4,7 +4,7 @@ import android.util.Log
 import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.model.TranslationEntry
-import com.venom.lingopro.data.model.TranslationResponse
+import com.venom.data.model.TranslationResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -35,8 +35,7 @@ class TranslationRepository @Inject constructor(
 
     fun getTranslationHistory(): Flow<List<TranslationEntry>> = translationDao.getAllEntries()
 
-    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>> =
-        translationDao.getBookmarkedEntries()
+    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>> = translationDao.getBookmarkedEntries()
 
     suspend fun updateTranslationEntry(entry: TranslationEntry) = translationDao.update(entry)
 
