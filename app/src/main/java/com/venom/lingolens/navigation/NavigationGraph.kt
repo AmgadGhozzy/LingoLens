@@ -2,12 +2,18 @@ package com.venom.lingolens.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.venom.lingopro.ui.screens.BookmarkHistoryScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
+import com.venom.lingopro.ui.viewmodel.ViewType
+import com.venom.resources.R
+import com.venom.ui.components.common.ImageCropper
 import com.venom.textsnap.ui.screens.OcrScreen
-import com.venom.textsnap.ui.screens.OcrViewModel
+import com.venom.textsnap.ui.viewmodel.OcrViewModel
 
 @Composable
 fun NavigationGraph(
@@ -42,7 +48,17 @@ fun NavigationGraph(
         }
 
         composable(Screen.Bookmarks.route) {
+            BookmarkHistoryScreen(
+                onBackClick = { navController.popBackStack() },
+                viewType = ViewType.BOOKMARKS
+            )
+        }
 
+        composable(Screen.History.route) {
+            BookmarkHistoryScreen(
+                onBackClick = { navController.popBackStack() },
+                viewType = ViewType.HISTORY
+            )
         }
     }
 }
