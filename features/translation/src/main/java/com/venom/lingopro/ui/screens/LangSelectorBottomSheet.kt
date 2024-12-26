@@ -17,7 +17,6 @@ import com.venom.resources.R
 import com.venom.ui.components.bars.LanguageBar
 import com.venom.ui.components.common.EmptyState
 import com.venom.ui.components.inputs.SearchBar
-import com.venom.ui.components.inputs.rememberSearchBarState
 import com.venom.ui.components.items.LanguageListItem
 import kotlinx.coroutines.launch
 
@@ -41,9 +40,7 @@ fun LanguageSelectorBottomSheet(
     val maxHeight = screenHeight * 0.9f
     val offsetY = screenHeight * 0.1f
 
-    val searchState = rememberSearchBarState(onSearchTriggered = { query ->
-        // Handle search
-    })
+    var searchQuery by remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
 
@@ -52,14 +49,14 @@ fun LanguageSelectorBottomSheet(
     var targetLang by remember { mutableStateOf(initialTargetLang) }
 
     // Filter languages based on search query
-    val filteredLanguages = remember(searchState.searchQuery, languages) {
+    val filteredLanguages = remember(searchQuery, languages) {
         languages.filter {
-            searchState.searchQuery.isEmpty() || listOf(
+            searchQuery.isEmpty() || listOf(
                 it.code,
                 it.name,
             ).any { name ->
                 name.contains(
-                    searchState.searchQuery, ignoreCase = true
+                    searchQuery, ignoreCase = true
                 )
             }
         }
@@ -100,9 +97,7 @@ fun LanguageSelectorBottomSheet(
             )
 
             // Search Bar
-            SearchBar(
-                state = searchState,
-            )
+            SearchBar(searchQuery = searchQuery, onSearchQueryChanged = { searchQuery = it })
 
             // Language List Section
             LanguageListSection(filteredLanguages = filteredLanguages,
