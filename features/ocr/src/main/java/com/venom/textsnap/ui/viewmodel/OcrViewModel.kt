@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.mapper.ParagraphBoxMapper.convertToParagraphBoxes
+import com.venom.data.model.OcrEntry
 import com.venom.data.model.OcrResponse
 import com.venom.data.model.OriginalResponse
 import com.venom.data.model.ParagraphBox
@@ -65,6 +66,13 @@ class OcrViewModel @Inject constructor(
 
         repository.performOcr(compressedFile).onSuccess { response ->
             processParagraphs(response)
+            val ocrEntry = OcrEntry(
+                recognizedText = uiState.value.recognizedText,
+                imageData = uiState.value.compressedFile?.readBytes() ?: ByteArray(0),
+                boundingBoxes = uiState.value.paragraphBoxes,
+                apiResponse = response
+            )
+            repository.saveOcrEntry(ocrEntry)
             _uiState.update { it.copy(isLoading = false) }
         }.onFailure { e ->
             _uiState.update {
