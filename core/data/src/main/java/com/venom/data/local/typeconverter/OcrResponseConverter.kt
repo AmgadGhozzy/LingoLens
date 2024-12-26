@@ -3,8 +3,8 @@ package com.venom.data.local.typeconverter
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.venom.data.model.BoundingBox
 import com.venom.data.model.OcrResponse
+import com.venom.data.model.ParagraphBox
 
 object OcrResponseConverter {
 
@@ -22,16 +22,16 @@ object OcrResponseConverter {
     }
 
     @TypeConverter
-    fun fromBoundingBoxList(value: List<BoundingBox>): String {
+    fun fromParagraphBoxList(value: List<ParagraphBox>): String {
         val gson = Gson()
-        val type = object : TypeToken<List<BoundingBox>>() {}.type
+        val type = object : TypeToken<List<ParagraphBox>>() {}.type
         return gson.toJson(value, type)
     }
 
     @TypeConverter
-    fun toBoundingBoxList(value: String): List<BoundingBox> {
+    fun toParagraphBoxList(value: String): List<ParagraphBox> {
         val gson = Gson()
-        val type = object : TypeToken<List<BoundingBox>>() {}.type
+        val type = object : TypeToken<List<ParagraphBox>>() {}.type
         return gson.fromJson(value, type)
     }
 }
