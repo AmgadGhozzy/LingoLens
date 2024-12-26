@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.lingolens.navigation.Screen
-import com.venom.lingopro.ui.screens.BookmarkHistoryScreen
-import com.venom.lingopro.ui.viewmodel.ViewType
+import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.resources.R
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.screen.ContentType
 
 @Composable
 fun LingoLensApp(
@@ -33,10 +33,10 @@ fun LingoLensApp(
 
 
     if (showHistoryDialog) BookmarkHistoryScreen(
-        onBackClick = { showHistoryDialog = false }, viewType = ViewType.HISTORY
+        onBackClick = { showHistoryDialog = false }, contentType = ContentType.TRANSLATION
     )
     else if (showBookmarkDialog) BookmarkHistoryScreen(
-        onBackClick = { showBookmarkDialog = false }, viewType = ViewType.BOOKMARKS
+        onBackClick = { showBookmarkDialog = false }, contentType = ContentType.OCR
     )
     else Scaffold(topBar = {
         TopBar(title = stringResource(id = R.string.app_name), onNavigationClick = {
