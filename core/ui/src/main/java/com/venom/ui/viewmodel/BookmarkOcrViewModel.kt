@@ -1,10 +1,11 @@
-package com.venom.textsnap.ui.viewmodel
+package com.venom.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.OcrEntry
 import com.venom.data.repo.OcrRepository
+import com.venom.ui.screen.ViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,10 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-enum class ViewType {
-    BOOKMARKS, HISTORY
-}
 
 data class OcrBookmarkState(
     val items: List<OcrEntry> = emptyList(),
