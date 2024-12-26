@@ -9,7 +9,13 @@
     <string name="action_paste">Paste</string>
     <string name="action_save">Save</string>
     <string name="action_share">Share</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_close">Close</string>
     <string name="action_speak">Speak</string>
+    <string name="action_search">Search</string>
+    <string name="action_expand">Expand</string>
+    <string name="action_collapse">Collapse</string>
+    <string name="action_clear_search">Clear Search</string>
     <string name="action_translate">Translate</string>
     <string name="action_speech_to_text">Speech to Text</string>
     <string name="action_fullscreen">Full Screen</string>
@@ -22,6 +28,8 @@
     <string name="action_show_paragraphs">Show Paragraphs</string>
     <string name="action_hide_paragraphs">Hide Paragraphs</string>
     <string name="action_clear_history">Clear All History</string>
+    <string name="action_clear_bookmarks">Clear All Bookmarks</string>
+    <string name="copied_message">Copied!</string>
 
 
     <!-- Navigation -->
@@ -32,10 +40,9 @@
     <string name="bookmarks_title">Bookmarks</string>
     <string name="bookmarks_empty_title">No Bookmarks</string>
     <string name="bookmarks_empty_subtitle">Your saved translations will appear here</string>
-    <string name="bookmark_add">Bookmark</string>
+    <string name="bookmark_add">Add Bookmark</string>
     <string name="bookmark_remove">Remove Bookmark</string>
     <string name="bookmarks_search_hint">Search Bookmarks</string>
-    <string name="bookmarks_clear_search">Clear Search</string>
 
     <!-- History -->
     <string name="history_title">History</string>
@@ -57,6 +64,11 @@
     <string name="translate_type_text">Type text to translate</string>
     <string name="translate_result_placeholder">Translation will appear here</string>
 
+    <string name="more_lines_count">+%d more lines</string>
+    <string name="expand_translation">Show full translation</string>
+    <string name="collapse_translation">Show less</string>
+    <string name="synonyms_label">Synonyms</string>
+
     <!-- Confirmation Dialog -->
     <string name="dialog_clear_all_title">Clear All Items</string>
     <string name="dialog_clear_all_message">Are you sure you want to clear all items? This action cannot be undone.</string>
@@ -67,13 +79,13 @@
 
     <string name="ocr_title">OCR</string>
     <string name="translate_title">Translate</string>
+
+
     <string name="retry">Retry</string>
     <string name="error_message">Please try again</string>
     <string name="empty_state_title">Add an image to start scanning</string>
     <string name="recognized_text_placeholder">Recognized text will appear here</string>
     <string name="ocr_image_content_description">OCR Image</string>
-    <string name="action_close">Close</string>
-    <string name="ocr_empty_subtitle">Your recent activity will appear here</string>
-    <string name="ocr_empty_title">No History</string>
+    <string name="ocr_entry_description">OCR text from %1$s: %2$s</string>
 
 </resources>
