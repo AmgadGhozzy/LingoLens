@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Vibrator
@@ -18,8 +19,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.content.ContextCompat
+import java.text.DateFormat
+import java.util.Date
 
 /**
  * Comprehensive utility extensions for Android development
@@ -166,7 +171,7 @@ object Extensions {
     /**
      * Intent & Navigation
      */
-    fun Activity.shareText(text: String?, chooserTitle: String? = null) {
+    fun Context.shareText(text: String?, chooserTitle: String? = null) {
         text?.let {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -199,7 +204,17 @@ object Extensions {
     /**
      * Time Conversions
      */
+
+    fun Long.formatTimestamp(): String =
+        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(this))
+
     fun Long.millisToSeconds(): Long = this / 1000
 
     fun Long.secondsToMillis(): Long = this * 1000
+
+    /*
+     * Image Processing
+     */
+    fun ByteArray.toBitmap(): ImageBitmap =
+        BitmapFactory.decodeByteArray(this, 0, this.size).asImageBitmap()
 }
