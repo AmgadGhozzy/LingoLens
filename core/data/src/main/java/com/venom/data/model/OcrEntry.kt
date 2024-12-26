@@ -15,6 +15,6 @@ data class OcrEntry(
 
     val timestamp: Long = System.currentTimeMillis(),
 
-    @TypeConverters(OcrResponseConverter::class) val apiResponse: OcrResponse,
-    @TypeConverters(OcrResponseConverter::class) val boundingBoxes: List<BoundingBox> = emptyList(),
+    @TypeConverters(OcrResponseConverter::class) val apiResponse: OcrResponse? = null,
+    @TypeConverters(OcrResponseConverter::class) val boundingBoxes: List<ParagraphBox> = emptyList(),
 )
