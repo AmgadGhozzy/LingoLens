@@ -22,10 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 
-
 @Composable
 fun LanguageSection(
     languageName: String,
+    languageCode: String,
     text: String,
     isExpanded: Boolean,
     style: TextStyle,
@@ -57,7 +57,7 @@ fun LanguageSection(
                     tonalElevation = 2.dp
                 ) {
                     Text(
-                        text = languageName.take(2).uppercase(),
+                        text = languageCode.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -110,6 +110,7 @@ private fun LanguageSectionPreview() {
     MaterialTheme {
         LanguageSection(
             languageName = "English",
+            languageCode = "en",
             text = """
                 This is a sample text that spans
                 multiple lines to demonstrate
