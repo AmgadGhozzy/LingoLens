@@ -46,6 +46,7 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
+    implementation(libs.lottie.compose)
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
