@@ -20,7 +20,6 @@ import com.venom.ui.components.sections.LanguageSection
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun TransHistoryItemView(
     entry: TranslationEntry,
@@ -39,8 +38,7 @@ fun TransHistoryItemView(
             .fillMaxWidth()
             .animateContentSize(),
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 4.dp
+            defaultElevation = 2.dp, pressedElevation = 4.dp
         ),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -51,34 +49,23 @@ fun TransHistoryItemView(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            HistoryItemHeader(
-                timestamp = entry.timestamp,
+            HistoryItemHeader(timestamp = entry.timestamp,
                 isBookmarked = entry.isBookmarked,
-                onToggleBookmark = { onToggleBookmark(entry) }
-            )
+                onToggleBookmark = { onToggleBookmark(entry) })
 
             TranslationContent(
-                sourceLang = entry.sourceLang,
-                targetLang = entry.targetLang,
-                sourceText = entry.sourceText,
-                translatedText = entry.translatedText,
-                synonyms = entry.synonyms,
+                entry = entry,
                 isExpanded = isExpanded,
-                onExpandClick = { isExpanded = !isExpanded }
-            )
+                onExpandClick = { isExpanded = !isExpanded })
 
-            BookMarkActionButtons(
-                onShareClick = { onShareClick(entry) },
-                onCopyClick = {
-                    onCopyClick(entry)
-                    scope.launch {
-                        showCopiedToast = true
-                        delay(2000)
-                        showCopiedToast = false
-                    }
-                },
-                onDeleteClick = { onEntryRemove(entry) },
-                showCopiedToast = showCopiedToast
+            BookMarkActionButtons(onShareClick = { onShareClick(entry) }, onCopyClick = {
+                onCopyClick(entry)
+                scope.launch {
+                    showCopiedToast = true
+                    delay(2000)
+                    showCopiedToast = false
+                }
+            }, onDeleteClick = { onEntryRemove(entry) }, showCopiedToast = showCopiedToast
             )
         }
     }
@@ -86,19 +73,17 @@ fun TransHistoryItemView(
 
 @Composable
 private fun TranslationContent(
-    sourceLang: String,
-    targetLang: String,
-    sourceText: String,
-    translatedText: String,
-    synonyms: List<String>?,
+    entry: TranslationEntry,
     isExpanded: Boolean,
     onExpandClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
+        // Source
         LanguageSection(
-            languageName = sourceLang,
-            text = sourceText,
+            languageName = entry.sourceLangName,
+            languageCode = entry.sourceLangCode,
+            text = entry.sourceText,
             isExpanded = isExpanded,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -107,22 +92,22 @@ private fun TranslationContent(
 
         TranslationArrow()
 
-        Spacer(modifier = Modifier.height(8.dp))
-
+        // Target
         LanguageSection(
-            languageName = targetLang,
-            text = translatedText,
+            languageName = entry.targetLangName,
+            languageCode = entry.targetLangCode,
+            text = entry.translatedText,
             isExpanded = isExpanded,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
         )
 
-        if (!synonyms.isNullOrEmpty()) {
+        if (!entry.synonyms.isNullOrEmpty()) {
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
-                SynonymsSection(synonyms = synonyms)
+                SynonymsSection(synonyms = entry.synonyms!!)
             }
         }
 
@@ -133,7 +118,7 @@ private fun TranslationContent(
                 if (isExpanded) R.string.action_collapse
                 else R.string.action_expand
             ),
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier.align(Alignment.End).fillMaxWidth()
         )
     }
 }
@@ -153,16 +138,17 @@ private fun TranslationArrow() {
 
 @Composable
 private fun SynonymsSection(synonyms: List<String>) {
-    Column(modifier = Modifier.padding(top = 12.dp)) {
+    Column {
         Text(
             text = stringResource(R.string.synonyms_label),
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = 12.dp)
         )
         Text(
             text = synonyms.joinToString(", "),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(horizontal = 4.dp)
         )
     }
 }
