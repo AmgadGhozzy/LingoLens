@@ -1,6 +1,5 @@
 package com.venom.lingopro.ui.screens
 
-import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,33 +12,39 @@ import com.venom.domain.model.LANGUAGES_LIST
 import com.venom.domain.model.LanguageItem
 import com.venom.lingopro.ui.components.sections.ThesaurusView
 import com.venom.lingopro.ui.components.sections.TranslationSection
-import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
+import com.venom.ui.components.speech.SpeechToTextDialog
+import com.venom.ui.viewmodel.STTViewModel
+import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.pasteFromClipboard
 import com.venom.utils.Extensions.shareText
+import kotlinx.coroutines.launch
 
 @Composable
 fun TranslationScreen(
     viewModel: TranslateViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
+    sttViewModel: STTViewModel = hiltViewModel(),
     initialText: String? = null,
     isDialog: Boolean = false,
-    onNavigateToBookmarks: () -> Unit = {},
-    onNavigateToHistory: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val ttsState by ttsViewModel.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
     var sourceLang by remember { mutableStateOf(LANGUAGES_LIST[0]) }
     var targetLang by remember { mutableStateOf(LANGUAGES_LIST[1]) }
 
     var sourceText by remember { mutableStateOf(initialText ?: state.sourceText) }
+
+    var showSpeechToTextDialog by remember { mutableStateOf(false) }
 
     var showFullscreenDialog by remember { mutableStateOf(false) }
 
@@ -49,9 +54,6 @@ fun TranslationScreen(
             viewModel.onSourceTextChanged(initialText)
         }
     }
-
-    val onBookmark: () -> Unit = { onNavigateToBookmarks() }
-    val onHistory: () -> Unit = { onNavigateToHistory() }
 
     val languageSelectAction: (Boolean, LanguageItem) -> Unit = { isSourceLang, selectedLang ->
         if (isSourceLang) {
@@ -83,8 +85,12 @@ fun TranslationScreen(
 
     // Actions for copying, sharing, and speaking
     val copyAction: (String) -> Unit = { text -> context.copyToClipboard(text) }
-    val shareAction: (String) -> Unit = { text -> (context as Activity).shareText(text) }
+    val shareAction: (String) -> Unit = { text -> context.shareText(text) }
     val speakAction: (String) -> Unit = { text -> ttsViewModel.speak(text) }
+    val onSaveAction: () -> Unit = { viewModel.toggleBookmark() }
+    val onSpeechToTextAction: () -> Unit = {
+        showSpeechToTextDialog = true
+    }
     val onPasteAction: () -> Unit = {
         val pastedText = context.pasteFromClipboard()
         pastedText?.let {
@@ -111,7 +117,9 @@ fun TranslationScreen(
                 onShare = shareAction,
                 onSpeak = speakAction,
                 onPaste = onPasteAction,
-                onFullscreen = {showFullscreenDialog = true})
+                onSave = onSaveAction,
+                onSpeechToText = onSpeechToTextAction,
+                onFullscreen = { showFullscreenDialog = true })
 
             // Only show thesaurus in fullScreen mode
             if (!isDialog && state.synonyms.isNotEmpty()) {
@@ -136,6 +144,20 @@ fun TranslationScreen(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxSize()
+        )
+    }
+
+    if (showSpeechToTextDialog) {
+        SpeechToTextDialog(
+            state = sttViewModel.speechState,
+            onDismiss = { showSpeechToTextDialog = false },
+            onStop = sttViewModel::stopRecognition,
+            onStart = {
+                coroutineScope.launch {
+                    sttViewModel.startRecognition()
+                }
+            },
+            onPause = sttViewModel::pauseRecognition
         )
     }
 
