@@ -16,38 +16,63 @@ object ParagraphBoxMapper {
     }
 
     private fun convertFromFullText(response: OriginalResponse): List<ParagraphBox> {
-        return response.fullTextAnnotation.pages.flatMap { page ->
-            page.blocks.flatMap { block ->
-                block.paragraphs.map { paragraph ->
-                    val paragraphText = paragraph.words.joinToString(" ") { word ->
-                        word.symbols.joinToString("") { it.text }
-                    }.sanitize()
+        return runCatching {
+            response.fullTextAnnotation.pages.flatMap { page ->
+                page.blocks.flatMap { block ->
+                    block.paragraphs.map { paragraph ->
+                        val paragraphText = paragraph.words.joinToString(" ") { word ->
+                            word.symbols.joinToString("") { it.text }
+                        }.sanitize()
 
-                    val avgWordHeight =
-                        paragraph.words.map { it.boundingBlock.height() }.average().toFloat()
-                    Log.d(
-                        "BoundingBox",
-                        "avgWordHeight: ${paragraph.words.map { it.boundingBlock.height() }}"
-                    )
-                    ParagraphBox(
-                        text = paragraphText,
-                        boundingBlock = paragraph.boundingBlock,
-                        avgWordHeight = avgWordHeight
-                    )
+                        val avgWordHeight =
+                            paragraph.words.mapNotNull { it.boundingBlock.height() }.average()
+                                .toFloat()
+
+                        Log.d(
+                            "BoundingBox",
+                            "avgWordHeight: ${paragraph.words.mapNotNull { it.boundingBlock.height() }}"
+                        )
+                        ParagraphBox(
+                            text = paragraphText,
+                            boundingBlock = paragraph.boundingBlock,
+                            avgWordHeight = avgWordHeight
+                        )
+                    }
                 }
             }
+        }.getOrElse { exception ->
+            Log.e(
+                "ParagraphBoxMapper",
+                "Error converting from full text: ${exception.message}",
+                exception
+            )
+            emptyList()
         }
     }
 
     private fun convertFromTextAnnotations(response: OriginalResponse): List<ParagraphBox> {
-        return response.textAnnotations.drop(1).map { annotation ->
-            ParagraphBox(
-                text = annotation.description, boundingBlock = annotation.boundingBlock
+        return runCatching {
+            response.textAnnotations.drop(1).map { annotation ->
+                ParagraphBox(
+                    text = annotation.description, boundingBlock = annotation.boundingBlock
+                )
+            }
+        }.getOrElse { exception ->
+            Log.e(
+                "ParagraphBoxMapper",
+                "Error converting from text annotations: ${exception.message}",
+                exception
             )
+            emptyList()
         }
     }
 
-    private fun BoundingBlock.height(): Float = vertices.takeIf { it.isNotEmpty() }?.let { points ->
-        points.maxOf { it.y.toFloat() } - points.minOf { it.y.toFloat() }
-    } ?: 0f
+    private fun BoundingBlock.height(): Float? =
+        vertices.takeIf { it.isNotEmpty() }?.let { points ->
+            points.maxOfOrNull { it.y.toFloat() }?.let { maxY ->
+                points.minOfOrNull { it.y.toFloat() }?.let { minY ->
+                    maxY - minY
+                }
+            }
+        }
 }
