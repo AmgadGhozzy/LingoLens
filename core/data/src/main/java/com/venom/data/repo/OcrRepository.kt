@@ -18,7 +18,7 @@ import javax.inject.Inject
 class OcrRepository @Inject constructor(private val ocrService: OcrService,private val ocrDao: OcrDao) {
     suspend fun performOcr(imageFile: File): Result<OcrResponse> = withContext(Dispatchers.IO) {
         try {
-            val authToken = "Bearer ${BuildConfig.OCR_API_KEY}"
+            val authToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZDJhMzNiODgtZjdjMi00MzIyLThkNDEtZWI4NzY1YmNkYTZjIiwidHlwZSI6ImFwaV90b2tlbiJ9.NCRDaPF5ko8cIuwiXLzkCck7IvBrTHqeAns2VHqT4rA"
             val showOriginalResponse = "true".toRequestBody("text/plain".toMediaTypeOrNull())
             val fallbackProviders = "".toRequestBody("text/plain".toMediaTypeOrNull())
             val providers = "google".toRequestBody("text/plain".toMediaTypeOrNull())
