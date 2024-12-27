@@ -7,14 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,12 +31,12 @@ import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.SearchBar
 import com.venom.ui.components.items.OcrHistoryItemView
 import com.venom.ui.components.items.TransHistoryItemView
+import com.venom.ui.components.sections.BookmarkHistoryTabs
 import com.venom.ui.viewmodel.BookmarkOcrViewModel
 import com.venom.ui.viewmodel.BookmarkViewModel
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,34 +119,33 @@ fun BookmarkHistoryScreen(
     Surface(
         color = MaterialTheme.colorScheme.background, modifier = Modifier.Companion.fillMaxSize()
     ) {
+
         Column(
-            modifier = Modifier.Companion
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TopBar(title = viewResources.title, onNavigationClick = onBackClick, actions = {
-                CustomButton(icon = Icons.Rounded.Delete,
+                CustomButton(
+                    icon = R.drawable.icon_delete,
+                    onClick = { showClearConfirmation = true },
+                    selected = true,
+                    selectedTint = MaterialTheme.colorScheme.error,
                     contentDescription = stringResource(R.string.action_clear_history),
-                    onClick = { showClearConfirmation = true })
+                )
             })
 
             // View Type Selector (Bookmarks/History)
-            TabRow(
-                selectedTabIndex = selectedTab, modifier = Modifier.Companion.fillMaxWidth()
-            ) {
-                Tab(selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    text = { Text(stringResource(R.string.bookmarks_title)) })
-                Tab(selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    text = { Text(stringResource(R.string.history_title)) })
-            }
+            BookmarkHistoryTabs(
+                selectedTab = selectedTab, onTabSelected = { newTab ->
+                    selectedTab = newTab
+                }, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
+            )
 
             SearchBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 searchQuery = searchQuery,
                 onSearchQueryChanged = { searchQuery = it },
-                modifier = Modifier.Companion.padding(vertical = 8.dp)
             )
 
             when (contentType) {
@@ -188,12 +182,12 @@ private fun TranslationList(
 ) {
     val filteredItems = items.filter { item ->
         searchQuery.isEmpty() || listOf(
-            item.sourceText, item.translatedText, item.sourceLang, item.targetLang
+            item.sourceText, item.translatedText, item.sourceLangCode, item.targetLangCode
         ).any { it.contains(searchQuery, ignoreCase = true) }
     }
 
     LazyColumn(
-        modifier = Modifier.Companion.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
@@ -222,7 +216,7 @@ private fun OcrList(
     }
 
     LazyColumn(
-        modifier = Modifier.Companion.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
