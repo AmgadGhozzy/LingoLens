@@ -18,17 +18,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TranslationUiState(
-    val sourceLanguage: LanguageItem = LanguageItem(
-        "en", "English"
-    ),//
-    val targetLanguage: LanguageItem = LanguageItem(
-        "ar", "Arabic"
-    ),//
-    val sourceText: String = "",///
-    val translatedText: String = "",///
-    val translationResult: TranslationResponse? = null,///
-    val synonyms: List<String> = emptyList(),///
-    val isLoading: Boolean = false,///
+    val sourceLanguage: LanguageItem = LanguageItem("en", "English"),
+    val targetLanguage: LanguageItem = LanguageItem("ar", "Arabic"),
+    val sourceText: String = "",
+    val translatedText: String = "",
+    val translationResult: TranslationResponse? = null,
+    val synonyms: List<String> = emptyList(),
+    val isLoading: Boolean = false,
     val error: String? = null,
     val isNetworkAvailable: Boolean = true,
     val isBookmarked: Boolean = false,
@@ -64,19 +60,9 @@ class TranslateViewModel @Inject constructor(
         }
     }
 
-    fun clearText() {
-        _uiState.update {
-            it.copy(
-                sourceText = "",
-                translatedText = "",
-                translationResult = null,
-                synonyms = emptyList()
-            )
-        }
-    }
-
     fun toggleBookmark() {
         _uiState.update { it.copy(isBookmarked = !it.isBookmarked) }
+        saveTranslation()
     }
 
     private fun translate(input: String) {
@@ -97,17 +83,8 @@ class TranslateViewModel @Inject constructor(
                         error = null
                     )
                 }
-                launch {
-                    // Create and save translation entry to history
-                    val translationEntry = TranslationEntry(
-                        sourceText = _uiState.value.sourceText,
-                        translatedText = _uiState.value.translatedText,
-                        sourceLang = _uiState.value.sourceLanguage.code,
-                        targetLang = _uiState.value.targetLanguage.code,
-                        synonyms = _uiState.value.synonyms
-                    )
-                    repository.saveTranslationEntry(translationEntry)
-                }
+                // Create and save translation entry to history
+                saveTranslation()
             }.onFailure { exception ->
                 _uiState.update {
                     it.copy(
@@ -115,6 +92,34 @@ class TranslateViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun saveTranslation() {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            val translationEntry = TranslationEntry(
+                sourceText = currentState.sourceText,
+                translatedText = currentState.translatedText,
+                sourceLangName = currentState.sourceLanguage.name,
+                targetLangName = currentState.targetLanguage.name,
+                sourceLangCode = currentState.sourceLanguage.code,
+                targetLangCode = currentState.targetLanguage.code,
+                isBookmarked = currentState.isBookmarked,
+                synonyms = currentState.synonyms
+            )
+            repository.saveTranslationEntry(translationEntry)
+        }
+    }
+
+    fun clearText() {
+        _uiState.update {
+            it.copy(
+                sourceText = "",
+                translatedText = "",
+                translationResult = null,
+                synonyms = emptyList()
+            )
         }
     }
 }
