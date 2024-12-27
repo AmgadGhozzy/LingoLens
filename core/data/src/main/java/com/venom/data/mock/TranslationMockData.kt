@@ -6,35 +6,76 @@ val TRANSLATION_LIST = listOf(
     TranslationEntry(
         sourceText = "Hello",
         translatedText = "Hola",
-        sourceLang = "en",
-        targetLang = "es",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es",
         isBookmarked = true,
-        synonyms = listOf("Hi", "Greetings")
+        synonyms = listOf("Hi", "Greetings"),
     ), TranslationEntry(
-        sourceText = "Goodbye", translatedText = "Adiós", sourceLang = "en", targetLang = "es"
+        sourceText = "Goodbye",
+        translatedText = "Adiós",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
         sourceText = "Thank you",
         translatedText = "Gracias",
-        sourceLang = "en",
-        targetLang = "es",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es",
         synonyms = listOf("Thanks")
     ), TranslationEntry(
-        sourceText = "Yes", translatedText = "Sí", sourceLang = "en", targetLang = "es"
+        sourceText = "Yes",
+        translatedText = "Sí",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
-        sourceText = "No", translatedText = "No", sourceLang = "en", targetLang = "es"
+        sourceText = "No",
+        translatedText = "No",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
-        sourceText = "Please", translatedText = "Por favor", sourceLang = "en", targetLang = "es"
+        sourceText = "Please",
+        translatedText = "Por favor",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
-        sourceText = "Sorry", translatedText = "Lo siento", sourceLang = "en", targetLang = "es"
+        sourceText = "Sorry",
+        translatedText = "Lo siento",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
-        sourceText = "Excuse me", translatedText = "Perdón", sourceLang = "en", targetLang = "es"
+        sourceText = "Excuse me",
+        translatedText = "Perdón",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     ), TranslationEntry(
         sourceText = "I love you",
         translatedText = "Te quiero",
-        sourceLang = "en",
-        targetLang = "es",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es",
         isBookmarked = true
     ), TranslationEntry(
-        sourceText = "Help", translatedText = "Ayuda", sourceLang = "en", targetLang = "es"
+        sourceText = "Help",
+        translatedText = "Ayuda",
+        sourceLangName = "English",
+        targetLangName = "Spanish",
+        sourceLangCode = "en",
+        targetLangCode = "es"
     )
 )
