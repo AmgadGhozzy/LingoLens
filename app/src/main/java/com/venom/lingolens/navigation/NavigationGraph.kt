@@ -26,10 +26,6 @@ fun NavigationGraph(
     ) {
         composable(Screen.Translation.route) {
             TranslationScreen(
-                onNavigateToBookmarks = {
-                    navController.navigate(Screen.Bookmarks.route)
-                },
-                onNavigateToHistory = { },
                 onDismiss = {},
             )
         }
