@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import com.venom.ui.components.buttons.BookmarkButton
 import com.venom.utils.Extensions.formatTimestamp
 
@@ -33,4 +34,14 @@ fun HistoryItemHeader(
             isBookmarked = isBookmarked, onToggleBookmark = onToggleBookmark
         )
     }
+}
+
+@Preview
+@Composable
+fun HistoryItemHeaderPreview() {
+    HistoryItemHeader(
+        timestamp = System.currentTimeMillis(),
+        isBookmarked = false,
+        onToggleBookmark = {}
+    )
 }
