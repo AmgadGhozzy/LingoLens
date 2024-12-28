@@ -2,7 +2,7 @@ package com.venom.data.stt
 
 import com.venom.domain.model.SpeechState
 import com.venom.domain.repo.stt.ISpeechToTextRepository
-import com.venom.domain.repo.stt.SpeechConfig
+import com.venom.domain.model.SpeechConfig
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,8 +19,6 @@ class SpeechToTextRepository @Inject constructor(
     override suspend fun pauseListening() = speechToTextManager.pauseListening()
 
     override suspend fun stopListening() = speechToTextManager.stopListening()
-
-    override suspend fun cancelListening() = speechToTextManager.cancelListening()
 
     override suspend fun destroy() = speechToTextManager.destroy()
 }
