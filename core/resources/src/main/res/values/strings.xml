@@ -76,6 +76,25 @@
     <string name="dialog_cancel">Cancel</string>
 
 
+    <!-- Speech State Messages -->
+    <string name="speech_state_listening">Listening…</string>
+    <string name="speech_state_partial">I heard…</string>
+    <string name="speech_state_result">I got it!</string>
+    <string name="speech_state_error">Oops!</string>
+    <string name="speech_state_ready">Ready to listen</string>
+
+    <!-- Speech Error Messages -->
+    <string name="speech_error_no_permission">Microphone permission needed</string>
+    <string name="speech_error_not_available">Speech recognition unavailable on this device</string>
+    <string name="speech_error_audio">Audio recording error</string>
+    <string name="speech_error_network">Network error</string>
+    <string name="speech_error_timeout">Network timeout</string>
+    <string name="speech_error_no_match">Couldn\'t understand that</string>
+    <string name="speech_error_busy">Speech service busy</string>
+    <string name="speech_error_server">Server error</string>
+    <string name="speech_error_no_input">No speech detected</string>
+    <string name="speech_error_unknown">Something went wrong</string>
+
 
     <string name="ocr_title">OCR</string>
     <string name="translate_title">Translate</string>
@@ -87,5 +106,14 @@
     <string name="recognized_text_placeholder">Recognized text will appear here</string>
     <string name="ocr_image_content_description">OCR Image</string>
     <string name="ocr_entry_description">OCR text from %1$s: %2$s</string>
+    <string name="settings_title">Settings</string>
+    <string name="action_start">Start</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_stop">Stop</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
+    <string name="transcript_label">Transcript</string>
+    <string name="action_menu">Main Menu</string>
+
 
 </resources>
