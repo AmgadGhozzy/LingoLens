@@ -1,11 +1,10 @@
 package com.venom.ui.components.bars
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,7 +15,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 
 /**
- * A top app bar with a title and optional navigation icon and actions.
+ * A top app bar with a title and optional navigation or menu icon and actions.
  *
  * @param title The title of the top app bar
  * @param modifier The modifier to apply to the top app bar
- * @param navigationIcon The icon to use for navigation. If null, no icon is shown
- * @param onNavigationClick The callback to call when the navigation icon is clicked
+ * @param leadingIcon The icon to show on the left side (navigation or menu)
+ * @param onLeadingIconClick The callback to call when the leading icon is clicked
  * @param actions The actions to show on the top app bar
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,38 +36,39 @@ import com.venom.resources.R
 fun TopBar(
     title: String,
     modifier: Modifier = Modifier,
-    navigationIcon: ImageVector? = Icons.Rounded.ArrowBackIosNew,
-    onNavigationClick: (() -> Unit)? = null,
+    @DrawableRes leadingIcon: Int,
+    onLeadingIconClick: () -> Unit,
     actions: @Composable (RowScope.() -> Unit) = {}
 ) {
-    TopAppBar(title = {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-        )
-    }, navigationIcon = {
-        navigationIcon?.let {
-            IconButton(onClick = { onNavigationClick?.invoke() }) {
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onLeadingIconClick) {
                 Icon(
-                    imageVector = it, contentDescription = stringResource(R.string.action_back)
+                    painter = painterResource(leadingIcon), contentDescription = when (leadingIcon) {
+                        R.drawable.icon_menu -> stringResource(R.string.action_menu)
+                        else -> stringResource(R.string.action_back)
+                    }
                 )
-            }
-        }
-    }, actions = actions, colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surface,
-        navigationIconContentColor = MaterialTheme.colorScheme.primary,
-        titleContentColor = MaterialTheme.colorScheme.onSurface,
-        actionIconContentColor = MaterialTheme.colorScheme.primary
-    ), modifier = modifier
-        .fillMaxWidth()
-        .height(82.dp)
-        .wrapContentHeight(align = Alignment.CenterVertically)
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun TopBarPreview() {
-    TopBar(title = "LingoPro")
+            }
+        },
+        actions = actions,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            navigationIconContentColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.primary
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(82.dp)
+            .wrapContentHeight(align = Alignment.CenterVertically)
+    )
 }
