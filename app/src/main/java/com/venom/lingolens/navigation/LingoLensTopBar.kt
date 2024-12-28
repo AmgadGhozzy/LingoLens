@@ -11,7 +11,10 @@ import com.venom.ui.components.buttons.CustomButton
 fun LingoLensTopBar(
     navController: NavHostController, onBookmarkClick: () -> Unit
 ) {
-    TopBar(title = stringResource(id = R.string.app_name), onNavigationClick = {
+    TopBar(
+        title = stringResource(id = R.string.app_name),
+        leadingIcon = R.drawable.icon_menu,
+        onLeadingIconClick = {
         navController.navigateToStart(Screen.Translation)
     }, actions = {
         TopBarActions(onBookmarkClick)
