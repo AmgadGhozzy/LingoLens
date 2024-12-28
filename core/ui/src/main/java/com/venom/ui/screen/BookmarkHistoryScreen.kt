@@ -121,11 +121,13 @@ fun BookmarkHistoryScreen(
     ) {
 
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            TopBar(title = viewResources.title, onNavigationClick = onBackClick, actions = {
+            TopBar(
+                title = viewResources.title,
+                onLeadingIconClick = onBackClick,
+                leadingIcon = R.drawable.icon_back,
+                actions = {
                 CustomButton(
                     icon = R.drawable.icon_delete,
                     onClick = { showClearConfirmation = true },
@@ -139,7 +141,9 @@ fun BookmarkHistoryScreen(
             BookmarkHistoryTabs(
                 selectedTab = selectedTab, onTabSelected = { newTab ->
                     selectedTab = newTab
-                }, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
             )
 
             SearchBar(
@@ -187,7 +191,9 @@ private fun TranslationList(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
@@ -216,7 +222,9 @@ private fun OcrList(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
