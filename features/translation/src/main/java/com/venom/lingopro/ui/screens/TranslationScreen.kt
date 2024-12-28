@@ -37,7 +37,6 @@ fun TranslationScreen(
     val ttsState by ttsViewModel.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     var sourceLang by remember { mutableStateOf(LANGUAGES_LIST[0]) }
     var targetLang by remember { mutableStateOf(LANGUAGES_LIST[1]) }
@@ -148,16 +147,8 @@ fun TranslationScreen(
     }
 
     if (showSpeechToTextDialog) {
-        SpeechToTextDialog(
-            state = sttViewModel.speechState,
+        SpeechToTextDialog(sttViewModel = sttViewModel,
             onDismiss = { showSpeechToTextDialog = false },
-            onStop = sttViewModel::stopRecognition,
-            onStart = {
-                coroutineScope.launch {
-                    sttViewModel.startRecognition()
-                }
-            },
-            onPause = sttViewModel::pauseRecognition
         )
     }
 
