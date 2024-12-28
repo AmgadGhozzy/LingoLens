@@ -8,75 +8,114 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import androidx.core.content.ContextCompat
+import com.venom.domain.model.SpeechConfig
 import com.venom.domain.model.SpeechError
 import com.venom.domain.model.SpeechState
-import com.venom.domain.repo.stt.SpeechConfig
+import com.venom.domain.repo.stt.ISpeechToTextRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SpeechToTextManager @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : ISpeechToTextRepository {
     private var speechRecognizer: SpeechRecognizer? = null
-    private var recognitionJob: Job? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
     private val _state = MutableStateFlow<SpeechState>(SpeechState.Idle)
-    val state = _state.asStateFlow()
+    override val state: StateFlow<SpeechState> = _state.asStateFlow()
 
-    private var currentConfig = SpeechConfig()
+    private var isListening = false
     private var isPaused = false
-    private var lastPartialResult: String? = null
+    private var currentConfig = SpeechConfig()
+    private var lastPartialResult = ""
 
+    private var hasPermission: Boolean = false
+    private var isRecognitionAvailable: Boolean = false
 
+    init {
+        // Check permission and availability once during initialization
+        checkPermissionAndAvailability()
+    }
+
+    /**
+     * Creates and configures an intent for speech recognition.
+     */
     private fun createRecognizerIntent() = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, currentConfig.language)
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, currentConfig.partialResults)
         putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, currentConfig.maxResults)
+        putExtra(
+            RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
+            currentConfig.completeSilenceLengthMs
+        )
+        putExtra(
+            RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, currentConfig.minimumLengthMs
+        )
+        putExtra(
+            RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,
+            currentConfig.possiblyCompleteSilenceLengthMs
+        )
     }
 
-    suspend fun startListening(config: SpeechConfig = SpeechConfig()) =
-        withContext(Dispatchers.Main) {
-            if (speechRecognizer != null && !isPaused) return@withContext
+    /**
+     * Starts listening to the user's voice with the given configuration.
+     */
+    override suspend fun startListening(config: SpeechConfig) {
+        if (!checkPermissionAndAvailability()) return
 
-            currentConfig = config
-            if (!checkPreconditions()) return@withContext
-
-            if (isPaused) {
-                resumeListening()
-            } else {
-                initializeRecognizer()
-            }
-            startRecognitionTimeout()
-        }
-
-
-    suspend fun pauseListening() = withContext(Dispatchers.Main) {
-        isPaused = true
-        speechRecognizer?.stopListening()
-        cancelTimeout()
-        _state.value = SpeechState.Paused(lastPartialResult.toString())
-    }
-
-    private suspend fun resumeListening() = withContext(Dispatchers.Main) {
+        currentConfig = config
+        isListening = true
         isPaused = false
-        speechRecognizer?.startListening(createRecognizerIntent())
-        _state.value = SpeechState.Listening
+
+        initializeRecognizer()
     }
 
-    private fun checkPreconditions(): Boolean {
+    /**
+     * Pauses the current listening session.
+     */
+    override suspend fun pauseListening() {
+        if (!isListening) return
+
+        isPaused = true
+        isListening = false
+        speechRecognizer?.stopListening()
+        _state.value = SpeechState.Paused(lastPartialResult)
+    }
+
+    /**
+     * Stops the current listening session.
+     */
+    override suspend fun stopListening() {
+        isListening = false
+        isPaused = false
+        lastPartialResult = ""
+        destroy()
+        _state.value = SpeechState.Idle
+    }
+
+    /**
+     * Checks for audio recording permissions and availability of speech recognition services.
+     */
+    private fun checkPermissionAndAvailability(): Boolean {
+        hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+
+        isRecognitionAvailable = SpeechRecognizer.isRecognitionAvailable(context)
+
         return when {
-            !isPermissionGranted() -> {
+            !hasPermission -> {
                 _state.value = SpeechState.Error(SpeechError.NO_PERMISSION)
                 false
             }
 
-            !SpeechRecognizer.isRecognitionAvailable(context) -> {
+            !isRecognitionAvailable -> {
                 _state.value = SpeechState.Error(SpeechError.NOT_AVAILABLE)
                 false
             }
@@ -85,81 +124,30 @@ class SpeechToTextManager @Inject constructor(
         }
     }
 
+    /**
+     * Initializes the SpeechRecognizer and starts listening.
+     */
     private fun initializeRecognizer() {
-        try {
+        if (speechRecognizer == null) {
             speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
                 setRecognitionListener(createListener())
-                startListening(createRecognizerIntent())
             }
+        }
+        try {
+            speechRecognizer?.startListening(createRecognizerIntent())
             _state.value = SpeechState.Listening
         } catch (e: Exception) {
-            handleError(SpeechError.UNKNOWN)
+            _state.value = SpeechState.Error(SpeechError.UNKNOWN)
+            Log.e("SpeechToTextManager", "Error initializing SpeechRecognizer: ${e.message}")
         }
     }
 
-    fun stopListening() = changeStateAndDestroyRecognizer(SpeechRecognizer::stopListening)
-    fun cancelListening() = changeStateAndDestroyRecognizer(SpeechRecognizer::cancel)
-
-    fun destroy() {
-        cancelTimeout()
-        changeStateAndDestroyRecognizer(SpeechRecognizer::destroy)
-        recognitionJob?.cancel()
-        coroutineScope.cancel()
-    }
-
-    private fun changeStateAndDestroyRecognizer(action: SpeechRecognizer.() -> Unit) {
-        try {
-            speechRecognizer?.action()
-        } catch (e: Exception) {
-            // Ignore exceptions during cleanup
-        } finally {
-            _state.value = SpeechState.Idle
-            destroyRecognizer()
-        }
-    }
-
-    private fun destroyRecognizer() {
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        isPaused = false
-        lastPartialResult = null
-        cancelTimeout()
-    }
-
-    private fun startRecognitionTimeout() {
-        cancelTimeout()
-        recognitionJob = coroutineScope.launch {
-            delay(currentConfig.recognitionTimeoutMs)
-            if (speechRecognizer != null && !isPaused) {
-                handleError(SpeechError.TIMEOUT)
-            }
-        }
-    }
-
-    private fun cancelTimeout() {
-        recognitionJob?.cancel()
-        recognitionJob = null
-    }
-
-    private fun handleError(error: SpeechError) {
-        _state.value = SpeechState.Error(error)
-        destroyRecognizer()
-
-        if (error in listOf(SpeechError.NETWORK, SpeechError.BUSY)) {
-            coroutineScope.launch {
-                delay(currentConfig.retryDelayMs)
-                startListening(currentConfig)
-            }
-        }
-    }
-
-    private fun isPermissionGranted() = ContextCompat.checkSelfPermission(
-        context, Manifest.permission.RECORD_AUDIO
-    ) == PackageManager.PERMISSION_GRANTED
-
+    /**
+     * Creates a RecognitionListener to handle speech recognition events.
+     */
     private fun createListener() = object : RecognitionListener {
         override fun onPartialResults(partialResults: Bundle?) {
-            if (isPaused) return
+            if (!isListening) return
 
             partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                 ?.let { text ->
@@ -168,46 +156,72 @@ class SpeechToTextManager @Inject constructor(
                 }
         }
 
-        override fun onReadyForSpeech(params: Bundle?) {
-            if (!isPaused) _state.value = SpeechState.Listening
-        }
-
-        override fun onEndOfSpeech() {
-            if (!isPaused) {
-                cancelTimeout()
-            }
-        }
-
         override fun onResults(results: Bundle?) {
-            if (isPaused) return
+            if (!isListening) return
 
             results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
                 ?.let { text ->
                     _state.value = SpeechState.Result(text)
+                    if (isListening) {
+                        initializeRecognizer()
+                    }
                 } ?: run {
-                _state.value = SpeechState.Error(SpeechError.NO_MATCH)
+                if (isListening) {
+                    initializeRecognizer()
+                }
             }
-            destroyRecognizer()
         }
 
         override fun onError(error: Int) {
-            if (!isPaused) handleError(mapError(error))
+            handleRecognizerError(error)
+            if (isListening) {
+                initializeRecognizer()
+            }
         }
 
+        override fun onReadyForSpeech(params: Bundle?) {
+            if (isListening) _state.value = SpeechState.Listening
+        }
+
+        // Required overrides
         override fun onBeginningOfSpeech() {}
+        override fun onEndOfSpeech() {}
         override fun onRmsChanged(rmsdB: Float) {}
         override fun onBufferReceived(buffer: ByteArray?) {}
         override fun onEvent(eventType: Int, params: Bundle?) {}
     }
 
-    private fun mapError(errorCode: Int): SpeechError = when (errorCode) {
-        SpeechRecognizer.ERROR_AUDIO -> SpeechError.AUDIO
-        SpeechRecognizer.ERROR_NETWORK -> SpeechError.NETWORK
-        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> SpeechError.TIMEOUT
-        SpeechRecognizer.ERROR_NO_MATCH -> SpeechError.NO_MATCH
-        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> SpeechError.BUSY
-        SpeechRecognizer.ERROR_SERVER -> SpeechError.SERVER
-        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> SpeechError.NO_INPUT
-        else -> SpeechError.UNKNOWN
+    /**
+     * Handles errors from the SpeechRecognizer.
+     */
+    private fun handleRecognizerError(error: Int) {
+        val speechError = when (error) {
+            SpeechRecognizer.ERROR_NO_MATCH -> SpeechError.NO_MATCH
+            SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
+                if (lastPartialResult.isNotEmpty())
+                    _state.value = SpeechState.Result(lastPartialResult)
+
+                SpeechError.NO_INPUT
+            }
+
+            SpeechRecognizer.ERROR_AUDIO -> SpeechError.AUDIO
+            SpeechRecognizer.ERROR_NETWORK -> SpeechError.NETWORK
+            SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> SpeechError.TIMEOUT
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> SpeechError.BUSY
+            SpeechRecognizer.ERROR_SERVER -> SpeechError.SERVER
+            else -> SpeechError.UNKNOWN
+        }
+        _state.value = SpeechState.Error(speechError)
+    }
+
+    /**
+     * Destroys the SpeechRecognizer instance.
+     */
+    override suspend fun destroy() {
+        isListening = false
+        isPaused = false
+        lastPartialResult = ""
+        speechRecognizer?.destroy()
+        speechRecognizer = null
     }
 }
