@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.screens
+package com.venom.ui.screen
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.*
