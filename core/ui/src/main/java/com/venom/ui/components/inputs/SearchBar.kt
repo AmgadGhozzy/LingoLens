@@ -3,13 +3,14 @@ package com.venom.ui.components.inputs
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,9 +20,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
@@ -48,21 +53,28 @@ fun SearchBar(
     searchHint: String = stringResource(R.string.nav_search),
     enabled: Boolean = true,
     searchIconTint: Color = MaterialTheme.colorScheme.primary,
-    clearIconTint: Color = MaterialTheme.colorScheme.error
+    clearIconTint: Color = MaterialTheme.colorScheme.error,
+    shape: RoundedCornerShape = RoundedCornerShape(28.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
 ) {
-    var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val interactionSource = remember { MutableInteractionSource() }
 
-    Box(
+    Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(shape)
+            .semantics { contentDescription = searchHint },
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = if (isFocused) 2.dp else 0.dp,
+        shape = shape
     ) {
         Row(
-            modifier = Modifier, verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(contentPadding),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Search Icon
             CustomButton(
@@ -77,11 +89,9 @@ fun SearchBar(
                 },
             )
 
-            // Search Input
             Box(modifier = Modifier.weight(1f)) {
-                BasicTextField(
-                    value = searchQuery,
-                    onValueChange = { onSearchQueryChanged(it) },
+                BasicTextField(value = searchQuery,
+                    onValueChange = onSearchQueryChanged,
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
@@ -95,27 +105,28 @@ fun SearchBar(
                         onSearchTriggered()
                         keyboardController?.hide()
                     }),
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onSurface
                     ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    interactionSource = interactionSource,
+                    visualTransformation = VisualTransformation.None,
                     decorationBox = { innerTextField ->
-                        if (searchQuery.isEmpty()) {
-                            Text(
-                                text = searchHint,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                        Box {
+                            if (searchQuery.isEmpty()) {
+                                Text(
+                                    text = searchHint,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
-                    }
-                )
+                    })
             }
 
-            // Clear Search Button
             AnimatedVisibility(
-                visible = searchQuery.isNotEmpty() && enabled,
-                enter = fadeIn(),
-                exit = fadeOut()
+                visible = searchQuery.isNotEmpty() && enabled, enter = fadeIn(), exit = fadeOut()
             ) {
                 CustomButton(
                     icon = R.drawable.icon_clear,
@@ -124,10 +135,9 @@ fun SearchBar(
                     onClick = {
                         onSearchQueryChanged("")
                         keyboardController?.hide()
-                        focusRequester.freeFocus()
                     },
                     enabled = enabled,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(40.dp)
                 )
             }
         }
@@ -141,7 +151,8 @@ fun SearchBarPreview() {
         SearchBar(
             searchQuery = "",
             onSearchQueryChanged = {},
-            searchHint = "Search here..."
+            searchHint = "Search here...",
+            modifier = Modifier.padding(16.dp)
         )
     }
 }
