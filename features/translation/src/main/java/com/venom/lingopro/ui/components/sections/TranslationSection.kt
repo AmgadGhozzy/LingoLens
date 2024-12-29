@@ -11,25 +11,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.domain.model.LANGUAGES_LIST
-import com.venom.domain.model.LanguageItem
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.ui.components.bars.LanguageBar
 import com.venom.ui.components.bars.SourceTextActionBar
 import com.venom.ui.components.bars.TranslatedTextActionBar
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.utils.Extensions.getSelectedOrFullText
 
 @Composable
 fun TranslationSection(
-    sourceLang: LanguageItem = LANGUAGES_LIST[0],
-    targetLang: LanguageItem = LANGUAGES_LIST[1],
+    viewModel: LangSelectorViewModel = hiltViewModel(),
     sourceTextValue: TextFieldValue,
     translatedTextValue: TextFieldValue,
     onTextChange: (TextFieldValue) -> Unit = {},
     isLoading: Boolean = true,
-    onLanguageSelect: (Boolean, LanguageItem) -> Unit = { _, _ -> },
-    onSwapLanguages: () -> Unit = {},
     onClearText: () -> Unit = {},
     onCopy: (String) -> Unit = {},
     onShare: (String) -> Unit = {},
@@ -48,10 +45,7 @@ fun TranslationSection(
     CustomCard {
         // Translation Top Bar for source and target languages
         LanguageBar(
-            sourceLang = sourceLang,
-            targetLang = targetLang,
-            onLanguageSelect = onLanguageSelect,
-            onSwapLanguages = onSwapLanguages,
+            viewModel = viewModel,
             showNativeNameHint = showNativeNameHint,
             showFlag = showFlag,
         )
@@ -98,8 +92,6 @@ fun TranslationSection(
 fun TranslationSectionWithoutFlagPreview() {
     LingoLensTheme {
         TranslationSection(
-            sourceLang = LANGUAGES_LIST[0],
-            targetLang = LANGUAGES_LIST[1],
             sourceTextValue = TextFieldValue("Hello"),
             translatedTextValue = TextFieldValue("مرحبا"),
         )
@@ -110,8 +102,6 @@ fun TranslationSectionWithoutFlagPreview() {
 @Composable
 fun TranslationSectionPreview() {
     TranslationSection(
-        sourceLang = LANGUAGES_LIST[0],
-        targetLang = LANGUAGES_LIST[1],
         sourceTextValue = TextFieldValue("Hello"),
         translatedTextValue = TextFieldValue("مرحبا"),
         showFlag = true
