@@ -21,23 +21,17 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.venom.domain.model.LANGUAGES_LIST
-import com.venom.domain.model.LanguageItem
 import com.venom.resources.R
 import com.venom.ui.components.items.LanguageItemView
-import com.venom.ui.screen.LanguageSelectorBottomSheet
-
+import com.venom.ui.screen.LangSelectorBottomSheet
+import com.venom.ui.viewmodel.LangSelectorViewModel
 
 /**
  * A customizable top bar for language translation.
  *
- * @param sourceLang The source language for translation.
- * @param targetLang The target language for translation.
- * @param onSwapLanguages Callback invoked when the swap languages button is clicked.
- * @param onLanguageSelect Callback invoked when a language is selected; boolean indicates if it's the source language.
+ * @param viewModel The view model for language selection.
  * @param showNativeNameHint Whether to show the native name of languages.
  * @param showFlag Whether to show flags for languages.
  * @param modifier Additional modifier for customization.
@@ -48,10 +42,7 @@ import com.venom.ui.screen.LanguageSelectorBottomSheet
 
 @Composable
 fun LanguageBar(
-    sourceLang: LanguageItem,
-    targetLang: LanguageItem,
-    onSwapLanguages: () -> Unit,
-    onLanguageSelect: (Boolean, LanguageItem) -> Unit,
+    viewModel: LangSelectorViewModel,
     isFromBottomSheet: Boolean = false,
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false,
@@ -60,16 +51,13 @@ fun LanguageBar(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
-    var isSelectingSourceLanguage by remember { mutableStateOf(true) }
+    val state by viewModel.state.collectAsState()
     var showLanguageSelector by remember { mutableStateOf(false) }
 
     val rotation by animateFloatAsState(
-        targetValue = if (isFromBottomSheet) 0f else 180f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "Swap Button Rotation"
+        targetValue = if (isFromBottomSheet) 0f else 180f, animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
+        ), label = "Swap Button Rotation"
     )
 
     Surface(
@@ -83,25 +71,23 @@ fun LanguageBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            // Source Language
             AnimatedContent(
-                targetState = sourceLang,
-                label = "Source Language Animation"
+                targetState = state.sourceLang, label = "Source Language Animation"
             ) { language ->
-                LanguageItemView(
-                    language = language,
+                LanguageItemView(language = language,
                     showFlag = showFlag,
                     flagSize = flagSize,
                     showNativeNameHint = showNativeNameHint,
                     onClick = {
-                        isSelectingSourceLanguage = true
+                        viewModel.setSelectingSourceLanguage(true)
                         showLanguageSelector = true
-                    }
-                )
+                    })
             }
 
+            // Swap Button
             IconButton(
-                onClick = onSwapLanguages,
-                modifier = Modifier.rotate(rotation)
+                onClick = { viewModel.swapLanguages() }, modifier = Modifier.rotate(rotation)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.icon_swap),
@@ -110,43 +96,26 @@ fun LanguageBar(
                 )
             }
 
+            // Target Language
             AnimatedContent(
-                targetState = targetLang,
-                label = "Target Language Animation"
+                targetState = state.targetLang, label = "Target Language Animation"
             ) { language ->
-                LanguageItemView(
-                    language = language,
+                LanguageItemView(language = language,
                     showFlag = showFlag,
                     flagSize = flagSize,
                     showNativeNameHint = showNativeNameHint,
                     onClick = {
-                        isSelectingSourceLanguage = false
+                        viewModel.setSelectingSourceLanguage(false)
                         showLanguageSelector = true
-                    }
-                )
+                    })
             }
         }
     }
 
     if (showLanguageSelector && !isFromBottomSheet) {
-        LanguageSelectorBottomSheet(
-            initialSourceLang = sourceLang,
-            initialTargetLang = targetLang,
-            isSelectingSourceLanguage = isSelectingSourceLanguage,
-            onLanguageSelected = { selectedLanguage ->
-                onLanguageSelect(isSelectingSourceLanguage, selectedLanguage)
-                showLanguageSelector = false
-            },
-            onDismiss = { showLanguageSelector = false }
-        )
+        LangSelectorBottomSheet(viewModel = viewModel, onDismiss = {
+            showLanguageSelector = false
+        })
     }
 }
 
-@Preview
-@Composable
-fun TranslationTopBarPreview() {
-    LanguageBar(sourceLang = LANGUAGES_LIST[0],
-        targetLang = LANGUAGES_LIST[1],
-        onSwapLanguages = {},
-        onLanguageSelect = { _, _ -> })
-}
