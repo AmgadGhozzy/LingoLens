@@ -34,7 +34,7 @@ fun TranslationSection(
     onPaste: () -> Unit = {},
     onOcr: () -> Unit = {},
     onSave: () -> Unit = {},
-    onFullscreen: () -> Unit = {},
+    onFullscreen: (String) -> Unit = {},
     onSpeechToText: () -> Unit = {},
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false
@@ -66,7 +66,7 @@ fun TranslationSection(
             onOcr = onOcr,
             onPaste = onPaste,
             onCopy = { onCopy(sourceTextValue.getSelectedOrFullText()) },
-            onFullscreen = {},
+            onFullscreen = { onFullscreen(sourceTextValue.getSelectedOrFullText()) },
             onSpeak = { onSpeak(sourceTextValue.getSelectedOrFullText()) },
         )
 
@@ -80,7 +80,7 @@ fun TranslationSection(
             onSave = { isSaved = !isSaved; onSave() },
             onCopy = { onCopy(translatedTextValue.getSelectedOrFullText()) },
             onShare = { onShare(translatedTextValue.getSelectedOrFullText()) },
-            onFullscreen = onFullscreen,
+            onFullscreen = { onFullscreen(translatedTextValue.getSelectedOrFullText()) },
             onSpeak = { onSpeak(translatedTextValue.getSelectedOrFullText()) },
         )
     }
