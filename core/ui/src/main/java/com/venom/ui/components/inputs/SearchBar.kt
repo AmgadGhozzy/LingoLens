@@ -55,7 +55,7 @@ fun SearchBar(
     searchIconTint: Color = MaterialTheme.colorScheme.primary,
     clearIconTint: Color = MaterialTheme.colorScheme.error,
     shape: RoundedCornerShape = RoundedCornerShape(28.dp),
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
 ) {
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
@@ -74,7 +74,7 @@ fun SearchBar(
         Row(
             modifier = Modifier.padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             // Search Icon
             CustomButton(
@@ -137,7 +137,7 @@ fun SearchBar(
                         keyboardController?.hide()
                     },
                     enabled = enabled,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(32.dp)
                 )
             }
         }
