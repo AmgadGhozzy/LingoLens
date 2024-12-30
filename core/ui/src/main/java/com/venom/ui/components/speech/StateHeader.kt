@@ -3,6 +3,7 @@ package com.venom.ui.components.speech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -27,11 +28,13 @@ fun StateHeader(state: SpeechState, onDismiss: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text(
             text = stringResource(state.toDisplayString()),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
+        Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = onDismiss,
             modifier = Modifier
