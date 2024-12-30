@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,6 +44,7 @@ fun TranslatedTextActionBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        var isSaved by remember { mutableStateOf(false) }
         // Speak Button
         CustomButton(
             icon = R.drawable.icon_sound,
@@ -64,8 +67,7 @@ fun TranslatedTextActionBar(
             CustomButton(
                 icon = R.drawable.icon_share,
                 contentDescription = stringResource(R.string.action_share),
-                onClick =
-                onShare
+                onClick = onShare
             )
 
             // Copy Button
@@ -76,11 +78,9 @@ fun TranslatedTextActionBar(
             )
 
             // Save Button
-            CustomButton(
-                icon = R.drawable.icon_bookmark_outline,
+            CustomButton(icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
                 contentDescription = stringResource(R.string.action_save),
-                onClick = onSave
-            )
+                onClick = { onSave; isSaved = !isSaved })
         }
     }
 }
