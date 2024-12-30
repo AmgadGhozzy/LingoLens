@@ -8,7 +8,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationEntry
@@ -16,9 +19,10 @@ import com.venom.resources.R
 import com.venom.ui.components.bars.BookMarkActionButtons
 import com.venom.ui.components.bars.HistoryItemHeader
 import com.venom.ui.components.buttons.CustomButton
-import com.venom.ui.components.sections.LanguageSection
+import com.venom.ui.components.sections.LangHistorySection
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun TransHistoryItemView(
@@ -32,11 +36,17 @@ fun TransHistoryItemView(
     var isExpanded by remember { mutableStateOf(false) }
     var showCopiedToast by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val hapticFeedback = LocalHapticFeedback.current
 
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(),
+            .animateContentSize()
+            .semantics {
+                contentDescription =
+                    "Translation from ${entry.sourceLangName} to ${entry.targetLangName}"
+            },
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 2.dp, pressedElevation = 4.dp
         ),
@@ -48,6 +58,7 @@ fun TransHistoryItemView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .animateContentSize()
         ) {
             HistoryItemHeader(timestamp = entry.timestamp,
                 isBookmarked = entry.isBookmarked,
@@ -71,6 +82,7 @@ fun TransHistoryItemView(
     }
 }
 
+
 @Composable
 private fun TranslationContent(
     entry: TranslationEntry,
@@ -80,7 +92,7 @@ private fun TranslationContent(
 ) {
     Column(modifier = modifier) {
         // Source
-        LanguageSection(
+        LangHistorySection(
             languageName = entry.sourceLangName,
             languageCode = entry.sourceLangCode,
             text = entry.sourceText,
@@ -93,7 +105,7 @@ private fun TranslationContent(
         TranslationArrow()
 
         // Target
-        LanguageSection(
+        LangHistorySection(
             languageName = entry.targetLangName,
             languageCode = entry.targetLangCode,
             text = entry.translatedText,
@@ -118,7 +130,9 @@ private fun TranslationContent(
                 if (isExpanded) R.string.action_collapse
                 else R.string.action_expand
             ),
-            modifier = Modifier.align(Alignment.End).fillMaxWidth()
+            modifier = Modifier
+                .align(Alignment.End)
+                .fillMaxWidth()
         )
     }
 }
@@ -130,7 +144,7 @@ private fun TranslationArrow() {
     ) {
         Icon(
             imageVector = Icons.Rounded.ArrowDownward,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.expand_translation),
             tint = MaterialTheme.colorScheme.primary
         )
     }
