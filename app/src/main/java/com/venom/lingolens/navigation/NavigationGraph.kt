@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
+import com.venom.phrase.ui.screen.CategoryScreen
+import com.venom.phrase.ui.screen.PhraseScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.screen.ContentType
@@ -39,11 +41,8 @@ fun NavigationGraph(
             )
         }
 
-        composable(Screen.Bookmarks.route) {
-            BookmarkHistoryScreen(
-                onBackClick = { navController.popBackStack() },
-                contentType = ContentType.OCR
-            )
+        composable(Screen.Phrases.route) {
+            CategoryScreen()
         }
 
         composable(Screen.History.route) {
