@@ -8,13 +8,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.domain.model.LanguageItem
-import com.venom.lingopro.ui.components.sections.ThesaurusView
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
+import com.venom.ui.components.sections.ThesaurusView
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
@@ -41,7 +40,8 @@ fun TranslationScreen(
 
     var sourceText by remember { mutableStateOf(initialText ?: state.sourceText) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
-    var showFullscreenDialog by remember { mutableStateOf(false) }
+    var fullscreenState by remember { mutableStateOf<String?>(null) }
+
 
     LaunchedEffect(initialText, isDialog) {
         if (isDialog && !initialText.isNullOrBlank()) {
@@ -92,7 +92,7 @@ fun TranslationScreen(
                 onPaste = onPasteAction,
                 onSave = onSaveAction,
                 onSpeechToText = onSpeechToTextAction,
-                onFullscreen = { showFullscreenDialog = true })
+                onFullscreen = { text -> fullscreenState = text },)
 
             if (!isDialog && state.synonyms.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
@@ -125,10 +125,10 @@ fun TranslationScreen(
         )
     }
 
-    if (showFullscreenDialog) {
+    fullscreenState?.let { text ->
         FullscreenTextDialog(
-            textValue = TextFieldValue(state.translatedText),
-            onDismiss = { showFullscreenDialog = false },
+            textValue = TextFieldValue(text),
+            onDismiss = { fullscreenState = null },
             onCopy = copyAction,
             onShare = shareAction,
             onSpeak = speakAction
