@@ -1,4 +1,4 @@
-package com.venom.lingopro.ui.components.sections
+package com.venom.ui.components.sections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
