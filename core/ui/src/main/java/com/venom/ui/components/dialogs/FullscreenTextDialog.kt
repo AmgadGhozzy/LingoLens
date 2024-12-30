@@ -6,8 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -80,8 +78,7 @@ fun FullscreenTextDialog(
             )
 
             CustomCard(modifier = Modifier.padding(bottom = 32.dp)) {
-                TranslatedTextActionBar(
-                    onSave = {},
+                TranslatedTextActionBar(onSave = {},
                     onCopy = { onCopy(textValue.getSelectedOrFullText()) },
                     onShare = { onShare(textValue.getSelectedOrFullText()) },
                     onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
