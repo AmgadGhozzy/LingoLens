@@ -13,8 +13,8 @@ import javax.inject.Inject
 import kotlin.text.contains
 
 data class LanguageSelectorState(
-    val sourceLang: LanguageItem,
-    val targetLang: LanguageItem,
+    val sourceLang: LanguageItem = LANGUAGES_LIST[0],
+    val targetLang: LanguageItem = LANGUAGES_LIST[1],
     val searchQuery: String = "",
     val isSelectingSourceLanguage: Boolean = true,
     val filteredLanguages: List<LanguageItem> = LANGUAGES_LIST
@@ -23,11 +23,8 @@ data class LanguageSelectorState(
 @HiltViewModel
 class LangSelectorViewModel @Inject constructor() : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        LanguageSelectorState(
-            sourceLang = LANGUAGES_LIST[0], targetLang = LANGUAGES_LIST[1]
-        )
-    )
+    private val _state = MutableStateFlow(LanguageSelectorState())
+
     val state = _state.asStateFlow()
 
     fun onSearchQueryChange(query: String) {
@@ -62,9 +59,31 @@ class LangSelectorViewModel @Inject constructor() : ViewModel() {
     fun onLanguageSelected(language: LanguageItem) {
         _state.update { currentState ->
             if (currentState.isSelectingSourceLanguage) {
-                currentState.copy(sourceLang = language)
+                if (language == currentState.targetLang) {
+                    currentState.copy(
+                        sourceLang = currentState.targetLang,
+                        targetLang = currentState.sourceLang,
+                        isSelectingSourceLanguage = false
+                    )
+                } else {
+                    currentState.copy(
+                        sourceLang = language,
+                        isSelectingSourceLanguage = false
+                    )
+                }
             } else {
-                currentState.copy(targetLang = language)
+                if (language == currentState.sourceLang) {
+                    currentState.copy(
+                        sourceLang = currentState.targetLang,
+                        targetLang = currentState.sourceLang,
+                        isSelectingSourceLanguage = true
+                    )
+                } else {
+                    currentState.copy(
+                        targetLang = language,
+                        isSelectingSourceLanguage = true
+                    )
+                }
             }
         }
     }
