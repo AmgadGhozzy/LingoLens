@@ -1,34 +1,27 @@
 package com.venom.phrase.ui.screen
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.venom.phrase.ui.viewmodel.PhrasebookViewModel
-import kotlinx.coroutines.launch
+import com.venom.phrase.ui.viewmodel.PhraseViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategoryScreen(viewModel: PhrasebookViewModel = hiltViewModel()) {
-    val categories by viewModel.categories.observeAsState(emptyList())
+fun PhrasesScreen(
+    viewModel: PhraseViewModel = hiltViewModel(), categoryId: Int
+) {
+    val state by viewModel.state.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    LazyColumn {
-        items(categories) { category ->
-            Text(text = category.english ?: "")
-        }
+    LaunchedEffect(categoryId) {
+        viewModel.loadSectionsForCategory(categoryId)
     }
-}
 
-@Composable
-fun PhraseScreen(sectionId: Int, viewModel: PhrasebookViewModel = hiltViewModel()) {
-    val phrases by viewModel.phrases.observeAsState(emptyList())
-
-    LazyColumn {
-        items(phrases) { phrase ->
-            Text(text = phrase.english ?: "")
-        }
-    }
+    PhraseScreenContent(
+        state = state, scrollBehavior = scrollBehavior
+    )
 }
