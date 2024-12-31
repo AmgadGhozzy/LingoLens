@@ -6,6 +6,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CameraAlt
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,9 +50,9 @@ fun ExpandableFAB(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FABOption(icon = Icons.Default.CameraAlt, contentDescription = "Camera", onClick = { onCameraClick(); isExpanded = false })
-                FABOption(icon = Icons.Default.PhotoLibrary, contentDescription = "Gallery", onClick = { onGalleryClick(); isExpanded = false })
-                FABOption(icon = Icons.Default.Folder, contentDescription = "File", onClick = { onFileClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.CameraAlt, contentDescription = "Camera", onClick = { onCameraClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.PhotoLibrary, contentDescription = "Gallery", onClick = { onGalleryClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.Folder, contentDescription = "File", onClick = { onFileClick(); isExpanded = false })
             }
         }
 
@@ -59,7 +63,7 @@ fun ExpandableFAB(
             modifier = Modifier.scale(if (isExpanded) 1.1f else 1f)
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                imageVector = Icons.Rounded.Add,
                 contentDescription = if (isExpanded) "Close" else "Expand",
                 modifier = Modifier
                     .size(32.dp)
