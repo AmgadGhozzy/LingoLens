@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.venom.phrase.data.local.PhraseDatabase
 import com.venom.phrase.data.local.dao.CategoryDao
 import com.venom.phrase.data.local.dao.PhraseDao
+import com.venom.phrase.data.local.dao.SectionDao
 import com.venom.phrase.data.repo.PhraseRepository
 import dagger.Module
 import dagger.Provides
@@ -42,7 +43,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRepository(
-        phraseDao: PhraseDao, categoryDao: CategoryDao
-    ) = PhraseRepository(phraseDao, categoryDao)
+        phraseDao: PhraseDao, categoryDao: CategoryDao, sectionDao: SectionDao
+    ) = PhraseRepository(phraseDao, categoryDao, sectionDao)
 }
 
