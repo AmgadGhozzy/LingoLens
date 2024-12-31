@@ -5,13 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
-import com.venom.phrase.ui.screen.CategoryScreen
-import com.venom.phrase.ui.screen.PhraseScreen
+import com.venom.phrase.ui.screen.PhrasebookScreen
+import com.venom.phrase.ui.screen.PhrasesScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
-import com.venom.ui.screen.ContentType
 
 @Composable
 fun NavigationGraph(
@@ -42,14 +40,20 @@ fun NavigationGraph(
         }
 
         composable(Screen.Phrases.route) {
-            CategoryScreen()
+            PhrasebookScreen(
+                onNavigateToCategory = { categoryId ->
+                    navController.navigate(Screen.PhrasesCategory.createRoute(categoryId))
+                }
+            )
         }
 
-        composable(Screen.History.route) {
-            BookmarkHistoryScreen(
-                onBackClick = { navController.popBackStack() },
-                contentType = ContentType.TRANSLATION
-            )
+        composable(Screen.PhrasesCategory.route) {
+            val categoryId = it.arguments?.getString("categoryId")?.toIntOrNull()
+            categoryId?.let { viewModel ->
+                PhrasesScreen(
+                    categoryId = viewModel
+                )
+            }
         }
     }
 }
