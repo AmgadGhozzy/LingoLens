@@ -16,6 +16,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): PhraseDatabase {
@@ -23,9 +24,25 @@ object AppModule {
             context, PhraseDatabase::class.java, "Phrasebook.db"
         ).createFromAsset("Phrasebook.db").build()
     }
+
+    @Provides
+    @Singleton
+    fun provideCategoryDao(database: PhraseDatabase) = database.categoryDao()
+
+    @Provides
+    @Singleton
+    fun provideSectionDao(database: PhraseDatabase) = database.sectionDao()
+
+
+    @Provides
+    @Singleton
+    fun providePhraseDao(database: PhraseDatabase) = database.phraseDao()
+
+
     @Provides
     @Singleton
     fun provideRepository(
         phraseDao: PhraseDao, categoryDao: CategoryDao
-    ): PhraseRepository = PhraseRepository(phraseDao, categoryDao)
+    ) = PhraseRepository(phraseDao, categoryDao)
 }
+
