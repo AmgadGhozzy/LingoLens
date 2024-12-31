@@ -45,7 +45,7 @@ import com.venom.ui.components.buttons.CustomButton
  * @param clearIconTint Color of the clear icon
  */
 @Composable
-fun SearchBar(
+fun CustomSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     onSearchTriggered: () -> Unit = {},
@@ -54,8 +54,8 @@ fun SearchBar(
     enabled: Boolean = true,
     searchIconTint: Color = MaterialTheme.colorScheme.primary,
     clearIconTint: Color = MaterialTheme.colorScheme.error,
-    shape: RoundedCornerShape = RoundedCornerShape(28.dp),
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
 ) {
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
@@ -64,17 +64,18 @@ fun SearchBar(
 
     Surface(
         modifier = modifier
+            .padding(8.dp)
             .fillMaxWidth()
             .clip(shape)
             .semantics { contentDescription = searchHint },
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         tonalElevation = if (isFocused) 2.dp else 0.dp,
         shape = shape
     ) {
         Row(
             modifier = Modifier.padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Search Icon
             CustomButton(
@@ -148,7 +149,7 @@ fun SearchBar(
 @Composable
 fun SearchBarPreview() {
     MaterialTheme {
-        SearchBar(
+        CustomSearchBar(
             searchQuery = "",
             onSearchQueryChanged = {},
             searchHint = "Search here...",
