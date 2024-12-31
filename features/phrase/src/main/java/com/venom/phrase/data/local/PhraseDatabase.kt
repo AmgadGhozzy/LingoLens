@@ -8,10 +8,10 @@ import com.venom.phrase.data.model.Category
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.model.Section
 
-@Database(
-    entities = [Phrase::class, Category::class, Section::class], version = 1, exportSchema = false
-)
+@Database(entities = [Phrase::class, Category::class, Section::class], version = 1, exportSchema = false)
 abstract class PhraseDatabase : RoomDatabase() {
-    abstract fun phraseDao(): PhraseDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun sectionDao(): CategoryDao
+    abstract fun phraseDao(): PhraseDao
+
 }
