@@ -7,16 +7,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.model.Category
+import com.venom.phrase.ui.viewmodel.PhraseUiState
 
 @Composable
 fun CategoryList(
-    categories: List<Category>, onCategoryClick: (Int) -> Unit
+    state: PhraseUiState, onCategoryClick: (Int) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(categories) { category ->
-            CategoryItemCard(category = category,
+        items(state.categories) { category ->
+            CategoryItemCard(state = state,
+                category = category,
                 onClick = { category.categoryId?.let(onCategoryClick) })
         }
     }
