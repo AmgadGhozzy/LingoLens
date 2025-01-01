@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.venom.phrase.ui.components.PhraseScreenContent
 import com.venom.phrase.ui.viewmodel.PhraseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,10 +19,10 @@ fun PhrasesScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     LaunchedEffect(categoryId) {
+        viewModel.loadCategories()
         viewModel.loadSectionsForCategory(categoryId)
+        viewModel.loadPhrasesForSection(categoryId)
     }
 
-    PhraseScreenContent(
-        state = state, scrollBehavior = scrollBehavior
-    )
+    PhraseScreenContent(state = state, scrollBehavior = scrollBehavior)
 }
