@@ -20,11 +20,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.model.Category
+import com.venom.phrase.ui.viewmodel.PhraseUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryItemCard(
-    category: Category, onClick: () -> Unit
+    state: PhraseUiState, category: Category, onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
@@ -53,7 +54,7 @@ fun CategoryItemCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${category.priority} Phrases",
+                    text = "${state.phrases.size} Phrases",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
