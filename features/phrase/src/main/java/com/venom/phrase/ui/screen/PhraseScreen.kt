@@ -19,9 +19,7 @@ fun PhrasesScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     LaunchedEffect(categoryId) {
-        viewModel.loadCategories()
-        viewModel.loadSectionsForCategory(categoryId)
-        viewModel.loadPhrasesForSection(categoryId)
+        viewModel.loadeSectionsWithPhrases(categoryId)
     }
 
     PhraseScreenContent(state = state, scrollBehavior = scrollBehavior)
