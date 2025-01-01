@@ -15,8 +15,7 @@ fun TranslatedText(text: String) {
     Text(
         text = text,
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.CenterStart),
+            .fillMaxWidth(),
         style = TextStyle(
             fontSize = MaterialTheme.typography.bodyLarge.fontSize,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
