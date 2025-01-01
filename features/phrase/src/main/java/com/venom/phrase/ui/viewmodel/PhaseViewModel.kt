@@ -20,9 +20,9 @@ data class PhraseUiState(
     val phrases: List<Phrase> = emptyList(),
     val sections: List<Section> = emptyList(),
     val selectedCategory: Category? = null,
+    val selectedSection: Section? = null,
     val sourceLanguage: LanguageItem = LANGUAGES_LIST[0],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
-    val selectedSection: Section? = null,
     val searchQuery: String = "",
 )
 
@@ -36,7 +36,6 @@ class PhraseViewModel @Inject constructor(
 
     init {
         loadCategories()
-        loadPhrasesForSection(0)
     }
 
     fun updateLanguages(
@@ -49,10 +48,34 @@ class PhraseViewModel @Inject constructor(
         }
     }
 
+    fun selectCategory(category: Category) {
+        _state.update { currentState ->
+            currentState.copy(
+                selectedCategory = category,
+                selectedSection = null
+            )
+        }
+        category.categoryId?.let { categoryId ->
+            loadSectionsForCategory(categoryId)
+        }
+    }
+
+    fun selectSection(section: Section) {
+        _state.update { currentState ->
+            currentState.copy(selectedSection = section)
+        }
+        loadPhrasesForSection(section.sectionId)
+    }
+
     fun loadCategories() {
         viewModelScope.launch {
             repository.getAllCategories().collect { categories ->
-                _state.value = _state.value.copy(categories = categories)
+                _state.update { currentState ->
+                    currentState.copy(categories = categories)
+                }
+                if (_state.value.selectedCategory == null && categories.isNotEmpty()) {
+                    selectCategory(categories.first())
+                }
             }
         }
     }
@@ -60,7 +83,12 @@ class PhraseViewModel @Inject constructor(
     fun loadSectionsForCategory(categoryId: Int) {
         viewModelScope.launch {
             repository.getSectionsForCategory(categoryId).collect { sections ->
-                _state.value = _state.value.copy(sections = sections)
+                _state.update { currentState ->
+                    currentState.copy(sections = sections)
+                }
+                if (_state.value.selectedSection == null && sections.isNotEmpty()) {
+                    selectSection(sections.first())
+                }
             }
         }
     }
@@ -68,7 +96,9 @@ class PhraseViewModel @Inject constructor(
     fun loadPhrasesForSection(sectionId: Int) {
         viewModelScope.launch {
             repository.getPhrasesForSection(sectionId).collect { phrases ->
-                _state.value = _state.value.copy(phrases = phrases)
+                _state.update { currentState ->
+                    currentState.copy(phrases = phrases)
+                }
             }
         }
     }
