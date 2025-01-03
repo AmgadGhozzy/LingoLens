@@ -1,96 +1,81 @@
 package com.venom.ui.components.bars
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.BaseActionBar
 
 /**
  * Bottom action bar with multiple functional icons
  *
  * @param onSave Callback for save action
+ * @param isSaved Whether the text is saved
  * @param onCopy Callback for copy action
  * @param onShare Callback for share action
  * @param onFullscreen Callback for fullscreen action
  * @param onSpeak Callback for speak/sound action
+ * @param isSpeaking Whether the text is speaking
  * @param modifier Optional modifier for the entire row
  */
+
 @Composable
 fun TranslatedTextActionBar(
     onSave: () -> Unit,
+    isSaved: Boolean,
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onFullscreen: () -> Unit,
     onSpeak: () -> Unit,
+    isSpeaking: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        var isSaved by remember { mutableStateOf(false) }
-        // Speak Button
-        CustomButton(
-            icon = R.drawable.icon_sound,
-            contentDescription = stringResource(R.string.action_speak),
-            onClick = onSpeak
+    val leftAction = ActionItem.Action(
+        icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
+        textRes = R.string.action_speak,
+        onClick = onSpeak
+    )
+
+    val actions = listOf(
+        ActionItem.Action(
+            icon = R.drawable.icon_fullscreen,
+            textRes = R.string.action_fullscreen,
+            onClick = onFullscreen
+        ),
+        ActionItem.Action(
+            icon = R.drawable.icon_share,
+            textRes = R.string.action_share,
+            onClick = onShare
+        ),
+        ActionItem.Action(
+            icon = R.drawable.icon_copy,
+            textRes = R.string.action_copy,
+            onClick = onCopy
+        ),
+        ActionItem.Action(
+            icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
+            textRes = R.string.action_save,
+            onClick = onSave
         )
+    )
 
-        // Action Buttons
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
-        ) {
-            // Fullscreen Button
-            CustomButton(
-                icon = R.drawable.icon_fullscreen,
-                contentDescription = stringResource(R.string.action_fullscreen),
-                onClick = onFullscreen
-            )
-
-            // Share Button
-            CustomButton(
-                icon = R.drawable.icon_share,
-                contentDescription = stringResource(R.string.action_share),
-                onClick = onShare
-            )
-
-            // Copy Button
-            CustomButton(
-                icon = R.drawable.icon_copy,
-                contentDescription = stringResource(R.string.action_copy),
-                onClick = onCopy
-            )
-
-            // Save Button
-            CustomButton(icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
-                contentDescription = stringResource(R.string.action_save),
-                onClick = { onSave; isSaved = !isSaved })
-        }
-    }
+    BaseActionBar(
+        leftAction = leftAction,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        actions = actions,
+        modifier = modifier
+    )
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun TranslatedTextActionBarPreview() {
     TranslatedTextActionBar(
         onSpeak = { },
+        isSpeaking = false,
+        isSaved = false,
         onFullscreen = { },
         onCopy = { },
         onSave = { },
