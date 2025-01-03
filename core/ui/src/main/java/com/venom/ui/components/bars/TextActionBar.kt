@@ -1,21 +1,15 @@
 package com.venom.ui.components.bars
 
-import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomTextButton
-import com.venom.ui.components.dialogs.CustomCard
-import com.venom.ui.components.menus.DropdownMenuTrigger
+import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.BaseActionBar
 
 /**
  * A Material 3 action bar component that displays text-related actions.
@@ -25,48 +19,23 @@ import com.venom.ui.components.menus.DropdownMenuTrigger
  * @param containerColor Background color of the action bar
  * @param elevation Elevation of the action bar
  */
+
 @Composable
 fun TextActionBar(
     actions: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     elevation: Dp = 2.dp
 ) {
-    CustomCard {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 6.dp)
-                .padding(end = 18.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            DropdownMenuTrigger(onOptionSelected = { it.onClick() })
-            actions.forEach { action ->
-                CustomTextButton(
-                    onClick = action.onClick,
-                    icon = action.icon,
-                    text = stringResource(action.textRes),
-                    withText = false,
-                    enabled = action.enabled
-                )
-            }
-        }
-    }
-}
-
-sealed class ActionItem {
-    data class Action(
-        val icon: Any, // Can be @DrawableRes Int or ImageVector
-        @StringRes val textRes: Int,
-        val onClick: () -> Unit,
-        val enabled: Boolean = true,
-        val selected: Boolean = false
-    ) : ActionItem()
-
-    data class DropdownMenuOption(
-        val text: String, val icon: ImageVector? = null, val onClick: () -> Unit
-    ) : ActionItem()
+    BaseActionBar(
+        actions = actions,
+        showDropdownMenu = true,
+        useCard = true,
+        containerColor = containerColor,
+        elevation = elevation,
+        useTextButtons = true,
+        modifier = modifier
+    )
 }
 
 @Preview
