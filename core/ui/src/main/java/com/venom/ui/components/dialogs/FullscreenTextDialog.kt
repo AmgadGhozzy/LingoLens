@@ -31,7 +31,6 @@ import com.venom.utils.Extensions.getSelectedOrFullText
  * @param onCopy Callback for copying the text
  * @param onShare Callback for sharing the text
  * @param onSpeak Callback for speaking the text
- * @param properties Optional dialog properties
  */
 @Composable
 fun FullscreenTextDialog(
@@ -82,6 +81,8 @@ fun FullscreenTextDialog(
                     onCopy = { onCopy(textValue.getSelectedOrFullText()) },
                     onShare = { onShare(textValue.getSelectedOrFullText()) },
                     onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
+                    isSaved = false,
+                    isSpeaking = false,
                     onFullscreen = {})
             }
         }
@@ -95,9 +96,6 @@ fun FullscreenTextDialogPreview() {
         FullscreenTextDialog(
             textValue = TextFieldValue("Hello"),
             onDismiss = { },
-            onCopy = { },
-            onShare = { },
-            onSpeak = { },
         )
     }
 }
