@@ -19,7 +19,7 @@ import com.venom.domain.model.LanguageItem
 import com.venom.resources.R
 import com.venom.ui.components.bars.LanguageBar
 import com.venom.ui.components.common.EmptyState
-import com.venom.ui.components.inputs.SearchBar
+import com.venom.ui.components.inputs.CustomSearchBar
 import com.venom.ui.components.items.LanguageListItem
 import com.venom.ui.viewmodel.LanguageSelectorState
 
@@ -42,7 +42,7 @@ fun LangSelectorContent(
             showFlag = true
         )
 
-        SearchBar(
+        CustomSearchBar(
             searchQuery = state.searchQuery,
             onSearchQueryChanged = onSearchQueryChange,
             modifier = Modifier.padding(vertical = 8.dp)
