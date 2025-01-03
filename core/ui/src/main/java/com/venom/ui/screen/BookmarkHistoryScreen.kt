@@ -28,78 +28,60 @@ import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.ConfirmationDialog
-import com.venom.ui.components.inputs.SearchBar
+import com.venom.ui.components.inputs.CustomSearchBar
 import com.venom.ui.components.items.OcrHistoryItemView
 import com.venom.ui.components.items.TransHistoryItemView
 import com.venom.ui.components.sections.BookmarkHistoryTabs
 import com.venom.ui.viewmodel.BookmarkOcrViewModel
 import com.venom.ui.viewmodel.BookmarkViewModel
-import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookmarkHistoryScreen(
+    contentType: ContentType,
     translationViewModel: BookmarkViewModel = hiltViewModel(),
     ocrViewModel: BookmarkOcrViewModel = hiltViewModel(),
-    ttsViewModel: TTSViewModel = hiltViewModel(),
-    contentType: ContentType,
     onBackClick: () -> Unit,
+    onTranslationItemClick: ((TranslationEntry) -> Unit) = {},
+    onOcrItemClick: ((OcrEntry) -> Unit) = {}
 ) {
-    var contentType by remember { mutableStateOf(contentType) }
     var selectedTab by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
     var showClearConfirmation by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val copyAction: (String) -> Unit = { text -> context.copyToClipboard(text) }
-    val shareAction: (String) -> Unit = { text -> context.shareText(text) }
-    val speakAction: (String) -> Unit = { text -> ttsViewModel.speak(text) }
+    // View resources based on content type and tab
+    val viewResources = when {
+        selectedTab == 0 -> ViewResources(
+            title = stringResource(R.string.bookmarks_title),
+            stateIcon = R.drawable.icon_bookmark_outline,
+            stateTitle = stringResource(R.string.bookmarks_empty_title),
+            stateSubtitle = stringResource(R.string.bookmarks_empty_subtitle)
+        )
 
-    // Collect states from both ViewModels
-    val translationState by translationViewModel.bookmarkState.collectAsState()
-    val ocrState by ocrViewModel.ocrBookmarkState.collectAsState()
+        contentType == ContentType.TRANSLATION -> ViewResources(
+            title = stringResource(R.string.history_title),
+            stateIcon = R.drawable.icon_history,
+            stateTitle = stringResource(R.string.history_empty_title),
+            stateSubtitle = stringResource(R.string.history_empty_subtitle)
+        )
 
-    // Set view type based on selected tab
-    LaunchedEffect(selectedTab) {
-        val viewType = if (selectedTab == 0) ViewType.BOOKMARKS else ViewType.HISTORY
-        if (contentType == ContentType.TRANSLATION) translationViewModel.fetchItems(viewType) else ocrViewModel.fetchItems(
-            viewType
+        else -> ViewResources(
+            title = stringResource(R.string.history_title),
+            stateIcon = R.drawable.icon_camera,
+            stateTitle = stringResource(R.string.history_empty_title),
+            stateSubtitle = stringResource(R.string.history_empty_subtitle)
         )
     }
 
-    val viewResources = when (contentType) {
-        ContentType.TRANSLATION -> when (selectedTab) {
-            0 -> ViewResources(
-                title = stringResource(R.string.bookmarks_title),
-                stateIcon = R.drawable.icon_bookmark_outline,
-                stateTitle = stringResource(R.string.bookmarks_empty_title),
-                stateSubtitle = stringResource(R.string.bookmarks_empty_subtitle)
-            )
-
-            else -> ViewResources(
-                title = stringResource(R.string.history_title),
-                stateIcon = R.drawable.icon_history,
-                stateTitle = stringResource(R.string.history_empty_title),
-                stateSubtitle = stringResource(R.string.history_empty_subtitle)
-            )
-        }
-
-        ContentType.OCR -> when (selectedTab) {
-            0 -> ViewResources(
-                title = stringResource(R.string.bookmarks_title),
-                stateIcon = R.drawable.icon_bookmark_outline,
-                stateTitle = stringResource(R.string.bookmarks_empty_title),
-                stateSubtitle = stringResource(R.string.bookmarks_empty_subtitle)
-            )
-
-            else -> ViewResources(
-                title = stringResource(R.string.history_title),
-                stateIcon = R.drawable.icon_camera,
-                stateTitle = stringResource(R.string.history_empty_title),
-                stateSubtitle = stringResource(R.string.history_empty_subtitle)
-            )
+    // Fetch items based on selected tab
+    LaunchedEffect(selectedTab) {
+        val viewType = if (selectedTab == 0) ViewType.BOOKMARKS else ViewType.HISTORY
+        when (contentType) {
+            ContentType.TRANSLATION -> translationViewModel.fetchItems(viewType)
+            ContentType.OCR -> ocrViewModel.fetchItems(viewType)
         }
     }
 
@@ -117,25 +99,23 @@ fun BookmarkHistoryScreen(
     }
 
     Surface(
-        color = MaterialTheme.colorScheme.background, modifier = Modifier.Companion.fillMaxSize()
+        color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            TopBar(
-                title = viewResources.title,
+            TopBar(title = viewResources.title,
                 onLeadingIconClick = onBackClick,
                 leadingIcon = R.drawable.icon_back,
                 actions = {
-                CustomButton(
-                    icon = R.drawable.icon_delete,
-                    onClick = { showClearConfirmation = true },
-                    selected = true,
-                    selectedTint = MaterialTheme.colorScheme.error,
-                    contentDescription = stringResource(R.string.action_clear_history),
-                )
-            })
+                    CustomButton(
+                        icon = R.drawable.icon_delete,
+                        onClick = { showClearConfirmation = true },
+                        selected = true,
+                        selectedTint = MaterialTheme.colorScheme.error,
+                        contentDescription = stringResource(R.string.action_clear_history),
+                    )
+                })
 
             // View Type Selector (Bookmarks/History)
             BookmarkHistoryTabs(
@@ -146,7 +126,7 @@ fun BookmarkHistoryScreen(
                     .padding(horizontal = 12.dp)
             )
 
-            SearchBar(
+            CustomSearchBar(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 searchQuery = searchQuery,
                 onSearchQueryChanged = { searchQuery = it },
@@ -154,21 +134,29 @@ fun BookmarkHistoryScreen(
 
             when (contentType) {
                 ContentType.TRANSLATION -> {
-                    TranslationList(items = translationState.items,
+                    val items by translationViewModel.bookmarkState.collectAsState()
+                    TranslationList(
+                        items = items.items,
                         searchQuery = searchQuery,
-                        onItemRemove = { translationViewModel.removeItem(it) },
-                        onToggleBookmark = { translationViewModel.toggleBookmark(it) },
-                        onShareClick = { shareAction(it.translatedText) },
-                        onCopyClick = { copyAction(it.translatedText) })
+                        onItemRemove = translationViewModel::removeItem,
+                        onToggleBookmark = translationViewModel::toggleBookmark,
+                        onShareClick = { context.shareText(it.translatedText) },
+                        onCopyClick = { context.copyToClipboard(it.translatedText) },
+                        onItemClick = onTranslationItemClick
+                    )
                 }
 
                 ContentType.OCR -> {
-                    OcrList(items = ocrState.items,
+                    val items by ocrViewModel.ocrBookmarkState.collectAsState()
+                    OcrList(
+                        items = items.items,
                         searchQuery = searchQuery,
-                        onItemRemove = { ocrViewModel.removeItem(it) },
-                        onToggleBookmark = { ocrViewModel.toggleBookmark(it) },
-                        onShareClick = { shareAction(it.recognizedText) },
-                        onCopyClick = { copyAction(it.recognizedText) })
+                        onItemRemove = ocrViewModel::removeItem,
+                        onToggleBookmark = ocrViewModel::toggleBookmark,
+                        onShareClick = { context.shareText(it.recognizedText) },
+                        onCopyClick = { context.copyToClipboard(it.recognizedText) },
+                        onItemClick = onOcrItemClick
+                    )
                 }
             }
         }
@@ -182,7 +170,8 @@ private fun TranslationList(
     onItemRemove: (TranslationEntry) -> Unit,
     onToggleBookmark: (TranslationEntry) -> Unit,
     onShareClick: (TranslationEntry) -> Unit,
-    onCopyClick: (TranslationEntry) -> Unit
+    onCopyClick: (TranslationEntry) -> Unit,
+    onItemClick: ((TranslationEntry) -> Unit)
 ) {
     val filteredItems = items.filter { item ->
         searchQuery.isEmpty() || listOf(
@@ -202,7 +191,8 @@ private fun TranslationList(
                 onEntryRemove = onItemRemove,
                 onToggleBookmark = onToggleBookmark,
                 onShareClick = onShareClick,
-                onCopyClick = onCopyClick
+                onCopyClick = onCopyClick,
+                onItemClick = onItemClick
             )
         }
     }
@@ -215,7 +205,8 @@ private fun OcrList(
     onItemRemove: (OcrEntry) -> Unit,
     onToggleBookmark: (OcrEntry) -> Unit,
     onShareClick: (OcrEntry) -> Unit,
-    onCopyClick: (OcrEntry) -> Unit
+    onCopyClick: (OcrEntry) -> Unit,
+    onItemClick: ((OcrEntry) -> Unit)
 ) {
     val filteredItems = items.filter { item ->
         searchQuery.isEmpty() || item.recognizedText.contains(searchQuery, ignoreCase = true)
@@ -228,12 +219,14 @@ private fun OcrList(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
-            OcrHistoryItemView(entry = entry,
+            OcrHistoryItemView(
+                entry = entry,
                 onEntryRemove = onItemRemove,
                 onToggleBookmark = onToggleBookmark,
                 onShareClick = onShareClick,
                 onCopyClick = onCopyClick,
-                onItemClick = {})
+                onItemClick = onItemClick
+            )
         }
     }
 }
