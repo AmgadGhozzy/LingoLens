@@ -17,7 +17,8 @@ data class LanguageSelectorState(
     val targetLang: LanguageItem = LANGUAGES_LIST[1],
     val searchQuery: String = "",
     val isSelectingSourceLanguage: Boolean = true,
-    val filteredLanguages: List<LanguageItem> = LANGUAGES_LIST
+    val filteredLanguages: List<LanguageItem> = LANGUAGES_LIST,
+    val didSwap: Boolean = false
 )
 
 @HiltViewModel
@@ -41,10 +42,10 @@ class LangSelectorViewModel @Inject constructor() : ViewModel() {
         return if (query.isEmpty()) {
             LANGUAGES_LIST
         } else {
+            val lowerCaseQuery = query.lowercase().trim()
             LANGUAGES_LIST.filter { lang ->
-                lang.code.contains(query, ignoreCase = true) || lang.name.contains(
-                    query,
-                    ignoreCase = true
+                lang.code.contains(lowerCaseQuery, ignoreCase = true) || lang.name.contains(
+                    lowerCaseQuery, ignoreCase = true
                 )
             }
         }
@@ -67,8 +68,7 @@ class LangSelectorViewModel @Inject constructor() : ViewModel() {
                     )
                 } else {
                     currentState.copy(
-                        sourceLang = language,
-                        isSelectingSourceLanguage = false
+                        sourceLang = language, isSelectingSourceLanguage = false
                     )
                 }
             } else {
@@ -80,8 +80,7 @@ class LangSelectorViewModel @Inject constructor() : ViewModel() {
                     )
                 } else {
                     currentState.copy(
-                        targetLang = language,
-                        isSelectingSourceLanguage = true
+                        targetLang = language, isSelectingSourceLanguage = true
                     )
                 }
             }
@@ -91,8 +90,16 @@ class LangSelectorViewModel @Inject constructor() : ViewModel() {
     fun swapLanguages() {
         _state.update { currentState ->
             currentState.copy(
-                sourceLang = currentState.targetLang, targetLang = currentState.sourceLang
+                sourceLang = currentState.targetLang,
+                targetLang = currentState.sourceLang,
+                didSwap = true
             )
+        }
+    }
+
+    fun resetSwapFlag() {
+        _state.update { currentState ->
+            currentState.copy(didSwap = false)
         }
     }
 }
