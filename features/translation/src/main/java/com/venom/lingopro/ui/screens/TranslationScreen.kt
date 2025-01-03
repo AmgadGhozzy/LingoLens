@@ -34,33 +34,43 @@ fun TranslationScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val langSelectorState by langSelectorViewModel.state.collectAsStateWithLifecycle()
-    val ttsState by ttsViewModel.state.collectAsStateWithLifecycle()
+    val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
-    var sourceText by remember { mutableStateOf(initialText ?: state.sourceText) }
+    var sourceTextFieldValue by remember {
+        mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
+    }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
 
-    LaunchedEffect(initialText, isDialog) {
-        if (isDialog && !initialText.isNullOrBlank()) {
-            viewModel.onSourceTextChanged(initialText)
+    LaunchedEffect(langSelectorState) {
+        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
+
+        if (langSelectorState.didSwap && state.sourceText.isNotBlank()) {
+            // Preserve cursor position and selection when swapping
+            val currentSelection = sourceTextFieldValue.selection
+            val currentComposition = sourceTextFieldValue.composition
+
+            viewModel.onSourceTextChanged(state.sourceText)
+            sourceTextFieldValue = TextFieldValue(
+                text = state.sourceText,
+                selection = currentSelection,
+                composition = currentComposition
+            )
+            langSelectorViewModel.resetSwapFlag()
         }
     }
 
-    LaunchedEffect(langSelectorState.sourceLang, langSelectorState.targetLang) {
-        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
-    }
-
-    val textChangeAction: (TextFieldValue) -> Unit = { text ->
-        sourceText = text.text
-        viewModel.onSourceTextChanged(sourceText)
+    val textChangeAction: (TextFieldValue) -> Unit = { newValue ->
+        sourceTextFieldValue = newValue
+        viewModel.onSourceTextChanged(newValue.text)
     }
 
     val clearTextAction = {
+        sourceTextFieldValue = TextFieldValue("")
         viewModel.clearText()
-        sourceText = ""
     }
 
     // Actions for copying, sharing, and speaking
@@ -72,7 +82,7 @@ fun TranslationScreen(
     val onPasteAction: () -> Unit = {
         val pastedText = context.pasteFromClipboard()
         pastedText?.let {
-            sourceText = it
+            sourceTextFieldValue = TextFieldValue(it)
             viewModel.onSourceTextChanged(it)
         }
     }
@@ -80,8 +90,9 @@ fun TranslationScreen(
     @Composable
     fun TranslationContent(modifier: Modifier = Modifier) {
         Column(modifier = modifier) {
-            TranslationSection(viewModel = langSelectorViewModel,
-                sourceTextValue = TextFieldValue(sourceText),
+            TranslationSection(
+                viewModel = langSelectorViewModel,
+                sourceTextValue = sourceTextFieldValue,
                 translatedTextValue = TextFieldValue(state.translatedText),
                 onTextChange = textChangeAction,
                 onClearText = clearTextAction,
@@ -89,16 +100,20 @@ fun TranslationScreen(
                 onCopy = copyAction,
                 onShare = shareAction,
                 onSpeak = speakAction,
+                isSpeaking = ttsState.isSpeaking,
                 onPaste = onPasteAction,
+                onOcr = {},
                 onSave = onSaveAction,
+                isSaved = state.isBookmarked,
                 onSpeechToText = onSpeechToTextAction,
-                onFullscreen = { text -> fullscreenState = text },)
+                onFullscreen = { text -> fullscreenState = text },
+            )
 
             if (!isDialog && state.synonyms.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 CustomCard {
                     ThesaurusView(synonyms = state.synonyms, onWordClick = { selectedWord ->
-                        sourceText = selectedWord
+                        sourceTextFieldValue = TextFieldValue(selectedWord)
                         viewModel.onSourceTextChanged(selectedWord)
                     })
                 }
