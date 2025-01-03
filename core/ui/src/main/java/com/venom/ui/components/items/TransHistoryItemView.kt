@@ -1,28 +1,23 @@
 package com.venom.ui.components.items
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationEntry
 import com.venom.resources.R
-import com.venom.ui.components.bars.BookMarkActionButtons
-import com.venom.ui.components.bars.HistoryItemHeader
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.HistoryItemView
 import com.venom.ui.components.sections.LangHistorySection
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
 
 @Composable
 fun TransHistoryItemView(
@@ -31,63 +26,29 @@ fun TransHistoryItemView(
     onToggleBookmark: (TranslationEntry) -> Unit,
     onShareClick: (TranslationEntry) -> Unit,
     onCopyClick: (TranslationEntry) -> Unit,
+    onItemClick: (TranslationEntry) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var showCopiedToast by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val hapticFeedback = LocalHapticFeedback.current
-
-    ElevatedCard(
-        modifier = modifier
-            .fillMaxWidth()
-            .animateContentSize()
-            .semantics {
-                contentDescription =
-                    "Translation from ${entry.sourceLangName} to ${entry.targetLangName}"
-            },
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 2.dp, pressedElevation = 4.dp
-        ),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+    HistoryItemView(entry = entry,
+        onEntryRemove = { onEntryRemove(entry) },
+        onToggleBookmark = { onToggleBookmark(entry) },
+        onShareClick = { onShareClick(entry) },
+        onCopyClick = { onCopyClick(entry) },
+        onItemClick = { onItemClick(entry) }) { isExpanded, onExpandClick ->
+        TranslationContent(
+            entry = entry,
+            isExpanded = isExpanded,
+            onExpandClick = onExpandClick,
+            modifier = modifier
         )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .animateContentSize()
-        ) {
-            HistoryItemHeader(timestamp = entry.timestamp,
-                isBookmarked = entry.isBookmarked,
-                onToggleBookmark = { onToggleBookmark(entry) })
-
-            TranslationContent(
-                entry = entry,
-                isExpanded = isExpanded,
-                onExpandClick = { isExpanded = !isExpanded })
-
-            BookMarkActionButtons(onShareClick = { onShareClick(entry) }, onCopyClick = {
-                onCopyClick(entry)
-                scope.launch {
-                    showCopiedToast = true
-                    delay(2000)
-                    showCopiedToast = false
-                }
-            }, onDeleteClick = { onEntryRemove(entry) }, showCopiedToast = showCopiedToast
-            )
-        }
     }
 }
-
 
 @Composable
 private fun TranslationContent(
     entry: TranslationEntry,
-    isExpanded: Boolean,
     onExpandClick: () -> Unit,
+    isExpanded: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -142,11 +103,20 @@ private fun TranslationArrow() {
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Rounded.ArrowDownward,
-            contentDescription = stringResource(R.string.expand_translation),
-            tint = MaterialTheme.colorScheme.primary
-        )
+        Box(
+            modifier = Modifier
+                .background(
+                    MaterialTheme.colorScheme.background.copy(alpha = 0.5f), CircleShape
+                )
+                .padding(6.dp)
+                .size(18.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.ArrowDownward,
+                contentDescription = stringResource(R.string.expand_translation),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
