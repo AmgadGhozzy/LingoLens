@@ -114,6 +114,10 @@
     <string name="action_resume">Resume</string>
     <string name="transcript_label">Transcript</string>
     <string name="action_menu">Main Menu</string>
+    <string name="category">Category</string>
+    <string name="phrase">Phrase</string>
+    <string name="phrase_title">PhraseBook</string>
+    <string name="phrases">Phrases</string>
 
 
 </resources>
