@@ -5,16 +5,15 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.venom.data.local.typeconverter.OcrResponseConverter
+import com.venom.domain.model.IHistoryEntry
 
 @Entity(tableName = "ocr_history")
 data class OcrEntry(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val recognizedText: String,
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB) val imageData: ByteArray,
-    val isBookmarked: Boolean = false,
-
-    val timestamp: Long = System.currentTimeMillis(),
-
     @TypeConverters(OcrResponseConverter::class) val apiResponse: OcrResponse? = null,
     @TypeConverters(OcrResponseConverter::class) val boundingBoxes: List<ParagraphBox> = emptyList(),
-)
+    override val timestamp: Long = System.currentTimeMillis(),
+    override val isBookmarked: Boolean = false,
+) : IHistoryEntry
