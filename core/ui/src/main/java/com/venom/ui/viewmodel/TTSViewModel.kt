@@ -10,10 +10,19 @@ import com.venom.domain.repo.tts.TTSUrlGenerator
 import com.venom.domain.repo.tts.TextToSpeechFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
+
+data class TTSUiState(
+    val isInitializing: Boolean = false,
+    val isSpeaking: Boolean = false,
+    val currentText: String = "",
+    val error: String? = null
+)
 
 @HiltViewModel
 class TTSViewModel @Inject constructor(
@@ -24,91 +33,137 @@ class TTSViewModel @Inject constructor(
     private var tts: TextToSpeech? = null
     private var mediaPlayer: MediaPlayer? = null
 
-    private val _state = MutableStateFlow<TTSState>(TTSState.Idle)
-    val state = _state.asStateFlow()
+    private val _uiState = MutableStateFlow(TTSUiState())
+    val uiState: StateFlow<TTSUiState> = _uiState.asStateFlow()
 
     init {
         initTTS() // Initialize TextToSpeech
     }
 
     private fun initTTS() {
+        _uiState.update { it.copy(isInitializing = true) }
         tts = textToSpeechFactory.create { status ->
+            _uiState.update { it.copy(isInitializing = false) }
             if (status == TextToSpeech.SUCCESS) {
-                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String) {
-                        _state.value = TTSState.Speaking(utteranceId)
-                    }
-
-                    override fun onDone(utteranceId: String) {
-                        _state.value = TTSState.Idle
-                    }
-
-                    override fun onError(utteranceId: String) {
-                        _state.value = TTSState.Error("TTS failed")
-                    }
-                })
+                setupTTSListener()
+            } else {
+                _uiState.update {
+                    it.copy(error = "Failed to initialize TTS")
+                }
             }
         }
     }
 
-    fun speak(text: String, source: TextSource = TextSource.SOURCE) {
+    private fun setupTTSListener() {
+        tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String) {
+                updateSpeakingState(true)
+            }
+
+            override fun onDone(utteranceId: String) {
+                updateSpeakingState(false)
+            }
+
+            override fun onError(utteranceId: String) {
+                handleError("TTS failed")
+            }
+        })
+    }
+
+    fun speak(text: String) {
         if (text.isEmpty()) return
-        viewModelScope.launch {
+
+        // If currently speaking the same text, stop it
+        if (uiState.value.isSpeaking && uiState.value.currentText == text) {
             stopSpeaking()
-            val locale = determineLocale(text)
+            return
+        }
+
+        viewModelScope.launch {
             try {
+                stopSpeaking() // Stop any previous speech
+                _uiState.update { it.copy(currentText = text) }
+
+                val locale = determineLocale(text)
                 when (tts?.isLanguageAvailable(locale)) {
-                    TextToSpeech.LANG_AVAILABLE -> speakLocally(text, locale, source.id)
-                    else -> speakOnline(text, locale, source.id)
+                    TextToSpeech.LANG_AVAILABLE -> speakLocally(text, locale)
+                    else -> speakOnline(text, locale)
                 }
             } catch (e: Exception) {
-                _state.value = TTSState.Error(e.message ?: "Unknown error")
+                handleError(e.message ?: "Unknown error")
             }
         }
     }
 
-    private fun determineLocale(text: String): Locale {
-        return if (text.matches(Regex("[a-zA-Z]+"))) Locale.ENGLISH else Locale("ar")
-    }
+    private fun determineLocale(text: String): Locale =
+        if (text.matches(Regex("[a-zA-Z]+"))) Locale.ENGLISH else Locale("ar")
 
     // Speaks text using local TTS
-    private fun speakLocally(text: String, locale: Locale, sourceId: String) {
+    private fun speakLocally(text: String, locale: Locale) {
         try {
-            tts?.language = locale
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, sourceId)
-                ?: throw Exception("TTS is null")
+            tts?.apply {
+                language = locale
+                speak(text, TextToSpeech.QUEUE_FLUSH, null, text.hashCode().toString())
+            } ?: throw Exception("TTS is null")
         } catch (e: Exception) {
-            speakOnline(text, locale, sourceId) // Fallback to online if local fails
+            speakOnline(text, locale)
         }
     }
 
-    private fun speakOnline(text: String, locale: Locale, sourceId: String) {
+    private fun speakOnline(text: String, locale: Locale) {
         try {
-            mediaPlayer?.release()
+            releaseMediaPlayer()
             mediaPlayer = mediaPlayerFactory.create().apply {
                 val url = urlGenerator.generateTTSUrl(text, locale)
                 setDataSource(url)
-                setOnPreparedListener { _state.value = TTSState.Speaking(sourceId); start() }
+                setOnPreparedListener {
+                    updateSpeakingState(true)
+                    start()
+                }
                 setOnCompletionListener {
-                    _state.value = TTSState.Idle; release(); mediaPlayer = null
+                    updateSpeakingState(false)
+                    releaseMediaPlayer()
                 }
                 setOnErrorListener { _, _, _ ->
-                    _state.value = TTSState.Error("Audio playback failed")
-                    release(); mediaPlayer = null
+                    handleError("Audio playback failed")
+                    releaseMediaPlayer()
                     true
                 }
                 prepareAsync()
             }
         } catch (e: Exception) {
-            _state.value = TTSState.Error("Media player error: ${e.message}")
+            handleError("Media player error: ${e.message}")
         }
+    }
+
+    private fun updateSpeakingState(isSpeaking: Boolean) {
+        _uiState.update { it.copy(isSpeaking = isSpeaking) }
+    }
+
+    private fun handleError(message: String) {
+        _uiState.update {
+            it.copy(
+                error = message, isSpeaking = false
+            )
+        }
+    }
+
+    private fun releaseMediaPlayer() {
+        mediaPlayer?.apply {
+            if (isPlaying) stop()
+            release()
+        }
+        mediaPlayer = null
     }
 
     fun stopSpeaking() {
         tts?.stop()
-        mediaPlayer?.apply { if (isPlaying) stop(); release() }
-        mediaPlayer = null
-        _state.value = TTSState.Idle
+        releaseMediaPlayer()
+        updateSpeakingState(false)
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     override fun onCleared() {
@@ -116,14 +171,4 @@ class TTSViewModel @Inject constructor(
         stopSpeaking()
         tts?.shutdown()
     }
-}
-
-sealed class TTSState {
-    object Idle : TTSState()
-    data class Speaking(val sourceId: String) : TTSState()
-    data class Error(val message: String) : TTSState()
-}
-
-enum class TextSource(val id: String) {
-    SOURCE("source_text"), TRANSLATED("translated_text")
 }
