@@ -3,6 +3,7 @@ package com.venom.data.model
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.venom.domain.model.IHistoryEntry
 
 @Entity(
     tableName = "translation_history", indices = [Index(
@@ -18,7 +19,7 @@ data class TranslationEntry(
     val targetLangName: String,
     val sourceLangCode: String,
     val targetLangCode: String,
-    val isBookmarked: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis(),
-    val synonyms: List<String>? = null
-)
+    val synonyms: List<String>? = null,
+    override val timestamp: Long = System.currentTimeMillis(),
+    override val isBookmarked: Boolean = false
+) : IHistoryEntry
