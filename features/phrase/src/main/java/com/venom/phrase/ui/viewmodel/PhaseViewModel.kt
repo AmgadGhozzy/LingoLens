@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.domain.model.LANGUAGES_LIST
 import com.venom.domain.model.LanguageItem
+import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
 import com.venom.phrase.data.model.SectionWithPhrases
 import com.venom.phrase.data.repo.PhraseRepository
@@ -16,10 +17,11 @@ import javax.inject.Inject
 
 data class PhraseUiState(
     val categories: List<Category> = emptyList(),
-    val sectionsWithPhrases: List<SectionWithPhrases> = emptyList(),
+    val sections: List<SectionWithPhrases> = emptyList(),
+    val filteredSections: List<SectionWithPhrases> = emptyList(),
     val selectedCategory: Category? = null,
-    val sourceLanguage: LanguageItem = LANGUAGES_LIST[0],
-    val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val sourceLang: LanguageItem = LANGUAGES_LIST[2],
+    val targetLang: LanguageItem = LANGUAGES_LIST[3],
     val searchQuery: String = ""
 )
 
@@ -27,7 +29,6 @@ data class PhraseUiState(
 class PhraseViewModel @Inject constructor(
     private val repository: PhraseRepository
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(PhraseUiState())
     val state = _state.asStateFlow()
 
@@ -35,30 +36,75 @@ class PhraseViewModel @Inject constructor(
         loadCategories()
     }
 
-    fun updateLanguages(
-        sourceLanguage: LanguageItem, targetLanguage: LanguageItem
-    ) {
+    fun onSearchQueryChange(query: String) {
         _state.update { currentState ->
             currentState.copy(
-                sourceLanguage = sourceLanguage, targetLanguage = targetLanguage
+                searchQuery = query,
+                filteredSections = filterSections(query, currentState.sections)
             )
         }
     }
 
+    private fun filterSections(
+        query: String,
+        sections: List<SectionWithPhrases>
+    ): List<SectionWithPhrases> {
+        if (query.isBlank()) return sections
 
-    fun loadCategories() {
-        viewModelScope.launch {
-            _state.update { currentState ->
-                currentState.copy(categories = repository.getAllCategories())
+        val searchQuery = query.lowercase().trim()
+        val sourceLangCode = _state.value.sourceLang.code
+        val targetLangCode = _state.value.targetLang.code
+
+        return sections.mapNotNull { sectionWithPhrases ->
+            // Check if section name matches in both languages
+            val sectionMatchesSource = sectionWithPhrases.section.getTranslation(sourceLangCode)
+                .lowercase()
+                .contains(searchQuery)
+
+            val sectionMatchesTarget = sectionWithPhrases.section.getTranslation(targetLangCode)
+                .lowercase()
+                .contains(searchQuery)
+
+            // Filter matching phrases in both languages
+            val matchingPhrases = sectionWithPhrases.phrases.filter { phrase ->
+                phrase.getTranslation(sourceLangCode).lowercase().contains(searchQuery) ||
+                        phrase.getTranslation(targetLangCode).lowercase().contains(searchQuery)
+            }
+
+            // Return section with filtered phrases if either condition is met
+            when {
+                sectionMatchesSource || sectionMatchesTarget -> sectionWithPhrases
+                matchingPhrases.isNotEmpty() -> sectionWithPhrases.copy(phrases = matchingPhrases)
+                else -> null
             }
         }
     }
 
-    fun loadeSectionsWithPhrases(categoryId: Int) {
+    fun updateLanguages(source: LanguageItem, target: LanguageItem) {
+        _state.update {
+            it.copy(
+                sourceLang = source, targetLang = target
+            )
+        }
+    }
+
+    fun loadCategories() {
         viewModelScope.launch {
-            _state.update { currentState ->
-                currentState.copy(sectionsWithPhrases = repository.getSectionsWithPhrases(categoryId),
-                    selectedCategory = currentState.categories.find { it.categoryId == categoryId })
+            _state.update {
+                it.copy(
+                    categories = repository.getAllCategories()
+                )
+            }
+        }
+    }
+
+    fun loadSectionsWithPhrases(categoryId: Int) {
+        viewModelScope.launch {
+            val sections = repository.getSectionsWithPhrases(categoryId)
+            _state.update {
+                it.copy(sections = sections,
+                    filteredSections = sections,
+                    selectedCategory = _state.value.categories.find { it.categoryId == categoryId })
             }
         }
     }
