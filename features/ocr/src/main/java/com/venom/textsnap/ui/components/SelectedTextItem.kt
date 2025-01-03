@@ -1,7 +1,9 @@
 package com.venom.textsnap.ui.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,57 +15,65 @@ import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.menus.DropdownMenuTrigger
+import com.venom.ui.components.menus.defaultDropdownOptions
 
 /**
  * Represents the actions available for selected text
  */
-sealed class TextAction {
-    data object Copy : TextAction()
-    data object Share : TextAction()
-    data object Speak : TextAction()
+sealed interface TextAction {
+    data object Copy : TextAction
+    data object Share : TextAction
+    data object Speak : TextAction
+    data object Translate : TextAction
 }
 
 /**
  * A card component that displays selected text with action buttons.
  *
  * @param text The text to be displayed
- * @param onActionSelected Callback for when an action is selected
+ * @param onAction Callback for when an action is selected
  * @param expanded Whether the text should be fully expanded
  * @param modifier Optional modifier for the component
  */
 @Composable
 fun SelectedTextItem(
     text: String,
-    onActionSelected: (TextAction) -> Unit,
+    onAction: (TextAction) -> Unit,
     expanded: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .animateContentSize()
-            .padding(6.dp)
+            .padding(8.dp)
     ) {
-        SelectedTextContent(
-            text = text,
-            expanded = expanded,
-            onActionSelected = onActionSelected
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(12.dp),
+                maxLines = if (expanded) Int.MAX_VALUE else 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            ActionButtons(onActionSelected = onAction,)
+        }
     }
 }
-
 @Composable
 private fun SelectedTextContent(
     text: String,
     expanded: Boolean,
-    onActionSelected: (TextAction) -> Unit,
+    onAction: (TextAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -84,7 +94,7 @@ private fun SelectedTextContent(
         )
 
         // Action buttons
-        ActionButtons(onActionSelected = onActionSelected)
+        ActionButtons(onActionSelected = onAction)
     }
 }
 
@@ -98,19 +108,25 @@ private fun ActionButtons(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = 4.dp)
     ) {
-        // Copy button
         CustomButton(
             icon = R.drawable.icon_copy,
             contentDescription = stringResource(R.string.action_copy),
-            onClick = { onActionSelected(TextAction.Copy) }
+            onClick = { onActionSelected(TextAction.Copy) },
         )
 
-        // More options dropdown
+        CustomButton(
+            icon = R.drawable.icon_translate,
+            contentDescription = stringResource(R.string.action_translate),
+            onClick = { onActionSelected(TextAction.Translate) },
+        )
+
         DropdownMenuTrigger(
+            options = defaultDropdownOptions(),
             onOptionSelected = { option ->
                 when (option.text) {
                     "share" -> onActionSelected(TextAction.Share)
                     "speak" -> onActionSelected(TextAction.Speak)
+                    "translate" -> onActionSelected(TextAction.Translate)
                 }
             }
         )
@@ -122,7 +138,6 @@ private fun ActionButtons(
 private fun SelectedTextItemPreview() {
     SelectedTextItem(
         text = "This is a sample text for preview purposes that might be longer than two lines to demonstrate text overflow",
-        onActionSelected = {},
-        expanded = true
+        onAction = {},
     )
 }
