@@ -4,10 +4,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,17 +27,16 @@ fun TranslationSection(
     onCopy: (String) -> Unit = {},
     onShare: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {},
+    isSpeaking: Boolean = false,
     onPaste: () -> Unit = {},
     onOcr: () -> Unit = {},
     onSave: () -> Unit = {},
+    isSaved: Boolean = false,
     onFullscreen: (String) -> Unit = {},
     onSpeechToText: () -> Unit = {},
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false
 ) {
-
-    var isSaved by remember { mutableStateOf(false) }
-
     CustomCard {
         // Translation Top Bar for source and target languages
         LanguageBar(
@@ -68,6 +63,7 @@ fun TranslationSection(
             onCopy = { onCopy(sourceTextValue.getSelectedOrFullText()) },
             onFullscreen = { onFullscreen(sourceTextValue.getSelectedOrFullText()) },
             onSpeak = { onSpeak(sourceTextValue.getSelectedOrFullText()) },
+            isSpeaking = isSpeaking
         )
 
         // Translated Text Section for translated text
@@ -77,11 +73,13 @@ fun TranslationSection(
 
         // Translated Action bar for text interactions
         TranslatedTextActionBar(
-            onSave = { isSaved = !isSaved; onSave() },
+            onSave = onSave,
             onCopy = { onCopy(translatedTextValue.getSelectedOrFullText()) },
             onShare = { onShare(translatedTextValue.getSelectedOrFullText()) },
             onFullscreen = { onFullscreen(translatedTextValue.getSelectedOrFullText()) },
             onSpeak = { onSpeak(translatedTextValue.getSelectedOrFullText()) },
+            isSaved = isSaved,
+            isSpeaking = isSpeaking,
         )
     }
 }
