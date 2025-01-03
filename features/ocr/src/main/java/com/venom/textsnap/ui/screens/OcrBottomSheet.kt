@@ -17,12 +17,11 @@ import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.textsnap.ui.components.SelectedTextItem
 import com.venom.textsnap.ui.components.TextAction
-import com.venom.ui.components.bars.ActionItem
 import com.venom.ui.components.bars.TextActionBar
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.inputs.CustomTextField
-
 
 @Composable
 fun OcrBottomSheet(
@@ -72,13 +71,15 @@ fun OcrBottomSheet(
             ) {
                 items((if (selectedTexts.isEmpty()) recognizedList else selectedTexts).withIndex()
                     .toList(), key = { it.index }) { (index, text) ->
-                    SelectedTextItem(text = text,
+                    SelectedTextItem(
+                        text = text,
                         expanded = selectedTexts.size == 1,
-                        onActionSelected = { action ->
+                        onAction = { action ->
                             when (action) {
                                 TextAction.Copy -> onCopy(text)
                                 TextAction.Share -> onShare(text)
                                 TextAction.Speak -> onSpeak(text)
+                                TextAction.Translate -> {}
                             }
                         })
                 }
@@ -87,6 +88,7 @@ fun OcrBottomSheet(
 
     }
 }
+
 @Composable
 private fun RecognizedTextSection(
     text: String, modifier: Modifier = Modifier
@@ -94,7 +96,7 @@ private fun RecognizedTextSection(
     CustomCard {
         Box {
             SelectionContainer(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
@@ -110,8 +112,7 @@ private fun RecognizedTextSection(
             CustomButton(
                 icon = R.drawable.icon_fullscreen,
                 contentDescription = stringResource(R.string.action_fullscreen),
-                modifier = Modifier
-                    .align(Alignment.TopEnd),
+                modifier = Modifier.align(Alignment.TopEnd),
                 onClick = {},
             )
         }
