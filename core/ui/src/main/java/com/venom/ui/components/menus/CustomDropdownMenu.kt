@@ -22,19 +22,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.bars.ActionItem
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.ActionItem
 
 @Composable
 fun CustomDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    options: List<ActionItem.DropdownMenuOption>,
+    options: List<ActionItem.MenuOption>,
     modifier: Modifier = Modifier
 ) {
     val rollAnimation by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
-        animationSpec = tween(durationMillis = 600), label = "Roll Animation"
+        animationSpec = tween(durationMillis = 600),
+        label = "Roll Animation"
     )
 
     DropdownMenu(
@@ -46,23 +47,19 @@ fun CustomDropdownMenu(
             .background(color = MaterialTheme.colorScheme.surface)
             .alpha(rollAnimation)
             .graphicsLayer(
-                scaleY = rollAnimation,
-                transformOrigin = TransformOrigin(0.5f, 0f)
+                scaleY = rollAnimation, transformOrigin = TransformOrigin(0.5f, 0f)
             )
     ) {
         options.forEachIndexed { index, option ->
-            DropdownMenuItem(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+            DropdownMenuItem(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .clip(RoundedCornerShape(12.dp)),
                 onClick = {
                     option.onClick()
                     onDismissRequest()
                 },
-                text = {
-                    Text(text = option.text, style = MaterialTheme.typography.bodyMedium)
-                },
+                text = { Text(option.text, style = MaterialTheme.typography.bodyMedium) },
                 leadingIcon = option.icon?.let { icon ->
                     {
                         Icon(
@@ -72,8 +69,7 @@ fun CustomDropdownMenu(
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                         )
                     }
-                }
-            )
+                })
             if (index < options.lastIndex) {
                 HorizontalDivider(
                     modifier = Modifier
@@ -87,38 +83,40 @@ fun CustomDropdownMenu(
 
 @Composable
 fun DropdownMenuTrigger(
-    options: List<ActionItem.DropdownMenuOption> = defaultDropdownOptions(),
-    onOptionSelected: (ActionItem.DropdownMenuOption) -> Unit
+    options: List<ActionItem.MenuOption>,
+    onOptionSelected: (ActionItem.MenuOption) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-    Box {
+    Box(modifier = modifier) {
         CustomButton(
             icon = Icons.Rounded.MoreVert,
-            contentDescription = stringResource(id = R.string.action_more_options),
+            contentDescription = stringResource(R.string.action_more_options),
             onClick = { isExpanded = !isExpanded },
             iconSize = 32.dp
         )
-        CustomDropdownMenu(
-            expanded = isExpanded,
+        CustomDropdownMenu(expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
-            options = options
-        )
+            options = options.map { it.copy(onClick = { onOptionSelected(it) }) })
     }
 }
 
-fun defaultDropdownOptions() = listOf(
-    ActionItem.DropdownMenuOption("Show Paragraphs", Icons.AutoMirrored.Filled.LibraryBooks) {},
-    ActionItem.DropdownMenuOption("Show Labels", Icons.Filled.RemoveRedEye) {},
-    ActionItem.DropdownMenuOption("Select All", Icons.Filled.SelectAll) {},
-    ActionItem.DropdownMenuOption("Translate", Icons.Filled.Translate) {},
-    ActionItem.DropdownMenuOption("Share", Icons.Filled.Share) {},
-    ActionItem.DropdownMenuOption("Speak", Icons.AutoMirrored.Filled.VolumeUp) {},
-    ActionItem.DropdownMenuOption("Copy", Icons.Filled.ContentCopy) {}
-)
+fun defaultDropdownOptions() = listOf(ActionItem.MenuOption(
+    "Show Paragraphs", Icons.AutoMirrored.Filled.LibraryBooks
+) {},
+    ActionItem.MenuOption("Show Labels", Icons.Filled.RemoveRedEye) {},
+    ActionItem.MenuOption("Select All", Icons.Filled.SelectAll) {},
+    ActionItem.MenuOption("Translate", Icons.Filled.Translate) {},
+    ActionItem.MenuOption("Share", Icons.Filled.Share) {},
+    ActionItem.MenuOption("Speak", Icons.AutoMirrored.Filled.VolumeUp) {},
+    ActionItem.MenuOption("Copy", Icons.Filled.ContentCopy) {})
 
 @Preview(showBackground = true)
 @Composable
 fun DropdownMenuTriggerPreview() {
-    DropdownMenuTrigger(onOptionSelected = { selectedOption -> selectedOption.onClick() })
+    DropdownMenuTrigger(
+        onOptionSelected = { selectedOption -> selectedOption.onClick() },
+        options = defaultDropdownOptions(),
+    )
 }
