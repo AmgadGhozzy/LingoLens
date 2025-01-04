@@ -16,19 +16,29 @@ fun PhrasebookScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val langState by langSelectorViewModel.state.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
+
 
     LaunchedEffect(langState.sourceLang, langState.targetLang) {
         viewModel.updateLanguages(langState.sourceLang, langState.targetLang)
+        viewModel.loadCategories()
     }
 
     PhrasebookContent(
         state = state,
-        searchQuery = searchQuery,
-        onSearchQueryChange = { searchQuery = it },
         langSelectorViewModel = langSelectorViewModel,
-        onNavigateToCategory = onNavigateToCategory,
+        onNavigateToCategory = { categoryId ->
+            selectedCategoryId = categoryId
+        },
         scrollBehavior = scrollBehavior
     )
+
+    selectedCategoryId?.let { categoryId ->
+        PhrasesDialog(
+            categoryId = categoryId,
+            onDismiss = { selectedCategoryId = null }
+        )
+    }
 }
