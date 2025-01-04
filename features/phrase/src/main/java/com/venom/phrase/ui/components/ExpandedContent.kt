@@ -15,12 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Phrase
-
 
 @Composable
 fun ExpandedContent(
-    visible: Boolean, phrase: Phrase
+    visible: Boolean, phrase: Phrase, targetLang: String
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -37,7 +37,7 @@ fun ExpandedContent(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            TranslatedText(phrase.arEG)
+            TranslatedText(phrase.getTranslation(targetLang))
             Spacer(modifier = Modifier.height(8.dp))
             ActionButtons()
         }
