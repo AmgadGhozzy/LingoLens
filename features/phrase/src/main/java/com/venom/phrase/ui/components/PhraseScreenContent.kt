@@ -9,11 +9,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -24,31 +19,32 @@ import com.venom.ui.components.inputs.CustomSearchBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhraseScreenContent(
-    state: PhraseUiState, scrollBehavior: TopAppBarScrollBehavior
+    state: PhraseUiState,
+    onSearchQueryChanged: (String) -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior
 ) {
-
-    var searchQuery by remember { mutableStateOf("") }
-
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         TopAppBar(title = {
             Text(
-                state.selectedCategory?.enUS ?: "",
-                fontWeight = FontWeight.Bold
+                state.selectedCategory?.englishEn ?: "", fontWeight = FontWeight.Bold
             )
-        },
-            scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            actions = {
-                CustomSearchBar(
-                    modifier = Modifier.width(224.dp),
-                    searchQuery = searchQuery,
-                    onSearchQueryChanged = {},
-                )
-            })
+        }, scrollBehavior = scrollBehavior, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            scrolledContainerColor = MaterialTheme.colorScheme.surface
+        ), actions = {
+            CustomSearchBar(
+                modifier = Modifier.width(224.dp),
+                searchQuery = state.searchQuery,
+                onSearchQueryChanged = onSearchQueryChanged
+            )
+        })
     }) { padding ->
-        PhrasesList(phrases = state.phrases, contentPadding = padding)
+        SectionWithPhrasesList(
+            sections = state.filteredSections,
+            sourceLang = state.sourceLang.code,
+            targetLang = state.targetLang.code,
+            contentPadding = padding
+        )
     }
 }
+
