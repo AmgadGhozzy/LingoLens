@@ -4,19 +4,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material.icons.rounded.FlightTakeoff
+import androidx.compose.material.icons.rounded.FormatListNumbered
 import androidx.compose.material.icons.rounded.Hotel
+import androidx.compose.material.icons.rounded.LocalBar
 import androidx.compose.material.icons.rounded.LocalHospital
+import androidx.compose.material.icons.rounded.Movie
 import androidx.compose.material.icons.rounded.Restaurant
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.School
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.Store
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
+import com.venom.phrase.data.mapper.getCategoryIcon
 
 @Composable
 fun CategoryIcon(icon: String) {
@@ -32,14 +40,4 @@ fun CategoryIcon(icon: String) {
             tint = MaterialTheme.colorScheme.primary
         )
     }
-}
-
-@Composable
-fun getCategoryIcon(iconName: String) = when (iconName) {
-    "categoryEssentials" -> Icons.Rounded.Star
-    "categoryTraveling" -> Icons.Rounded.FlightTakeoff
-    "categoryMedical" -> Icons.Rounded.LocalHospital
-    "categoryHotel" -> Icons.Rounded.Hotel
-    "categoryRestaurant" -> Icons.Rounded.Restaurant
-    else -> Icons.AutoMirrored.Default.FormatListBulleted
 }
