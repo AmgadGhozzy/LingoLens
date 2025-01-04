@@ -10,7 +10,12 @@ import com.venom.phrase.data.model.Phrase
 
 @Composable
 fun PhraseCardContent(
-    phrase: Phrase, expanded: Boolean, isFavorite: Boolean, onFavoriteClick: () -> Unit
+    phrase: Phrase,
+    expanded: Boolean,
+    sourceLang: String,
+    targetLang: String,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -18,11 +23,15 @@ fun PhraseCardContent(
             .padding(16.dp)
     ) {
         PhraseCardHeader(
-            phrase = phrase, isFavorite = isFavorite, onFavoriteClick = onFavoriteClick
+            phrase = phrase,
+            sourceLang = sourceLang,
+            isFavorite = isFavorite,
+            onFavoriteClick = onFavoriteClick
         )
 
         ExpandedContent(
-            visible = expanded, phrase = phrase
+            visible = expanded, phrase = phrase,
+            targetLang = targetLang,
         )
     }
 }
