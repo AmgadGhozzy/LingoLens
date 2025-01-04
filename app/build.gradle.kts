@@ -57,6 +57,7 @@ dependencies {
     // Features
     implementation(project(":features:translation"))
     implementation(project(":features:phrase"))
+    implementation(project(":features:dialog"))
     implementation(project(":features:ocr"))
 
 

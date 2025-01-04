@@ -23,9 +23,9 @@ rootProject.name = "LingoLens"
 
 include(":app")
 
-
 include(":features:translation")
 include(":features:phrase")
+include(":features:dialog")
 include(":features:ocr")
 
 include(":core:ui")
@@ -34,3 +34,4 @@ include(":core:di")
 include(":core:resources")
 include(":core:utils")
 include(":core:domain")
+
