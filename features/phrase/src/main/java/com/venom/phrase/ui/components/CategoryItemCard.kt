@@ -15,12 +15,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
 import com.venom.phrase.ui.viewmodel.PhraseUiState
+import com.venom.resources.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +35,7 @@ fun CategoryItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
-            .semantics { contentDescription = "Category: ${category.enUS}" },
+            .semantics { contentDescription = "Category card: ${category.englishEn}" },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
@@ -49,17 +52,18 @@ fun CategoryItemCard(
             CategoryIcon(category.icon.toString())
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = category.enUS,
+                    text = category.getTranslation(state.sourceLang.code),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
+
                 Text(
-                    text = "${state.phrases.size} Phrases",
+                    text = "${category.phraseCount} ${stringResource(R.string.phrases)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            NavigateButton(category.enUS, onClick)
+            NavigateButton(category.getTranslation(state.targetLang.code), onClick)
         }
     }
 }
