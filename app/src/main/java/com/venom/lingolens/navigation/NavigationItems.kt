@@ -6,6 +6,7 @@ enum class NavigationItems(
     val icon: Int,
     val titleRes: Int
 ) {
+    DIALOG(Screen.Dialog, R.drawable.icon_dialog, R.string.dialog_title),
     BOOKMARKS(Screen.Phrases, R.drawable.icon_dialog, R.string.phrase_title),
     OCR(Screen.Ocr, R.drawable.icon_camera, R.string.ocr_title),
     TRANSLATE(Screen.Translation, R.drawable.icon_translate, R.string.translate_title)
