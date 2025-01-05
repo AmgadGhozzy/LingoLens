@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.venom.dialog.ui.screen.DialogScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
 import com.venom.phrase.ui.screen.PhrasesScreen
@@ -55,5 +56,10 @@ fun NavigationGraph(
                 )
             }
         }
+
+        composable(Screen.Dialog.route) {
+            DialogScreen()
+        }
+
     }
 }
