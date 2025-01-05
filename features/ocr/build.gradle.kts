@@ -48,13 +48,14 @@ dependencies {
 
     // Core Modules
     implementation(project(":core:data"))
-    implementation(project(":core:ui"))
+    implementation(project(":core:di"))
     implementation(project(":core:resources"))
+    implementation(project(":core:ui"))
+
 
 
     // Hilt
     api(libs.hilt.android)
-    implementation(project(":core:di"))
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
