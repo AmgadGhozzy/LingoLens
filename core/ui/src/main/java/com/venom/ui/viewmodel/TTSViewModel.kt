@@ -70,7 +70,7 @@ class TTSViewModel @Inject constructor(
         })
     }
 
-    fun speak(text: String) {
+    fun speak(text: String, language: String? = null) {
         if (text.isEmpty()) return
 
         // If currently speaking the same text, stop it
@@ -84,7 +84,7 @@ class TTSViewModel @Inject constructor(
                 stopSpeaking() // Stop any previous speech
                 _uiState.update { it.copy(currentText = text) }
 
-                val locale = determineLocale(text)
+                val locale = language?.let { Locale(it) } ?: determineLocale(text)
                 when (tts?.isLanguageAvailable(locale)) {
                     TextToSpeech.LANG_AVAILABLE -> speakLocally(text, locale)
                     else -> speakOnline(text, locale)
