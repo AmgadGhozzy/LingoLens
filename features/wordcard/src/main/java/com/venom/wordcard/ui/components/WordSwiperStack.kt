@@ -3,8 +3,6 @@ package com.venom.wordcard.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
@@ -14,7 +12,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.venom.wordcard.data.model.WordCardModel
 import com.venom.wordcard.ui.components.WordCardAnimations.rememberCardAnimationState
+import com.venom.wordcard.ui.viewmodel.WordSwiperEvent
+import com.venom.wordcard.ui.viewmodel.WordSwiperViewModel
 import kotlinx.coroutines.launch
 import kotlin.collections.asReversed
 import kotlin.math.abs
@@ -31,9 +32,9 @@ import kotlin.math.abs
  */
 @Composable
 fun WordSwiperStack(
-    words: List<WordCard>,
-    onSaveWord: (WordCard) -> Unit,
-    onSpeakWord: (WordCard) -> Unit,
+    words: List<WordCardModel>,
+    onSaveWord: (WordCardModel) -> Unit,
+    onSpeakWord: (WordCardModel) -> Unit,
     onUndoLastAction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -139,25 +140,6 @@ fun WordSwiperStack(
     }
 }
 
-@Composable
-private fun UndoButton(
-    removedCardsCount: Int, onUndo: () -> Unit, modifier: Modifier = Modifier
-) {
-    FloatingActionButton(onClick = onUndo, modifier = modifier.semantics {
-        contentDescription = "Undo last action. $removedCardsCount cards available"
-    }) {
-        BadgedBox(badge = {
-            if (removedCardsCount > 1) {
-                Badge { Text(removedCardsCount.toString()) }
-            }
-        }) {
-            Icon(
-                Icons.AutoMirrored.Rounded.Undo, contentDescription = null
-            )
-        }
-    }
-}
-
 private suspend fun resetAnimationState(cardAnimState: CardAnimationState) {
     cardAnimState.apply {
         offsetX.snapTo(0f)
@@ -181,32 +163,32 @@ private suspend fun returnToCenter(cardAnimState: CardAnimationState) {
 @Composable
 fun WordSwiperStackPreview() {
     val sampleWords = listOf(
-        WordCard(
+        WordCardModel(
             id = "1",
             word = "مرحبا",
             translation = "Hello",
             examples = listOf("مرحبا، كيف حالك؟", "مرحبا بالجميع!")
-        ), WordCard(
+        ), WordCardModel(
             id = "2",
             word = "شكرا",
             translation = "Thank you",
             examples = listOf("شكرا جزيلا!", "على الرحب والسعة")
-        ), WordCard(
+        ), WordCardModel(
             id = "3",
             word = "مع السلامة",
             translation = "Goodbye",
             examples = listOf("مع السلامة و يوم سعيد!", "إلى اللقاء!")
-        ), WordCard(
+        ), WordCardModel(
             id = "4",
             word = "مرحبا",
             translation = "Hello",
             examples = listOf("مرحبا، كيف حالك؟", "مرحبا بالجميع!")
-        ), WordCard(
+        ), WordCardModel(
             id = "5",
             word = "شكرا",
             translation = "Thank you",
             examples = listOf("شكرا جزيلا!", "على الرحب والسعة")
-        ), WordCard(
+        ), WordCardModel(
             id = "6",
             word = "مع السلامة",
             translation = "Goodbye",
@@ -216,8 +198,7 @@ fun WordSwiperStackPreview() {
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        WordSwiperStack(
-            words = sampleWords,
+        WordSwiperStack(words = sampleWords,
             onSaveWord = { },
             onSpeakWord = { },
             onUndoLastAction = { },
