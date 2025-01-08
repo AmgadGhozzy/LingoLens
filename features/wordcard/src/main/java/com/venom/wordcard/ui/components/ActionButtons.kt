@@ -14,11 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.venom.wordcard.data.model.WordCardModel
+import com.venom.wordcard.data.model.WordEntity
 
 @Composable
 fun ActionButtons(
-    card: WordCardModel, onFlip: () -> Unit
+    card: WordEntity,
+    onBookmark: () -> Unit,
+    onSpeak: () -> Unit,
+    onCopy: () -> Unit,
+    onFlip: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -30,14 +34,15 @@ fun ActionButtons(
         ) {
             ActionButton(
                 icon = Icons.Rounded.ContentCopy,
-                contentDescription = "Copy word ${card.word}",
+                contentDescription = "Copy word ${card.englishWord}",
                 backgroundColor = MaterialTheme.colorScheme.primary,
-                iconTint = MaterialTheme.colorScheme.onPrimary
+                iconTint = MaterialTheme.colorScheme.onPrimary,
+                onClick = onCopy
             )
 
             ActionButton(
                 icon = Icons.Rounded.Refresh,
-                contentDescription = "Flip card for ${card.word}",
+                contentDescription = "Flip card for ${card.englishWord}",
                 backgroundColor = MaterialTheme.colorScheme.secondary,
                 iconTint = MaterialTheme.colorScheme.onSecondary,
                 onClick = onFlip
@@ -45,12 +50,13 @@ fun ActionButtons(
 
             ActionButton(
                 icon = Icons.Rounded.Mic,
-                contentDescription = "Speech-to-text for ${card.word}",
+                contentDescription = "Speech-to-text for ${card.englishWord}",
                 backgroundColor = MaterialTheme.colorScheme.tertiary,
-                iconTint = MaterialTheme.colorScheme.onTertiary
+                iconTint = MaterialTheme.colorScheme.onTertiary,
+                onClick = onSpeak
             )
         }
 
-        BookmarkButton(card)
+        BookmarkButton(card, onBookmark)
     }
 }
