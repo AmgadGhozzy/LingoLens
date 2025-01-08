@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.venom.wordcard.data.model.WordEntity
 
 @Composable
-fun FrontContent(card: WordCard) {
+fun FrontContent(card: WordEntity) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -23,7 +24,7 @@ fun FrontContent(card: WordCard) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = card.word,
+            text = card.englishWord,
             fontSize = 32.sp,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineLarge
