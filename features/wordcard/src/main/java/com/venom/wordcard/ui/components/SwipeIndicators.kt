@@ -6,23 +6,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import com.venom.resources.R
 
 @Composable
 fun SwipeIndicators(
-    offsetX: Float, swipeThreshold: Float, isFlipped: Boolean
+    offsetX: Float, swipeThreshold: Float
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer(rotationY = if (isFlipped) 180f else 0f)
+        modifier = Modifier.fillMaxSize()
     ) {
         // Left indicator ("I Remember")
         Box(
             modifier = Modifier.align(Alignment.CenterStart)
         ) {
             SwipeIndicator(
-                text = "I Remember",
+                text = stringResource(R.string.i_remember),
                 alpha = (-offsetX / swipeThreshold).coerceIn(0f, 1f),
                 backgroundColor = MaterialTheme.colorScheme.primary
             )
@@ -33,7 +32,7 @@ fun SwipeIndicators(
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
             SwipeIndicator(
-                text = "Forgot",
+                text = stringResource(R.string.forgot),
                 alpha = (offsetX / swipeThreshold).coerceIn(0f, 1f),
                 backgroundColor = MaterialTheme.colorScheme.error
             )
