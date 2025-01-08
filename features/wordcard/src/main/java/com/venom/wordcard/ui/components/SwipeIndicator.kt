@@ -21,7 +21,7 @@ fun SwipeIndicator(
         modifier = modifier
             .alpha(alpha)
             .clip(CircleShape)
-            .background(backgroundColor.copy(alpha = 0.9f))
+            .background(backgroundColor)
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
