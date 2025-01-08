@@ -8,9 +8,9 @@ import androidx.navigation.compose.composable
 import com.venom.dialog.ui.screen.DialogScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
-import com.venom.phrase.ui.screen.PhrasesScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.wordcard.ui.screen.WordCardScreen
 
 @Composable
 fun NavigationGraph(
@@ -22,13 +22,11 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Translation.route,
+        startDestination = Screen.WordCard.route,
         modifier = modifier
     ) {
         composable(Screen.Translation.route) {
-            TranslationScreen(
-                onDismiss = {},
-            )
+            TranslationScreen()
         }
 
         composable(Screen.Ocr.route) {
@@ -41,24 +39,15 @@ fun NavigationGraph(
         }
 
         composable(Screen.Phrases.route) {
-            PhrasebookScreen(
-                onNavigateToCategory = { categoryId ->
-                    navController.navigate(Screen.PhrasesCategory.createRoute(categoryId))
-                }
-            )
-        }
-
-        composable(Screen.PhrasesCategory.route) {
-            val categoryId = it.arguments?.getString("categoryId")?.toIntOrNull()
-            categoryId?.let { viewModel ->
-                PhrasesScreen(
-                    categoryId = viewModel
-                )
-            }
+            PhrasebookScreen()
         }
 
         composable(Screen.Dialog.route) {
             DialogScreen()
+        }
+
+        composable(Screen.WordCard.route) {
+            WordCardScreen()
         }
 
     }
