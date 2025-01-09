@@ -1,8 +1,10 @@
-package com.venom.wordcard.data.repo
+package com.venom.stackcard.data.repo
 
-import com.venom.wordcard.data.local.dao.WordDao
-import com.venom.wordcard.data.model.WordEntity
+import com.venom.stackcard.data.local.dao.WordDao
+import com.venom.stackcard.data.model.WordEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class WordRepository @Inject constructor(
@@ -20,15 +22,15 @@ class WordRepository @Inject constructor(
 
     fun getForgotedWords(): Flow<List<WordEntity>> = wordDao.getForgotedWords()
 
-    suspend fun toggleBookmark(wordEntity: WordEntity) {
+    suspend fun toggleBookmark(wordEntity: WordEntity) = withContext(Dispatchers.IO) {
         wordDao.update(wordEntity.copy(isBookmarked = !wordEntity.isBookmarked))
     }
 
-    suspend fun toggleRemember(wordEntity: WordEntity) {
+    suspend fun toggleRemember(wordEntity: WordEntity) = withContext(Dispatchers.IO) {
         wordDao.update(wordEntity.copy(isRemembered = !wordEntity.isRemembered))
     }
 
-    suspend fun toggleForgot(wordEntity: WordEntity) {
+    suspend fun toggleForgot(wordEntity: WordEntity) = withContext(Dispatchers.IO) {
         wordDao.update(wordEntity.copy(isForgotten = !wordEntity.isForgotten))
     }
 }
