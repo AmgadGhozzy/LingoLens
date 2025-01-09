@@ -12,7 +12,6 @@ import com.venom.ui.viewmodel.LangSelectorViewModel
 fun PhrasebookScreen(
     viewModel: PhraseViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
-    onNavigateToCategory: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val langState by langSelectorViewModel.state.collectAsState()
