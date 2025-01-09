@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.venom.resources.R
 
-
 @Composable
 fun BookmarkButton(
     isBookmarked: Boolean, onToggleBookmark: () -> Unit, modifier: Modifier = Modifier
