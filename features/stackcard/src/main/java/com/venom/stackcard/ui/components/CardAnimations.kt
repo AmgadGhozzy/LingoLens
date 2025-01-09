@@ -1,4 +1,4 @@
-package com.venom.wordcard.ui.components
+package com.venom.stackcard.ui.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -25,15 +25,15 @@ object WordCardAnimations {
         visibilityThreshold = 0.01f
     )
 
-    val FlipAnimationSpec = spring<Float>(
-        dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessLow,
-        visibilityThreshold = 0.01f
-    )
-
-//    val FlipAnimationSpec = tween<Float>(
-//        durationMillis = 400, easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
+//    val FlipAnimationSpec = spring<Float>(
+//        dampingRatio = Spring.DampingRatioMediumBouncy,
+//        stiffness = Spring.StiffnessLow,
+//        visibilityThreshold = 0.01f
 //    )
+
+    val FlipAnimationSpec = tween<Float>(
+        durationMillis = 400, easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
+    )
 
     val ScaleAnimationSpec = spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = 400f
