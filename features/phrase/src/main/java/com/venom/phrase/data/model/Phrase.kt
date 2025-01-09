@@ -47,4 +47,7 @@ data class Phrase(
     override val norwegianNo: String,
     override val hindiHi: String,
     override val russianRu: String,
+    val isBookmarked: Boolean = false,
+    val isRemembered: Boolean = false,
+    val isForgotten: Boolean = false,
 ) : ITranslatable
