@@ -16,8 +16,8 @@ android {
         applicationId = "com.venom.lingolens"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 3
+        versionName = "3.0"
 
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -58,7 +58,7 @@ dependencies {
     implementation(project(":features:translation"))
     implementation(project(":features:phrase"))
     implementation(project(":features:dialog"))
-    implementation(project(":features:wordcard"))
+    implementation(project(":features:stackcard"))
     implementation(project(":features:ocr"))
 
 
