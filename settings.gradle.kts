@@ -26,7 +26,7 @@ include(":app")
 include(":features:translation")
 include(":features:phrase")
 include(":features:dialog")
-include(":features:wordcard")
+include(":features:stackcard")
 include(":features:ocr")
 
 
