@@ -7,9 +7,7 @@ import com.venom.phrase.data.model.Category
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.model.Section
 
-@Database(
-    entities = [Phrase::class, Category::class, Section::class], version = 1, exportSchema = true
-)
+@Database(entities = [Phrase::class, Category::class, Section::class], version = 1)
 abstract class PhraseDatabase : RoomDatabase() {
     abstract fun phraseDao(): PhraseDao
 }
