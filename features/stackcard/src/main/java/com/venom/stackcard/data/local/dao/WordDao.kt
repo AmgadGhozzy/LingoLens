@@ -1,7 +1,7 @@
-package com.venom.wordcard.data.local.dao
+package com.venom.stackcard.data.local.dao
 
 import androidx.room.*
-import com.venom.wordcard.data.model.WordEntity
+import com.venom.stackcard.data.model.WordEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
