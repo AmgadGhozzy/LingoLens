@@ -1,10 +1,10 @@
-package com.venom.wordcard.di
+package com.venom.stackcard.di
 
 import android.content.Context
 import androidx.room.Room
-import com.venom.wordcard.data.local.WordDatabase
-import com.venom.wordcard.data.local.dao.WordDao
-import com.venom.wordcard.data.repo.WordRepository
+import com.venom.stackcard.data.local.WordDatabase
+import com.venom.stackcard.data.local.dao.WordDao
+import com.venom.stackcard.data.repo.WordRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
