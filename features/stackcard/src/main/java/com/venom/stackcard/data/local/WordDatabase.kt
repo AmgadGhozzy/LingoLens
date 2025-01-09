@@ -1,11 +1,11 @@
-package com.venom.wordcard.data.local
+package com.venom.stackcard.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.venom.data.local.typeconverter.ListStringConverter
-import com.venom.wordcard.data.local.dao.WordDao
-import com.venom.wordcard.data.model.WordEntity
+import com.venom.stackcard.data.local.dao.WordDao
+import com.venom.stackcard.data.model.WordEntity
 
 @Database(entities = [WordEntity::class], version = 1)
 @TypeConverters(ListStringConverter::class)
