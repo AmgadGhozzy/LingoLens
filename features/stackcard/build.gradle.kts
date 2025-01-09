@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.venom.wordcard"
+    namespace = "com.venom.stackcard"
     compileSdk = 35
 
     defaultConfig {
@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":core:di"))
     implementation(project(":core:resources"))
     implementation(project(":core:ui"))
+    implementation(project(":features:phrase"))
 
 
 
