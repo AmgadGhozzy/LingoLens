@@ -1,6 +1,5 @@
 package com.venom.utils
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,16 +11,12 @@ import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.provider.Settings
-import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.content.ContextCompat
 import java.text.DateFormat
 import java.util.Date
@@ -40,18 +35,6 @@ object Extensions {
         }
     }
 
-    fun TextView.setProgressText(progressText: String) {
-        text = progressText
-    }
-
-    fun TextFieldValue.getSelectedOrFullText(): String {
-        return if (selection.start != selection.end) {
-            text.substring(selection.start, selection.end)
-        } else {
-            text
-        }
-    }
-
     fun TextView.getSelectedOrFullText(): String {
         return if (hasSelection()) {
             text.subSequence(selectionStart, selectionEnd).toString()
@@ -59,8 +42,6 @@ object Extensions {
             text.toString()
         }
     }
-
-    private fun TextView.hasSelection(): Boolean = isFocused && selectionStart != selectionEnd
 
     /**
      * Clipboard Operations
@@ -105,25 +86,6 @@ object Extensions {
     fun String.postprocessText(): String = replace("☆", "\n").replace("★", ".")
 
     /**
-     * View Visibility
-     */
-    fun View.show() {
-        visibility = View.VISIBLE
-    }
-
-    fun View.hide() {
-        visibility = View.GONE
-    }
-
-    fun View.invisible() {
-        visibility = View.INVISIBLE
-    }
-
-    fun View.toggleVisibility() {
-        visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
-    }
-
-    /**
      * Keyboard Management
      */
     fun View.showKeyboard() {
@@ -156,17 +118,6 @@ object Extensions {
 
     fun Context.isDarkMode(): Boolean =
         resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-
-    /**
-     * Resource Handling
-     */
-    fun Context.getColorCompat(@ColorRes colorRes: Int) = ContextCompat.getColor(this, colorRes)
-
-    fun Context.getDrawableCompat(@DrawableRes drawableRes: Int) =
-        ContextCompat.getDrawable(this, drawableRes)
-
-    fun Context.dpToPx(dp: Float): Int =
-        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
 
     /**
      * Intent & Navigation
