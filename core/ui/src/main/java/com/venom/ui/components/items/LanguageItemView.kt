@@ -1,20 +1,24 @@
 package com.venom.ui.components.items
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,95 +30,107 @@ import com.venom.domain.model.LANGUAGES_LIST
 import com.venom.domain.model.LanguageItem
 import com.venom.resources.R
 
-/**
- * Displays a language item with an optional flag and native name hint, now with added clickability.
- *
- * @param language The [LanguageItem] data to display.
- * @param isSelected Whether the language is selected, affecting its styling.
- * @param showNativeNameHint Whether to show the native name below the main name.
- * @param showFlag Whether to display the language flag.
- * @param onClick Callback for when the language item is clicked.
- * @param modifier Additional modifier for customization.
- * @param flagSize The size of the flag icon.
- */
 @Composable
 fun LanguageItemView(
     language: LanguageItem,
     isSelected: Boolean = false,
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false,
+    showArrow: Boolean = true,
+    isExpanded: Boolean = false,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    flagSize: Dp = 40.dp
-
+    flagSize: Dp = 40.dp,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 6.dp)
 ) {
-    // Interaction source for the ripple effect
     val interactionSource = remember { MutableInteractionSource() }
+    val arrowRotation by animateFloatAsState(targetValue = if (isExpanded) 180f else 0f, label = "")
 
-    // Clickable modifier
-    val baseModifier = modifier
-        .clip(RoundedCornerShape(12.dp))
-        .then(if (onClick != null) {
-            Modifier.clickable(
-                interactionSource = interactionSource, indication = LocalIndication.current
-            ) { onClick() }
-        } else {
-            Modifier
-        })
-        .padding(6.dp)
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = baseModifier
-    ) {
-        // Display the flag if enabled
-        if (showFlag) {
-            val flagPainter = language.flagResId?.let { painterResource(id = it) }
-                ?: painterResource(id = R.drawable.default_flag)
-
-            Image(
-                painter = flagPainter,
-                contentDescription = "Flag of ${language.name}",
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(flagSize)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape
-                    ),
-                contentScale = ContentScale.Crop
+    Row(verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(
+                interactionSource = interactionSource, indication = null
+            ) { onClick?.invoke() }
+            .padding(contentPadding)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            if (showFlag) {
+                LanguageFlag(language = language, flagSize = flagSize)
+            }
+            LanguageText(
+                language = language,
+                isSelected = isSelected,
+                showNativeNameHint = showNativeNameHint
             )
         }
-
-        // Display the language name and optional native name
-        Column {
-            Text(
-                text = language.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        if (showArrow && onClick != null) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowDown,
+                contentDescription = "Expand language selection",
+                modifier = Modifier
+                    .size(20.dp)
+                    .rotate(arrowRotation),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            if (showNativeNameHint) {
-                Text(
-                    text = language.nativeName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
     }
 }
 
+@Composable
+private fun LanguageFlag(language: LanguageItem, flagSize: Dp) {
+    val flagPainter = painterResource(id = language.flagResId ?: R.drawable.default_flag)
+    Image(
+        painter = flagPainter,
+        contentDescription = "Flag of ${language.name}",
+        modifier = Modifier
+            .size(flagSize)
+            .clip(CircleShape),
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+private fun LanguageText(language: LanguageItem, isSelected: Boolean, showNativeNameHint: Boolean) {
+    Column {
+        Text(
+            text = language.name,
+            style = MaterialTheme.typography.titleMedium,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (showNativeNameHint) {
+            Text(
+                text = language.nativeName,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
-fun LanguageItemViewClickablePreview() {
-    LanguageItemView(
-        language = LANGUAGES_LIST[0],
-        isSelected = false,
-        onClick = { /* Handle click */ })
+private fun LanguageItemViewPreview() {
+    MaterialTheme {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp)
+        ) {
+            LanguageItemView(language = LANGUAGES_LIST[0], onClick = {})
+            LanguageItemView(language = LANGUAGES_LIST[1],
+                isSelected = true,
+                showNativeNameHint = true,
+                showFlag = true,
+                isExpanded = true,
+                onClick = {})
+            LanguageItemView(language = LANGUAGES_LIST[2],
+                showArrow = false,
+                showFlag = true,
+                onClick = {})
+        }
+    }
 }
