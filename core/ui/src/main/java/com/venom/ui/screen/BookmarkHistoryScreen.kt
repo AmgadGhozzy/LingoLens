@@ -31,7 +31,8 @@ import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.CustomSearchBar
 import com.venom.ui.components.items.OcrHistoryItemView
 import com.venom.ui.components.items.TransHistoryItemView
-import com.venom.ui.components.sections.BookmarkHistoryTabs
+import com.venom.ui.components.sections.CustomTabs
+import com.venom.ui.components.sections.TabItem
 import com.venom.ui.viewmodel.BookmarkOcrViewModel
 import com.venom.ui.viewmodel.BookmarkViewModel
 import com.venom.utils.Extensions.copyToClipboard
@@ -118,10 +119,14 @@ fun BookmarkHistoryScreen(
                 })
 
             // View Type Selector (Bookmarks/History)
-            BookmarkHistoryTabs(
-                selectedTab = selectedTab, onTabSelected = { newTab ->
-                    selectedTab = newTab
-                }, modifier = Modifier
+            CustomTabs(
+                tabs = listOf(
+                    TabItem(R.string.bookmarks_title, R.drawable.icon_bookmark_outline),
+                    TabItem(R.string.history_title, R.drawable.icon_history)
+                ),
+                selectedTab = selectedTab,
+                onTabSelected = { newTab -> selectedTab = newTab },
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
             )
