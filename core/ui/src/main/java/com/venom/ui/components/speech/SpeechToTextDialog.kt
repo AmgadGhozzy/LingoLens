@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.ui.components.common.RequestMicrophonePermission
 import com.venom.ui.components.dialogs.PermissionDeniedDialog
@@ -37,7 +38,9 @@ fun SpeechToTextDialog(
     }
 
     if (dialogVisible) {
-        Dialog(onDismissRequest = {
+        Dialog(properties = DialogProperties(
+            dismissOnBackPress = true, dismissOnClickOutside = true
+        ), onDismissRequest = {
             dialogVisible = false
             onDismiss()
         }) {
