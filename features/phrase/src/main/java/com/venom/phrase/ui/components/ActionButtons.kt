@@ -3,24 +3,33 @@ package com.venom.phrase.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Share
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CopyButton
+import com.venom.ui.components.buttons.CustomButton
 
 @Composable
-fun ActionButtons() {
+fun ActionButtons(
+    onCopyClick: () -> Unit, onShareClick: () -> Unit
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
     ) {
-        ActionTextButton(
-            onClick = { }, icon = Icons.Rounded.ContentCopy, text = stringResource(R.string.action_copy)
-        )
-        ActionTextButton(
-            onClick = { }, icon = Icons.Rounded.Share, text = stringResource(R.string.action_share)
+        CopyButton(onClick = onCopyClick, iconSize = 28.dp)
+
+        CustomButton(
+            icon = R.drawable.icon_share,
+            onClick = onShareClick,
+            iconSize = 28.dp,
+            contentDescription = stringResource(R.string.action_share)
         )
     }
 }
