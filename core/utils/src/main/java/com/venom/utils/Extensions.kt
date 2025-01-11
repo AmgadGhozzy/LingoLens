@@ -13,10 +13,10 @@ import android.os.VibratorManager
 import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.content.ContextCompat
 import java.text.DateFormat
 import java.util.Date
@@ -35,11 +35,11 @@ object Extensions {
         }
     }
 
-    fun TextView.getSelectedOrFullText(): String {
-        return if (hasSelection()) {
-            text.subSequence(selectionStart, selectionEnd).toString()
+    fun TextFieldValue.getSelectedOrFullText(): String {
+        return if (selection.start != selection.end) {
+            text.substring(selection.start, selection.end)
         } else {
-            text.toString()
+            text
         }
     }
 
