@@ -10,12 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.venom.utils.isTextRightToLeft
+import com.venom.utils.getTextDirection
 
 /**
  * A customizable text field supporting multiple languages and text directions
@@ -66,10 +65,6 @@ fun CustomTextField(
         (maxFontSize - (textValue.text.length / 50)).coerceAtLeast(minFontSize).sp
     }
 
-    val textDirection = remember(textValue.text) {
-        if (isTextRightToLeft(textValue.text)) TextDirection.Rtl else TextDirection.Ltr
-    }
-
     val scrollState = remember { ScrollState(0) }
 
     TextField(
@@ -84,14 +79,14 @@ fun CustomTextField(
             onTextChange(TextFieldValue(newText, textValue.selection))
         },
         textStyle = TextStyle(
-            fontSize = dynamicFontSize, textDirection = textDirection
+            fontSize = dynamicFontSize, textDirection = getTextDirection(textValue.text)
         ),
         placeholder = {
             Text(
                 text = placeHolderText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 fontSize = 20.sp,
-                style = TextStyle(textDirection = textDirection)
+                style = TextStyle(textDirection = getTextDirection(textValue.text))
             )
         },
         colors = colors
