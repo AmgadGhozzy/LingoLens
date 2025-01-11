@@ -28,6 +28,7 @@ material = "1.12.0"
 materialIconsCoreAndroid = "1.6.0"
 lottieCompose = "6.6.2"
 accompanistPermissions = "0.37.0"
+playServicesAds = "23.6.0"
 
 [libraries]
 # Android Jetpack
@@ -79,6 +80,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-material-icons-core-android = { group = "androidx.compose.material", name = "material-icons-core-android", version.ref = "materialIconsCoreAndroid" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -71,6 +71,7 @@ dependencies {
     api(libs.androidx.lifecycle.viewmodel.ktx)
     api(libs.androidx.fragment.ktx)
 
+    api(libs.play.services.ads)
 
     // Hilt
     api(libs.hilt.android)
