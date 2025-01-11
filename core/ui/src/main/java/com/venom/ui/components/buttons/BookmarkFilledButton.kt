@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 
@@ -23,6 +24,7 @@ fun BookmarkFilledButton(
     onToggleBookmark: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: Dp = 48.dp,
     shape: Shape = IconButtonDefaults.filledShape,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
@@ -37,7 +39,7 @@ fun BookmarkFilledButton(
         onClick = onToggleBookmark,
         modifier = modifier
             .scale(if (isBookmarked) 1.1f else 1f)
-            .size(48.dp),
+            .size(size),
         enabled = enabled,
         shape = shape,
         colors = colors,
