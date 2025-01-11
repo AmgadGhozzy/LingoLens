@@ -20,7 +20,6 @@ fun BookMarkActionBar(
     onShareClick: () -> Unit,
     onCopyClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    showCopiedToast: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -30,7 +29,7 @@ fun BookMarkActionBar(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CopyButton(onClick = onCopyClick, showCopiedToast = showCopiedToast)
+        CopyButton(onClick = onCopyClick)
 
         CustomButton(
             icon = R.drawable.icon_share,
