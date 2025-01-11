@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -56,7 +55,7 @@ fun CustomButton(
 ) {
     // Animated color logic with more flexible tinting
     val defaultDisabledColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-    val defaultSelectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val defaultSelectedColor = MaterialTheme.colorScheme.onSecondary
     val defaultUnselectedColor = MaterialTheme.colorScheme.primary
 
     val iconColor by animateColorAsState(
