@@ -35,4 +35,8 @@ class PhraseRepository(private val dao: PhraseDao) {
     suspend fun toggleForgot(phrase: Phrase) = withContext(Dispatchers.IO) {
         dao.update(phrase.copy(isForgotten = !phrase.isForgotten))
     }
+
+    suspend fun update(phrase: Phrase) = withContext(Dispatchers.IO) {
+        dao.update(phrase)
+    }
 }
