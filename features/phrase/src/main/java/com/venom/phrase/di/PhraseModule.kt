@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object PhraseModule {
 
     @Provides
     @Singleton
@@ -30,8 +30,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRepository(
-        phraseDao: PhraseDao
-    ) = PhraseRepository(phraseDao)
+    fun provideRepository(phraseDao: PhraseDao) = PhraseRepository(phraseDao)
 }
 
