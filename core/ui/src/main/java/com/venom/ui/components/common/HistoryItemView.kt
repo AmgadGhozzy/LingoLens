@@ -15,13 +15,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.OcrEntry
 import com.venom.data.model.TranslationEntry
 import com.venom.domain.model.IHistoryEntry
 import com.venom.ui.components.bars.BookMarkActionBar
 import com.venom.ui.components.bars.HistoryItemHeader
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun HistoryItemView(
@@ -35,8 +32,6 @@ fun HistoryItemView(
     content: @Composable (Boolean, () -> Unit) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var showCopiedToast by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     ElevatedCard(
         modifier = modifier
@@ -68,12 +63,7 @@ fun HistoryItemView(
             BookMarkActionBar(
                 onShareClick = onShareClick, onCopyClick = {
                     onCopyClick()
-                    scope.launch {
-                        showCopiedToast = true
-                        delay(2000)
-                        showCopiedToast = false
-                    }
-                }, onDeleteClick = onEntryRemove, showCopiedToast = showCopiedToast
+                }, onDeleteClick = onEntryRemove
             )
         }
     }
