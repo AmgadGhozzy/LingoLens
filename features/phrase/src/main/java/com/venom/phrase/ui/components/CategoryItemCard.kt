@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,12 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
 import com.venom.phrase.ui.viewmodel.PhraseUiState
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.DynamicStyledText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +55,9 @@ fun CategoryItemCard(
         ) {
             CategoryIcon(category.icon.toString())
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = category.getTranslation(state.sourceLang.code),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                DynamicStyledText(
+                    category.getTranslation(state.sourceLang.code), modifier = Modifier
+                        .fillMaxWidth()
                 )
 
                 Text(
@@ -63,7 +66,15 @@ fun CategoryItemCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            NavigateButton(category.getTranslation(state.targetLang.code), onClick)
+            CustomFilledIconButton(
+                icon = Icons.Rounded.ChevronRight,
+                contentDescription = "View ${category.getTranslation(state.targetLang.code)} phrases",
+                onClick = onClick,
+                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.09f),
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            )
         }
     }
 }
