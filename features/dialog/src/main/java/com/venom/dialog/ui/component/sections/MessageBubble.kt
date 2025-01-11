@@ -6,32 +6,29 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.venom.dialog.data.model.DialogMessage
+import com.venom.dialog.data.local.model.DialogMessage
 import com.venom.dialog.ui.component.AnimatedPlayButton
-import com.venom.domain.model.LanguageItem
+import com.venom.ui.components.common.DynamicStyledText
 
 @Composable
 fun MessageBubble(
     message: DialogMessage, onPlayClick: () -> Unit, modifier: Modifier = Modifier
 ) {
-    val bubbleColor = if (message.isSender) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.tertiary
-    }
+    val bubbleColor =
+        if (message.isSender) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
 
-    val textColor = if (message.isSender) {
-        MaterialTheme.colorScheme.onPrimary
-    } else {
-        MaterialTheme.colorScheme.onTertiary
-    }
+    val textColor =
+        if (message.isSender) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val maxWidth = screenWidth * 0.8f
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = if (message.isSender) Alignment.End else Alignment.Start
     ) {
         Surface(
@@ -42,29 +39,38 @@ fun MessageBubble(
                 bottomEnd = if (message.isSender) 4.dp else 20.dp
             ),
             color = bubbleColor,
-            tonalElevation = 4.dp,
-            shadowElevation = 2.dp,
-            modifier = Modifier.widthIn(max = 320.dp)
+            tonalElevation = 6.dp,
+            shadowElevation = 4.dp,
+            modifier = Modifier
+                .wrapContentSize()
+                .widthIn(max = maxWidth)
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
                     modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = message.sourceText, style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 18.sp
-                        ), color = textColor
+                    // SourceText
+                    DynamicStyledText(
+                        text = message.sourceText, maxFontSize = 24, color = textColor,modifier =
+                        Modifier.fillMaxWidth()
                     )
-                    Text(
+
+                    HorizontalDivider(
+                        color = textColor.copy(alpha = 0.2f),
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+
+                    DynamicStyledText(
                         text = message.translatedText,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 16.sp
-                        ),
-                        color = textColor.copy(alpha = 0.8f)
+                        fontWeight = FontWeight.Normal,
+                        maxFontSize = 24,
+                        color = textColor,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
@@ -78,39 +84,36 @@ fun MessageBubble(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun MessageBubblePreview() {
-    MaterialTheme {
-        Surface(
-            color = Color(0xFF121212),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Column {
-                MessageBubble(
-                    message = DialogMessage(
-                        sourceText = "How are you.",
-                        translatedText = "مرحبا.",
-                        sourceLanguage = LanguageItem("en", "English"),
-                        targetLanguage = LanguageItem("ar", "Arabic"),
-                        isSender = true
-                    ),
-                    onPlayClick = {}
-                )
+    val initialMessages = listOf(
+        DialogMessage(
+            id = "welcome_1",
+            sourceText = "Welcome to LingoLens!",
+            translatedText = "مرحباً بك في LingoLens!",
+            sourceLanguageCode = "en",
+            sourceLanguageName = "English",
+            targetLanguageCode = "ar",
+            targetLanguageName = "Arabic",
+            timestamp = System.currentTimeMillis(),
+            isSender = true
+        ), DialogMessage(
+            id = "welcome_2",
+            sourceText = "Tap",
+            translatedText = "انقر",
+            sourceLanguageCode = "en",
+            sourceLanguageName = "English",
+            targetLanguageCode = "ar",
+            targetLanguageName = "Arabic",
+            timestamp = System.currentTimeMillis() + 1000,
+            isSender = false
+        )
+    )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                MessageBubble(
-                    message = DialogMessage(
-                        sourceText = "Welcome.",
-                        translatedText = "اهلا وسهلا.",
-                        sourceLanguage = LanguageItem("ar", "Arabic"),
-                        targetLanguage = LanguageItem("en", "English"),
-                        isSender = false
-                    ),
-                    onPlayClick = {}
-                )
-            }
-        }
+    Column {
+        MessageBubble(message = initialMessages[0], onPlayClick = {})
+        Spacer(modifier = Modifier.height(8.dp))
+        MessageBubble(message = initialMessages[1], onPlayClick = {})
     }
 }
