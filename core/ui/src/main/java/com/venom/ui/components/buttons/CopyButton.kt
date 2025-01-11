@@ -5,25 +5,46 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.dialogs.CopiedToast
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CopyButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    showCopiedToast: Boolean = false
+    iconSize: Dp = 28.dp,
+    modifier: Modifier = Modifier
 ) {
+
+    var showCopiedToast by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
     IconButton(
-        onClick = onClick,enabled = enabled, modifier = modifier.size(56.dp)
+        onClick = {
+            onClick
+            showCopiedToast = true
+            scope.launch {
+                delay(2000)
+                showCopiedToast = false
+            }
+        }, enabled = enabled, modifier = modifier.size(56.dp)
     ) {
         Icon(
+            modifier = Modifier.size(iconSize),
             painter = painterResource(id = R.drawable.icon_copy),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.action_copy),
             tint = MaterialTheme.colorScheme.primary
         )
         CopiedToast(visible = showCopiedToast)
