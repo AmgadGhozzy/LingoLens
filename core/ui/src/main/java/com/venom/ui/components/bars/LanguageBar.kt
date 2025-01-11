@@ -1,6 +1,5 @@
 package com.venom.ui.components.bars
 
-
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -79,6 +78,7 @@ fun LanguageBar(
                     showFlag = showFlag,
                     flagSize = flagSize,
                     showNativeNameHint = showNativeNameHint,
+                    showArrow = !isFromBottomSheet,
                     onClick = {
                         viewModel.setSelectingSourceLanguage(true)
                         showLanguageSelector = true
@@ -104,6 +104,7 @@ fun LanguageBar(
                     showFlag = showFlag,
                     flagSize = flagSize,
                     showNativeNameHint = showNativeNameHint,
+                    showArrow = !isFromBottomSheet,
                     onClick = {
                         viewModel.setSelectingSourceLanguage(false)
                         showLanguageSelector = true
