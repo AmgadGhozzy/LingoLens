@@ -41,23 +41,38 @@ class TranslateViewModel @Inject constructor(
     val uiState: StateFlow<TranslationUiState> = _uiState.asStateFlow()
 
     fun onSourceTextChanged(input: String) {
-        if (input.isNotBlank()) {
+        if (input.isBlank()) {
+            _uiState.update { it.copy(
+                sourceText = input,
+                translationResult = null,
+                translatedText = "",
+                synonyms = emptyList()
+            )}
+            return
+        }
+
+        if (input != _uiState.value.sourceText) {
             _uiState.update { it.copy(sourceText = input) }
             translate(input)
-        } else {
-            _uiState.update { it.copy(translationResult = null) }
         }
     }
 
     fun updateLanguages(
-        sourceLanguage: LanguageItem, targetLanguage: LanguageItem
+        sourceLanguage: LanguageItem,
+        targetLanguage: LanguageItem
     ) {
-        _uiState.update { currentState ->
-            val updatedState =
-                currentState.copy(sourceLanguage = sourceLanguage, targetLanguage = targetLanguage)
-            updatedState.sourceText.takeIf { it.isNotBlank() }?.let { translate(it) }
-            updatedState
+        val currentState = _uiState.value
+        if (sourceLanguage == currentState.sourceLanguage &&
+            targetLanguage == currentState.targetLanguage) {
+            return
         }
+
+        _uiState.update { it.copy(
+            sourceLanguage = sourceLanguage,
+            targetLanguage = targetLanguage
+        )}
+
+        currentState.sourceText.takeIf { it.isNotBlank() }?.let { translate(it) }
     }
 
     fun toggleBookmark() {
