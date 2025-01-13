@@ -22,6 +22,7 @@ data class TranslationUiState(
     val sourceLanguage: String = "auto",
     val targetLanguage: String = "ar",
     val translationResult: TranslationResponse? = null,
+    val synonyms: List<String> = emptyList(),
     val isBookmarked: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
