@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,8 +27,8 @@ import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.CustomSearchBar
-import com.venom.ui.components.items.OcrHistoryItemView
-import com.venom.ui.components.items.TransHistoryItemView
+import com.venom.ui.components.lists.OcrBookmarkList
+import com.venom.ui.components.lists.TransBookmarkList
 import com.venom.ui.components.sections.CustomTabs
 import com.venom.ui.components.sections.TabItem
 import com.venom.ui.viewmodel.BookmarkOcrViewModel
@@ -79,10 +77,13 @@ fun BookmarkHistoryScreen(
 
     // Fetch items based on selected tab
     LaunchedEffect(selectedTab) {
-        val viewType = if (selectedTab == 0) ViewType.BOOKMARKS else ViewType.HISTORY
+        val viewType = if (selectedTab == 0) ViewType.HISTORY else ViewType.BOOKMARKS
+        translationViewModel.setViewType(viewType)
+        ocrViewModel.setViewType(viewType)
         when (contentType) {
             ContentType.TRANSLATION -> translationViewModel.fetchItems(viewType)
             ContentType.OCR -> ocrViewModel.fetchItems(viewType)
+            else -> {}
         }
     }
 
@@ -93,6 +94,7 @@ fun BookmarkHistoryScreen(
                 when (contentType) {
                     ContentType.TRANSLATION -> translationViewModel.clearAllItems()
                     ContentType.OCR -> ocrViewModel.clearAllItems()
+                    else -> {}
                 }
                 showClearConfirmation = false
             },
@@ -103,7 +105,7 @@ fun BookmarkHistoryScreen(
         color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             TopBar(title = viewResources.title,
                 onLeadingIconClick = onBackClick,
@@ -121,8 +123,8 @@ fun BookmarkHistoryScreen(
             // View Type Selector (Bookmarks/History)
             CustomTabs(
                 tabs = listOf(
+                    TabItem(R.string.history_title, R.drawable.icon_history),
                     TabItem(R.string.bookmarks_title, R.drawable.icon_bookmark_outline),
-                    TabItem(R.string.history_title, R.drawable.icon_history)
                 ),
                 selectedTab = selectedTab,
                 onTabSelected = { newTab -> selectedTab = newTab },
@@ -132,7 +134,7 @@ fun BookmarkHistoryScreen(
             )
 
             CustomSearchBar(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 18.dp),
                 searchQuery = searchQuery,
                 onSearchQueryChanged = { searchQuery = it },
             )
@@ -140,7 +142,7 @@ fun BookmarkHistoryScreen(
             when (contentType) {
                 ContentType.TRANSLATION -> {
                     val items by translationViewModel.bookmarkState.collectAsState()
-                    TranslationList(
+                    TransBookmarkList(
                         items = items.items,
                         searchQuery = searchQuery,
                         onItemRemove = translationViewModel::removeItem,
@@ -153,7 +155,7 @@ fun BookmarkHistoryScreen(
 
                 ContentType.OCR -> {
                     val items by ocrViewModel.ocrBookmarkState.collectAsState()
-                    OcrList(
+                    OcrBookmarkList(
                         items = items.items,
                         searchQuery = searchQuery,
                         onItemRemove = ocrViewModel::removeItem,
@@ -163,81 +165,15 @@ fun BookmarkHistoryScreen(
                         onItemClick = onOcrItemClick
                     )
                 }
+
+                else -> {}
             }
         }
     }
 }
 
-@Composable
-private fun TranslationList(
-    items: List<TranslationEntry>,
-    searchQuery: String,
-    onItemRemove: (TranslationEntry) -> Unit,
-    onToggleBookmark: (TranslationEntry) -> Unit,
-    onShareClick: (TranslationEntry) -> Unit,
-    onCopyClick: (TranslationEntry) -> Unit,
-    onItemClick: ((TranslationEntry) -> Unit)
-) {
-    val filteredItems = items.filter { item ->
-        searchQuery.isEmpty() || listOf(
-            item.sourceText, item.translatedText, item.sourceLangCode, item.targetLangCode
-        ).any { it.contains(searchQuery, ignoreCase = true) }
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(filteredItems) { entry ->
-            TransHistoryItemView(
-                entry = entry,
-                onEntryRemove = onItemRemove,
-                onToggleBookmark = onToggleBookmark,
-                onShareClick = onShareClick,
-                onCopyClick = onCopyClick,
-                onItemClick = onItemClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun OcrList(
-    items: List<OcrEntry>,
-    searchQuery: String,
-    onItemRemove: (OcrEntry) -> Unit,
-    onToggleBookmark: (OcrEntry) -> Unit,
-    onShareClick: (OcrEntry) -> Unit,
-    onCopyClick: (OcrEntry) -> Unit,
-    onItemClick: ((OcrEntry) -> Unit)
-) {
-    val filteredItems = items.filter { item ->
-        searchQuery.isEmpty() || item.recognizedText.contains(searchQuery, ignoreCase = true)
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(filteredItems) { entry ->
-            OcrHistoryItemView(
-                entry = entry,
-                onEntryRemove = onItemRemove,
-                onToggleBookmark = onToggleBookmark,
-                onShareClick = onShareClick,
-                onCopyClick = onCopyClick,
-                onItemClick = onItemClick
-            )
-        }
-    }
-}
-
 enum class ContentType {
-    TRANSLATION, OCR
+    TRANSLATION, OCR, PHRASEBOOK, DIALOG, STACKCARD
 }
 
 enum class ViewType {
