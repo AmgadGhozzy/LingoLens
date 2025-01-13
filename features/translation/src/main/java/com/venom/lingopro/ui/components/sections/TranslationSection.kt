@@ -8,9 +8,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.venom.ui.components.bars.LanguageBar
-import com.venom.ui.components.bars.SourceTextActionBar
-import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.lingopro.ui.viewmodel.TranslationActions
+import com.venom.ui.components.bars.*
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.LangSelectorViewModel
@@ -21,73 +20,89 @@ fun TranslationSection(
     viewModel: LangSelectorViewModel = hiltViewModel(),
     sourceTextValue: TextFieldValue,
     translatedTextValue: TextFieldValue,
-    onTextChange: (TextFieldValue) -> Unit = {},
+    actions: TranslationActions = TranslationActions.Empty,
     isLoading: Boolean = true,
-    onClearText: () -> Unit = {},
-    onCopy: (String) -> Unit = {},
-    onShare: (String) -> Unit = {},
-    onSpeak: (String) -> Unit = {},
     isSpeaking: Boolean = false,
-    onPaste: () -> Unit = {},
-    onOcr: () -> Unit = {},
-    onSave: () -> Unit = {},
-    isSaved: Boolean = false,
-    onFullscreen: (String) -> Unit = {},
-    onSpeechToText: () -> Unit = {},
+    isBookmarked: Boolean = false,
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false
 ) {
     CustomCard {
-        // Translation Top Bar for source and target languages
-        LanguageBar(
-            viewModel = viewModel,
-            showNativeNameHint = showNativeNameHint,
-            showFlag = showFlag,
+        TranslationHeader(
+            viewModel = viewModel, showNativeNameHint = showNativeNameHint, showFlag = showFlag
         )
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline, thickness = 0.5.dp)
-
-        // Source Text Section for user input
-        SourceTextSection(
+        TranslationContent(
             sourceTextValue = sourceTextValue,
-            onTextChange = onTextChange,
-            onClearText = onClearText,
-            isLoading = isLoading
-        )
-
-        // Source Action bar for text interactions
-        SourceTextActionBar(
-            onSpeechToText = onSpeechToText,
-            onOcr = onOcr,
-            onPaste = onPaste,
-            onCopy = { onCopy(sourceTextValue.getSelectedOrFullText()) },
-            onFullscreen = { onFullscreen(sourceTextValue.getSelectedOrFullText()) },
-            onSpeak = { onSpeak(sourceTextValue.getSelectedOrFullText()) },
-            isSpeaking = isSpeaking
-        )
-
-        // Translated Text Section for translated text
-        TranslatedTextSection(
-            translatedTextValue = translatedTextValue
-        )
-
-        // Translated Action bar for text interactions
-        TranslatedTextActionBar(
-            onSave = onSave,
-            onCopy = { onCopy(translatedTextValue.getSelectedOrFullText()) },
-            onShare = { onShare(translatedTextValue.getSelectedOrFullText()) },
-            onFullscreen = { onFullscreen(translatedTextValue.getSelectedOrFullText()) },
-            onSpeak = { onSpeak(translatedTextValue.getSelectedOrFullText()) },
-            isSaved = isSaved,
-            isSpeaking = isSpeaking,
+            translatedTextValue = translatedTextValue,
+            actions = actions,
+            states = TranslationStates(
+                isLoading = isLoading, isSpeaking = isSpeaking, isSaved = isBookmarked
+            )
         )
     }
 }
 
+@Composable
+private fun TranslationHeader(
+    viewModel: LangSelectorViewModel, showNativeNameHint: Boolean, showFlag: Boolean
+) {
+    LanguageBar(
+        viewModel = viewModel,
+        showNativeNameHint = showNativeNameHint,
+        showFlag = showFlag,
+    )
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.outline, thickness = 0.5.dp
+    )
+}
+
+@Composable
+private fun TranslationContent(
+    sourceTextValue: TextFieldValue,
+    translatedTextValue: TextFieldValue,
+    actions: TranslationActions,
+    states: TranslationStates
+) {
+    // Source text section
+    SourceTextSection(
+        sourceTextValue = sourceTextValue,
+        onTextChange = actions.onTextChange,
+        onClearText = actions.onClearText,
+        isLoading = states.isLoading
+    )
+
+    SourceTextActionBar(
+        onSpeechToText = actions.onSpeechToText,
+        onOcr = actions.onOcr,
+        onPaste = actions.onPaste,
+        onCopy = { actions.onCopy(sourceTextValue.getSelectedOrFullText()) },
+        onFullscreen = { actions.onFullscreen(sourceTextValue.getSelectedOrFullText()) },
+        onSpeak = { actions.onSpeak(sourceTextValue.getSelectedOrFullText()) },
+        isSpeaking = states.isSpeaking
+    )
+
+    // Translation text section
+    TranslatedTextSection(translatedTextValue = translatedTextValue)
+
+    TranslatedTextActionBar(
+        onBookmark = actions.onBookmark,
+        onCopy = { actions.onCopy(translatedTextValue.getSelectedOrFullText()) },
+        onShare = { actions.onShare(translatedTextValue.getSelectedOrFullText()) },
+        onFullscreen = { actions.onFullscreen(translatedTextValue.getSelectedOrFullText()) },
+        onSpeak = { actions.onSpeak(translatedTextValue.getSelectedOrFullText()) },
+        isSaved = states.isSaved,
+        isSpeaking = states.isSpeaking,
+    )
+}
+
+private data class TranslationStates(
+    val isLoading: Boolean = true, val isSpeaking: Boolean = false, val isSaved: Boolean = false
+)
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun TranslationSectionWithoutFlagPreview() {
+private fun TranslationSectionWithoutFlagPreview() {
     LingoLensTheme {
         TranslationSection(
             sourceTextValue = TextFieldValue("Hello"),
@@ -98,10 +113,12 @@ fun TranslationSectionWithoutFlagPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun TranslationSectionPreview() {
-    TranslationSection(
-        sourceTextValue = TextFieldValue("Hello"),
-        translatedTextValue = TextFieldValue("مرحبا"),
-        showFlag = true
-    )
+private fun TranslationSectionWithFlagPreview() {
+    LingoLensTheme {
+        TranslationSection(
+            sourceTextValue = TextFieldValue("Hello"),
+            translatedTextValue = TextFieldValue("مرحبا"),
+            showFlag = true
+        )
+    }
 }
