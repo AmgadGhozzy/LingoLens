@@ -1,6 +1,5 @@
 package com.venom.textsnap.ui.screens
 
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,21 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.textsnap.ui.components.sections.ImagePreviewSection
-import com.venom.textsnap.ui.viewmodel.OcrUiState
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.common.CustomDragHandle
-import com.venom.ui.theme.LingoLensTheme
-import com.venom.ui.theme.LocalPeekHeight
+import com.venom.ui.navigation.Screen
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
 import kotlinx.coroutines.launch
-
 
 /**
  * Main OCR screen that handles image processing and text recognition.
@@ -41,6 +37,7 @@ import kotlinx.coroutines.launch
 fun OcrScreen(
     viewModel: OcrViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
+    navController: NavController = rememberNavController(),
     onFileClick: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
@@ -75,104 +72,46 @@ fun OcrScreen(
         }
     }
 
-    LocalPeekHeight provides peekHeight.dp
-
-    CompositionLocalProvider {
-        BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
-            modifier = Modifier.navigationBarsPadding(),
-            sheetPeekHeight = peekHeight.dp,
-            sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-            sheetDragHandle = { CustomDragHandle() },
-            sheetSwipeEnabled = true,
-            content = { paddingValues ->
-                OcrContent(viewModel = viewModel,
-                    modifier = Modifier.padding(paddingValues),
-                    onRetry = viewModel::processOcr,
-                    onFileClick = onFileClick,
-                    onCameraClick = onCameraClick,
-                    onGalleryClick = onGalleryClick,
-                    onToggleSelected = viewModel::toggleSelection,
-                    onToggleLabels = viewModel::toggleLabels,
-                    onToggleParagraphs = viewModel::toggleParagraphs,
-                    onTranslate = { })
-            },
-            sheetContent = {
-                OcrBottomSheetContent(uiState = uiState,
-                    maxHeight = maxHeight.dp,
-                    onCopy = { text -> context.copyToClipboard(text) },
-                    onShare = { text -> (context as Activity).shareText(text) },
-                    onSpeak = { text -> ttsViewModel.speak(text) })
-            })
-    }
-}
-
-@Composable
-private fun OcrContent(
-    viewModel: OcrViewModel,
-    modifier: Modifier = Modifier,
-    onRetry: () -> Unit,
-    onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit,
-    onToggleSelected: () -> Unit,
-    onFileClick: () -> Unit,
-    onToggleLabels: () -> Unit,
-    onToggleParagraphs: () -> Unit,
-    onTranslate: () -> Unit
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(bottom = 6.dp)
-            .padding(horizontal = 8.dp),
-    ) {
-        ImagePreviewSection(
-            viewModel = viewModel,
-            modifier = Modifier.weight(1f),
-            onRetry = onRetry,
-            onCameraClick = onCameraClick,
-            onGalleryClick = onGalleryClick,
-            onToggleSelected = onToggleSelected,
-            onFileClick = onFileClick,
-            onToggleLabels = onToggleLabels,
-            onToggleParagraphs = onToggleParagraphs,
-            onTranslate = onTranslate
-        )
-    }
-}
-
-@Composable
-private fun OcrBottomSheetContent(
-    uiState: OcrUiState,
-    maxHeight: Dp,
-    onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
-    onSpeak: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(max = maxHeight)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-
-    ) {
-        OcrBottomSheet(
-            recognizedText = uiState.recognizedText,
-            recognizedList = uiState.selectedBoxes.map { it.text },
-            selectedTexts = uiState.selectedBoxes.map { it.text },
-            isParageraphMode = uiState.isParagraphMode,
-            onCopy = onCopy,
-            onShare = onShare,
-            onSpeak = onSpeak
-        )
-    }
+    BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
+        modifier = Modifier.navigationBarsPadding(),
+        sheetPeekHeight = peekHeight.dp,
+        sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
+        sheetDragHandle = { CustomDragHandle() },
+        sheetSwipeEnabled = true,
+        content = { paddingValues ->
+            OcrScreenContent(viewModel = viewModel,
+                modifier = Modifier.padding(paddingValues),
+                navController = navController,
+                onFileClick = onFileClick,
+                onCameraClick = onCameraClick,
+                onGalleryClick = onGalleryClick,
+                onRetry = viewModel::processOcr,
+                onToggleSelected = viewModel::toggleSelection,
+                onToggleLabels = viewModel::toggleLabels,
+                onToggleParagraphs = viewModel::toggleParagraphs,
+                onTranslate = {
+                    navController.navigate(
+                        Screen.Translation.createRoute(
+                            uiState.selectedBoxes.map { it.text }.takeIf { it.isNotEmpty() }
+                                ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
+                                ?: uiState.recognizedText
+                        )
+                    )
+                })
+        },
+        sheetContent = {
+            OcrBottomSheetContent(uiState = uiState,
+                maxHeight = maxHeight.dp,
+                onCopy = { text -> context.copyToClipboard(text) },
+                onShare = { text -> context.shareText(text) },
+                onSpeak = { text -> ttsViewModel.speak(text) })
+        })
 }
 
 
-@Preview(showBackground = true, device = "id:pixel_8")
+@Preview
 @Composable
 fun OcrScreenPreview() {
-    LingoLensTheme() {
-        OcrScreen(onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
-    }
+    OcrScreen(onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
 }
 
