@@ -8,13 +8,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
+import com.venom.lingopro.ui.viewmodel.TranslationActions
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.sections.ThesaurusView
 import com.venom.ui.components.speech.SpeechToTextDialog
+import com.venom.ui.navigation.Screen
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
@@ -28,15 +32,17 @@ fun TranslationScreen(
     ttsViewModel: TTSViewModel = hiltViewModel(),
     sttViewModel: STTViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
+    navController: NavHostController = rememberNavController(),
     initialText: String? = null,
     isDialog: Boolean = false,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val langSelectorState by langSelectorViewModel.state.collectAsStateWithLifecycle()
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
+    val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
 
     var sourceTextFieldValue by remember {
         mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
@@ -44,18 +50,17 @@ fun TranslationScreen(
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
-
     LaunchedEffect(langSelectorState) {
         viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
 
-        if (langSelectorState.didSwap && state.sourceText.isNotBlank()) {
+        if (sourceTextFieldValue.text.isNotBlank()) {
             // Preserve cursor position and selection when swapping
             val currentSelection = sourceTextFieldValue.selection
             val currentComposition = sourceTextFieldValue.composition
 
-            viewModel.onSourceTextChanged(state.sourceText)
+            viewModel.onSourceTextChanged(sourceTextFieldValue.text)
             sourceTextFieldValue = TextFieldValue(
-                text = state.sourceText,
+                text = sourceTextFieldValue.text,
                 selection = currentSelection,
                 composition = currentComposition
             )
@@ -63,28 +68,28 @@ fun TranslationScreen(
         }
     }
 
-    val textChangeAction: (TextFieldValue) -> Unit = { newValue ->
-        sourceTextFieldValue = newValue
-        viewModel.onSourceTextChanged(newValue.text)
-    }
-
-    val clearTextAction = {
-        sourceTextFieldValue = TextFieldValue("")
-        viewModel.clearText()
-    }
-
-    // Actions for copying, sharing, and speaking
-    val copyAction: (String) -> Unit = { text -> context.copyToClipboard(text) }
-    val shareAction: (String) -> Unit = { text -> context.shareText(text) }
-    val speakAction: (String) -> Unit = { text -> ttsViewModel.speak(text) }
-    val onSaveAction: () -> Unit = { viewModel.toggleBookmark() }
-    val onSpeechToTextAction: () -> Unit = { showSpeechToTextDialog = true }
-    val onPasteAction: () -> Unit = {
-        val pastedText = context.pasteFromClipboard()
-        pastedText?.let {
-            sourceTextFieldValue = TextFieldValue(it)
-            viewModel.onSourceTextChanged(it)
-        }
+    val actions = remember(context) {
+        TranslationActions(onTextChange = { newValue ->
+            sourceTextFieldValue = newValue
+            viewModel.onSourceTextChanged(newValue.text)
+        },
+            onClearText = {
+                sourceTextFieldValue = TextFieldValue("")
+                viewModel.clearText()
+            },
+            onCopy = { text -> context.copyToClipboard(text) },
+            onShare = { text -> context.shareText(text) },
+            onSpeak = ttsViewModel::speak,
+            onBookmark = viewModel::toggleBookmark,
+            onSpeechToText = { showSpeechToTextDialog = true },
+            onPaste = {
+                context.pasteFromClipboard()?.let { text ->
+                    sourceTextFieldValue = TextFieldValue(text)
+                    viewModel.onSourceTextChanged(text)
+                }
+            },
+            onOcr = { navController.navigate(Screen.Ocr.route) },
+            onFullscreen = { fullscreenState = it })
     }
 
     @Composable
@@ -94,19 +99,10 @@ fun TranslationScreen(
                 viewModel = langSelectorViewModel,
                 sourceTextValue = sourceTextFieldValue,
                 translatedTextValue = TextFieldValue(state.translatedText),
-                onTextChange = textChangeAction,
-                onClearText = clearTextAction,
+                actions = actions,
                 isLoading = state.isLoading,
-                onCopy = copyAction,
-                onShare = shareAction,
-                onSpeak = speakAction,
                 isSpeaking = ttsState.isSpeaking,
-                onPaste = onPasteAction,
-                onOcr = {},
-                onSave = onSaveAction,
-                isSaved = state.isBookmarked,
-                onSpeechToText = onSpeechToTextAction,
-                onFullscreen = { text -> fullscreenState = text },
+                isBookmarked = state.isBookmarked,
             )
 
             if (!isDialog && state.synonyms.isNotEmpty()) {
@@ -136,7 +132,14 @@ fun TranslationScreen(
     if (showSpeechToTextDialog) {
         SpeechToTextDialog(
             sttViewModel = sttViewModel,
-            onDismiss = { showSpeechToTextDialog = false },
+            onDismiss = {
+                showSpeechToTextDialog = false
+                transcription.let {
+                    sourceTextFieldValue = TextFieldValue(it)
+                    viewModel.onSourceTextChanged(it)
+                    sttViewModel.stopRecognition()
+                }
+            },
         )
     }
 
@@ -144,9 +147,9 @@ fun TranslationScreen(
         FullscreenTextDialog(
             textValue = TextFieldValue(text),
             onDismiss = { fullscreenState = null },
-            onCopy = copyAction,
-            onShare = shareAction,
-            onSpeak = speakAction
+            onCopy = actions.onCopy,
+            onShare = actions.onShare,
+            onSpeak = actions.onSpeak
         )
     }
 }
