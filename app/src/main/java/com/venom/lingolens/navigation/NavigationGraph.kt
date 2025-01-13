@@ -5,12 +5,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.venom.dialog.ui.screen.DialogScreen
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
+import com.venom.stackcard.ui.screen.CardScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
-import com.venom.wordcard.ui.screen.WordCardScreen
+import com.venom.ui.navigation.Screen
 
 @Composable
 fun NavigationGraph(
@@ -21,22 +23,26 @@ fun NavigationGraph(
     imageSelector: () -> Unit
 ) {
     NavHost(
-        navController = navController,
-        startDestination = Screen.WordCard.route,
-        modifier = modifier
+        navController = navController, startDestination = Screen.Translation.route, modifier = modifier
     ) {
-        composable(Screen.Translation.route) {
-            TranslationScreen()
+        composable(
+            route = Screen.Translation.route,
+            arguments = listOf(navArgument("text") { nullable = true })
+        ) { entry ->
+            TranslationScreen(
+                navController = navController,
+                initialText = entry.arguments?.getString("text")
+            )
         }
 
         composable(Screen.Ocr.route) {
-            OcrScreen(
-                viewModel = ocrViewModel,
+            OcrScreen(viewModel = ocrViewModel,
+                navController = navController,
                 onCameraClick = startCamera,
-                onFileClick = { },
-                onGalleryClick = { imageSelector() },
-            )
+                onFileClick = { imageSelector() },
+                onGalleryClick = { imageSelector() })
         }
+
 
         composable(Screen.Phrases.route) {
             PhrasebookScreen()
@@ -46,8 +52,8 @@ fun NavigationGraph(
             DialogScreen()
         }
 
-        composable(Screen.WordCard.route) {
-            WordCardScreen()
+        composable(Screen.StackCard.route) {
+            CardScreen()
         }
 
     }
