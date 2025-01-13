@@ -64,13 +64,8 @@ class BookmarkViewModel @Inject constructor(
         }
     }
 
-    fun toggleViewType() {
-        val currentViewType = _bookmarkState.value.viewType
-        val newViewType = when (currentViewType) {
-            ViewType.BOOKMARKS -> ViewType.HISTORY
-            ViewType.HISTORY -> ViewType.BOOKMARKS
-        }
-        fetchItems(newViewType)
+    fun setViewType(viewType: ViewType) {
+        _bookmarkState.update { it.copy(viewType = viewType) }
     }
 
     // Remove a single item
