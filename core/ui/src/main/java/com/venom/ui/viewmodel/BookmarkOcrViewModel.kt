@@ -63,13 +63,8 @@ class BookmarkOcrViewModel @Inject constructor(
         }
     }
 
-    fun toggleViewType() {
-        val currentViewType = _ocrBookmarkState.value.viewType
-        val newViewType = when (currentViewType) {
-            ViewType.BOOKMARKS -> ViewType.HISTORY
-            ViewType.HISTORY -> ViewType.BOOKMARKS
-        }
-        fetchItems(newViewType)
+    fun setViewType(viewType: ViewType) {
+        _ocrBookmarkState.update { it.copy(viewType = viewType) }
     }
 
     // Remove a single item
