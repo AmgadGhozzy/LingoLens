@@ -6,23 +6,24 @@ import androidx.navigation.NavHostController
 import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.navigation.Screen
 
 @Composable
 fun LingoLensTopBar(
     navController: NavHostController, onBookmarkClick: () -> Unit
 ) {
-    TopBar(
-        title = stringResource(id = R.string.app_name),
+    TopBar(title = stringResource(id = R.string.app_name),
         leadingIcon = R.drawable.icon_menu,
         onLeadingIconClick = {
-        navController.navigateToStart(Screen.Translation)
-    }, actions = {
-        TopBarActions(onBookmarkClick)
-    })
+            navController.navigateToStart(Screen.Translation)
+        },
+        actions = {
+            TopBarActions(onBookmarkClick)
+        })
 }
 
 @Composable
-private fun TopBarActions(onBookmarkClick: () -> Unit) {
+fun TopBarActions(onBookmarkClick: () -> Unit) {
     CustomButton(
         icon = R.drawable.icon_bookmark_filled,
         contentDescription = stringResource(R.string.bookmarks_title),
