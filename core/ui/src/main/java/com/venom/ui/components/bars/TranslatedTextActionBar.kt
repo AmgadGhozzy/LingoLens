@@ -11,7 +11,7 @@ import com.venom.ui.components.common.BaseActionBar
 /**
  * Bottom action bar with multiple functional icons
  *
- * @param onSave Callback for save action
+ * @param onBookmark Callback for save action
  * @param isSaved Whether the text is saved
  * @param onCopy Callback for copy action
  * @param onShare Callback for share action
@@ -23,7 +23,7 @@ import com.venom.ui.components.common.BaseActionBar
 
 @Composable
 fun TranslatedTextActionBar(
-    onSave: () -> Unit,
+    onBookmark: () -> Unit,
     isSaved: Boolean,
     onCopy: () -> Unit,
     onShare: () -> Unit,
@@ -57,7 +57,7 @@ fun TranslatedTextActionBar(
         ActionItem.Action(
             icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
             textRes = R.string.action_save,
-            onClick = onSave
+            onClick = onBookmark
         )
     )
 
@@ -78,7 +78,7 @@ fun TranslatedTextActionBarPreview() {
         isSaved = false,
         onFullscreen = { },
         onCopy = { },
-        onSave = { },
+        onBookmark = { },
         onShare = {},
     )
 }
