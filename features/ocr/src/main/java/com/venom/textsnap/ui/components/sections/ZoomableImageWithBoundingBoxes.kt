@@ -73,7 +73,7 @@ fun ZoomableImageWithBoundingBoxes(
 
     // Transformable state with constrained zoom
     val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        scale = (scale * zoomChange).coerceIn(0.5f, 5f)
+        scale = (scale * zoomChange).coerceIn(0.5f, 3f)
         offset = calculateConstrainedOffset(
             currentOffset = offset,
             panChange = panChange,
@@ -118,13 +118,14 @@ fun ZoomableImageWithBoundingBoxes(
         containerHeight = constraints.maxHeight.toFloat()
 
         Image(
-            bitmap = imageBitmap,
-            contentDescription = stringResource(id = R.string.ocr_image_content_description),
-            contentScale = ContentScale.FillBounds,
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.Center)
-                .transformable(transformableState)
+                .transformable(transformableState),
+            bitmap = imageBitmap,
+            contentDescription = stringResource(id = R.string.ocr_image_content_description),
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop,
         )
 
         // Draw path during drag
@@ -146,12 +147,15 @@ fun ZoomableImageWithBoundingBoxes(
 
         SelectionContainer {
             uiState.paragraphBoxes.forEach { box ->
-                DrawBoundingBox(box = box,
+                DrawBoundingBox(
+                    box = box,
                     rect = boxRects[box]!!,
                     isSelected = box in uiState.selectedBoxes,
-                    isParageraphMode = uiState.isParagraphMode,
+                    isParagraphMode = uiState.isParagraphMode,
                     showLabels = uiState.showLabels,
-                    onSelect = { viewModel.toggleSelectBox(box) })
+                    imageBitmap = imageBitmap,
+                    onSelect = { viewModel.toggleSelectBox(box) },
+                )
             }
         }
     }
