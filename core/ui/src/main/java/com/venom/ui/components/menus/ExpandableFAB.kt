@@ -5,20 +5,22 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.PhotoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.venom.resources.R
 
 @Composable
 fun ExpandableFAB(
@@ -27,7 +29,7 @@ fun ExpandableFAB(
     onFileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(true) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     // Rotation animation for the main FAB icon
     val rotationAngle by animateFloatAsState(
@@ -36,12 +38,11 @@ fun ExpandableFAB(
         label = "FAB Rotation"
     )
 
-    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
+    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier.wrapContentSize()) {
         // Smaller FABs with animations
-        AnimatedVisibility(
-            visible = isExpanded,
+        AnimatedVisibility(visible = isExpanded,
             enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-            exit = fadeOut() + slideOutVertically(targetOffsetY = { it - 120 }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it - 68 }),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .offset(y = (-68).dp)
@@ -50,9 +51,15 @@ fun ExpandableFAB(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FABOption(icon = Icons.Rounded.CameraAlt, contentDescription = "Camera", onClick = { onCameraClick(); isExpanded = false })
-                FABOption(icon = Icons.Rounded.PhotoLibrary, contentDescription = "Gallery", onClick = { onGalleryClick(); isExpanded = false })
-                FABOption(icon = Icons.Rounded.Folder, contentDescription = "File", onClick = { onFileClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.CameraAlt,
+                    contentDescription = stringResource(R.string.action_camera),
+                    onClick = { onCameraClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.PhotoLibrary,
+                    contentDescription = stringResource(R.string.action_gallery),
+                    onClick = { onGalleryClick(); isExpanded = false })
+                FABOption(icon = Icons.Rounded.Folder,
+                    contentDescription = stringResource(R.string.action_files),
+                    onClick = { onFileClick(); isExpanded = false })
             }
         }
 
