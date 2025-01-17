@@ -1,4 +1,4 @@
-package com.venom.wordcard.ui.components
+package com.venom.stackcard.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo

@@ -1,4 +1,4 @@
-package com.venom.wordcard.ui.components
+package com.venom.stackcard.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
