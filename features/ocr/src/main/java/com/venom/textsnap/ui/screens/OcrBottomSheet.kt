@@ -8,6 +8,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,7 +24,7 @@ import com.venom.textsnap.ui.components.TextAction
 import com.venom.ui.components.bars.TextActionBar
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.common.ActionItem
-import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.inputs.CustomTextField
 
 @Composable
@@ -32,6 +36,7 @@ fun OcrBottomSheet(
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onSpeak: (String) -> Unit,
+    onTranslate: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -41,7 +46,10 @@ fun OcrBottomSheet(
     ) {
         // Recognized text section
         RecognizedTextSection(text = selectedTexts.takeIf { it.isNotEmpty() }
-            ?.joinToString(if (isParageraphMode) "\n" else " ") ?: recognizedText)
+            ?.joinToString(if (isParageraphMode) "\n" else " ") ?: recognizedText,
+            onCopy = onCopy,
+            onShare = onShare,
+            onSpeak = onSpeak)
 
         // Text action bar
         if (recognizedText.isNotEmpty()) {
@@ -71,15 +79,14 @@ fun OcrBottomSheet(
             ) {
                 items((if (selectedTexts.isEmpty()) recognizedList else selectedTexts).withIndex()
                     .toList(), key = { it.index }) { (index, text) ->
-                    SelectedTextItem(
-                        text = text,
+                    SelectedTextItem(text = text,
                         expanded = selectedTexts.size == 1,
                         onAction = { action ->
                             when (action) {
-                                TextAction.Copy -> onCopy(text)
-                                TextAction.Share -> onShare(text)
-                                TextAction.Speak -> onSpeak(text)
-                                TextAction.Translate -> {}
+                                TextAction.Copy -> onCopy
+                                TextAction.Share -> onShare
+                                TextAction.Speak -> onSpeak
+                                TextAction.Translate -> onTranslate
                             }
                         })
                 }
@@ -91,31 +98,45 @@ fun OcrBottomSheet(
 
 @Composable
 private fun RecognizedTextSection(
-    text: String, modifier: Modifier = Modifier
+    text: String,
+    onCopy: (String) -> Unit,
+    onShare: (String) -> Unit,
+    onSpeak: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    CustomCard {
-        Box {
-            SelectionContainer(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                CustomTextField(
-                    textValue = TextFieldValue(text),
-                    placeHolderText = stringResource(R.string.recognized_text_placeholder),
-                    maxLines = 4,
-                    maxHeight = 106.dp,
-                    minHeight = 106.dp,
-                    isReadOnly = true
-                )
-            }
-            CustomButton(
-                icon = R.drawable.icon_fullscreen,
-                contentDescription = stringResource(R.string.action_fullscreen),
-                modifier = Modifier.align(Alignment.TopEnd),
-                onClick = {},
+    var fullscreenState by remember { mutableStateOf<String?>(null) }
+
+    fullscreenState?.let { text ->
+        FullscreenTextDialog(
+            textValue = TextFieldValue(text),
+            onDismiss = { fullscreenState = null },
+            onCopy = onCopy,
+            onShare = onShare,
+            onSpeak = onSpeak
+        )
+    }
+
+    Box {
+        SelectionContainer(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            CustomTextField(
+                textValue = TextFieldValue(text),
+                placeHolderText = stringResource(R.string.recognized_text_placeholder),
+                maxLines = 4,
+                maxHeight = 106.dp,
+                minHeight = 106.dp,
+                isReadOnly = true
             )
         }
+        CustomButton(
+            icon = R.drawable.icon_fullscreen,
+            contentDescription = stringResource(R.string.action_fullscreen),
+            modifier = Modifier.align(Alignment.TopEnd),
+            onClick = { fullscreenState = text },
+        )
     }
 }
 
@@ -148,5 +169,6 @@ fun OcrBottomSheetPreview() {
         isParageraphMode = true,
         onCopy = {},
         onShare = {},
-        onSpeak = {})
+        onSpeak = {},
+        onTranslate = {})
 }
