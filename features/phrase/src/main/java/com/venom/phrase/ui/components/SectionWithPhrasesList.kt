@@ -45,10 +45,9 @@ fun SectionWithPhrasesList(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surfaceBright.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(8.dp)
+                                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+                                shape = RoundedCornerShape(12.dp)
                             )
-                            .padding(12.dp)
                     ) {
                         DynamicStyledText(text = section.section.getTranslation(sourceLang),
                             maxFontSize = 28,
