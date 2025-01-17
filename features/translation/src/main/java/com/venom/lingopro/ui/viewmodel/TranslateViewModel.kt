@@ -22,7 +22,7 @@ data class TranslationUiState(
     val targetLanguage: LanguageItem = LanguageItem("ar", "Arabic"),
     val sourceText: String = "",
     val translatedText: String = "",
-    val translationResult: TranslationResponse? = null,
+    val translationResult: TranslationResponse = TranslationResponse(),
     val synonyms: List<String> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -42,12 +42,14 @@ class TranslateViewModel @Inject constructor(
 
     fun onSourceTextChanged(input: String) {
         if (input.isBlank()) {
-            _uiState.update { it.copy(
-                sourceText = input,
-                translationResult = null,
-                translatedText = "",
-                synonyms = emptyList()
-            )}
+            _uiState.update {
+                it.copy(
+                    sourceText = input,
+                    translationResult = TranslationResponse(),
+                    translatedText = "",
+                    synonyms = emptyList()
+                )
+            }
             return
         }
 
@@ -58,19 +60,18 @@ class TranslateViewModel @Inject constructor(
     }
 
     fun updateLanguages(
-        sourceLanguage: LanguageItem,
-        targetLanguage: LanguageItem
+        sourceLanguage: LanguageItem, targetLanguage: LanguageItem
     ) {
         val currentState = _uiState.value
-        if (sourceLanguage == currentState.sourceLanguage &&
-            targetLanguage == currentState.targetLanguage) {
+        if (sourceLanguage == currentState.sourceLanguage && targetLanguage == currentState.targetLanguage) {
             return
         }
 
-        _uiState.update { it.copy(
-            sourceLanguage = sourceLanguage,
-            targetLanguage = targetLanguage
-        )}
+        _uiState.update {
+            it.copy(
+                sourceLanguage = sourceLanguage, targetLanguage = targetLanguage
+            )
+        }
 
         currentState.sourceText.takeIf { it.isNotBlank() }?.let { translate(it) }
     }
@@ -132,7 +133,7 @@ class TranslateViewModel @Inject constructor(
             it.copy(
                 sourceText = "",
                 translatedText = "",
-                translationResult = null,
+                translationResult = TranslationResponse(),
                 synonyms = emptyList()
             )
         }
