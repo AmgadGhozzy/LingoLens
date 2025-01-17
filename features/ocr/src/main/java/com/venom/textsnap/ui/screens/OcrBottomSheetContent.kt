@@ -8,6 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.venom.textsnap.ui.viewmodel.OcrUiState
 
 @Composable
@@ -16,7 +18,8 @@ fun OcrBottomSheetContent(
     maxHeight: Dp,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    onSpeak: (String) -> Unit
+    onSpeak: (String) -> Unit,
+    onTranslate: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -31,7 +34,8 @@ fun OcrBottomSheetContent(
             isParageraphMode = uiState.isParagraphMode,
             onCopy = onCopy,
             onShare = onShare,
-            onSpeak = onSpeak
+            onSpeak = onSpeak,
+            onTranslate = onTranslate
         )
     }
 }
