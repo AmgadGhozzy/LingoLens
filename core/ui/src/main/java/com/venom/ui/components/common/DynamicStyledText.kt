@@ -21,9 +21,9 @@ fun DynamicStyledText(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Unspecified,
-    minFontSize: Int = 24,
+    minFontSize: Int = 22,
     maxFontSize: Int = 32,
-    lineHeight: Int = 38,
+    lineHeight: Int = 32,
     fontWeight: FontWeight = FontWeight.Bold,
     color: Color = MaterialTheme.colorScheme.onBackground,
 ) {
