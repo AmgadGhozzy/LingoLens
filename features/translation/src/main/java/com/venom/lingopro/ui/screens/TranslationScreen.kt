@@ -2,10 +2,13 @@ package com.venom.lingopro.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -13,12 +16,14 @@ import androidx.navigation.compose.rememberNavController
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
-import com.venom.ui.components.dialogs.CustomCard
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
-import com.venom.ui.components.sections.ThesaurusView
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.navigation.Screen
+import com.venom.ui.screen.DictionaryScreen
+import com.venom.ui.screen.TranslationsCard
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
@@ -47,6 +52,7 @@ fun TranslationScreen(
     var sourceTextFieldValue by remember {
         mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
     }
+    var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
@@ -107,41 +113,61 @@ fun TranslationScreen(
 
             if (!isDialog && state.synonyms.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomCard {
-                    ThesaurusView(synonyms = state.synonyms, onWordClick = { selectedWord ->
-                        sourceTextFieldValue = TextFieldValue(selectedWord)
-                        viewModel.onSourceTextChanged(selectedWord)
-                    })
+                state.translationResult.dict?.let { translations ->
+                    TranslationsCard(
+                        translations = translations, onWordClick = { selectedWord ->
+                            sourceTextFieldValue = TextFieldValue(selectedWord)
+                            viewModel.onSourceTextChanged(selectedWord)
+                        }, modifier = Modifier.fillMaxWidth()
+                    )
                 }
+                Spacer(modifier = Modifier.height(12.dp))
+                CustomButton(
+                    icon = R.drawable.icon_fullscreen,
+                    onClick = { showDictionaryDialog = true },
+                    modifier = Modifier.align(Alignment.End),
+                    contentDescription = "View Synonyms",
+                )
             }
         }
     }
 
-    if (isDialog) {
-        DraggableDialog(onDismissRequest = onDismiss) {
-            TranslationContent()
-        }
-    } else {
-        TranslationContent(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize()
-        )
+
+    if (isDialog) DraggableDialog(onDismissRequest = onDismiss) {
+        TranslationContent()
     }
 
-    if (showSpeechToTextDialog) {
-        SpeechToTextDialog(
-            sttViewModel = sttViewModel,
-            onDismiss = {
-                showSpeechToTextDialog = false
-                transcription.let {
-                    sourceTextFieldValue = TextFieldValue(it)
-                    viewModel.onSourceTextChanged(it)
-                    sttViewModel.stopRecognition()
-                }
-            },
+    else TranslationContent(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+    )
+
+    if (showDictionaryDialog) Dialog(
+        onDismissRequest = { showDictionaryDialog = false }, properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false,
+            dismissOnBackPress = true
         )
+    ) {
+        DictionaryScreen(translationResponse = state.translationResult,
+            onWordClick = { selectedWord ->
+                sourceTextFieldValue = TextFieldValue(selectedWord)
+                viewModel.onSourceTextChanged(selectedWord)
+            })
     }
+
+    if (showSpeechToTextDialog) SpeechToTextDialog(
+        sttViewModel = sttViewModel,
+        onDismiss = {
+            showSpeechToTextDialog = false
+            transcription.let {
+                sourceTextFieldValue = TextFieldValue(it)
+                viewModel.onSourceTextChanged(it)
+                sttViewModel.stopRecognition()
+            }
+        },
+    )
 
     fullscreenState?.let { text ->
         FullscreenTextDialog(
