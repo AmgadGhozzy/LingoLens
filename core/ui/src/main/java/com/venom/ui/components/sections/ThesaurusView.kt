@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +38,6 @@ fun ThesaurusView(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(12.dp)
-            .verticalScroll(rememberScrollState()) // Enables scrolling
     ) {
         // Title
         Text(
@@ -53,11 +50,12 @@ fun ThesaurusView(
 
         // Synonyms Flow Row
         FlowRow(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            maxItemsInEachRow = Int.MAX_VALUE
         ) {
             // Display a list of synonyms sorted alphabetically
-            synonyms.sortedBy { it } // Sort alphabetically
-                .forEach { word ->
+            synonyms.sortedBy { it }.forEach { word ->
                     WordChipItem(word = word, onWordClick = { onWordClick?.invoke(word) })
                 }
         }
