@@ -73,7 +73,7 @@ fun OcrScreen(
     }
 
     BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
-        modifier = Modifier.navigationBarsPadding(),
+        modifier = Modifier.navigationBarsPadding().systemBarsPadding(),
         sheetPeekHeight = peekHeight.dp,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetDragHandle = { CustomDragHandle() },
@@ -104,7 +104,16 @@ fun OcrScreen(
                 maxHeight = maxHeight.dp,
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
-                onSpeak = { text -> ttsViewModel.speak(text) })
+                onSpeak = { text -> ttsViewModel.speak(text) },
+                onTranslate = {
+                    navController.navigate(
+                        Screen.Translation.createRoute(
+                            uiState.selectedBoxes.map { it.text }.takeIf { it.isNotEmpty() }
+                                ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
+                                ?: uiState.recognizedText
+                        )
+                    )
+                })
         })
 }
 
