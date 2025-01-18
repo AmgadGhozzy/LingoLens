@@ -1,8 +1,9 @@
 package com.venom.lingopro.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
@@ -16,14 +17,12 @@ import androidx.navigation.compose.rememberNavController
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
-import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.navigation.Screen
-import com.venom.ui.screen.DictionaryScreen
-import com.venom.ui.screen.TranslationsCard
+import com.venom.ui.screen.dictionary.DictionaryScreen
+import com.venom.ui.screen.dictionary.TranslationsCard
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
@@ -115,19 +114,16 @@ fun TranslationScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 state.translationResult.dict?.let { translations ->
                     TranslationsCard(
-                        translations = translations, onWordClick = { selectedWord ->
+                        translations = translations,
+                        onWordClick = { selectedWord ->
                             sourceTextFieldValue = TextFieldValue(selectedWord)
                             viewModel.onSourceTextChanged(selectedWord)
-                        }, modifier = Modifier.fillMaxWidth()
+                        },
+                        onExpand = { showDictionaryDialog = true },
+                        onSpeak = ttsViewModel::speak,
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
                     )
                 }
-                Spacer(modifier = Modifier.height(12.dp))
-                CustomButton(
-                    icon = R.drawable.icon_fullscreen,
-                    onClick = { showDictionaryDialog = true },
-                    modifier = Modifier.align(Alignment.End),
-                    contentDescription = "View Synonyms",
-                )
             }
         }
     }
@@ -136,7 +132,6 @@ fun TranslationScreen(
     if (isDialog) DraggableDialog(onDismissRequest = onDismiss) {
         TranslationContent()
     }
-
     else TranslationContent(
         modifier = Modifier
             .padding(8.dp)
@@ -150,7 +145,8 @@ fun TranslationScreen(
             dismissOnBackPress = true
         )
     ) {
-        DictionaryScreen(translationResponse = state.translationResult,
+        DictionaryScreen(
+            translationResponse = state.translationResult,
             onWordClick = { selectedWord ->
                 sourceTextFieldValue = TextFieldValue(selectedWord)
                 viewModel.onSourceTextChanged(selectedWord)
