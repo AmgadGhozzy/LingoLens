@@ -1,0 +1,77 @@
+package com.venom.ui.screen.dictionary
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.CompareArrows
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.venom.data.model.Synset
+import com.venom.resources.R
+import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.components.items.WordChip
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SynonymsCard(
+    synsets: List<Synset>,
+    onWordClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    var showAll by remember { mutableStateOf(false) }
+
+    CustomCard(modifier = modifier) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            SectionHeader(
+                title = stringResource(id = R.string.synonyms),
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
+
+            synsets.forEach { synset ->
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = synset.pos.replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val visibleEntries = if (showAll) synset.entry else synset.entry.take(10)
+                        visibleEntries.flatMap { it.synonym }.distinct().forEach { synonym ->
+                            WordChip(word = synonym, onClick = { onWordClick(synonym) })
+                        }
+
+                        if (synset.entry.size > 10) WordChip(word = "...", onClick = { showAll = !showAll })
+                    }
+                }
+            }
+        }
+    }
+}
