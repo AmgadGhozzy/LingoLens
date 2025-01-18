@@ -1,11 +1,10 @@
 package com.venom.phrase.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Phrase
 import com.venom.ui.components.common.DynamicStyledText
@@ -18,18 +17,23 @@ fun PhraseCardHeader(
     onBookmarkClick: () -> Unit,
     onSpeakClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
         DynamicStyledText(
-            text = phrase.getTranslation(sourceLang)
+            text = phrase.getTranslation(sourceLang),
+            minFontSize = 20,
+            maxFontSize = 28,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 100.dp)
         )
+
         ExpandCardActions(
             isBookmarked = isBookmarked,
             onBookmarkClick = onBookmarkClick,
-            onSpeakClick = onSpeakClick
+            onSpeakClick = onSpeakClick,
+            modifier = Modifier.align(Alignment.TopEnd)
         )
     }
 }
