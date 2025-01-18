@@ -15,12 +15,12 @@ fun CardText(
 ) {
     Spacer(modifier = Modifier.height(32.dp))
 
-    DynamicStyledText(text = text, textAlign = TextAlign.Center, maxFontSize = 42)
+    DynamicStyledText(text = text, textAlign = TextAlign.Center, maxFontSize = 42, lineHeight = 48)
     if (isFlipped) {
         when {
             isLoading -> PulseAnimation(size = 32f)
             translationText != null -> {
-                DynamicStyledText(text = translationText)
+                DynamicStyledText(text = translationText, textAlign = TextAlign.Center)
             }
         }
     }
