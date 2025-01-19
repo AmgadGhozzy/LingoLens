@@ -6,12 +6,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import com.venom.data.mock.TRANSLATION_RESPONSE
 import com.venom.data.model.TranslationResponse
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
 
 @Composable
 fun DictionaryScreen(
@@ -19,7 +23,8 @@ fun DictionaryScreen(
     modifier: Modifier = Modifier,
     onWordClick: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {},
-    onCopy: (String) -> Unit = {}
+    onCopy: (String) -> Unit = {},
+    onDismiss: () -> Unit = {}
 ) {
 
     Column(
@@ -31,6 +36,17 @@ fun DictionaryScreen(
             .padding(horizontal = 12.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+
+        Row {
+            CustomButton(
+                onClick = onDismiss,
+                icon = R.drawable.icon_back,
+                iconSize = 32.dp,
+                contentDescription = stringResource(R.string.action_back),
+                modifier = Modifier.align(Alignment.Top)
+            )
+        }
+
         // Card displaying translation details
         TranslationCard(
             translationResponse = translationResponse,
@@ -39,22 +55,22 @@ fun DictionaryScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Display translations if available
-        translationResponse.dict?.let { translations ->
-            TranslationsCard(
-                translations = translations,
-                onWordClick = onWordClick,
-                onSpeak = onSpeak,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
         // Display definitions if available
         translationResponse.definitions?.let { definitions ->
             DefinitionsCard(
                 definitions = definitions,
                 onSpeak = onSpeak,
                 onCopy = onCopy,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Display translations if available
+        translationResponse.dict?.let { translations ->
+            TranslationsCard(
+                translations = translations,
+                onWordClick = onWordClick,
+                onSpeak = onSpeak,
                 modifier = Modifier.fillMaxWidth()
             )
         }
