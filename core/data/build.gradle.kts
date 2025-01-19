@@ -43,6 +43,8 @@ android {
 
 dependencies {
 
+    api(libs.play.services.ads)
+
     // Core Modules
     implementation(project(":core:domain"))
     implementation(project(":core:utils"))
