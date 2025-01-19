@@ -145,12 +145,14 @@ fun TranslationScreen(
             dismissOnBackPress = true
         )
     ) {
-        DictionaryScreen(
-            translationResponse = state.translationResult,
+        DictionaryScreen(translationResponse = state.translationResult,
             onWordClick = { selectedWord ->
                 sourceTextFieldValue = TextFieldValue(selectedWord)
                 viewModel.onSourceTextChanged(selectedWord)
-            })
+            },
+            onSpeak = ttsViewModel::speak,
+            onCopy = actions.onCopy,
+            onDismiss = { showDictionaryDialog = false })
     }
 
     if (showSpeechToTextDialog) SpeechToTextDialog(
