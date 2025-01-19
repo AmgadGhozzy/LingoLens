@@ -1,8 +1,6 @@
 package com.venom.ui.screen.dictionary
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,9 +17,9 @@ fun DefinitionSection(
     definition: Definition,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
+    onTextClick: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-
     var showAll by remember { mutableStateOf(false) }
 
     Column(
@@ -33,37 +31,23 @@ fun DefinitionSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = definition.pos.uppercase(),
+                text = "#${definition.pos.uppercase()}: ",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
             )
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                IconButton(
-                    onClick = { onSpeak(definition.pos) }, modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                        contentDescription = "Speak part of speech",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
         }
 
-        var visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
+        val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
         visibleDefinitions.forEach { entry ->
             DefinitionEntry(
-                entry = entry, onSpeak = onSpeak, onCopy = onCopy
+                entry = entry, onSpeak = onSpeak, onCopy = onCopy, onTextClick = onTextClick
             )
         }
 
-        if (definition.entry.size > 5)
-            WordChip(word = if (showAll) stringResource(id = R.string.show_less
-        ) else stringResource(id = R.string.show_all),
-            onClick = { showAll = !showAll })
+        if (definition.entry.size > 5) {
+            WordChip(word = if (showAll) stringResource(id = R.string.show_less)
+            else stringResource(id = R.string.show_all), onClick = { showAll = !showAll })
+        }
     }
 }
