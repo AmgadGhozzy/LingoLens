@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
     private val imageSelector =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
-                ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
+                ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
             }
         }
 
