@@ -5,19 +5,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.venom.resources.R
 import com.venom.textsnap.ui.components.sections.ImagePreviewSection
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
-import com.venom.ui.components.bars.TopBar
-import com.venom.ui.components.buttons.CustomButton
 
 @Composable
 fun OcrScreenContent(
     viewModel: OcrViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier,
     onRetry: () -> Unit,
     onCameraClick: () -> Unit,
