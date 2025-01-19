@@ -73,7 +73,9 @@ fun OcrScreen(
     }
 
     BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
-        modifier = Modifier.navigationBarsPadding().systemBarsPadding(),
+        modifier = Modifier
+            .navigationBarsPadding()
+            .systemBarsPadding(),
         sheetPeekHeight = peekHeight.dp,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetDragHandle = { CustomDragHandle() },
@@ -81,7 +83,6 @@ fun OcrScreen(
         content = { paddingValues ->
             OcrScreenContent(viewModel = viewModel,
                 modifier = Modifier.padding(paddingValues),
-                navController = navController,
                 onFileClick = onFileClick,
                 onCameraClick = onCameraClick,
                 onGalleryClick = onGalleryClick,
@@ -90,13 +91,10 @@ fun OcrScreen(
                 onToggleLabels = viewModel::toggleLabels,
                 onToggleParagraphs = viewModel::toggleParagraphs,
                 onTranslate = {
-                    navController.navigate(
-                        Screen.Translation.createRoute(
-                            uiState.selectedBoxes.map { it.text }.takeIf { it.isNotEmpty() }
-                                ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
-                                ?: uiState.recognizedText
-                        )
-                    )
+                    navController.navigate(Screen.Translation.createRoute(uiState.selectedBoxes.map { it.text }
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
+                        ?: uiState.recognizedText))
                 })
         },
         sheetContent = {
@@ -106,13 +104,10 @@ fun OcrScreen(
                 onShare = { text -> context.shareText(text) },
                 onSpeak = { text -> ttsViewModel.speak(text) },
                 onTranslate = {
-                    navController.navigate(
-                        Screen.Translation.createRoute(
-                            uiState.selectedBoxes.map { it.text }.takeIf { it.isNotEmpty() }
-                                ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
-                                ?: uiState.recognizedText
-                        )
-                    )
+                    navController.navigate(Screen.Translation.createRoute(uiState.selectedBoxes.map { it.text }
+                        .takeIf { it.isNotEmpty() }
+                        ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
+                        ?: uiState.recognizedText))
                 })
         })
 }
