@@ -130,6 +130,17 @@
 
     <string name="phrase_empty_state_title">No Phrases Found</string>
     <string name="phrase_empty_state_subtitle">No matching phrases found. Try searching for something else.</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="action_files">Files</string>
+    <string name="ocr_empty_state_description">Use camera or select from gallery</string>
+    <string name="synonyms">Synonyms</string>
+    <string name="definitions">Definitions</string>
+    <string name="translations">Translations</string>
+    <string name="dictionary">Dictionary</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_all">Show All</string>
+    <string name="show_more">Show More</string>
 
 
 </resources>
