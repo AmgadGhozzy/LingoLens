@@ -1,6 +1,7 @@
 package com.venom.ui.screen.dictionary
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material3.*
@@ -18,9 +19,9 @@ fun DefinitionsCard(
     definitions: List<Definition>,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
+    onTextClick: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-
     var showAll by remember { mutableStateOf(false) }
 
     CustomCard(modifier = modifier) {
@@ -28,27 +29,30 @@ fun DefinitionsCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader(
-                title = stringResource(id = R.string.definitions),
-                icon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Book,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            )
+            SectionHeader(title = stringResource(id = R.string.definitions), icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Book,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            })
 
             val visibleDefinitions = if (showAll) definitions else definitions.take(5)
             visibleDefinitions.forEach { definition ->
                 DefinitionSection(
                     definition = definition,
                     onSpeak = onSpeak,
-                    onCopy = onCopy
+                    onCopy = onCopy,
+                    onTextClick = onTextClick
                 )
+            }
 
-                if (definitions.size > 5) WordChip(word = "...", onClick = { showAll = !showAll },)
+            if (definitions.size > 5) {
+                WordChip(word = if (showAll) stringResource(id = R.string.show_less)
+                else stringResource(id = R.string.show_more),
+                    onClick = { showAll = !showAll })
             }
         }
     }
 }
+
