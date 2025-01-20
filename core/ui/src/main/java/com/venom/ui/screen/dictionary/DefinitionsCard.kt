@@ -1,7 +1,6 @@
 package com.venom.ui.screen.dictionary
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material3.*
@@ -17,17 +16,18 @@ import com.venom.ui.components.items.WordChip
 @Composable
 fun DefinitionsCard(
     definitions: List<Definition>,
+    onTextClick: ((String) -> Unit)? = null,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
-    onTextClick: ((String) -> Unit)? = null,
+    onShare: (String) -> Unit,
+    isSpeaking: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var showAll by remember { mutableStateOf(false) }
 
     CustomCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             SectionHeader(title = stringResource(id = R.string.definitions), icon = {
                 Icon(
@@ -41,16 +41,17 @@ fun DefinitionsCard(
             visibleDefinitions.forEach { definition ->
                 DefinitionSection(
                     definition = definition,
+                    onTextClick = onTextClick,
                     onSpeak = onSpeak,
                     onCopy = onCopy,
-                    onTextClick = onTextClick
+                    onShare = onShare,
+                    isSpeaking = isSpeaking
                 )
             }
 
             if (definitions.size > 5) {
                 WordChip(word = if (showAll) stringResource(id = R.string.show_less)
-                else stringResource(id = R.string.show_more),
-                    onClick = { showAll = !showAll })
+                else stringResource(id = R.string.show_more), onClick = { showAll = !showAll })
             }
         }
     }
