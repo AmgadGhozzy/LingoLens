@@ -15,9 +15,11 @@ import com.venom.ui.components.items.WordChip
 @Composable
 fun DefinitionSection(
     definition: Definition,
+    onTextClick: ((String) -> Unit)? = null,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
-    onTextClick: ((String) -> Unit)? = null,
+    onShare: (String) -> Unit,
+    isSpeaking: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var showAll by remember { mutableStateOf(false) }
@@ -31,8 +33,8 @@ fun DefinitionSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "#${definition.pos.uppercase()}: ",
-                style = MaterialTheme.typography.labelMedium,
+                text = definition.pos.replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
             )
@@ -41,7 +43,12 @@ fun DefinitionSection(
         val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
         visibleDefinitions.forEach { entry ->
             DefinitionEntry(
-                entry = entry, onSpeak = onSpeak, onCopy = onCopy, onTextClick = onTextClick
+                entry = entry,
+                onTextClick = onTextClick,
+                onSpeak = onSpeak,
+                onCopy = onCopy,
+                onShare = onShare,
+                isSpeaking = isSpeaking
             )
         }
 
