@@ -25,28 +25,22 @@ import com.venom.ui.components.items.WordChip
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SynonymsCard(
-    synsets: List<Synset>,
-    onWordClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    synsets: List<Synset>, onWordClick: (String) -> Unit, modifier: Modifier = Modifier
 ) {
 
     var showAll by remember { mutableStateOf(false) }
 
     CustomCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader(
-                title = stringResource(id = R.string.synonyms),
-                icon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            )
+            SectionHeader(title = stringResource(id = R.string.synonyms), icon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            })
 
             synsets.forEach { synset ->
                 Column(
@@ -63,12 +57,14 @@ fun SynonymsCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        val visibleEntries = if (showAll) synset.entry else synset.entry.take(10)
-                        visibleEntries.flatMap { it.synonym }.distinct().forEach { synonym ->
+                        val synonyms = synset.entry.flatMap { it.synonym }.distinct()
+                        val visibleEntries = if (showAll) synonyms else synonyms.take(20)
+                        visibleEntries.forEach { synonym ->
                             WordChip(word = synonym, onClick = { onWordClick(synonym) })
                         }
 
-                        if (synset.entry.size > 10) WordChip(word = "...", onClick = { showAll = !showAll })
+                        if (synonyms.size > 20) WordChip(word = "...",
+                            onClick = { showAll = !showAll })
                     }
                 }
             }
