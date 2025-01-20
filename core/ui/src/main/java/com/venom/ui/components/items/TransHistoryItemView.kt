@@ -1,6 +1,7 @@
 package com.venom.ui.components.items
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationEntry
 import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.buttons.ExpandIndicator
 import com.venom.ui.components.common.HistoryItemView
 import com.venom.ui.components.sections.LangHistorySection
 
@@ -76,24 +77,20 @@ private fun TranslationContent(
 
         if (!entry.synonyms.isNullOrEmpty()) {
             AnimatedVisibility(
-                visible = isExpanded,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+                visible = isExpanded, enter = fadeIn() + expandVertically(
+                    expandFrom = Alignment.Top, animationSpec = tween(durationMillis = 300)
+                ), exit = fadeOut() + shrinkVertically(
+                    shrinkTowards = Alignment.Top, animationSpec = tween(durationMillis = 200)
+                )
             ) {
                 SynonymsSection(synonyms = entry.synonyms!!)
             }
         }
 
-        CustomButton(
-            icon = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+        ExpandIndicator(
+            expanded = isExpanded,
             onClick = onExpandClick,
-            contentDescription = stringResource(
-                if (isExpanded) R.string.action_collapse
-                else R.string.action_expand
-            ),
-            modifier = Modifier
-                .align(Alignment.End)
-                .fillMaxWidth()
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
 }
