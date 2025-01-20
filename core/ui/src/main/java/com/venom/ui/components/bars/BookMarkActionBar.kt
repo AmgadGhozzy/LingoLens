@@ -3,7 +3,6 @@ package com.venom.ui.components.bars
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +23,7 @@ fun BookMarkActionBar(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -45,7 +43,6 @@ fun BookMarkActionBar(
             contentDescription = stringResource(R.string.action_delete)
         )
     }
-
 }
 
 @Preview
