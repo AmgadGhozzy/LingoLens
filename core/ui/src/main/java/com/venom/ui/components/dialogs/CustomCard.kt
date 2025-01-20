@@ -3,7 +3,6 @@ package com.venom.ui.components.dialogs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +28,7 @@ import androidx.compose.ui.unit.dp
 fun CustomCard(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.large,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     elevation: Dp = 5.dp,
     contentAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable () -> Unit
