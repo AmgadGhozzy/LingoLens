@@ -24,16 +24,18 @@ fun DictionaryScreen(
     onWordClick: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {},
     onCopy: (String) -> Unit = {},
+    onShare: (String) -> Unit = {},
+    isSpeaking: Boolean = false,
     onDismiss: () -> Unit = {}
 ) {
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .verticalScroll(rememberScrollState())
             .systemBarsPadding()
-            .padding(horizontal = 12.dp, vertical = 16.dp),
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
@@ -59,8 +61,11 @@ fun DictionaryScreen(
         translationResponse.definitions?.let { definitions ->
             DefinitionsCard(
                 definitions = definitions,
+                onTextClick = onWordClick,
                 onSpeak = onSpeak,
                 onCopy = onCopy,
+                onShare = onShare,
+                isSpeaking = isSpeaking,
                 modifier = Modifier.fillMaxWidth()
             )
         }
