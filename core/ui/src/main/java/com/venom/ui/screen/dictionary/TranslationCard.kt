@@ -1,21 +1,20 @@
 package com.venom.ui.screen.dictionary
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExpandLess
-import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationResponse
 import com.venom.resources.R
+import com.venom.ui.components.buttons.ExpandIndicator
+import com.venom.ui.components.common.DynamicStyledText
 
 @Composable
 fun TranslationCard(
@@ -28,35 +27,34 @@ fun TranslationCard(
     val sentence = translationResponse.sentences?.firstOrNull() ?: return
 
     ElevatedCard(
-        modifier = modifier.animateContentSize(),
+        modifier = modifier,
         onClick = { expanded = !expanded },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Main Translation Row
+            // Main Translation
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
+                DynamicStyledText(
                     text = sentence.trans,
-                    style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f)
                 )
 
-                Row {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ActionIconButton(
                         iconRes = R.drawable.icon_sound,
-                        contentDescription = "Speak",
+                        contentDescription = R.string.action_speak,
                         onClick = { onSpeak(sentence.trans) }
                     )
                     ActionIconButton(
                         iconRes = R.drawable.icon_copy,
-                        contentDescription = "Copy",
+                        contentDescription = R.string.action_copy,
                         onClick = { onCopy(sentence.trans) }
                     )
                 }
@@ -72,20 +70,18 @@ fun TranslationCard(
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
                     }
-                    Text(
+                    DynamicStyledText(
                         text = sentence.orig,
-                        style = MaterialTheme.typography.bodyMedium,
+                        maxFontSize = 18,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
                     )
                 }
             }
 
-            // Expand/Collapse Icon
-            Icon(
-                imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            ExpandIndicator(
+                expanded = expanded,
+                onClick = { expanded = !expanded },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }
@@ -93,9 +89,7 @@ fun TranslationCard(
 
 @Composable
 fun ActionIconButton(
-    iconRes: Int,
-    contentDescription: String?,
-    onClick: () -> Unit
+    iconRes: Int, contentDescription: Int, onClick: () -> Unit
 ) {
     IconButton(
         onClick = onClick,
@@ -105,7 +99,7 @@ fun ActionIconButton(
     ) {
         Icon(
             painter = painterResource(id = iconRes),
-            contentDescription = contentDescription,
+            contentDescription = stringResource(contentDescription),
             tint = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
