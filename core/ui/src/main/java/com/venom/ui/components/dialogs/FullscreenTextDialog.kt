@@ -77,7 +77,7 @@ fun FullscreenTextDialog(
             )
 
             CustomCard(modifier = Modifier.padding(bottom = 32.dp)) {
-                TranslatedTextActionBar(onSave = {},
+                TranslatedTextActionBar(onBookmark = {},
                     onCopy = { onCopy(textValue.getSelectedOrFullText()) },
                     onShare = { onShare(textValue.getSelectedOrFullText()) },
                     onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
