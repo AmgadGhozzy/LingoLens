@@ -34,14 +34,14 @@ fun TranslatedTextActionBar(
 ) {
     val leftAction = ActionItem.Action(
         icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
-        textRes = R.string.action_speak,
+        textRes = R.string.action_speak_source,
         onClick = onSpeak
     )
 
     val actions = listOf(
         ActionItem.Action(
             icon = R.drawable.icon_fullscreen,
-            textRes = R.string.action_fullscreen,
+            textRes = R.string.action_fullscreen_source,
             onClick = onFullscreen
         ),
         ActionItem.Action(
@@ -51,7 +51,7 @@ fun TranslatedTextActionBar(
         ),
         ActionItem.Action(
             icon = R.drawable.icon_copy,
-            textRes = R.string.action_copy,
+            textRes = R.string.action_copy_source,
             onClick = onCopy
         ),
         ActionItem.Action(
