@@ -21,13 +21,15 @@ fun PhrasebookContent(
     state: PhraseUiState,
     langSelectorViewModel: LangSelectorViewModel,
     onNavigateToCategory: (Int) -> Unit,
+    onBookmarkClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) {
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         PhrasebookTopBar(
             viewModel = langSelectorViewModel,
             totalPhrases = state.categories.sumOf { it.phraseCount },
-            scrollBehavior = scrollBehavior,
+            onBookmarkClick = onBookmarkClick,
+            scrollBehavior = scrollBehavior
         )
     }) { padding ->
         Column(
