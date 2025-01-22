@@ -14,6 +14,15 @@ interface TranslationDao {
     @Query("SELECT * FROM translation_history ORDER BY timestamp DESC")
     fun getAllEntries(): Flow<List<TranslationEntry>>
 
+    @Query(
+        """
+    SELECT * FROM translation_history WHERE sourceText = :sourceText AND sourceLangCode = 
+    :sourceLangCode AND targetLangCode =:targetLangCode"""
+    )
+    suspend fun getTranslationEntry(
+        sourceText: String, sourceLangCode: String, targetLangCode: String
+    ): TranslationEntry?
+
     @Query("SELECT * FROM translation_history WHERE isBookmarked = 1 ORDER BY timestamp DESC")
     fun getBookmarkedEntries(): Flow<List<TranslationEntry>>
 
