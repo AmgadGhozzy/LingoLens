@@ -1,6 +1,8 @@
 package com.venom.ui.screen.dictionary
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -27,7 +29,13 @@ fun TranslationCard(
     val sentence = translationResponse.sentences?.firstOrNull() ?: return
 
     ElevatedCard(
-        modifier = modifier,
+        modifier = modifier
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            ),
         onClick = { expanded = !expanded },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -67,13 +75,13 @@ fun TranslationCard(
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     DynamicStyledText(
                         text = sentence.orig,
                         maxFontSize = 18,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.5f)
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                     )
                 }
             }
