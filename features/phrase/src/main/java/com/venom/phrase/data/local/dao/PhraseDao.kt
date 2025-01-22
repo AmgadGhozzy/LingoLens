@@ -18,6 +18,17 @@ interface PhraseDao {
     @Query("SELECT * FROM SECTIONS WHERE categoryId = :categoryId")
     fun getSectionsWithPhrases(categoryId: Int): List<SectionWithPhrases>
 
+    @Transaction
+    @Query("""
+        SELECT * FROM sections 
+        WHERE sectionId IN (
+            SELECT DISTINCT sectionId 
+            FROM phrases 
+            WHERE isBookmarked = 1
+        )
+    """)
+    fun getSectionsWithPhrases(): List<SectionWithPhrases>
+
     @Query("SELECT * FROM phrases WHERE isRemembered = 0 AND isForgotten = 0 ORDER BY sectionId LIMIT 10")
     fun get10UnseenPhrases(): Flow<List<Phrase>>
 
