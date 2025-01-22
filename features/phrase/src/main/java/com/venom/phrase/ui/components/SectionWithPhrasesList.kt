@@ -7,14 +7,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.model.SectionWithPhrases
+import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.common.DynamicStyledText
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -30,6 +36,9 @@ fun SectionWithPhrasesList(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+
+    var showCardDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -45,7 +54,7 @@ fun SectionWithPhrasesList(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+                                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f),
                                 shape = RoundedCornerShape(12.dp)
                             )
                     ) {
@@ -53,8 +62,17 @@ fun SectionWithPhrasesList(
                             maxFontSize = 28,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(0.9f)
                                 .semantics { heading() })
+
+                        CustomButton(
+                            icon = R.drawable.icon_cards1,
+                            contentDescription = stringResource(R.string.card_sentence_practice),
+                            onClick = {
+                                showCardDialog = !showCardDialog
+                            },
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
                     }
                 }
 
@@ -77,5 +95,13 @@ fun SectionWithPhrasesList(
                 }
             }
         }
+    }
+
+    if (showCardDialog) Dialog(
+        onDismissRequest = { showCardDialog = false }, properties = DialogProperties(
+            usePlatformDefaultWidth = false, decorFitsSystemWindows = false
+        )
+    ) {
+
     }
 }
