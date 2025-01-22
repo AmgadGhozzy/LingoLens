@@ -6,6 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.*
@@ -32,12 +34,11 @@ fun DefinitionSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = definition.pos.replaceFirstChar { it.uppercase() },
+            Text(text = definition.pos.replaceFirstChar { it.uppercase() },
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
-            )
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.semantics { contentDescription = "${definition.pos} Definition" })
         }
 
         val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
