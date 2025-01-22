@@ -19,7 +19,7 @@ fun PhrasesDialog(
         )
     ) {
         PhrasesScreen(
-            viewModel = viewModel, categoryId = categoryId
+            viewModel = viewModel, categoryId = categoryId, onDismiss = onDismiss
         )
     }
 }
