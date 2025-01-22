@@ -57,7 +57,7 @@ fun SourceTextActionBar(
         ),
         ActionItem.Action(
             icon = R.drawable.icon_camera,
-            textRes = R.string.ocr_title,
+            textRes = R.string.action_ocr,
             onClick = onOcr
         ),
         ActionItem.Action(
