@@ -1,57 +1,53 @@
 package com.venom.textsnap.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.textsnap.ui.components.SelectedTextItem
 import com.venom.textsnap.ui.components.TextAction
+import com.venom.textsnap.ui.components.sections.RecognizedTextSection
+import com.venom.textsnap.ui.components.sections.SelectedTextList
 import com.venom.ui.components.bars.TextActionBar
-import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.common.ActionItem
-import com.venom.ui.components.dialogs.FullscreenTextDialog
-import com.venom.ui.components.inputs.CustomTextField
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrBottomSheet(
     recognizedText: String,
-    recognizedList: List<String>,
     selectedTexts: List<String>,
     isParageraphMode: Boolean,
+    peekHeight: Dp,
+    sheetState: SheetState = rememberStandardBottomSheetState(),
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onSpeak: (String) -> Unit,
-    onTranslate: (String) -> Unit
+    onTranslate: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
             .padding(horizontal = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Recognized text section
+        // Responsive recognized text section
         RecognizedTextSection(text = selectedTexts.takeIf { it.isNotEmpty() }
             ?.joinToString(if (isParageraphMode) "\n" else " ") ?: recognizedText,
+            peekHeight = peekHeight,
+            isExpanded = sheetState.currentValue == SheetValue.Expanded,
             onCopy = onCopy,
             onShare = onShare,
             onSpeak = onSpeak)
 
-        // Text action bar
         if (recognizedText.isNotEmpty()) {
             TextActionBar(
                 actions = listOf(
@@ -63,7 +59,7 @@ fun OcrBottomSheet(
                         onClick = { onSpeak(recognizedText) }),
                     ActionItem.Action(icon = R.drawable.icon_translate,
                         textRes = R.string.action_translate,
-                        onClick = {}),
+                        onClick = { onTranslate(recognizedText) }),
                     ActionItem.Action(icon = R.drawable.icon_copy,
                         textRes = R.string.action_copy,
                         onClick = { onCopy(recognizedText) })
@@ -71,90 +67,24 @@ fun OcrBottomSheet(
             )
         }
 
-        if (selectedTexts.isNotEmpty()) {
-            // Selected text list
-            LazyColumn(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                items((if (selectedTexts.isEmpty()) recognizedList else selectedTexts).withIndex()
-                    .toList(), key = { it.index }) { (index, text) ->
-                    SelectedTextItem(text = text,
-                        expanded = selectedTexts.size == 1,
-                        onAction = { action ->
-                            when (action) {
-                                TextAction.Copy -> onCopy
-                                TextAction.Share -> onShare
-                                TextAction.Speak -> onSpeak
-                                TextAction.Translate -> onTranslate
-                            }
-                        })
+        SelectedTextList(texts = selectedTexts,
+            isSingleSelection = selectedTexts.size == 1,
+            onAction = { text, action ->
+                when (action) {
+                    TextAction.Copy -> onCopy(text)
+                    TextAction.Share -> onShare(text)
+                    TextAction.Speak -> onSpeak(text)
+                    TextAction.Translate -> onTranslate(text)
                 }
-            }
-        }
-
+            })
     }
 }
 
-@Composable
-private fun RecognizedTextSection(
-    text: String,
-    onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
-    onSpeak: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var fullscreenState by remember { mutableStateOf<String?>(null) }
-
-    fullscreenState?.let { text ->
-        FullscreenTextDialog(
-            textValue = TextFieldValue(text),
-            onDismiss = { fullscreenState = null },
-            onCopy = onCopy,
-            onShare = onShare,
-            onSpeak = onSpeak
-        )
-    }
-
-    Box {
-        SelectionContainer(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            CustomTextField(
-                textValue = TextFieldValue(text),
-                placeHolderText = stringResource(R.string.recognized_text_placeholder),
-                maxLines = 4,
-                maxHeight = 106.dp,
-                minHeight = 106.dp,
-                isReadOnly = true
-            )
-        }
-        CustomButton(
-            icon = R.drawable.icon_fullscreen,
-            contentDescription = stringResource(R.string.action_fullscreen),
-            modifier = Modifier.align(Alignment.TopEnd),
-            onClick = { fullscreenState = text },
-        )
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun OcrBottomSheetPreview() {
     OcrBottomSheet(recognizedText = "TextSnap\nThe\nbest\ntext\nrecognition\napp\nin\nmarket",
-        recognizedList = listOf(
-            "This is a sample text for preview purposes",
-            "TextSnap",
-            "The",
-            "Best",
-            "Text",
-            "Recognition",
-            "App",
-            "In",
-            "Market"
-        ),
         selectedTexts = listOf(
             "This is a sample text for preview purposes",
             "TextSnap",
@@ -167,6 +97,7 @@ fun OcrBottomSheetPreview() {
             "Market"
         ),
         isParageraphMode = true,
+        peekHeight = 0.dp,
         onCopy = {},
         onShare = {},
         onSpeak = {},
