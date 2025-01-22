@@ -19,7 +19,6 @@ fun PhrasebookScreen(
 
     var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
 
-
     LaunchedEffect(langState.sourceLang, langState.targetLang) {
         viewModel.updateLanguages(langState.sourceLang, langState.targetLang)
         viewModel.loadCategories()
@@ -31,13 +30,13 @@ fun PhrasebookScreen(
         onNavigateToCategory = { categoryId ->
             selectedCategoryId = categoryId
         },
+        onBookmarkClick = {
+            selectedCategoryId = -1
+        },
         scrollBehavior = scrollBehavior
     )
 
     selectedCategoryId?.let { categoryId ->
-        PhrasesDialog(
-            categoryId = categoryId,
-            onDismiss = { selectedCategoryId = null }
-        )
+        PhrasesDialog(categoryId = categoryId, onDismiss = { selectedCategoryId = null })
     }
 }
