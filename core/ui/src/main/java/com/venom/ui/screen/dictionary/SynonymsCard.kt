@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.Synset
@@ -46,12 +48,13 @@ fun SynonymsCard(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = synset.pos.replaceFirstChar { it.uppercase() },
+                    Text(text = synset.pos.replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.semantics {
+                            contentDescription = "${synset.pos} Synonyms"
+                        })
 
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -63,7 +66,8 @@ fun SynonymsCard(
                             WordChip(word = synonym, onClick = { onWordClick(synonym) })
                         }
 
-                        if (synonyms.size > 20) WordChip(word = "...",
+                        if (synonyms.size > 20) WordChip(
+                            word = "...",
                             onClick = { showAll = !showAll })
                     }
                 }
