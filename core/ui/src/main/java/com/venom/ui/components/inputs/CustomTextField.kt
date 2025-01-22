@@ -8,12 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.venom.resources.R
 import com.venom.utils.getTextDirection
 
 /**
@@ -37,7 +39,7 @@ fun CustomTextField(
     textValue: TextFieldValue,
     onTextChange: (TextFieldValue) -> Unit = {},
     isReadOnly: Boolean = false,
-    placeHolderText: String = "Type something...",
+    placeHolderText: String = stringResource(R.string.type_something),
     maxLines: Int = 12,
     minLines: Int = 1,
 
