@@ -4,18 +4,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.venom.textsnap.ui.viewmodel.OcrUiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrBottomSheetContent(
     uiState: OcrUiState,
     maxHeight: Dp,
+    peekHeight: Dp,
+    sheetState: SheetState,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     onSpeak: (String) -> Unit,
@@ -25,13 +28,14 @@ fun OcrBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxHeight)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        ) {
+            .padding(horizontal = 8.dp),
+    ) {
         OcrBottomSheet(
             recognizedText = uiState.recognizedText,
-            recognizedList = uiState.selectedBoxes.map { it.text },
             selectedTexts = uiState.selectedBoxes.map { it.text },
             isParageraphMode = uiState.isParagraphMode,
+            peekHeight = peekHeight,
+            sheetState = sheetState,
             onCopy = onCopy,
             onShare = onShare,
             onSpeak = onSpeak,
