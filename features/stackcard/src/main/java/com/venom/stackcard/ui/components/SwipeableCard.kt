@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.venom.stackcard.ui.viewmodel.CardItem
@@ -60,7 +62,8 @@ fun SwipeableCard(
         .pointerInput(Unit) {
             detectDragGestures(onDragEnd = { onDragEnd() },
                 onDrag = { _, dragAmount -> onDrag(dragAmount) })
-        },
+        }
+        .semantics { contentDescription = "Learning card for ${card.englishEn}" },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp, pressedElevation = 8.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
