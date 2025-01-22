@@ -23,6 +23,7 @@ fun CardScreen(
     wordViewModel: CardSwiperViewModel = hiltViewModel(),
     phraseViewModel: CardSwiperViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
+    cardItemList: List<CardItem> = emptyList()
 ) {
     val context = LocalContext.current
 
