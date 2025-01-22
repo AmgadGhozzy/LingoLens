@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,13 +38,15 @@ fun DictionaryScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
             CustomButton(
                 onClick = onDismiss,
                 icon = R.drawable.icon_back,
                 iconSize = 32.dp,
                 contentDescription = stringResource(R.string.action_back),
-                modifier = Modifier.align(Alignment.Top)
             )
         }
 
