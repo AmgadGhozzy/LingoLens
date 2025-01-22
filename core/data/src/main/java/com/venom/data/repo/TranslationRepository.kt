@@ -33,9 +33,16 @@ class TranslationRepository @Inject constructor(
         translationDao.insert(translationEntry)
     }
 
+    suspend fun getTranslationEntry(
+        sourceText: String, sourceLangCode: String, targetLangCode: String
+    ): TranslationEntry? {
+        return translationDao.getTranslationEntry(sourceText, sourceLangCode, targetLangCode)
+    }
+
     fun getTranslationHistory(): Flow<List<TranslationEntry>> = translationDao.getAllEntries()
 
-    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>> = translationDao.getBookmarkedEntries()
+    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>> =
+        translationDao.getBookmarkedEntries()
 
     suspend fun updateTranslationEntry(entry: TranslationEntry) = translationDao.update(entry)
 
