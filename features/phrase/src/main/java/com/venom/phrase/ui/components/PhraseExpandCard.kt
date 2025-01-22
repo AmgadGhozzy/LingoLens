@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.model.Phrase
+import com.venom.ui.components.buttons.ExpandIndicator
 
 @Composable
 fun PhraseExpandCard(
@@ -53,10 +54,7 @@ fun PhraseExpandCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(
-                horizontal = 20.dp,
-                vertical = 16.dp
-            )
+            modifier = Modifier.padding(12.dp)
         ) {
             PhraseCardHeader(
                 phrase = phrase,
