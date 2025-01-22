@@ -54,10 +54,10 @@ fun OcrScreen(
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val peekHeight by remember(uiState.recognizedText) {
         derivedStateOf {
-            screenHeight * if (uiState.recognizedText.isEmpty()) 0.14 else 0.22
+            (screenHeight * if (uiState.recognizedText.isEmpty()) 0.14 else 0.22).dp
         }
     }
-    val maxHeight = screenHeight * 0.8
+    val maxHeight = screenHeight * 0.85
 
     // back press when bottom sheet is expanded
     BackHandler(enabled = sheetState.currentValue == SheetValue.Expanded) {
@@ -74,9 +74,8 @@ fun OcrScreen(
 
     BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
         modifier = Modifier
-            .navigationBarsPadding()
-            .systemBarsPadding(),
-        sheetPeekHeight = peekHeight.dp,
+            .navigationBarsPadding(),
+        sheetPeekHeight = peekHeight,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetDragHandle = { CustomDragHandle() },
         sheetSwipeEnabled = true,
@@ -100,6 +99,8 @@ fun OcrScreen(
         sheetContent = {
             OcrBottomSheetContent(uiState = uiState,
                 maxHeight = maxHeight.dp,
+                peekHeight = peekHeight,
+                sheetState = sheetState,
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
                 onSpeak = { text -> ttsViewModel.speak(text) },
