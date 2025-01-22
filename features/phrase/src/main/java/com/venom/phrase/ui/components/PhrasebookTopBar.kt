@@ -21,6 +21,7 @@ import com.venom.ui.viewmodel.LangSelectorViewModel
 fun PhrasebookTopBar(
     viewModel: LangSelectorViewModel,
     totalPhrases: Int,
+    onBookmarkClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
@@ -44,6 +45,11 @@ fun PhrasebookTopBar(
                         shape = RoundedCornerShape(28.dp)
                     )
             )
+//            CustomButton(
+//                icon = R.drawable.icon_bookmark_filled,
+//                contentDescription = stringResource(R.string.bookmarks_title),
+//                onClick = onBookmarkClick
+//            )
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
