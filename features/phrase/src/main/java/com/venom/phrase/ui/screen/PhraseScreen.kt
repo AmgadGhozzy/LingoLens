@@ -19,14 +19,19 @@ import com.venom.utils.Extensions.shareText
 fun PhrasesScreen(
     viewModel: PhraseViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
-    categoryId: Int
+    categoryId: Int,
+    onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     LaunchedEffect(categoryId) {
-        viewModel.loadSectionsWithPhrases(categoryId)
+        if (categoryId == -1) {
+            viewModel.loadBookmarkedPhrases()
+        } else {
+            viewModel.loadSectionsWithPhrases(categoryId)
+        }
     }
 
     val copyAction: (String) -> Unit = { text -> context.copyToClipboard(text) }
@@ -35,10 +40,11 @@ fun PhrasesScreen(
     PhraseScreenContent(
         state = state,
         scrollBehavior = scrollBehavior,
-        onBookmarkClick = viewModel::toggleRemembered,
+        onBookmarkClick = viewModel::toggleBookmark,
         onSpeakClick = ttsViewModel::speak,
         onSearchQueryChanged = viewModel::onSearchQueryChange,
         onCopy = copyAction,
-        onShare = shareAction
+        onShare = shareAction,
+        onDismiss = onDismiss
     )
 }
