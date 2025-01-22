@@ -6,6 +6,7 @@ import com.venom.domain.model.LANGUAGES_LIST
 import com.venom.domain.model.LanguageItem
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
+import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.model.SectionWithPhrases
 import com.venom.phrase.data.repo.PhraseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ data class PhraseUiState(
     val selectedCategory: Category? = null,
     val sourceLang: LanguageItem = LANGUAGES_LIST[2],
     val targetLang: LanguageItem = LANGUAGES_LIST[3],
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isBookmarkedView: Boolean = false
 )
 
 @HiltViewModel
@@ -32,22 +34,16 @@ class PhraseViewModel @Inject constructor(
     private val _state = MutableStateFlow(PhraseUiState())
     val state = _state.asStateFlow()
 
-    init {
-        loadCategories()
-    }
-
     fun onSearchQueryChange(query: String) {
         _state.update { currentState ->
             currentState.copy(
-                searchQuery = query,
-                filteredSections = filterSections(query, currentState.sections)
+                searchQuery = query, filteredSections = filterSections(query, currentState.sections)
             )
         }
     }
 
     private fun filterSections(
-        query: String,
-        sections: List<SectionWithPhrases>
+        query: String, sections: List<SectionWithPhrases>
     ): List<SectionWithPhrases> {
         if (query.isBlank()) return sections
 
@@ -57,18 +53,19 @@ class PhraseViewModel @Inject constructor(
 
         return sections.mapNotNull { sectionWithPhrases ->
             // Check if section name matches in both languages
-            val sectionMatchesSource = sectionWithPhrases.section.getTranslation(sourceLangCode)
-                .lowercase()
-                .contains(searchQuery)
+            val sectionMatchesSource =
+                sectionWithPhrases.section.getTranslation(sourceLangCode).lowercase()
+                    .contains(searchQuery)
 
-            val sectionMatchesTarget = sectionWithPhrases.section.getTranslation(targetLangCode)
-                .lowercase()
-                .contains(searchQuery)
+            val sectionMatchesTarget =
+                sectionWithPhrases.section.getTranslation(targetLangCode).lowercase()
+                    .contains(searchQuery)
 
             // Filter matching phrases in both languages
             val matchingPhrases = sectionWithPhrases.phrases.filter { phrase ->
-                phrase.getTranslation(sourceLangCode).lowercase().contains(searchQuery) ||
-                        phrase.getTranslation(targetLangCode).lowercase().contains(searchQuery)
+                phrase.getTranslation(sourceLangCode).lowercase()
+                    .contains(searchQuery) || phrase.getTranslation(targetLangCode).lowercase()
+                    .contains(searchQuery)
             }
 
             // Return section with filtered phrases if either condition is met
@@ -92,7 +89,7 @@ class PhraseViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update {
                 it.copy(
-                    categories = repository.getAllCategories()
+                    categories = repository.getAllCategories(), isBookmarkedView = false
                 )
             }
         }
@@ -105,6 +102,49 @@ class PhraseViewModel @Inject constructor(
                 it.copy(sections = sections,
                     filteredSections = sections,
                     selectedCategory = _state.value.categories.find { it.categoryId == categoryId })
+            }
+        }
+    }
+
+    fun loadBookmarkedPhrases() {
+        viewModelScope.launch {
+            val bookmarkedSections = repository.getSectionsWithBookmarkedPhrases()
+
+            _state.update {
+                it.copy(
+                    sections = bookmarkedSections,
+                    filteredSections = bookmarkedSections,
+                    selectedCategory = null,
+                    isBookmarkedView = true
+                )
+            }
+        }
+    }
+
+    fun toggleBookmark(phrase: Phrase) {
+        viewModelScope.launch {
+            repository.toggleBookmark(phrase)
+
+            if (_state.value.isBookmarkedView) {
+                // Reload all bookmarked phrases
+                loadBookmarkedPhrases()
+            } else {
+                _state.update { currentState ->
+                    val updatedSections = currentState.sections.map { section ->
+                        section.copy(
+                            phrases = section.phrases.map {
+                                if (it.phraseId == phrase.phraseId) {
+                                    it.copy(isBookmarked = !it.isBookmarked)
+                                } else it
+                            }
+                        )
+                    }
+
+                    currentState.copy(
+                        sections = updatedSections,
+                        filteredSections = filterSections(currentState.searchQuery, updatedSections)
+                    )
+                }
             }
         }
     }
