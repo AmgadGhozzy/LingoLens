@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Phrase
 import com.venom.ui.components.common.DynamicStyledText
@@ -25,8 +24,7 @@ fun PhraseCardHeader(
             minFontSize = 20,
             maxFontSize = 28,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 100.dp)
+                .fillMaxWidth(0.75f)
         )
 
         ExpandCardActions(
