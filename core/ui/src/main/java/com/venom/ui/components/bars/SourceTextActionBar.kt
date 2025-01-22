@@ -44,23 +44,13 @@ fun SourceTextActionBar(
             icon = R.drawable.icon_fullscreen,
             textRes = R.string.action_fullscreen,
             onClick = onFullscreen
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_copy,
-            textRes = R.string.action_copy,
-            onClick = onCopy
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_paste,
-            textRes = R.string.action_paste,
-            onClick = onPaste
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_camera,
-            textRes = R.string.action_ocr,
-            onClick = onOcr
-        ),
-        ActionItem.Action(
+        ), ActionItem.Action(
+            icon = R.drawable.icon_copy, textRes = R.string.action_copy, onClick = onCopy
+        ), ActionItem.Action(
+            icon = R.drawable.icon_paste, textRes = R.string.action_paste, onClick = onPaste
+        ), ActionItem.Action(
+            icon = R.drawable.icon_camera, textRes = R.string.action_ocr, onClick = onOcr
+        ), ActionItem.Action(
             icon = R.drawable.icon_mic,
             textRes = R.string.action_speech_to_text,
             onClick = onSpeechToText
