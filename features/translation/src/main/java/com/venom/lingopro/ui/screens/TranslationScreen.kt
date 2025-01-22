@@ -80,7 +80,7 @@ fun TranslationScreen(
         },
             onClearText = {
                 sourceTextFieldValue = TextFieldValue("")
-                viewModel.clearText()
+                viewModel.clearTranslation()
             },
             onCopy = { text -> context.copyToClipboard(text) },
             onShare = { text -> context.shareText(text) },
@@ -147,8 +147,8 @@ fun TranslationScreen(
     ) {
         DictionaryScreen(translationResponse = state.translationResult,
             onWordClick = { selectedWord ->
-                sourceTextFieldValue = TextFieldValue(selectedWord)
-                viewModel.onSourceTextChanged(selectedWord)
+//                sourceTextFieldValue = TextFieldValue(selectedWord)
+//                viewModel.onSourceTextChanged(selectedWord)
             },
             onSpeak = ttsViewModel::speak,
             onCopy = actions.onCopy,
