@@ -13,7 +13,6 @@ interface TranslationService {
         @Query("q") query: String,
         @Query("dj") dj: Int = 1,
         @Query("dt") dt: List<String> = listOf("t", "at", "bd", "ex", "md", "rw", "ss", "rm"),
-        @Query("tk") token: String = "361726.206039"
     ): TranslationResponse
 
     companion object {
