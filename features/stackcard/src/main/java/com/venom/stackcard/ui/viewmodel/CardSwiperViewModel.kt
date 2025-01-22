@@ -146,9 +146,24 @@ class CardSwiperViewModel @Inject constructor(
 
     private fun handleBookmark(card: CardItem) {
         viewModelScope.launch {
+            // Update the database
             when (card) {
                 is WordCard -> wordRepository.toggleBookmark(card.word)
                 is PhraseCard -> phraseRepository.toggleBookmark(card.phrase)
+            }
+
+            // Update the UI state with the new bookmark status
+            _state.update { currentState ->
+                currentState.copy(
+                    visibleCards = currentState.visibleCards.map { existingCard ->
+                        if (existingCard.id == card.id) {
+                            when (existingCard) {
+                                is WordCard -> WordCard(existingCard.word.copy(isBookmarked = !existingCard.isBookmarked))
+                                is PhraseCard -> PhraseCard(existingCard.phrase.copy(isBookmarked = !existingCard.isBookmarked))
+                            }
+                        } else existingCard
+                    }
+                )
             }
         }
     }
