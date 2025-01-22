@@ -24,7 +24,7 @@ fun ExpandCardActions(
             icon = R.drawable.icon_sound,
             contentDescription = stringResource(id = R.string.action_speak),
             onClick = onSpeakClick,
-            size = 42.dp,
+            size = 48.dp,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -32,7 +32,7 @@ fun ExpandCardActions(
         )
 
         BookmarkFilledButton(
-            isBookmarked = isBookmarked, onToggleBookmark = onBookmarkClick, size = 42.dp
+            isBookmarked = isBookmarked, onToggleBookmark = onBookmarkClick, size = 48.dp
         )
     }
 }
