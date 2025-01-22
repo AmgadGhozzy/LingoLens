@@ -10,6 +10,7 @@ import com.venom.data.model.OcrResponse
 import com.venom.data.model.OriginalResponse
 import com.venom.data.model.ParagraphBox
 import com.venom.data.repo.OcrRepository
+import com.venom.data.repo.TranslationRepository
 import com.venom.utils.ImageCompressor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OcrViewModel @Inject constructor(
-    private val repository: OcrRepository, private val imageCompressor: ImageCompressor
+    private val repository: OcrRepository,
+    private val translationRepository: TranslationRepository,
+    private val imageCompressor: ImageCompressor
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OcrUiState())
@@ -133,6 +136,57 @@ class OcrViewModel @Inject constructor(
         val newSelection =
             if (state.selectedBoxes.isEmpty()) state.paragraphBoxes.toSet() else emptySet()
         state.copy(isSelected = state.selectedBoxes.isEmpty(), selectedBoxes = newSelection)
+    }
+
+    fun translateParagraphs(targetLang: String) = viewModelScope.launch {
+        val paragraphs = uiState.value.paragraphBoxes.takeIf { it.isNotEmpty() } ?: return@launch
+
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
+        try {
+            // Combine all texts with a unique separator
+            val separator = "★" // Unique separator unlikely to appear in text
+            val combinedText = paragraphs.joinToString(separator) { it.text }
+
+            // Single translation request for all text
+            translationRepository.getTranslation(
+                targetLanguage = targetLang, query = combinedText
+            ).onSuccess { response ->
+                // Split translated text back into paragraphs
+                val translatedTexts =
+                    response.sentences?.firstOrNull()?.trans?.toString()?.split(separator)
+                        ?: return@onSuccess
+
+                // Map translated texts back to ParagraphBoxes
+                val translatedBoxes = paragraphs.zip(translatedTexts) { box, translatedText ->
+                    box.copy(text = translatedText)
+                }
+
+                _uiState.update {
+                    it.copy(
+                        translatedParagraphs = translatedBoxes,
+                        showTranslation = true,
+                        isLoading = false
+                    )
+                }
+            }.onFailure { e ->
+                _uiState.update {
+                    it.copy(
+                        isLoading = false, error = "Translation failed: ${e.message}"
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false, error = "Translation failed: ${e.message}"
+                )
+            }
+        }
+    }
+
+    fun toggleTranslation() {
+        _uiState.update { it.copy(showTranslation = !it.showTranslation) }
     }
 
     fun dismissError() = _uiState.update { it.copy(error = null) }
