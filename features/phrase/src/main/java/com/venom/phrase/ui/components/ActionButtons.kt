@@ -28,7 +28,6 @@ fun ActionButtons(
         CustomButton(
             icon = R.drawable.icon_share,
             onClick = onShareClick,
-            iconSize = 28.dp,
             contentDescription = stringResource(R.string.action_share)
         )
     }
