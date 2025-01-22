@@ -6,24 +6,21 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.venom.ui.screen.BannerAd
 import com.venom.lingolens.navigation.LingoLensBottomBar
 import com.venom.lingolens.navigation.LingoLensTopBar
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.lingolens.navigation.TopBarActions
+import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.resources.R
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.bars.TopBar
-import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.ui.screen.ContentType
@@ -54,10 +51,14 @@ fun LingoLensApp(
     }
 
     if (showBookmarkHistory) {
-        BookmarkHistoryScreen(
-            onBackClick = { showBookmarkHistory = false },
-            contentType = selectedScreen.toContentType()
-        )
+        if (selectedScreen != Screen.Phrases) {
+            BookmarkHistoryScreen(
+                onBackClick = { showBookmarkHistory = false },
+                contentType = selectedScreen.toContentType()
+            )
+        } else if (currentDestination == Screen.Phrases.route) {
+            PhrasesDialog(categoryId = -1, onDismiss = { showBookmarkHistory = false })
+        }
         return
     }
 
