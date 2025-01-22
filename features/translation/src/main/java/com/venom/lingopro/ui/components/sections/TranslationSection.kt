@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -14,6 +15,7 @@ import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.utils.Extensions.getSelectedOrFullText
+import com.venom.utils.Extensions.showToast
 
 @Composable
 fun TranslationSection(
@@ -27,6 +29,17 @@ fun TranslationSection(
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false
 ) {
+
+    val context = LocalContext.current
+
+    val validateAndExecute: (() -> Unit) -> Unit = {
+        if (translatedTextValue.text.isBlank()) {
+            context.showToast("No translation")
+        } else {
+            it()
+        }
+    }
+
     CustomCard {
         TranslationHeader(
             viewModel = viewModel, showNativeNameHint = showNativeNameHint, showFlag = showFlag
@@ -38,7 +51,8 @@ fun TranslationSection(
             actions = actions,
             states = TranslationStates(
                 isLoading = isLoading, isSpeaking = isSpeaking, isSaved = isBookmarked
-            )
+            ),
+            validateAndExecute = validateAndExecute
         )
     }
 }
@@ -62,7 +76,8 @@ private fun TranslationContent(
     sourceTextValue: TextFieldValue,
     translatedTextValue: TextFieldValue,
     actions: TranslationActions,
-    states: TranslationStates
+    states: TranslationStates,
+    validateAndExecute: ((() -> Unit) -> Unit)
 ) {
     // Source text section
     SourceTextSection(
@@ -76,21 +91,20 @@ private fun TranslationContent(
         onSpeechToText = actions.onSpeechToText,
         onOcr = actions.onOcr,
         onPaste = actions.onPaste,
-        onCopy = { actions.onCopy(sourceTextValue.getSelectedOrFullText()) },
-        onFullscreen = { actions.onFullscreen(sourceTextValue.getSelectedOrFullText()) },
-        onSpeak = { actions.onSpeak(sourceTextValue.getSelectedOrFullText()) },
+        onCopy = { validateAndExecute { actions.onCopy(sourceTextValue.getSelectedOrFullText()) } },
+        onFullscreen = { validateAndExecute { actions.onFullscreen(sourceTextValue.getSelectedOrFullText()) } },
+        onSpeak = { validateAndExecute { actions.onSpeak(sourceTextValue.getSelectedOrFullText()) } },
         isSpeaking = states.isSpeaking
     )
 
-    // Translation text section
     TranslatedTextSection(translatedTextValue = translatedTextValue)
 
     TranslatedTextActionBar(
-        onBookmark = actions.onBookmark,
-        onCopy = { actions.onCopy(translatedTextValue.getSelectedOrFullText()) },
-        onShare = { actions.onShare(translatedTextValue.getSelectedOrFullText()) },
-        onFullscreen = { actions.onFullscreen(translatedTextValue.getSelectedOrFullText()) },
-        onSpeak = { actions.onSpeak(translatedTextValue.getSelectedOrFullText()) },
+        onBookmark = { validateAndExecute(actions.onBookmark) },
+        onCopy = { validateAndExecute { actions.onCopy(translatedTextValue.getSelectedOrFullText()) } },
+        onShare = { validateAndExecute { actions.onShare(translatedTextValue.getSelectedOrFullText()) } },
+        onFullscreen = { validateAndExecute { actions.onFullscreen(translatedTextValue.getSelectedOrFullText()) } },
+        onSpeak = { validateAndExecute { actions.onSpeak(translatedTextValue.getSelectedOrFullText()) } },
         isSaved = states.isSaved,
         isSpeaking = states.isSpeaking,
     )
