@@ -13,9 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +34,7 @@ fun DrawBoundingBox(
     onSelect: () -> Unit
 ) {
     val density = LocalDensity.current
-    val textSize = if (isParagraphMode) box.avgWordHeight * 95f else rect.height * 0.65f
+    val textSize = if (isParagraphMode) box.avgWordHeight * 1.2f else rect.height * 0.7f
 
     // Get coordinates from bounding block
     val vertices = box.boundingBlock.vertices
