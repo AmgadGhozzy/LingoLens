@@ -23,7 +23,6 @@ import com.venom.ui.components.common.ActionItem
 fun OcrBottomSheet(
     recognizedText: String,
     selectedTexts: List<String>,
-    isParageraphMode: Boolean,
     peekHeight: Dp,
     sheetState: SheetState = rememberStandardBottomSheetState(),
     onCopy: (String) -> Unit,
@@ -40,13 +39,14 @@ fun OcrBottomSheet(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Responsive recognized text section
-        RecognizedTextSection(text = selectedTexts.takeIf { it.isNotEmpty() }
-            ?.joinToString(if (isParageraphMode) "\n" else " ") ?: recognizedText,
+        RecognizedTextSection(
+            text = recognizedText,
             peekHeight = peekHeight,
             isExpanded = sheetState.currentValue == SheetValue.Expanded,
             onCopy = onCopy,
             onShare = onShare,
-            onSpeak = onSpeak)
+            onSpeak = onSpeak
+        )
 
         if (recognizedText.isNotEmpty()) {
             TextActionBar(
@@ -96,7 +96,6 @@ fun OcrBottomSheetPreview() {
             "In",
             "Market"
         ),
-        isParageraphMode = true,
         peekHeight = 0.dp,
         onCopy = {},
         onShare = {},
