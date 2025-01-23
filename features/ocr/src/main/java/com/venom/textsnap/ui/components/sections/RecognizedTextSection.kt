@@ -39,7 +39,7 @@ fun RecognizedTextSection(
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
     // Define fixed heights instead of interpolating
-    val collapsedHeight = (peekHeight * 0.55f).coerceIn(56.dp, 112.dp)
+    val collapsedHeight = (peekHeight * 0.6f).coerceIn(56.dp, 112.dp)
     val expandedHeight = (configuration.screenHeightDp.dp * 0.3f).coerceIn(112.dp, 224.dp)
 
     // Use current height based on expansion state
