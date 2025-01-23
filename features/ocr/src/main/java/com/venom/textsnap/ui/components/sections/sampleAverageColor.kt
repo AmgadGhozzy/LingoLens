@@ -4,14 +4,16 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.toArgb
 
 data class TextColors(val backgroundColor: Color, val textColor: Color)
 
 fun sampleTextColors(imageBitmap: ImageBitmap, rect: Rect): TextColors {
     val bitmap = imageBitmap.asAndroidBitmap()
 
-    try {
-        // Calculate sampling coordinates
+    return try {
+        // Map rect coordinates to bitmap
         val startX =
             ((rect.left * bitmap.width) / imageBitmap.width).toInt().coerceIn(0, bitmap.width - 1)
         val startY =
@@ -26,103 +28,49 @@ fun sampleTextColors(imageBitmap: ImageBitmap, rect: Rect): TextColors {
             return TextColors(Color.White, Color.Black)
         }
 
-        // Enhanced sampling strategy
-        val width = endX - startX
-        val height = endY - startY
-
-        // Sample edges with better coverage
-        val sampleStep = maxOf(minOf(width, height) / 12, 1) // Increased sampling density
-        val edgePixels = IntArray(48) // Increased array size for more samples
-        var idx = 0
-
-        // Sample top, bottom, left, and right edges
-        for (x in startX..endX step sampleStep) {
-            if (idx < edgePixels.size - 3) {
-                edgePixels[idx++] = bitmap.getPixel(x, startY)
-                edgePixels[idx++] = bitmap.getPixel(x, endY)
+        // Sample all pixels in the bounding box
+        val pixels = IntArray((endX - startX + 1) * (endY - startY + 1))
+        var pixelIndex = 0
+        for (x in startX..endX) {
+            for (y in startY..endY) {
+                pixels[pixelIndex++] = bitmap.getPixel(x, y)
             }
         }
 
-        for (y in startY..endY step sampleStep) {
-            if (idx < edgePixels.size - 1) {
-                edgePixels[idx++] = bitmap.getPixel(startX, y)
-                edgePixels[idx++] = bitmap.getPixel(endX, y)
-            }
+        // Find most frequent background color
+        val backgroundColor =
+            pixels.groupBy { it }.maxByOrNull { it.value.size }?.key ?: pixels.first()
+
+        // Text color detection
+        val textColorCandidates = pixels.filter { pixel ->
+            // Filter for pixels significantly different from background
+            colorDifference(pixel, backgroundColor) > 5000
         }
 
-        val backgroundColor = findDominantColor(edgePixels, idx)
+        // Select text color with highest contrast
+        val textColor = textColorCandidates.maxByOrNull { pixel ->
+            calculateColorContrast(Color(pixel), Color(backgroundColor))
+        } ?: (if (Color(backgroundColor).luminance() > 0.5) Color.Black.toArgb() else Color.White.toArgb())
 
-        // Enhanced center sampling for text color
-        val centerX = (startX + endX) / 2
-        val centerY = (startY + endY) / 2
-        val radius = minOf(width, height) / 3 // Increased radius for better coverage
-
-        var bestContrast = 1.5f
-        var textColor = backgroundColor
-
-        val centerStep = maxOf(radius / 4, 1) // Smaller steps for more samples
-        for (x in (centerX - radius)..(centerX + radius) step centerStep) {
-            for (y in (centerY - radius)..(centerY + radius) step centerStep) {
-                val pixel = bitmap.getPixel(
-                    x.coerceIn(startX, endX), y.coerceIn(startY, endY)
-                )
-
-                val contrast = calculateContrast(pixel, backgroundColor)
-                if (contrast > bestContrast) {
-                    bestContrast = contrast
-                    textColor = pixel
-                    if (contrast > 3.0f) break // Early exit on good contrast
-                }
-            }
-        }
-
-        return TextColors(
+        TextColors(
             backgroundColor = Color(backgroundColor), textColor = Color(textColor)
         )
     } catch (_: Exception) {
-        return TextColors(Color.White, Color.Black)
+        TextColors(Color.White, Color.Black)
     }
 }
 
-private fun findDominantColor(colors: IntArray, count: Int): Int {
-    if (count == 0) return 0xFFFFFFFF.toInt()
-
-    var maxFreq = 0
-    var dominant = colors[0]
-
-    for (i in 0 until count) {
-        var freq = 1
-        val current = colors[i]
-
-        for (j in i + 1 until count) {
-            if (colorDifference(current, colors[j]) < 2500) freq++
-        }
-
-        if (freq > maxFreq) {
-            maxFreq = freq
-            dominant = current
-        }
-    }
-
-    return dominant
+// Calculate color contrast ratio
+private fun calculateColorContrast(c1: Color, c2: Color): Float {
+    val l1 = c1.luminance()
+    val l2 = c2.luminance()
+    return if (l1 > l2) (l1 + 0.05f) / (l2 + 0.05f) else (l2 + 0.05f) / (l1 + 0.05f)
 }
 
+// Calculate color difference
 private fun colorDifference(c1: Int, c2: Int): Int {
     val r = (c1 shr 16 and 0xFF) - (c2 shr 16 and 0xFF)
     val g = (c1 shr 8 and 0xFF) - (c2 shr 8 and 0xFF)
     val b = (c1 and 0xFF) - (c2 and 0xFF)
     return r * r + g * g + b * b
-}
-
-private fun calculateContrast(c1: Int, c2: Int): Float {
-    val l1 = getLuminance(c1)
-    val l2 = getLuminance(c2)
-    return if (l1 > l2) (l1 + 0.05f) / (l2 + 0.05f) else (l2 + 0.05f) / (l1 + 0.05f)
-}
-
-private fun getLuminance(color: Int): Float {
-    val r = (color shr 16 and 0xFF) / 255f
-    val g = (color shr 8 and 0xFF) / 255f
-    val b = (color and 0xFF) / 255f
-    return 0.2126f * r + 0.7152f * g + 0.0722f * b
 }
