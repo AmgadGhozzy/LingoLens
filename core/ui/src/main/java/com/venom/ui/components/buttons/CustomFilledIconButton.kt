@@ -1,5 +1,7 @@
 package com.venom.ui.components.buttons
 
+import android.util.Log
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,12 +31,13 @@ import androidx.compose.ui.unit.dp
  * @param icon Either a drawable resource ID (Int) or ImageVector
  * @param contentDescription Accessibility description for the icon
  * @param onClick Callback invoked when button is clicked
+ * @param onLongPress Callback invoked when button is long pressed (optional)
  * @param modifier Modifier for the button
  * @param enabled Whether the button is enabled
+ * @param selected Whether the button is in selected state
  * @param shape Shape of the button (defaults to Material 3 spec)
  * @param colors IconButtonColors for the button
  * @param interactionSource Optional interaction source for the button
- * @param selected Whether the button is in selected state
  * @param size Size of the button
  * @param iconSize Size of the icon
  * @param iconPadding Padding around the icon
@@ -44,23 +47,30 @@ fun CustomFilledIconButton(
     icon: Any,
     contentDescription: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    onLongPress: () -> Unit = {},
     enabled: Boolean = true,
-    shape: Shape = IconButtonDefaults.filledShape,
-    colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     selected: Boolean = false,
+    modifier: Modifier = Modifier,
+    shape: Shape = IconButtonDefaults.filledShape,
+    colors: IconButtonColors = selectedFilledIconButtonColors(isSelected = selected),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     size: Dp = 48.dp,
     iconSize: Dp = 24.dp,
     iconPadding: Dp = 8.dp
 ) {
     val scale = if (selected) 1.1f else 1f
 
-    FilledIconButton(
-        onClick = onClick,
+    FilledIconButton(onClick = onClick,
         modifier = modifier
             .scale(scale)
-            .size(size),
+            .size(size)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    Log.d("CustomFilledIconButton", "Long press detected")
+                    onLongPress()
+                }
+            ),
         enabled = enabled,
         shape = shape,
         colors = colors,
@@ -93,11 +103,14 @@ fun CustomFilledIconButton(
 fun selectedFilledIconButtonColors(
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
+    selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
     disabledContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
-    disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+    isSelected: Boolean = false
 ) = IconButtonDefaults.filledIconButtonColors(
-    containerColor = containerColor,
-    contentColor = contentColor,
+    containerColor = if (isSelected) selectedContainerColor else containerColor,
+    contentColor = if (isSelected) selectedContentColor else contentColor,
     disabledContainerColor = disabledContainerColor,
     disabledContentColor = disabledContentColor
 )
@@ -119,7 +132,7 @@ private fun EnhancedFilledIconButtonSelectedPreview() {
             contentDescription = "Add",
             onClick = {},
             selected = true,
-            colors = selectedFilledIconButtonColors()
+            colors = selectedFilledIconButtonColors(isSelected = true)
         )
     }
 }
