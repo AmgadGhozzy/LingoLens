@@ -47,9 +47,11 @@ fun ExpandableFAB(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .animateContentSize(
-                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium)
+                modifier = Modifier.animateContentSize(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
                     )
             ) {
                 icons.forEachIndexed { index, (icon, description) ->
@@ -72,7 +74,7 @@ fun ExpandableFAB(
             onClick = { isExpanded = !isExpanded },
             containerColor = primaryColor,
             modifier = Modifier
-                .padding(horizontal = 12.dp)
+                .size(62.dp)
                 .scale(if (isExpanded) 1.1f else 1f)
 
         ) {
