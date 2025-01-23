@@ -52,9 +52,9 @@ fun OcrScreen(
     )
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    val peekHeight by remember(uiState.recognizedText) {
+    val peekHeight by remember(uiState.currentRecognizedText) {
         derivedStateOf {
-            (screenHeight * if (uiState.recognizedText.isEmpty()) 0.14 else 0.22).dp
+            (screenHeight * if (uiState.currentRecognizedText.isEmpty()) 0.14 else 0.22).dp
         }
     }
     val maxHeight = screenHeight * 0.85
@@ -73,14 +73,14 @@ fun OcrScreen(
     }
 
     BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
-        modifier = Modifier
-            .navigationBarsPadding(),
+        modifier = Modifier.navigationBarsPadding(),
         sheetPeekHeight = peekHeight,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetDragHandle = { CustomDragHandle() },
         sheetSwipeEnabled = true,
         content = { paddingValues ->
-            OcrScreenContent(viewModel = viewModel,
+            OcrScreenContent(
+                viewModel = viewModel,
                 modifier = Modifier.padding(paddingValues),
                 onFileClick = onFileClick,
                 onCameraClick = onCameraClick,
@@ -89,12 +89,8 @@ fun OcrScreen(
                 onToggleSelected = viewModel::toggleSelection,
                 onToggleLabels = viewModel::toggleLabels,
                 onToggleParagraphs = viewModel::toggleParagraphs,
-                onTranslate = {
-                    navController.navigate(Screen.Translation.createRoute(uiState.selectedBoxes.map { it.text }
-                        .takeIf { it.isNotEmpty() }
-                        ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
-                        ?: uiState.recognizedText))
-                })
+                onTranslate = viewModel::toggleTranslation
+            )
         },
         sheetContent = {
             OcrBottomSheetContent(uiState = uiState,
@@ -104,12 +100,8 @@ fun OcrScreen(
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
                 onSpeak = { text -> ttsViewModel.speak(text) },
-                onTranslate = {
-                    navController.navigate(Screen.Translation.createRoute(uiState.selectedBoxes.map { it.text }
-                        .takeIf { it.isNotEmpty() }
-                        ?.joinToString(if (uiState.isParagraphMode) "\n" else " ")
-                        ?: uiState.recognizedText))
-                })
+                onTranslate = { navController.navigate(Screen.Translation.createRoute(uiState.selectedTexts)) }
+            )
         })
 }
 
