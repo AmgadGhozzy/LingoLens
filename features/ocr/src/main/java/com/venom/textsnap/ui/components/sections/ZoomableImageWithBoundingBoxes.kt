@@ -48,13 +48,14 @@ fun ZoomableImageWithBoundingBoxes(
     var containerHeight by remember { mutableFloatStateOf(0f) }
 
     // Memoized box rect calculations
-    val boxRects = remember(uiState.paragraphBoxes, containerWidth, containerHeight) {
-        uiState.paragraphBoxes.associate { box ->
+    val boxRects = remember(uiState.currentParagraphs, containerWidth, containerHeight) {
+        uiState.currentParagraphs.associate { box ->
             val rect = getBoxRect(
                 block = box.boundingBlock,
                 imageBitmap = imageBitmap,
                 containerWidth = containerWidth,
-                containerHeight = containerHeight
+                containerHeight = containerHeight,
+                padding = 10
             )
             Log.d("ZoomableImageWithBoundingBoxes", "Box: $box, Rect: $rect")
             box to rect
@@ -146,7 +147,7 @@ fun ZoomableImageWithBoundingBoxes(
         }
 
         SelectionContainer {
-            uiState.paragraphBoxes.forEach { box ->
+            uiState.currentParagraphs.forEach { box ->
                 DrawBoundingBox(
                     box = box,
                     rect = boxRects[box]!!,
