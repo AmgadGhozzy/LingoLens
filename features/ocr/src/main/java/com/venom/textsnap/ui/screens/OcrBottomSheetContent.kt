@@ -31,9 +31,8 @@ fun OcrBottomSheetContent(
             .padding(horizontal = 8.dp),
     ) {
         OcrBottomSheet(
-            recognizedText = uiState.recognizedText,
+            recognizedText = uiState.selectedTexts,
             selectedTexts = uiState.selectedBoxes.map { it.text },
-            isParageraphMode = uiState.isParagraphMode,
             peekHeight = peekHeight,
             sheetState = sheetState,
             onCopy = onCopy,
