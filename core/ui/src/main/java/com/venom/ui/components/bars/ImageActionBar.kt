@@ -1,6 +1,5 @@
 package com.venom.ui.components.bars
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,7 @@ import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.menus.OverflowMenu
 
 data class ActionItem(
-    @DrawableRes val icon: Int,
+    val icon: Any,
     @StringRes val description: Int,
     val onClick: () -> Unit,
     val selected: Boolean = false,
@@ -31,7 +30,7 @@ fun ImageActionBar(
     actions: List<ActionItem>,
     modifier: Modifier = Modifier,
     maxActionsVisible: Int = 4,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
 ) {
     Surface(
         shape = MaterialTheme.shapes.extraLarge,
@@ -41,21 +40,20 @@ fun ImageActionBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            actions.forEach { action ->
+            if (actions.size > maxActionsVisible) OverflowMenu(actions.drop(maxActionsVisible))
+            actions.take(maxActionsVisible).forEach { action ->
                 CustomFilledIconButton(
                     icon = action.icon,
+                    size = 42.dp,
                     contentDescription = action.description.toString(),
                     onClick = action.onClick,
                     enabled = action.isEnabled,
                     selected = action.selected,
                 )
-            }
-            if (actions.size > maxActionsVisible) {
-                OverflowMenu(actions.drop(maxActionsVisible))
             }
         }
     }
