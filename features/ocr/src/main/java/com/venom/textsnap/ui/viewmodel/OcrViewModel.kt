@@ -50,7 +50,7 @@ class OcrViewModel @Inject constructor(
         }.onSuccess { (file, bitmap, uri) ->
             uri?.let { setUri(it) }
             setImageBitmap(bitmap)
-            setcompressedFile(file)
+            setCompressedFile(file)
             _uiState.update { it.copy(isLoading = false) }
 
             if (processOcrAfter) processOcr()
@@ -69,6 +69,7 @@ class OcrViewModel @Inject constructor(
 
         repository.performOcr(compressedFile).onSuccess { response ->
             processParagraphs(response)
+            translateParagraphs("ar")
             val ocrEntry = OcrEntry(
                 recognizedText = uiState.value.recognizedText,
                 imageData = uiState.value.compressedFile?.readBytes() ?: ByteArray(0),
@@ -106,19 +107,33 @@ class OcrViewModel @Inject constructor(
     fun setImageBitmap(imageBitmap: ImageBitmap?) =
         _uiState.update { it.copy(imageBitmap = imageBitmap) }
 
-    fun setcompressedFile(file: File?) = _uiState.update { it.copy(compressedFile = file) }
+    fun setCompressedFile(file: File?) = _uiState.update { it.copy(compressedFile = file) }
 
     // UI actions
     fun toggleLabels() = _uiState.update { it.copy(showLabels = !it.showLabels) }
 
     fun toggleParagraphs() = _uiState.update { state ->
         val newMode = !state.isParagraphMode
-        val newParagraphs = state.originalResponse?.let {
-            convertToParagraphBoxes(it, newMode)
+        val showTranslation = newMode && state.showTranslation
+        val newParagraphs = state.cachedParagraphBoxes ?: state.originalResponse?.let {
+            val convertedParagraphs = convertToParagraphBoxes(it, newMode)
+            state.copy(cachedParagraphBoxes = convertedParagraphs) // Cache the result
+            convertedParagraphs
         } ?: state.paragraphBoxes
 
         state.copy(
-            isParagraphMode = newMode, paragraphBoxes = newParagraphs, selectedBoxes = emptySet()
+            isParagraphMode = newMode,
+            paragraphBoxes = newParagraphs,
+            showTranslation = showTranslation,
+            selectedBoxes = emptySet()
+        )
+    }
+
+    fun toggleTranslation() = _uiState.update { state ->
+        if (!state.isParagraphMode) toggleParagraphs()
+        val showTranslation = !state.showTranslation && state.isParagraphMode
+        state.copy(
+            showTranslation = showTranslation, selectedBoxes = emptySet()
         )
     }
 
@@ -164,9 +179,7 @@ class OcrViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        translatedParagraphs = translatedBoxes,
-                        showTranslation = true,
-                        isLoading = false
+                        translatedParagraphs = translatedBoxes, isLoading = false
                     )
                 }
             }.onFailure { e ->
@@ -184,12 +197,6 @@ class OcrViewModel @Inject constructor(
             }
         }
     }
-
-    fun toggleTranslation() {
-        _uiState.update { it.copy(showTranslation = !it.showTranslation) }
-    }
-
-    fun dismissError() = _uiState.update { it.copy(error = null) }
 
     fun reset() {
         _uiState.value = OcrUiState()
@@ -215,12 +222,21 @@ data class OcrUiState(
     val error: String? = null,
     val showLabels: Boolean = true,
     val showTranslation: Boolean = false,
+    val cachedParagraphBoxes: List<ParagraphBox>? = null,
     val isParagraphMode: Boolean = true,
     val isSelected: Boolean = false,
-    val isTranslate: Boolean = false,
 ) {
     val isSuccess get() = !isLoading && error == null && originalResponse != null
     val hasError get() = error != null
+
     val currentParagraphs
         get() = if (showTranslation) translatedParagraphs ?: paragraphBoxes else paragraphBoxes
+
+    val currentRecognizedText
+        get() = if (showTranslation) translatedParagraphs?.joinToString(if (isParagraphMode) "\n" else " ") { it.text }
+            ?: recognizedText else recognizedText
+
+    val selectedTexts
+        get() = selectedBoxes.map { it.text }.takeIf { it.isNotEmpty() }
+            ?.joinToString(if (isParagraphMode) "\n" else " ") ?: currentRecognizedText
 }
