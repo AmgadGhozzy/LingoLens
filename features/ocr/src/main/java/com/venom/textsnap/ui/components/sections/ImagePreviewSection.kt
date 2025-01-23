@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
@@ -16,21 +15,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.resources.R
 import com.venom.textsnap.ui.components.ErrorOverlay
 import com.venom.textsnap.ui.components.OcrLoadingOverlay
 import com.venom.textsnap.ui.viewmodel.ImageInput.FromBitmap
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.bars.ActionItem
 import com.venom.ui.components.bars.ImageActionBar
-import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.common.EmptyState
 import com.venom.ui.components.dialogs.ImageCropperDialog
 import com.venom.ui.components.menus.ExpandableFAB
 
 @Composable
 fun ImagePreviewSection(
-    viewModel: OcrViewModel,
+    viewModel: OcrViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
     onRetry: () -> Unit,
     onCameraClick: () -> Unit,
@@ -85,43 +85,43 @@ fun ImagePreviewSection(
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(bottom = 8.dp)
         ) {
 
             ImageActionBar(
-                modifier = Modifier.weight(1f),
-                actions = listOf(
-                    ActionItem.Action(
-                        icon = R.drawable.ic_paragraph_on,
-                        textRes = R.string.action_hide_paragraphs,
+                modifier = Modifier.weight(1f), actions = listOf(
+                    ActionItem(
+                        icon = if (uiState.isParagraphMode) R.drawable.ic_paragraph_off else R.drawable.ic_paragraph_on,
+                        description = R.string.action_hide_paragraphs,
                         onClick = onToggleParagraphs,
-                        selected = uiState.isParagraphMode && uiState.currentRecognizedText.isNotEmpty(),
-                    ),
-                    ActionItem.Action(
-                        icon = R.drawable.ic_labels_shown,
-                        textRes = R.string.action_hide_labels,
+                        selected = uiState.isParagraphMode,
+                        isEnabled = uiState.currentRecognizedText.isNotEmpty()
+                    ), ActionItem(
+                        icon = if (uiState.showLabels) R.drawable.ic_labels_hidden else R.drawable.ic_labels_shown,
+                        description = R.string.action_hide_labels,
                         onClick = onToggleLabels,
-                        selected = uiState.showLabels && uiState.currentRecognizedText.isNotEmpty(),
-                    ),
-                    ActionItem.Action(
-                        icon = R.drawable.ic_select_all,
-                        textRes = R.string.select_language,
+                        selected = uiState.showLabels,
+                        isEnabled = uiState.currentRecognizedText.isNotEmpty()
+                    ), ActionItem(
+                        icon = if (uiState.isSelected) R.drawable.ic_deselect else R.drawable.ic_select_all,
+                        description = R.string.action_select_all,
                         onClick = onToggleSelected,
-                        selected = uiState.isSelected && uiState.currentRecognizedText.isNotEmpty(),
-                    ),
-                    ActionItem.Action(
+                        selected = uiState.isSelected,
+                        isEnabled = uiState.currentRecognizedText.isNotEmpty()
+                    ), ActionItem(
                         icon = R.drawable.icon_translate,
-                        textRes = R.string.action_translate,
+                        description = R.string.action_translate,
                         onClick = onTranslate,
-                        selected = uiState.showTranslation && uiState.currentRecognizedText.isNotEmpty(),
-                    ),
-                ),
+                        selected = uiState.showTranslation,
+                        isEnabled = uiState.currentRecognizedText.isNotEmpty()
+                    )
+                )
             )
 
-            ExpandableFAB(modifier = Modifier.wrapContentSize(),
+            ExpandableFAB(
                 onCameraClick = { onCameraClick();viewModel.reset(); showImageCropper = true },
                 onGalleryClick = {
-                    onGalleryClick();viewModel.reset(); //showImageCropper = true
+                    onGalleryClick();viewModel.reset()//; showImageCropper = true
                 },
                 onFileClick = { onFileClick();viewModel.reset(); showImageCropper = true })
         }
@@ -132,7 +132,7 @@ fun ImagePreviewSection(
 @Preview
 @Composable
 fun ImagePreviewCardPreview() {
-//    ImagePreviewCard(
+//    ImagePreviewSection(
 //        onRetry = {},
 //        onFileClick = {},
 //        onToggleLabels = {},
