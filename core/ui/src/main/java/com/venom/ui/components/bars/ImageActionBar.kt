@@ -1,23 +1,64 @@
 package com.venom.ui.components.bars
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.common.ActionItem
-import com.venom.ui.components.common.BaseActionBar
+import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.menus.OverflowMenu
+
+data class ActionItem(
+    @DrawableRes val icon: Int,
+    @StringRes val description: Int,
+    val onClick: () -> Unit,
+    val selected: Boolean = false,
+    val isEnabled: Boolean = true
+)
 
 @Composable
 fun ImageActionBar(
-    actions: List<ActionItem.Action>,
-    modifier: Modifier = Modifier
+    actions: List<ActionItem>,
+    modifier: Modifier = Modifier,
+    maxActionsVisible: Int = 4,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
 ) {
-    BaseActionBar(
-        actions = actions,
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        showDropdownMenu = true, useCard = true, modifier = modifier
-    )
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        color = backgroundColor,
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            actions.forEach { action ->
+                CustomFilledIconButton(
+                    icon = action.icon,
+                    contentDescription = action.description.toString(),
+                    onClick = action.onClick,
+                    enabled = action.isEnabled,
+                    selected = action.selected,
+                )
+            }
+            if (actions.size > maxActionsVisible) {
+                OverflowMenu(actions.drop(maxActionsVisible))
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -25,24 +66,24 @@ fun ImageActionBar(
 fun ImageActionBarPreview() {
     ImageActionBar(
         actions = listOf(
-            ActionItem.Action(
+            ActionItem(
                 icon = R.drawable.ic_paragraph_on,
-                textRes = R.string.action_hide_paragraphs,
                 onClick = {},
-            ), ActionItem.Action(
+                description = R.string.action_hide_paragraphs,
+            ), ActionItem(
                 icon = R.drawable.ic_labels_shown,
-                textRes = R.string.action_hide_labels,
                 onClick = {},
-                selected = true
-            ), ActionItem.Action(
+                description = R.string.action_hide_labels,
+                isEnabled = true
+            ), ActionItem(
                 icon = R.drawable.ic_select_all,
-                textRes = R.string.select_language,
                 onClick = {},
-                enabled = false,
-            ), ActionItem.Action(
+                description = R.string.select_language,
+                isEnabled = false
+            ), ActionItem(
                 icon = R.drawable.icon_translate,
-                textRes = R.string.action_translate,
                 onClick = {},
+                description = R.string.action_translate,
             )
         )
     )
