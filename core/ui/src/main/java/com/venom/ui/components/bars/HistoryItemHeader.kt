@@ -21,7 +21,7 @@ fun HistoryItemHeader(
             onClick = {}), actions = listOf(
             ActionItem.Action(
                 icon = if (isBookmarked) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
-                textRes = if (isBookmarked) R.string.bookmark_remove else R.string.bookmark_add,
+                description = if (isBookmarked) R.string.bookmark_remove else R.string.bookmark_add,
                 onClick = onToggleBookmark
             )
         ),
