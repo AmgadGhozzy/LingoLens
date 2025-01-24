@@ -35,24 +35,24 @@ fun SourceTextActionBar(
 ) {
     val leftAction = ActionItem.Action(
         icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
-        textRes = R.string.action_speak,
+        description = R.string.action_speak,
         onClick = onSpeak
     )
 
     val actions = listOf(
         ActionItem.Action(
             icon = R.drawable.icon_fullscreen,
-            textRes = R.string.action_fullscreen,
+            description = R.string.action_fullscreen,
             onClick = onFullscreen
         ), ActionItem.Action(
-            icon = R.drawable.icon_copy, textRes = R.string.action_copy, onClick = onCopy
+            icon = R.drawable.icon_copy, description = R.string.action_copy, onClick = onCopy
         ), ActionItem.Action(
-            icon = R.drawable.icon_paste, textRes = R.string.action_paste, onClick = onPaste
+            icon = R.drawable.icon_paste, description = R.string.action_paste, onClick = onPaste
         ), ActionItem.Action(
-            icon = R.drawable.icon_camera, textRes = R.string.action_ocr, onClick = onOcr
+            icon = R.drawable.icon_camera, description = R.string.action_ocr, onClick = onOcr
         ), ActionItem.Action(
             icon = R.drawable.icon_mic,
-            textRes = R.string.action_speech_to_text,
+            description = R.string.action_speech_to_text,
             onClick = onSpeechToText
         )
     )
