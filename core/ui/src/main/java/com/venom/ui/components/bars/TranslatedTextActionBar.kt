@@ -34,29 +34,29 @@ fun TranslatedTextActionBar(
 ) {
     val leftAction = ActionItem.Action(
         icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
-        textRes = R.string.action_speak_source,
+        description = R.string.action_speak_source,
         onClick = onSpeak
     )
 
     val actions = listOf(
         ActionItem.Action(
             icon = R.drawable.icon_fullscreen,
-            textRes = R.string.action_fullscreen_source,
+            description = R.string.action_fullscreen_source,
             onClick = onFullscreen
         ),
         ActionItem.Action(
             icon = R.drawable.icon_share,
-            textRes = R.string.action_share,
+            description = R.string.action_share,
             onClick = onShare
         ),
         ActionItem.Action(
             icon = R.drawable.icon_copy,
-            textRes = R.string.action_copy_source,
+            description = R.string.action_copy_source,
             onClick = onCopy
         ),
         ActionItem.Action(
             icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
-            textRes = R.string.action_save,
+            description = R.string.action_save,
             onClick = onBookmark
         )
     )
