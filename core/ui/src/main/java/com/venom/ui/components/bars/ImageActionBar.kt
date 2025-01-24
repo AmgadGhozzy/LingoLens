@@ -1,6 +1,5 @@
 package com.venom.ui.components.bars
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,19 +14,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.menus.OverflowMenu
-
-data class ActionItem(
-    val icon: Any,
-    @StringRes val description: Int,
-    val onClick: () -> Unit,
-    val selected: Boolean = false,
-    val isEnabled: Boolean = true
-)
 
 @Composable
 fun ImageActionBar(
-    actions: List<ActionItem>,
+    actions: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
     maxActionsVisible: Int = 4,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
@@ -51,7 +43,7 @@ fun ImageActionBar(
                     size = 42.dp,
                     contentDescription = action.description.toString(),
                     onClick = action.onClick,
-                    enabled = action.isEnabled,
+                    enabled = action.enabled,
                     selected = action.selected,
                 )
             }
@@ -64,21 +56,21 @@ fun ImageActionBar(
 fun ImageActionBarPreview() {
     ImageActionBar(
         actions = listOf(
-            ActionItem(
+            ActionItem.Action(
                 icon = R.drawable.ic_paragraph_on,
                 onClick = {},
                 description = R.string.action_hide_paragraphs,
-            ), ActionItem(
+            ), ActionItem.Action(
                 icon = R.drawable.ic_labels_shown,
                 onClick = {},
                 description = R.string.action_hide_labels,
-                isEnabled = true
-            ), ActionItem(
+                enabled = true
+            ), ActionItem.Action(
                 icon = R.drawable.ic_select_all,
                 onClick = {},
                 description = R.string.select_language,
-                isEnabled = false
-            ), ActionItem(
+                enabled = false
+            ), ActionItem.Action(
                 icon = R.drawable.icon_translate,
                 onClick = {},
                 description = R.string.action_translate,
