@@ -3,6 +3,7 @@ package com.venom.ui.components.menus
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -37,7 +38,7 @@ fun ExpandableFAB(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         AnimatedVisibility(
             visible = isExpanded,
@@ -46,13 +47,12 @@ fun ExpandableFAB(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
                 modifier = Modifier.animateContentSize(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
                     )
+                )
             ) {
                 icons.forEachIndexed { index, (icon, description) ->
                     FABOption(icon = icon,
@@ -74,7 +74,7 @@ fun ExpandableFAB(
             onClick = { isExpanded = !isExpanded },
             containerColor = primaryColor,
             modifier = Modifier
-                .size(62.dp)
+                .size(64.dp)
                 .scale(if (isExpanded) 1.1f else 1f)
 
         ) {
@@ -100,7 +100,7 @@ private fun FABOption(
         onClick = onClick,
         containerColor = containerColor,
         modifier = Modifier
-            .padding(bottom = 12.dp)
+            .padding(bottom = 8.dp)
             .size(56.dp)
     ) {
         Icon(
