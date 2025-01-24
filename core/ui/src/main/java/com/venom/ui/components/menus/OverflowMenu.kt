@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,12 +22,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.bars.ActionItem
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.ActionItem
 
 @Composable
 fun OverflowMenu(
-    hiddenActions: List<ActionItem>, modifier: Modifier = Modifier
+    options: List<ActionItem.Action>,
+    modifier: Modifier = Modifier,
+    buttonType: ButtonType = ButtonType.FILLED_ICON
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -37,12 +41,22 @@ fun OverflowMenu(
     )
 
     Box(modifier = modifier) {
-        CustomButton(
-            icon = Icons.Rounded.MoreVert,
-            contentDescription = stringResource(R.string.action_more_options),
-            onClick = { isExpanded = !isExpanded },
-            iconSize = 32.dp
-        )
+        when (buttonType) {
+            ButtonType.FILLED_ICON -> CustomFilledIconButton(
+                icon = Icons.Rounded.MoreHoriz,
+                contentDescription = stringResource(R.string.action_more_options),
+                onClick = { isExpanded = !isExpanded },
+                iconSize = 32.dp
+            )
+
+            ButtonType.OUTLINED -> CustomButton(
+                icon = Icons.Rounded.MoreVert,
+                contentDescription = stringResource(R.string.action_more_options),
+                onClick = { isExpanded = !isExpanded },
+                iconSize = 32.dp
+            )
+        }
+
         DropdownMenu(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
@@ -55,7 +69,7 @@ fun OverflowMenu(
                     scaleY = rollAnimation, transformOrigin = TransformOrigin(0.5f, 0f)
                 )
         ) {
-            hiddenActions.forEachIndexed { index, action ->
+            options.forEachIndexed { index, action ->
                 DropdownMenuItem(modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
@@ -86,7 +100,7 @@ fun OverflowMenu(
                         else -> throw IllegalArgumentException("Icon must be either a drawable resource ID or an ImageVector")
                     }
                 })
-                if (index < hiddenActions.lastIndex) {
+                if (index < options.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier
                             .padding(horizontal = 24.dp)
@@ -96,4 +110,8 @@ fun OverflowMenu(
             }
         }
     }
+}
+
+enum class ButtonType {
+    FILLED_ICON, OUTLINED
 }
