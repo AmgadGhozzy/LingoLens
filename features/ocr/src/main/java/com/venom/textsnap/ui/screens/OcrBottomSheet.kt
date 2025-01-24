@@ -12,7 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.textsnap.ui.components.TextAction
 import com.venom.textsnap.ui.components.sections.RecognizedTextSection
 import com.venom.textsnap.ui.components.sections.SelectedTextList
 import com.venom.ui.components.bars.TextActionBar
@@ -36,7 +35,7 @@ fun OcrBottomSheet(
         modifier = modifier
             .fillMaxHeight()
             .padding(horizontal = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         // Responsive recognized text section
         RecognizedTextSection(
@@ -52,31 +51,29 @@ fun OcrBottomSheet(
             TextActionBar(
                 actions = listOf(
                     ActionItem.Action(icon = R.drawable.icon_share,
-                        textRes = R.string.action_share,
+                        description = R.string.action_share,
                         onClick = { onShare(recognizedText) }),
                     ActionItem.Action(icon = R.drawable.icon_sound,
-                        textRes = R.string.action_speak,
+                        description = R.string.action_speak,
                         onClick = { onSpeak(recognizedText) }),
                     ActionItem.Action(icon = R.drawable.icon_translate,
-                        textRes = R.string.action_translate,
+                        description = R.string.action_translate,
                         onClick = { onTranslate(recognizedText) }),
                     ActionItem.Action(icon = R.drawable.icon_copy,
-                        textRes = R.string.action_copy,
+                        description = R.string.action_copy,
                         onClick = { onCopy(recognizedText) })
                 )
             )
         }
 
-        SelectedTextList(texts = selectedTexts,
+        SelectedTextList(
+            texts = selectedTexts,
             isSingleSelection = selectedTexts.size == 1,
-            onAction = { text, action ->
-                when (action) {
-                    TextAction.Copy -> onCopy(text)
-                    TextAction.Share -> onShare(text)
-                    TextAction.Speak -> onSpeak(text)
-                    TextAction.Translate -> onTranslate(text)
-                }
-            })
+            onCopy = onCopy,
+            onShare = onShare,
+            onSpeak = onSpeak,
+            onTranslate = onTranslate
+        )
     }
 }
 
