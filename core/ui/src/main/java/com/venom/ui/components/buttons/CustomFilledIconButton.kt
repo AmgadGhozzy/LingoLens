@@ -58,7 +58,7 @@ fun CustomFilledIconButton(
     iconSize: Dp = 24.dp,
     iconPadding: Dp = 8.dp
 ) {
-    val scale = if (selected) 1.1f else 1f
+    val scale = if (selected && enabled) 1.1f else 1f
 
     FilledIconButton(onClick = onClick,
         modifier = modifier
