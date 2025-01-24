@@ -29,7 +29,7 @@ fun TextActionBar(
 ) {
     BaseActionBar(
         actions = actions,
-        showDropdownMenu = true,
+        showOverflowMenu = true,
         useCard = true,
         containerColor = containerColor,
         elevation = elevation,
@@ -44,16 +44,16 @@ fun TextActionBarPreview() {
     TextActionBar(
         actions = listOf(
             ActionItem.Action(icon = R.drawable.icon_share,
-                textRes = R.string.action_share,
+                description = R.string.action_share,
                 onClick = { }),
             ActionItem.Action(icon = R.drawable.icon_sound,
-                textRes = R.string.action_speak,
+                description = R.string.action_speak,
                 onClick = { }),
             ActionItem.Action(icon = R.drawable.icon_translate,
-                textRes = R.string.action_translate,
+                description = R.string.action_translate,
                 onClick = { }),
             ActionItem.Action(icon = R.drawable.icon_copy,
-                textRes = R.string.action_copy,
+                description = R.string.action_copy,
                 onClick = { }),
         )
     )
