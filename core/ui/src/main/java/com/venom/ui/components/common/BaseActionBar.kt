@@ -10,38 +10,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.buttons.CustomTextButton
 import com.venom.ui.components.dialogs.CustomCard
-import com.venom.ui.components.menus.DropdownMenuTrigger
-import com.venom.ui.components.menus.defaultDropdownOptions
+import com.venom.ui.components.menus.ButtonType
+import com.venom.ui.components.menus.OverflowMenu
 
 sealed class ActionItem {
     data class Action(
         val icon: Any,
-        @StringRes val textRes: Int,
+        @StringRes val description: Int,
         val onClick: () -> Unit,
         val enabled: Boolean = true,
-        val selected: Boolean = false,
-        val selectedTint: Color? = null
+        val selected: Boolean = false
     ) : ActionItem()
 
     data class TextAction(val text: String, val onClick: () -> Unit) : ActionItem()
-    data class MenuOption(
-        val text: String,
-        val icon: ImageVector? = null,
-        val onClick: () -> Unit
-    ) : ActionItem()
 }
 
 @Composable
 private fun ActionItemContent(
-    action: ActionItem,
-    useTextButtons: Boolean
+    action: ActionItem, useTextButtons: Boolean
 ) {
     when (action) {
         is ActionItem.Action -> {
@@ -49,17 +41,16 @@ private fun ActionItemContent(
                 CustomTextButton(
                     onClick = action.onClick,
                     icon = action.icon,
-                    text = stringResource(action.textRes),
+                    text = stringResource(action.description),
                     withText = false,
                     enabled = action.enabled
                 )
             } else {
                 CustomButton(
                     icon = action.icon,
-                    contentDescription = stringResource(action.textRes),
+                    contentDescription = stringResource(action.description),
                     onClick = action.onClick,
                     selected = action.selected,
-                    selectedTint = action.selectedTint,
                     enabled = action.enabled
                 )
             }
@@ -72,13 +63,6 @@ private fun ActionItemContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        is ActionItem.MenuOption -> {
-            DropdownMenuTrigger(
-                options = listOf(action),
-                onOptionSelected = { it.onClick() }
-            )
-        }
     }
 }
 
@@ -86,7 +70,8 @@ private fun ActionItemContent(
 fun BaseActionBar(
     leftAction: ActionItem? = null,
     actions: List<ActionItem>,
-    showDropdownMenu: Boolean = false,
+    showOverflowMenu: Boolean = false,
+    overflowOptions: List<ActionItem.Action> = emptyList(),
     useCard: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.surface,
     elevation: Dp = 2.dp,
@@ -101,13 +86,10 @@ fun BaseActionBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (showDropdownMenu || leftAction != null) {
+            if (showOverflowMenu || leftAction != null) {
                 Box(modifier = Modifier.weight(1f)) {
-                    if (showDropdownMenu) {
-                        DropdownMenuTrigger(
-                            options = defaultDropdownOptions(),
-                            onOptionSelected = { it.onClick() }
-                        )
+                    if (showOverflowMenu) {
+                        OverflowMenu(options = overflowOptions, buttonType = ButtonType.OUTLINED)
                     } else {
                         leftAction?.let { ActionItemContent(it, useTextButtons) }
                     }
@@ -117,7 +99,7 @@ fun BaseActionBar(
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = if (showDropdownMenu) Modifier.padding(end = 16.dp) else Modifier
+                modifier = if (showOverflowMenu) Modifier.padding(end = 16.dp) else Modifier
             ) {
                 actions.forEach { ActionItemContent(it, useTextButtons) }
             }
