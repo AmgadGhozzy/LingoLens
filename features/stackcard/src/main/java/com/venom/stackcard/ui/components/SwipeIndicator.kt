@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -20,9 +19,8 @@ fun SwipeIndicator(
     Box(
         modifier = modifier
             .alpha(alpha)
-            .clip(CircleShape)
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(color = backgroundColor, shape = CircleShape)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = text,
