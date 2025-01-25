@@ -41,17 +41,27 @@
 
     <!-- Bookmarks -->
     <string name="bookmarks_title">Bookmarks</string>
+    <string name="bookmark_add">Save</string>
+    <string name="bookmark_remove">Remove</string>
+    <string name="bookmarks_search_hint">Search Saved Translations</string>
+
+
     <string name="bookmarks_empty_title">No Bookmarks</string>
-    <string name="bookmarks_empty_subtitle">Your saved translations will appear here</string>
-    <string name="bookmark_add">Add Bookmark</string>
-    <string name="bookmark_remove">Remove Bookmark</string>
-    <string name="bookmarks_search_hint">Search Bookmarks</string>
+    <string name="bookmarks_empty_subtitle">Save translations to view them later</string>
+
+    <string name="ocr_empty_state_title">Scan an Image</string>
+    <string name="ocr_empty_state_description">Scan an image or select from gallery</string>
+
+    <string name="words_bookmarks_empty_state_title">No words bookmarked</string>
+    <string name="words_bookmarks_empty_state_subtitle">Bookmark words to practice them later</string>
+
+    <string name="phrase_empty_state_title">No phrases found</string>
+    <string name="phrase_empty_state_subtitle">No matching phrases were found. Try searching for something else</string>
 
     <!-- History -->
     <string name="history_title">History</string>
     <string name="history_empty_title">No History</string>
-    <string name="history_empty_subtitle">Your recent activity will appear here</string>
-
+    <string name="history_empty_subtitle">Your recent translations will appear here</string>
 
     <!-- Search -->
     <string name="search_no_results_title">No Results Found</string>
@@ -105,7 +115,6 @@
 
     <string name="retry">Retry</string>
     <string name="error_message">Please try again</string>
-    <string name="ocr_empty_state_title">Add an image to start scanning</string>
     <string name="recognized_text_placeholder">Recognized text will appear here</string>
     <string name="ocr_image_content_description">OCR Image</string>
     <string name="ocr_entry_description">OCR text from %1$s: %2$s</string>
@@ -131,12 +140,9 @@
     <string name="start_conversation">Use the microphone buttons below to begin translating</string>
     <string name="no_messages_found">No Messages Start a Conversation</string>
 
-    <string name="phrase_empty_state_title">No Phrases Found</string>
-    <string name="phrase_empty_state_subtitle">No matching phrases found. Try searching for something else.</string>
     <string name="action_camera">Camera</string>
     <string name="action_gallery">Gallery</string>
     <string name="action_files">Files</string>
-    <string name="ocr_empty_state_description">Use camera or select from gallery</string>
     <string name="synonyms">Synonyms</string>
     <string name="definitions">Definitions</string>
     <string name="translations">Translations</string>
