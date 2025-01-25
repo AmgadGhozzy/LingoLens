@@ -91,12 +91,6 @@ fun BookmarkWordItem(
             // Expanded Content
             AnimatedVisibility(visible = expanded) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(
-                        text = word.englishEn,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-
                     DynamicStyledText(
                         text = word.arabicAr,
                         maxFontSize = 18,
