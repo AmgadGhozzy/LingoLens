@@ -50,9 +50,13 @@ fun CustomFilledIconButton(
     onLongPress: () -> Unit = {},
     enabled: Boolean = true,
     selected: Boolean = false,
+    isAlpha: Boolean = false,
     modifier: Modifier = Modifier,
     shape: Shape = IconButtonDefaults.filledShape,
-    colors: IconButtonColors = selectedFilledIconButtonColors(isSelected = selected),
+    colors: IconButtonColors = selectedFilledIconButtonColors(
+        isSelected = selected,
+        isAlpha = isAlpha
+    ),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     size: Dp = 48.dp,
     iconSize: Dp = 24.dp,
@@ -103,14 +107,20 @@ fun CustomFilledIconButton(
 fun selectedFilledIconButtonColors(
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+
+    containerColorAlpha: Color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f),
+    contentColorAlpha: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+
     selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
     selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
+
     disabledContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-    isSelected: Boolean = false
+    isSelected: Boolean = false,
+    isAlpha: Boolean = false
 ) = IconButtonDefaults.filledIconButtonColors(
-    containerColor = if (isSelected) selectedContainerColor else containerColor,
-    contentColor = if (isSelected) selectedContentColor else contentColor,
+    containerColor = if (isSelected) selectedContainerColor else if (isAlpha) containerColorAlpha else containerColor,
+    contentColor = if (isSelected) selectedContentColor else if (isAlpha) contentColorAlpha else contentColor,
     disabledContainerColor = disabledContainerColor,
     disabledContentColor = disabledContentColor
 )
