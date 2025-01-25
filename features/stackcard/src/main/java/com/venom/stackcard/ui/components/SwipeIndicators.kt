@@ -16,28 +16,24 @@ fun SwipeIndicators(
     offsetX: Float, swipeThreshold: Float
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(12.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
         // Left indicator ("I Remember")
-        Box(
+        SwipeIndicator(
+            text = stringResource(R.string.i_remember),
+            alpha = (-offsetX / swipeThreshold).coerceIn(0f, 1f),
+            backgroundColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-            SwipeIndicator(
-                text = stringResource(R.string.i_remember),
-                alpha = (-offsetX / swipeThreshold).coerceIn(0f, 1f),
-                backgroundColor = MaterialTheme.colorScheme.primary
-            )
-        }
+        )
 
         // Right indicator ("Forgot")
-        Box(
+        SwipeIndicator(
+            text = stringResource(R.string.forgot),
+            alpha = (offsetX / swipeThreshold).coerceIn(0f, 1f),
+            backgroundColor = MaterialTheme.colorScheme.error,
             modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            SwipeIndicator(
-                text = stringResource(R.string.forgot),
-                alpha = (offsetX / swipeThreshold).coerceIn(0f, 1f),
-                backgroundColor = MaterialTheme.colorScheme.error
-            )
-        }
+        )
     }
 }
