@@ -19,6 +19,7 @@ import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.lingolens.navigation.TopBarActions
 import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.resources.R
+import com.venom.stackcard.ui.screen.WordBookmarksDialog
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.navigation.Screen
@@ -28,9 +29,7 @@ import com.venom.ui.screen.ContentType
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun LingoLensApp(
-    ocrViewModel: OcrViewModel,
-    startCamera: () -> Unit,
-    imageSelector: () -> Unit
+    ocrViewModel: OcrViewModel, startCamera: () -> Unit, imageSelector: () -> Unit
 ) {
     val navController = rememberNavController()
     var selectedScreen by remember { mutableStateOf<Screen>(Screen.Translation) }
@@ -51,19 +50,22 @@ fun LingoLensApp(
     }
 
     if (showBookmarkHistory) {
-        if (selectedScreen != Screen.Phrases) {
+        if (selectedScreen == Screen.Translation || selectedScreen == Screen.Ocr) {
             BookmarkHistoryScreen(
                 onBackClick = { showBookmarkHistory = false },
                 contentType = selectedScreen.toContentType()
             )
-        } else if (currentDestination == Screen.Phrases.route) {
+        } else if (selectedScreen == Screen.Phrases) {
             PhrasesDialog(categoryId = -1, onDismiss = { showBookmarkHistory = false })
+        } else if (selectedScreen == Screen.StackCard) {
+            WordBookmarksDialog(onDismiss = { showBookmarkHistory = false })
         }
         return
     }
 
     Scaffold(topBar = {
-        if (currentDestination != Screen.Ocr.route) LingoLensTopBar(navController,
+        if (currentDestination != Screen.Ocr.route) LingoLensTopBar(
+            navController,
             onBookmarkClick = { showBookmarkHistory = true })
         else TopBar(title = stringResource(R.string.ocr_title),
             onLeadingIconClick = { navController.navigateUp() },
