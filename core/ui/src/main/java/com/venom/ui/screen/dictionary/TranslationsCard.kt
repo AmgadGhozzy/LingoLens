@@ -58,7 +58,8 @@ fun TranslationsCard(
                         showAll = showAll,
                         onWordClick = onWordClick,
                         onSpeak = onSpeak,
-                        toggleShowAll = { showAll = !showAll }
+                        toggleShowAll = { showAll = !showAll },
+                        isAlpha = true
                     )
                 }
             }
