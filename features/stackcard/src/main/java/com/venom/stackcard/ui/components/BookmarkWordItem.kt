@@ -71,20 +71,16 @@ fun BookmarkWordItem(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    CustomFilledIconButton(
-                        icon = R.drawable.icon_sound,
+                    CustomFilledIconButton(icon = R.drawable.icon_sound,
                         shape = MaterialTheme.shapes.small,
                         isAlpha = true,
                         contentDescription = stringResource(R.string.action_speak),
-                        onClick = { onSpeak(word.englishEn) }
-                    )
-                    CustomFilledIconButton(
-                        icon = R.drawable.icon_copy,
+                        onClick = { onSpeak(word.englishEn) })
+                    CustomFilledIconButton(icon = R.drawable.icon_copy,
                         shape = MaterialTheme.shapes.small,
                         isAlpha = true,
                         contentDescription = stringResource(R.string.action_copy),
-                        onClick = { onCopy(word.englishEn) }
-                    )
+                        onClick = { onCopy(word.englishEn) })
                 }
             }
 
@@ -107,11 +103,14 @@ fun BookmarkWordItem(
                         )
                     } else {
                         translations?.forEach { entry ->
-                            TranslationEntry(entry = entry,
+                            TranslationEntry(
+                                entry = entry,
                                 showAll = showAll,
                                 onWordClick = {},
                                 onSpeak = onSpeak,
-                                toggleShowAll = {})
+                                toggleShowAll = {},
+                                isAlpha = true
+                            )
                         }
                     }
                 }
