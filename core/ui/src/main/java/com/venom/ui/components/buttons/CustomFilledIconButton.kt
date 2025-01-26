@@ -105,6 +105,9 @@ fun CustomFilledIconButton(
 // Custom color scheme for selected state
 @Composable
 fun selectedFilledIconButtonColors(
+    isAlpha: Boolean = false,
+    isSelected: Boolean = false,
+
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
 
@@ -116,11 +119,17 @@ fun selectedFilledIconButtonColors(
 
     disabledContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-    isSelected: Boolean = false,
-    isAlpha: Boolean = false
 ) = IconButtonDefaults.filledIconButtonColors(
-    containerColor = if (isSelected) selectedContainerColor else if (isAlpha) containerColorAlpha else containerColor,
-    contentColor = if (isSelected) selectedContentColor else if (isAlpha) contentColorAlpha else contentColor,
+    containerColor = when {
+        isSelected -> selectedContainerColor
+        isAlpha -> containerColorAlpha
+        else -> containerColor
+    },
+    contentColor = when {
+        isSelected -> selectedContentColor
+        isAlpha -> contentColorAlpha
+        else -> contentColor
+    },
     disabledContainerColor = disabledContainerColor,
     disabledContentColor = disabledContentColor
 )
@@ -135,7 +144,7 @@ private fun EnhancedFilledIconButtonPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun EnhancedFilledIconButtonSelectedPreview() {
+private fun CustomFilledIconButtonSelectedPreview() {
     MaterialTheme {
         CustomFilledIconButton(
             icon = Icons.Rounded.Add,
