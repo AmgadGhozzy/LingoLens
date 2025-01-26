@@ -22,7 +22,8 @@ fun TranslationEntry(
     showAll: Boolean,
     onWordClick: (String) -> Unit,
     onSpeak: (String) -> Unit,
-    toggleShowAll: () -> Unit
+    toggleShowAll: () -> Unit,
+    isAlpha: Boolean
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Display part of speech
@@ -41,9 +42,12 @@ fun TranslationEntry(
         ) {
             val visibleTerms = if (showAll) entry.terms else entry.terms.take(10)
             visibleTerms.forEach { term ->
-                WordChip(word = term,
+                WordChip(
+                    word = term,
                     onClick = { onWordClick(term) },
-                    onLongClick = { onSpeak(term) })
+                    onLongClick = { onSpeak(term) },
+                    isAlpha = isAlpha
+                )
             }
 
             // Add "..." chip if there are more terms to show
