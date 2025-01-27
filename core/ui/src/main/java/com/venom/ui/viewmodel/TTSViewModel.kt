@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom.domain.repo.tts.MediaPlayerFactory
 import com.venom.domain.repo.tts.TTSUrlGenerator
 import com.venom.domain.repo.tts.TextToSpeechFactory
+import com.venom.utils.Extensions.sanitize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -103,9 +104,14 @@ class TTSViewModel @Inject constructor(
         try {
             tts?.apply {
                 language = locale
-                speak(text, TextToSpeech.QUEUE_FLUSH, null, text.hashCode().toString())
+                speak(
+                    text.sanitize().lowercase(),
+                    TextToSpeech.QUEUE_FLUSH,
+                    null,
+                    text.hashCode().toString()
+                )
             } ?: throw Exception("TTS is null")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             speakOnline(text, locale)
         }
     }
@@ -114,7 +120,7 @@ class TTSViewModel @Inject constructor(
         try {
             releaseMediaPlayer()
             mediaPlayer = mediaPlayerFactory.create().apply {
-                val url = urlGenerator.generateTTSUrl(text, locale)
+                val url = urlGenerator.generateTTSUrl(text.sanitize().lowercase(), locale)
                 setDataSource(url)
                 setOnPreparedListener {
                     updateSpeakingState(true)
