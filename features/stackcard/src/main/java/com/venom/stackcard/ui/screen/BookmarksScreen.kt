@@ -70,6 +70,7 @@ fun BookmarksScreen(
                             word = word,
                             onSpeak = { onSpeak(word) },
                             onCopy = { onCopy(word) },
+                            onBookmark = { viewModel.removeBookmark(word) },
                             showAll = false,
                         )
                     }
