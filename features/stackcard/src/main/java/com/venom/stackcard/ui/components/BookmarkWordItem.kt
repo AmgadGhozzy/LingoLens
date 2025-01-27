@@ -1,137 +1,91 @@
 package com.venom.stackcard.ui.components
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.resources.R
+import com.venom.data.model.TranslationResponse
 import com.venom.stackcard.data.model.WordEntity
-import com.venom.stackcard.data.model.wordList
-import com.venom.ui.components.buttons.CustomFilledIconButton
-import com.venom.ui.components.buttons.ExpandIndicator
 import com.venom.ui.components.common.DynamicStyledText
+import com.venom.ui.components.common.ExpandableCard
 import com.venom.ui.screen.dictionary.TranslationEntry
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
 fun BookmarkWordItem(
-    word: WordEntity = wordList[0],
+    word: WordEntity,
     translateViewModel: TranslateViewModel = hiltViewModel(),
     showAll: Boolean,
+    onBookmark: () -> Unit,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     val state by translateViewModel.uiState.collectAsStateWithLifecycle()
-    val rememberedCard = remember(word.englishEn) { word }
 
-    val translations by remember(state.translationResult) {
-        derivedStateOf {
-            state.translationResult?.dict
+    val translations = remember(word.englishEn) {
+        mutableStateOf<TranslationResponse?>(null)
+    }
+
+    // Update the item translation state when the global state changes and this item is expanded
+    LaunchedEffect(state.translationResult, expanded) {
+        if (expanded && state.translationResult != null && word.englishEn == state.sourceText) {
+            translations.value = state.translationResult
         }
     }
 
-    LaunchedEffect(expanded, rememberedCard.englishEn) {
-        if (expanded) {
-            translateViewModel.onSourceTextChanged(rememberedCard.englishEn)
+    // Trigger translation when expanded
+    LaunchedEffect(expanded) {
+        if (expanded && translations.value == null) {
+            translateViewModel.onSourceTextChanged(word.englishEn)
         }
     }
 
-    ElevatedCard(
-        modifier = modifier.animateContentSize(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
+    ExpandableCard(
+        title = word.englishEn,
+        onSpeak = onSpeak,
+        onCopy = onCopy,
+        onBookmark = onBookmark,
+        onExpandChange = {
+            expanded = it
+            if (expanded && translations.value == null) {
+                translateViewModel.onSourceTextChanged(word.englishEn)
+            }
+        },
+        modifier = modifier,
+        expandedContent = {
+            DynamicStyledText(
+                text = word.arabicAr,
+                maxFontSize = 18,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
             )
-        ), onClick = { expanded = !expanded }, colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                DynamicStyledText(
-                    text = word.englishEn,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.weight(1f)
+
+            if (word.synonyms.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Synonyms: ${word.synonyms.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
                 )
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    CustomFilledIconButton(icon = R.drawable.icon_sound,
-                        shape = MaterialTheme.shapes.small,
-                        isAlpha = true,
-                        contentDescription = stringResource(R.string.action_speak),
-                        onClick = { onSpeak(word.englishEn) })
-                    CustomFilledIconButton(icon = R.drawable.icon_copy,
-                        shape = MaterialTheme.shapes.small,
-                        isAlpha = true,
-                        contentDescription = stringResource(R.string.action_copy),
-                        onClick = { onCopy(word.englishEn) })
-                }
-            }
-
-            // Expanded Content
-            AnimatedVisibility(visible = expanded) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    DynamicStyledText(
-                        text = word.arabicAr,
-                        maxFontSize = 18,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+            } else {
+                translations.value?.dict?.forEach { entry ->
+                    TranslationEntry(
+                        entry = entry,
+                        showAll = showAll,
+                        onWordClick = {},
+                        onSpeak = onSpeak,
+                        toggleShowAll = {},
+                        isAlpha = true
                     )
-
-                    // Synonyms
-                    if (word.synonyms.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Synonyms: ${word.synonyms.joinToString(", ")}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    } else {
-                        translations?.forEach { entry ->
-                            TranslationEntry(
-                                entry = entry,
-                                showAll = showAll,
-                                onWordClick = {},
-                                onSpeak = onSpeak,
-                                toggleShowAll = {},
-                                isAlpha = true
-                            )
-                        }
-                    }
                 }
             }
-
-            ExpandIndicator(
-                expanded = expanded,
-                onClick = { expanded = !expanded },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
-    }
-}
-
-@Preview
-@Composable
-fun BookmarksScreenPreview() {
-    BookmarkWordItem(word = wordList[0],
-        onSpeak = {},
-        onCopy = {},
-        showAll = TODO(),
-        modifier = TODO()
     )
 }
