@@ -17,6 +17,7 @@ import com.venom.lingolens.navigation.LingoLensBottomBar
 import com.venom.lingolens.navigation.LingoLensTopBar
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.lingolens.navigation.TopBarActions
+import com.venom.lingolens.navigation.navigateToStart
 import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.resources.R
 import com.venom.stackcard.ui.screen.WordBookmarksDialog
@@ -32,54 +33,98 @@ fun LingoLensApp(
     ocrViewModel: OcrViewModel, startCamera: () -> Unit, imageSelector: () -> Unit
 ) {
     val navController = rememberNavController()
-    var selectedScreen by remember { mutableStateOf<Screen>(Screen.Translation) }
-    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    var selectedScreen by remember {
+        mutableStateOf(Screen.fromRoute(currentRoute ?: Screen.Translation.route))
+    }
     var showBookmarkHistory by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
 
-    // Remove LaunchedEffect since initialization is done in Application class
+    LaunchedEffect(currentRoute) {
+        currentRoute?.let {
+            selectedScreen = Screen.fromRoute(it)
+        }
+    }
 
-    BackHandler(enabled = showBookmarkHistory) {
-        showBookmarkHistory = false
-        navController.navigate(selectedScreen.route) {
-            popUpTo(navController.graph.startDestinationId) {
-                saveState = true
+    BackHandler(enabled = showBookmarkHistory || showSettings) {
+        when {
+            showSettings -> showSettings = false
+            showBookmarkHistory -> {
+                showBookmarkHistory = false
+                navController.navigateToStart(selectedScreen)
             }
-            launchSingleTop = true
-            restoreState = true
         }
     }
 
     if (showBookmarkHistory) {
-        if (selectedScreen == Screen.Translation || selectedScreen == Screen.Ocr) {
-            BookmarkHistoryScreen(
-                onBackClick = { showBookmarkHistory = false },
-                contentType = selectedScreen.toContentType()
+        when (selectedScreen) {
+            Screen.Translation, Screen.Ocr -> {
+                BookmarkHistoryScreen(
+                    onBackClick = {
+                        showBookmarkHistory = false
+                        selectedScreen = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
+                    },
+                    contentType = selectedScreen.toContentType()
+                )
+            }
+
+            Screen.Phrases -> PhrasesDialog(
+                categoryId = -1,
+                onDismiss = {
+                    showBookmarkHistory = false
+                    selectedScreen = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
+                }
             )
-        } else if (selectedScreen == Screen.Phrases) {
-            PhrasesDialog(categoryId = -1, onDismiss = { showBookmarkHistory = false })
-        } else if (selectedScreen == Screen.StackCard) {
-            WordBookmarksDialog(onDismiss = { showBookmarkHistory = false })
+
+            Screen.StackCard -> WordBookmarksDialog(
+                onDismiss = {
+                    showBookmarkHistory = false
+                    selectedScreen = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
+                }
+            )
+
+            else -> {}
         }
         return
     }
 
-    Scaffold(topBar = {
-        if (currentDestination != Screen.Ocr.route) LingoLensTopBar(
-            navController,
-            onBookmarkClick = { showBookmarkHistory = true })
-        else TopBar(title = stringResource(R.string.ocr_title),
-            onLeadingIconClick = { navController.navigateUp() },
-            leadingIcon = R.drawable.icon_back,
-            actions = {
-                TopBarActions(onBookmarkClick = { showBookmarkHistory = true })
-            })
-    }, bottomBar = {
-        if (currentDestination != Screen.Ocr.route) LingoLensBottomBar(
-            navController, selectedScreen
-        ) { screen ->
-            selectedScreen = screen
+    Scaffold(
+        topBar = {
+            if (currentRoute != Screen.Ocr.route) {
+                LingoLensTopBar(
+                    onBookmarkClick = { showBookmarkHistory = true },
+                    onSettingsClick = { showSettings = true }
+                )
+            } else {
+                TopBar(
+                    title = stringResource(R.string.ocr_title),
+                    onLeadingIconClick = {
+                        selectedScreen = Screen.Translation
+                        navController.navigateToStart(Screen.Translation)
+                    },
+                    leadingIcon = R.drawable.icon_back,
+                    actions = {
+                        TopBarActions(
+                            onBookmarkClick = { showBookmarkHistory = true },
+                            onSettingsClick = { showSettings = true }
+                        )
+                    }
+                )
+            }
+        },
+        bottomBar = {
+            if (currentRoute != Screen.Ocr.route) {
+                LingoLensBottomBar(
+                    navController = navController,
+                    selectedScreen = selectedScreen,
+                    onScreenSelected = { screen ->
+                        selectedScreen = screen
+                        navController.navigateToStart(screen)
+                    }
+                )
+            }
         }
-    }) { padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
