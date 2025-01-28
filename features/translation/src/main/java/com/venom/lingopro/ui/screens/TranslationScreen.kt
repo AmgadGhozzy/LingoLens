@@ -12,8 +12,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
@@ -36,7 +35,7 @@ fun TranslationScreen(
     ttsViewModel: TTSViewModel = hiltViewModel(),
     sttViewModel: STTViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController(),
+    navController: NavController,
     initialText: String? = null,
     isDialog: Boolean = false,
     onDismiss: () -> Unit = {}
