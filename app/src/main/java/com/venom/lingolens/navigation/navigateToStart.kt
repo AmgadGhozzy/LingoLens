@@ -7,9 +7,10 @@ fun NavHostController.navigateToStart(screen: Screen) {
     if (currentDestination?.route != screen.route) {
         navigate(screen.route) {
             popUpTo(graph.startDestinationId) {
-                saveState = false
+                saveState = true
             }
             launchSingleTop = true
+            restoreState = true
         }
     }
 }
