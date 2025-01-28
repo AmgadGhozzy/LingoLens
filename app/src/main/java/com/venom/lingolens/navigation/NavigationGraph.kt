@@ -1,8 +1,11 @@
 package com.venom.lingolens.navigation
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -23,26 +26,45 @@ fun NavigationGraph(
     imageSelector: () -> Unit
 ) {
     NavHost(
-        navController = navController, startDestination = Screen.Translation.route, modifier = modifier
+        navController = navController,
+        startDestination = Screen.Translation.route,
+        modifier = modifier
     ) {
-        composable(
-            route = Screen.Translation.route,
-            arguments = listOf(navArgument("text") { nullable = true })
-        ) { entry ->
+
+        composable(Screen.Translation.route) {
             TranslationScreen(
                 navController = navController,
-                initialText = entry.arguments?.getString("text")
+                initialText = null
             )
         }
 
+        composable(
+            route = "${Screen.Translation.route}/{text}",
+            arguments = listOf(
+                navArgument("text") {
+                    type = NavType.StringType
+                    nullable = false
+                }
+            )
+        ) { entry ->
+            val encodedText = entry.arguments?.getString("text") ?: ""
+            val decodedText = Uri.decode(encodedText)
+            Log.d("NavigationGraph", "Decoded text: $decodedText")
+
+            TranslationScreen(
+                navController = navController,
+                initialText = decodedText
+            )
+        }
         composable(Screen.Ocr.route) {
-            OcrScreen(viewModel = ocrViewModel,
+            OcrScreen(
+                viewModel = ocrViewModel,
                 navController = navController,
                 onCameraClick = startCamera,
                 onFileClick = { imageSelector() },
-                onGalleryClick = { imageSelector() })
+                onGalleryClick = { imageSelector() }
+            )
         }
-
 
         composable(Screen.Phrases.route) {
             PhrasebookScreen()
@@ -55,6 +77,5 @@ fun NavigationGraph(
         composable(Screen.StackCard.route) {
             CardScreen()
         }
-
     }
 }
