@@ -11,7 +11,10 @@ import com.venom.domain.model.LANGUAGES_LIST
 import com.venom.domain.model.LanguageItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,9 +42,15 @@ class TranslateViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val textChangeFlow = MutableSharedFlow<String>()
+    private var translationJob: Job? = null
+    private var textCollectionJob: Job? = null
 
     init {
-        viewModelScope.launch {
+        startTextCollection()
+    }
+
+    private fun startTextCollection() {
+        textCollectionJob = viewModelScope.launch {
             textChangeFlow.debounce(500)
                 .filterNot { it.isBlank() && it != _uiState.value.sourceText }
                 .collect { translate(it) }
@@ -76,7 +85,10 @@ class TranslateViewModel @Inject constructor(
 
     private fun translate(input: String) {
         Log.d("TranslateViewModel", "Input: $input")
-        viewModelScope.launch {
+        // Cancel any ongoing translation
+        translationJob?.cancel()
+
+        translationJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val existingEntry = repository.getTranslationEntry(
@@ -86,23 +98,28 @@ class TranslateViewModel @Inject constructor(
             repository.getTranslation(
                 _uiState.value.sourceLanguage.code, _uiState.value.targetLanguage.code, input
             ).fold(onSuccess = { response ->
-                _uiState.update {
-                    it.copy(
-                        translationResult = response,
-                        translatedText = response.sentences?.firstOrNull()?.trans?.toString()
-                            .orEmpty(),
-                        synonyms = extractSynonyms(response),
-                        isLoading = false,
-                        error = null,
-                        isBookmarked = existingEntry?.isBookmarked == true
-                    )
+                if (currentCoroutineContext().isActive) {
+                    _uiState.update {
+                        it.copy(
+                            translationResult = response,
+                            translatedText = response.sentences?.firstOrNull()?.trans?.toString()
+                                .orEmpty(),
+                            synonyms = extractSynonyms(response),
+                            isLoading = false,
+                            error = null,
+                            isBookmarked = existingEntry?.isBookmarked == true
+                        )
+                    }
+                    saveTranslation()
                 }
-                saveTranslation()
             }, onFailure = { error ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false, error = error.message ?: "Unknown error occurred"
-                    )
+                if (currentCoroutineContext().isActive) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "Unknown error occurred"
+                        )
+                    }
                 }
             })
         }
@@ -128,10 +145,21 @@ class TranslateViewModel @Inject constructor(
     }
 
     fun clearTranslation() {
+        // Cancel ongoing translation and text collection
+        translationJob?.cancel()
+        textCollectionJob?.cancel()
+
         _uiState.update {
             it.copy(
-                sourceText = "", translatedText = "", isBookmarked = false, synonyms = emptyList()
+                sourceText = "",
+                translatedText = "",
+                isBookmarked = false,
+                synonyms = emptyList(),
+                isLoading = false,
+                error = null
             )
         }
+
+        startTextCollection()
     }
 }
