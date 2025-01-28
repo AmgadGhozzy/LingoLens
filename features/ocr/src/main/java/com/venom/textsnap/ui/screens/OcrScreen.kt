@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.common.CustomDragHandle
-import com.venom.ui.navigation.Screen
+import com.venom.ui.navigation.navigateToTranslation
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
@@ -100,7 +100,7 @@ fun OcrScreen(
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
                 onSpeak = { text -> ttsViewModel.speak(text) },
-                onTranslate = { navController.navigate(Screen.Translation.createRoute(uiState.selectedTexts)) }
+                onTranslate = { text -> navController.navigateToTranslation(text.trim()) }
             )
         })
 }
