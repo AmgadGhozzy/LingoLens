@@ -37,3 +37,4 @@ include(":core:resources")
 include(":core:utils")
 include(":core:domain")
 
+include(":features:settings")

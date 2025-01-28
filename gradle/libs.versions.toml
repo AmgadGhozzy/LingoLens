@@ -29,6 +29,8 @@ materialIconsCoreAndroid = "1.6.0"
 lottieCompose = "6.6.2"
 accompanistPermissions = "0.37.0"
 playServicesAds = "23.6.0"
+datastore = "1.1.2"
+kotlinxSerializationJson = "1.8.0"
 
 [libraries]
 # Android Jetpack
@@ -81,6 +83,8 @@ androidx-material-icons-core-android = { group = "androidx.compose.material", na
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "playServicesAds" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -6,6 +6,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -16,8 +17,8 @@ android {
         applicationId = "com.venom.lingolens"
         minSdk = 24
         targetSdk = 34
-        versionCode = 7
-        versionName = "3.6.5"
+        versionCode = 11
+        versionName = "3.8.6"
 
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -61,6 +62,7 @@ dependencies {
     implementation(project(":features:dialog"))
     implementation(project(":features:stackcard"))
     implementation(project(":features:ocr"))
+    implementation(project(":features:settings"))
 
 
     // Android Jetpack
@@ -86,6 +88,9 @@ dependencies {
     api(libs.androidx.room.runtime)
     api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.json)
 
 
     // Compose

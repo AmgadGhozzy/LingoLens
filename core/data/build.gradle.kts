@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("dagger.hilt.android.plugin")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -43,7 +44,7 @@ android {
 
 dependencies {
 
-    api(libs.play.services.ads)
+    //api(libs.play.services.ads)
 
     // Core Modules
     implementation(project(":core:domain"))
@@ -60,6 +61,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     api(libs.converter.gson)
+    implementation(libs.androidx.datastore)
+    implementation(libs.kotlinx.serialization.json)
 
 
     // Testing
