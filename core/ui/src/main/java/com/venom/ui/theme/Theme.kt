@@ -1,14 +1,72 @@
 package com.venom.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.ui.viewmodel.SettingsViewModel
+
+
+@Composable
+fun LingoLensTheme(
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    content: @Composable () -> Unit
+) {
+
+    val settingsState = settingsViewModel.uiState.collectAsStateWithLifecycle()
+
+    val isDarkTheme = settingsState.value.isDarkMode
+    val isAutoTheme = settingsState.value.isAutoTheme
+
+    val shouldUseDarkTheme = if (isAutoTheme) {
+        isSystemInDarkTheme()
+    } else {
+        isDarkTheme
+    }
+
+    val colorScheme = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (shouldUseDarkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
+        }
+
+        shouldUseDarkTheme -> DarkColorScheme
+        else -> LightColorScheme
+    }
+
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    window.statusBarColor = colorScheme.background.toArgb()
+    window.navigationBarColor = colorScheme.background.toArgb()
+
+    WindowCompat.getInsetsController(window, view).apply {
+        isAppearanceLightStatusBars = !shouldUseDarkTheme
+        isAppearanceLightNavigationBars = !shouldUseDarkTheme
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
+}
+
 val DarkColorScheme = ColorScheme(
     // Background Colors (Fundamental Surface Layers)
     background = Color(0xFF121214),       // Primary background color for entire app screens
@@ -127,26 +185,10 @@ val LightColorScheme = ColorScheme(
     // Utility Colors
     scrim = Color(0xff000000)                 // Overlay for dimming surfaces
 )
-@Composable
-fun LingoLensTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+object SettingsSpacing {
+    val sectionSpacing = 24.dp
+    val itemSpacing = 16.dp
+    val iconSpacing = 12.dp
+    val contentPadding = 20.dp
 }
