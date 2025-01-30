@@ -20,6 +20,7 @@ import com.venom.lingolens.navigation.TopBarActions
 import com.venom.lingolens.navigation.navigateToStart
 import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.resources.R
+import com.venom.settings.presentation.screen.SettingsBottomSheet
 import com.venom.stackcard.ui.screen.WordBookmarksDialog
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.bars.TopBar
@@ -86,6 +87,10 @@ fun LingoLensApp(
             else -> {}
         }
         return
+    }
+
+    if (showSettings) {
+        SettingsBottomSheet(onDismiss = { showSettings = false })
     }
 
     Scaffold(
