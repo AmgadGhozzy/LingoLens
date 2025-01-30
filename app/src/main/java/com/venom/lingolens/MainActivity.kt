@@ -1,6 +1,7 @@
 package com.venom.lingolens
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import androidx.activity.ComponentActivity
@@ -8,12 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
-import androidx.core.view.WindowInsetsControllerCompat
 import com.venom.lingolens.ui.LingoLensApp
 import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
@@ -26,22 +23,25 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val ocrViewModel: OcrViewModel by viewModels()
     private var currentPhotoUri: Uri? = null
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            LingoLensTheme {
-                updateStatusBarColor(MaterialTheme.colorScheme.background, !isSystemInDarkTheme())
-                LingoLensApp(ocrViewModel = ocrViewModel,
+            LingoLensTheme() {
+                LingoLensApp(
+                    ocrViewModel = ocrViewModel,
                     startCamera = { startCamera() },
-                    imageSelector = { imageSelector.launch("image/*") })
+                    imageSelector = { imageSelector.launch("image/*") }
+                )
             }
         }
     }
+
 
     private val imageSelector =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -58,14 +58,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-    private fun updateStatusBarColor(color: Color, isDarkTheme: Boolean) {
-        val windowInsetsController = WindowInsetsControllerCompat(window, window.decorView)
-        windowInsetsController.isAppearanceLightStatusBars = isDarkTheme
-        windowInsetsController.isAppearanceLightNavigationBars = isDarkTheme
-        window.statusBarColor = color.toArgb()
-        window.navigationBarColor = color.toArgb()
-    }
 
     private fun startCamera() {
         val photoFile = createImageCacheFile()
