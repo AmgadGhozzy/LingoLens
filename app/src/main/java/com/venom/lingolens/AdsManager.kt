@@ -1,4 +1,4 @@
-package com.venom.data
+package com.venom.lingolens
 
 import android.content.Context
 import android.util.Log
