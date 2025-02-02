@@ -1,7 +1,6 @@
 package com.venom.lingolens
 
 import android.app.Application
-import com.venom.data.AdsManager
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
