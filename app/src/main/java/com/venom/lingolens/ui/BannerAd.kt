@@ -1,4 +1,4 @@
-package com.venom.ui.screen
+package com.venom.lingolens.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +12,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
-import com.venom.data.AdsManager
+import com.venom.lingolens.AdsManager.Companion.TEST_AD_UNIT_ID
 
 @Composable
 fun BannerAd(
-    adUnitId: String = AdsManager.Companion.TEST_AD_UNIT_ID, modifier: Modifier = Modifier
+    adUnitId: String = TEST_AD_UNIT_ID, modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
