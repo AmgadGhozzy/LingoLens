@@ -1,0 +1,158 @@
+<resources>
+
+    <string name="app_name">LingoLens</string>
+
+    <!-- Actions -->
+    <string name="action_back">رجوع</string>
+    <string name="action_clear">مسح</string>
+    <string name="action_copy">نسخ</string>
+    <string name="action_copy_source">نسخ النص الأصلي</string>
+    <string name="action_paste">لصق</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_share">مشاركة</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_close">إغلاق</string>
+    <string name="action_speak">تحدث</string>
+    <string name="action_speak_source">تحدث بالنص الأصلي</string>
+    <string name="action_search">بحث</string>
+    <string name="action_expand">توسيع</string>
+    <string name="action_collapse">طي</string>
+    <string name="action_clear_search">مسح البحث</string>
+    <string name="action_translate">ترجمة</string>
+    <string name="action_speech_to_text">تحويل الكلام إلى نص</string>
+    <string name="action_fullscreen">شاشة كاملة</string>
+    <string name="action_fullscreen_source">شاشة كاملة للنص الأصلي</string>
+    <string name="action_more_options">خيارات إضافية</string>
+    <string name="action_select_all">تحديد الكل</string>
+    <string name="action_deselect_all">إلغاء تحديد الكل</string>
+    <string name="action_swap_languages">تبديل اللغات</string>
+    <string name="action_show_labels">إظهار التصنيفات</string>
+    <string name="action_hide_labels">إخفاء التصنيفات</string>
+    <string name="action_show_paragraphs">إظهار الفقرات</string>
+    <string name="action_hide_paragraphs">إخفاء الفقرات</string>
+    <string name="action_clear_history">مسح السجل بالكامل</string>
+    <string name="action_clear_bookmarks">مسح جميع الإشارات المرجعية</string>
+    <string name="copied_message">تم النسخ!</string>
+
+
+    <!-- Navigation -->
+    <string name="nav_back">رجوع</string>
+    <string name="nav_search">بحث</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_title">الإشارات المرجعية</string>
+    <string name="bookmark_add">حفظ</string>
+    <string name="bookmark_remove">إزالة</string>
+    <string name="bookmarks_search_hint">ابحث في الترجمات المحفوظة</string>
+
+
+    <string name="bookmarks_empty_title">لا توجد إشارات مرجعية</string>
+    <string name="bookmarks_empty_subtitle">احفظ الترجمات لعرضها لاحقًا</string>
+
+    <string name="ocr_empty_state_title">امسح صورة ضوئيًا</string>
+    <string name="ocr_empty_state_description">امسح صورة ضوئيًا أو حدد من المعرض</string>
+
+    <string name="words_bookmarks_empty_state_title">لا توجد كلمات مرجعية</string>
+    <string name="words_bookmarks_empty_state_subtitle">ضع إشارة مرجعية للكلمات لممارستها لاحقًا</string>
+
+    <string name="phrase_empty_state_title">لم يتم العثور على عبارات</string>
+    <string name="phrase_empty_state_subtitle">لم يتم العثور على عبارات مطابقة. حاول البحث عن شيء آخر</string>
+
+    <!-- History -->
+    <string name="history_title">السجل</string>
+    <string name="history_empty_title">لا يوجد سجل</string>
+    <string name="history_empty_subtitle">ستظهر ترجماتك الحديثة هنا</string>
+
+    <!-- Search -->
+    <string name="search_no_results_title">لم يتم العثور على نتائج</string>
+    <string name="search_no_results_subtitle">حاول البحث بكلمات مفتاحية مختلفة</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">اختر اللغة</string>
+    <string name="language_selected">تم اختيار اللغة</string>
+    <string name="language_no_results">عذرًا، لم يتم العثور على لغات</string>
+    <string name="language_native_name_hint">الاسم الأصلي</string>
+
+    <!-- Translation -->
+    <string name="translate_type_text">اكتب نصًا للترجمة</string>
+    <string name="translate_result_placeholder">ستظهر الترجمة هنا</string>
+
+    <string name="more_lines_count">+%d أسطر أخرى</string>
+    <string name="expand_translation">إظهار الترجمة الكاملة</string>
+    <string name="collapse_translation">إظهار أقل</string>
+    <string name="synonyms_label">مرادفات</string>
+
+    <!-- Confirmation Dialog -->
+    <string name="dialog_clear_all_title">مسح جميع العناصر</string>
+    <string name="dialog_clear_all_message">هل أنت متأكد أنك تريد مسح جميع العناصر؟ لا يمكن التراجع عن هذا الإجراء.</string>
+    <string name="dialog_confirm">تأكيد</string>
+    <string name="dialog_cancel">إلغاء</string>
+
+
+    <!-- Speech State Messages -->
+    <string name="speech_state_listening">جاري الاستماع…</string>
+    <string name="speech_state_partial">سمعت…</string>
+    <string name="speech_state_result">فهمت!</string>
+    <string name="speech_state_error">عفوًا!</string>
+    <string name="speech_state_ready">جاهز للاستماع</string>
+
+    <!-- Speech Error Messages -->
+    <string name="speech_error_no_permission">إذن الميكروفون مطلوب</string>
+    <string name="speech_error_not_available">التعرف على الكلام غير متوفر على هذا الجهاز</string>
+    <string name="speech_error_audio">خطأ في تسجيل الصوت</string>
+    <string name="speech_error_network">خطأ في الشبكة</string>
+    <string name="speech_error_timeout">انتهت مهلة الشبكة</string>
+    <string name="speech_error_no_match">لم أفهم ذلك</string>
+    <string name="speech_error_busy">خدمة الكلام مشغولة</string>
+    <string name="speech_error_server">خطأ في الخادم</string>
+    <string name="speech_error_no_input">لم يتم الكشف عن أي كلام</string>
+    <string name="speech_error_unknown">حدث خطأ ما</string>
+
+
+    <string name="ocr_title">التعرف على النص</string>
+    <string name="translate_title">ترجمة</string>
+
+
+    <string name="retry">إعادة المحاولة</string>
+    <string name="error_message">يرجى المحاولة مرة أخرى</string>
+    <string name="recognized_text_placeholder">سيظهر النص الذي تم التعرف عليه هنا</string>
+    <string name="ocr_image_content_description">صورة التعرف على النص</string>
+    <string name="ocr_entry_description">نص التعرف الضوئي على الحروف من %1$s: %2$s</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="action_start">ابدأ</string>
+    <string name="action_continue">متابعة</string>
+    <string name="action_stop">إيقاف</string>
+    <string name="action_pause">إيقاف مؤقت</string>
+    <string name="action_resume">استئناف</string>
+    <string name="transcript_label">نسخة مكتوبة</string>
+    <string name="action_menu">القائمة الرئيسية</string>
+    <string name="category">الفئة</string>
+    <string name="phrase">عبارة</string>
+    <string name="phrase_title">كتاب العبارات</string>
+    <string name="phrases">عبارات</string>
+    <string name="forgot">نسيت</string>
+    <string name="i_remember">أتذكر</string>
+    <string name="dialog_title">حوار</string>
+    <string name="stackcard_title">بطاقة مكدسة</string>
+    <string name="words_title">كلمات</string>
+    <string name="card_swiper_stack">مجموعة بطاقات لتعلم الكلمات</string>
+    <string name="card_sentence_practice">تدرب على الجمل باستخدام البطاقات</string>
+    <string name="start_conversation">استخدم أزرار الميكروفون أدناه لبدء الترجمة</string>
+    <string name="no_messages_found">لا توجد رسائل ابدأ محادثة</string>
+
+    <string name="action_camera">الكاميرا</string>
+    <string name="action_gallery">المعرض</string>
+    <string name="action_files">الملفات</string>
+    <string name="synonyms">مرادفات</string>
+    <string name="definitions">تعريفات</string>
+    <string name="translations">ترجمات</string>
+    <string name="dictionary">قاموس</string>
+    <string name="show_less">إظهار أقل</string>
+    <string name="show_all">إظهار الكل</string>
+    <string name="show_more">إظهار المزيد</string>
+    <string name="action_ocr">تحويل الصورة إلى نص</string>
+    <string name="type_something">اكتب شيئًا…</string>
+    <string name="settings">الإعدادات</string>
+
+
+</resources>
