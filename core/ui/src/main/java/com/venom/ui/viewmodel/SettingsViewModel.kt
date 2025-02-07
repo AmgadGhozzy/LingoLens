@@ -1,6 +1,9 @@
 package com.venom.ui.viewmodel
 
+import android.content.Context
 import android.util.Log
+import androidx.core.os.ConfigurationCompat
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.domain.repo.SettingsRepository
@@ -8,20 +11,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 data class SettingsState(
     val isDarkMode: Boolean = false,
-    val isAutoTheme: Boolean = false,
-    val selectedLanguage: String = "English",
+    val isAutoTheme: Boolean = true,
+    val selectedLanguage: String = Locale.getDefault().language,
     val speechRate: Float = 1f,
     val autoPronounciation: Boolean = true,
     val autoTranslate: Boolean = true,
     val autoCopy: Boolean = true,
     val realTimeOcr: Boolean = true
 )
+
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -36,51 +42,57 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.isDarkMode,
                 settingsRepository.isAutoTheme,
                 settingsRepository.speechRate,
-                settingsRepository.selectedLanguage
-            ) { isDarkMode, isAutoTheme, speechRate, language ->
-                SettingsState(
-                    isDarkMode = isDarkMode,
-                    isAutoTheme = isAutoTheme,
-                    speechRate = speechRate,
-                    selectedLanguage = language
-                )
+                settingsRepository.selectedLanguage,
+                ::createSettingsState
+            ).catch { e ->
+                Log.e("SettingsViewModel", "Error collecting settings", e)
             }.collect { state ->
                 _uiState.value = state
             }
         }
     }
 
-    fun updateDarkMode(enabled: Boolean) {
+    private fun createSettingsState(
+        isDarkMode: Boolean,
+        isAutoTheme: Boolean,
+        speechRate: Float,
+        language: String
+    ): SettingsState = SettingsState(
+        isDarkMode = isDarkMode,
+        isAutoTheme = isAutoTheme,
+        speechRate = speechRate,
+        selectedLanguage = language
+    )
+
+    fun updateSetting(update: suspend (SettingsRepository) -> Unit) {
         viewModelScope.launch {
             try {
-                Log.d("SettingsViewModel", "Updating dark mode to: $enabled")
-                settingsRepository.setDarkMode(enabled)
+                update(settingsRepository)
             } catch (e: Exception) {
-                Log.e("SettingsViewModel", "Error updating dark mode", e)
+                Log.e("SettingsViewModel", "Error updating setting", e)
             }
         }
     }
 
-    fun updateAutoTheme(enabled: Boolean) {
-        viewModelScope.launch {
-            try {
-                Log.d("SettingsViewModel", "Updating auto theme to: $enabled")
-                settingsRepository.setAutoTheme(enabled)
-            } catch (e: Exception) {
-                Log.e("SettingsViewModel", "Error updating auto theme", e)
+    fun updateDarkMode(enabled: Boolean) = updateSetting { it.setDarkMode(enabled) }
+    fun updateAutoTheme(enabled: Boolean) = updateSetting { it.setAutoTheme(enabled) }
+    fun updateSpeechRate(rate: Float) = updateSetting { it.setSpeechRate(rate) }
+    fun updateLanguage(language: String) = updateSetting { it.setLanguage(language) }
+
+    companion object {
+        fun setLocale(context: Context, languageCode: String): Context {
+            val locale = when (languageCode) {
+                "" -> Locale.getDefault()
+                else -> Locale(languageCode)
             }
-        }
-    }
 
-    fun updateSpeechRate(rate: Float) {
-        viewModelScope.launch {
-            settingsRepository.setSpeechRate(rate)
-        }
-    }
+            val config = context.resources.configuration
+            val localeList = LocaleListCompat.create(locale)
+            ConfigurationCompat.setLocales(config, localeList)
 
-    fun updateLanguage(language: String) {
-        viewModelScope.launch {
-            settingsRepository.setLanguage(language)
+            return context.createConfigurationContext(config).also {
+                Locale.setDefault(locale)
+            }
         }
     }
 }
