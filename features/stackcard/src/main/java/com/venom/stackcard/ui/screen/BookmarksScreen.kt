@@ -32,13 +32,13 @@ fun BookmarksScreen(
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
-                "Bookmarked Words", style = MaterialTheme.typography.headlineSmall
+                stringResource(R.string.words_bookmarks), style = MaterialTheme.typography.headlineSmall
             )
         }, navigationIcon = {
             IconButton(onClick = onBackClick) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
