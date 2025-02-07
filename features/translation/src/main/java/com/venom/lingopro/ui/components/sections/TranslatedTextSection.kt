@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.resources.R
+import com.venom.ui.components.inputs.AnimatedResponseTextField
 import com.venom.ui.components.inputs.CustomTextField
 
 /**
@@ -23,9 +24,8 @@ fun TranslatedTextSection(
     translatedTextValue: TextFieldValue,
     modifier: Modifier = Modifier,
 ) {
-    CustomTextField(
-        textValue = translatedTextValue,
-        isReadOnly = true,
+    AnimatedResponseTextField(
+        text = translatedTextValue.text,
         placeHolderText = stringResource(R.string.translate_result_placeholder),
         modifier = Modifier
             .fillMaxWidth()
