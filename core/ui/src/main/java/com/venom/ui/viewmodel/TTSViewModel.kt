@@ -5,6 +5,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.domain.repo.SettingsRepository
 import com.venom.domain.repo.tts.MediaPlayerFactory
 import com.venom.domain.repo.tts.TTSUrlGenerator
 import com.venom.domain.repo.tts.TextToSpeechFactory
@@ -29,7 +30,8 @@ data class TTSUiState(
 class TTSViewModel @Inject constructor(
     private val textToSpeechFactory: TextToSpeechFactory,
     private val mediaPlayerFactory: MediaPlayerFactory,
-    private val urlGenerator: TTSUrlGenerator
+    private val urlGenerator: TTSUrlGenerator,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private var tts: TextToSpeech? = null
     private var mediaPlayer: MediaPlayer? = null
@@ -38,6 +40,11 @@ class TTSViewModel @Inject constructor(
     val uiState: StateFlow<TTSUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            settingsRepository.speechRate.collect { rate ->
+                tts?.setSpeechRate(rate)
+            }
+        }
         initTTS() // Initialize TextToSpeech
     }
 
@@ -104,6 +111,7 @@ class TTSViewModel @Inject constructor(
         try {
             tts?.apply {
                 language = locale
+                // Speech rate is automatically applied since we're updating it in the flow collection
                 speak(
                     text.sanitize().lowercase(),
                     TextToSpeech.QUEUE_FLUSH,
@@ -166,10 +174,6 @@ class TTSViewModel @Inject constructor(
         tts?.stop()
         releaseMediaPlayer()
         updateSpeakingState(false)
-    }
-
-    fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 
     override fun onCleared() {
