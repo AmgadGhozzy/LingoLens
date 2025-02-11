@@ -10,11 +10,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import com.venom.lingolens.ui.LingoLensApp
 import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.SimpleDateFormat
@@ -24,6 +30,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val ocrViewModel: OcrViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private var currentPhotoUri: Uri? = null
 
     @RequiresApi(Build.VERSION_CODES.R)
@@ -31,8 +38,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val selectedLanguage = settingsViewModel.uiState.value.appLanguage
+
+        @Composable
+        fun UpdateLanguage(iso: String) {
+            val locale = if (iso.isEmpty()) Locale.getDefault() else Locale(iso)
+            val config = LocalConfiguration.current
+            config.setLocale(locale)
+            val res = LocalContext.current.resources
+            res.updateConfiguration(config, res.displayMetrics)
+        }
         setContent {
-            LingoLensTheme() {
+
+            val userPrefs = settingsViewModel.uiState.collectAsState().value
+            val themePrefs = userPrefs.themePrefs
+            UpdateLanguage(selectedLanguage.isoCode)
+            LingoLensTheme(
+                primaryColor = Color(themePrefs.primaryColor),
+                isAmoledBlack = themePrefs.isAmoledBlack,
+                materialYou = themePrefs.extractWallpaperColor,
+                appTheme = themePrefs.appTheme,
+                colorStyle = themePrefs.colorStyle,
+                fontFamilyStyle = themePrefs.fontFamily
+            ) {
+                //AppNavigation()
                 LingoLensApp(
                     ocrViewModel = ocrViewModel,
                     startCamera = { startCamera() },
@@ -41,7 +70,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 
     private val imageSelector =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
