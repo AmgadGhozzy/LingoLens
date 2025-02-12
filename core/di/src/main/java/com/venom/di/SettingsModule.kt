@@ -1,9 +1,8 @@
 package com.venom.di
 
 import android.content.Context
-import com.venom.data.local.SettingsDataStore
+import com.venom.data.repo.SettingsRepository
 import com.venom.data.repo.SettingsRepositoryImpl
-import com.venom.domain.repo.SettingsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,13 +16,7 @@ object SettingsModule {
 
     @Provides
     @Singleton
-    fun provideSettingsDataStore(
-        @ApplicationContext context: Context
-    ): SettingsDataStore = SettingsDataStore(context)
-
-    @Provides
-    @Singleton
     fun provideSettingsRepository(
-        settingsDataStore: SettingsDataStore
-    ): SettingsRepository = SettingsRepositoryImpl(settingsDataStore)
+        @ApplicationContext context: Context
+    ): SettingsRepository = SettingsRepositoryImpl(context)
 }
