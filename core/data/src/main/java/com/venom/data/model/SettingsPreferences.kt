@@ -4,7 +4,6 @@ import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.ColorStyle
 import com.venom.domain.model.FontFamilyStyle
-import com.venom.domain.model.UserLanguage
 import kotlinx.serialization.Serializable
 import java.util.Locale
 
@@ -17,9 +16,9 @@ data class SettingsPreferences(
 
     // Language Settings
     val appLanguage: AppLanguage = AppLanguage.FOLLOW_SYSTEM,
-    val userLanguage: UserLanguage = UserLanguage.entries.firstOrNull {
+    val nativeLanguage: AppLanguage = AppLanguage.entries.firstOrNull {
         it.isoCode == Locale.getDefault().language
-    } ?: UserLanguage.NOT_SPECIFIED,
+    } ?: AppLanguage.NOT_SPECIFIED,
 
     // Personal Settings
     val personalPrefs: PersonalPreference = PersonalPreference(),
