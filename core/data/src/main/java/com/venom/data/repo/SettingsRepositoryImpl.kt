@@ -1,44 +1,147 @@
 package com.venom.data.repo
 
-import com.venom.data.local.SettingsDataStore
-import com.venom.domain.repo.SettingsRepository
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import com.venom.data.local.SettingsPreferencesSerializer
+import com.venom.data.model.PersonalPreference
+import com.venom.data.model.SettingsPreferences
+import com.venom.data.model.ThemePreference
+import com.venom.domain.model.AppLanguage
+import com.venom.domain.model.ColorStyle
+import com.venom.domain.model.FontFamilyStyle
+import com.venom.utils.SETTING_FILE
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-    private val settingsDataStore: SettingsDataStore
+    private val context: Context
 ) : SettingsRepository {
 
-    override val isDarkMode: Flow<Boolean> =
-        settingsDataStore.settingsFlow.map { it.isDarkMode }.distinctUntilChanged()
+    private val Context.settingsDataStore: DataStore<SettingsPreferences> by dataStore(
+        fileName = SETTING_FILE,
+        serializer = SettingsPreferencesSerializer
+    )
 
-    override val isAutoTheme: Flow<Boolean> =
-        settingsDataStore.settingsFlow.map { it.isAutoTheme }.distinctUntilChanged()
+    override val settings: Flow<SettingsPreferences> = context.settingsDataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(SettingsPreferences())
+            } else {
+                throw exception
+            }
+        }
 
-
-    override val speechRate: Flow<Float> =
-        settingsDataStore.settingsFlow.map { it.speechRate }.distinctUntilChanged()
-
-    override val selectedLanguage: Flow<String> =
-        settingsDataStore.settingsFlow.map { it.selectedLanguage }.distinctUntilChanged()
-
-    override suspend fun setDarkMode(enabled: Boolean) {
-        settingsDataStore.updateDarkMode(enabled)
+    override suspend fun updateSettings(update: SettingsPreferences.() -> SettingsPreferences) {
+        context.settingsDataStore.updateData { prefs ->
+            update(prefs).copy(lastUpdated = System.currentTimeMillis())
+        }
     }
 
-    override suspend fun setAutoTheme(enabled: Boolean) {
-        settingsDataStore.updateAutoTheme(enabled)
+    override suspend fun updateThemePreferences(update: ThemePreference.() -> ThemePreference) {
+        updateSettings { copy(themePrefs = update(themePrefs)) }
+    }
+
+    override suspend fun updatePersonalPreferences(update: PersonalPreference.() -> PersonalPreference) {
+        updateSettings { copy(personalPrefs = update(personalPrefs)) }
     }
 
     override suspend fun setSpeechRate(rate: Float) {
-        settingsDataStore.updateSpeechRate(rate)
+        updateSettings { copy(speechRate = rate) }
     }
 
-    override suspend fun setLanguage(language: String) {
-        settingsDataStore.updateLanguage(language)
+    override suspend fun setAppLanguage(language: AppLanguage) {
+        updateSettings { copy(appLanguage = language) }
+    }
+
+    override suspend fun setUserLanguage(language: AppLanguage) {
+        updateSettings { copy(nativeLanguage = language) }
+    }
+
+    override suspend fun setColor(color: Int) {
+        updateThemePreferences {
+            copy(
+                primaryColor = color,
+                colorfulBackground = false,
+                extractWallpaperColor = false
+            )
+        }
+    }
+
+    override suspend fun setColorStyle(style: ColorStyle) {
+        updateThemePreferences { copy(colorStyle = style) }
+    }
+
+    override suspend fun setFontFamily(style: FontFamilyStyle) {
+        updateThemePreferences { copy(fontFamily = style) }
+    }
+
+    override suspend fun toggleAmoledBlack() {
+        updateThemePreferences { copy(isAmoledBlack = !isAmoledBlack) }
+    }
+
+    override suspend fun toggleWallpaperColor() {
+        updateThemePreferences {
+            copy(
+                extractWallpaperColor = !extractWallpaperColor,
+                colorfulBackground = if (!extractWallpaperColor) false else colorfulBackground
+            )
+        }
+    }
+
+    override suspend fun toggleRandomColor() {
+        updateThemePreferences { copy(randomColor = !randomColor) }
+    }
+
+    override suspend fun toggleColorfulBackground() {
+        updateThemePreferences {
+            copy(
+                colorfulBackground = !colorfulBackground,
+                extractWallpaperColor = if (!colorfulBackground) false else extractWallpaperColor
+            )
+        }
+    }
+
+    override suspend fun updateStreak(time: Long) {
+        val dayFormatter = SimpleDateFormat("dd MM yyyy", Locale.ROOT)
+        val currentPrefs = context.settingsDataStore.data.first()
+
+        val today = dayFormatter.format(time)
+        val yesterday = dayFormatter.format(System.currentTimeMillis() - (1000 * 60 * 60 * 24))
+        val lastLoginDate = dayFormatter.format(currentPrefs.personalPrefs.lastLoginDate)
+
+        val (currentStreak, maxStreak) = when (lastLoginDate) {
+            today -> return
+            yesterday -> listOf(
+                currentPrefs.personalPrefs.currentStreakCount + 1,
+                maxOf(
+                    currentPrefs.personalPrefs.maxStreakCount,
+                    currentPrefs.personalPrefs.currentStreakCount + 1
+                )
+            )
+
+            else -> listOf(
+                1,
+                maxOf(
+                    currentPrefs.personalPrefs.maxStreakCount,
+                    currentPrefs.personalPrefs.currentStreakCount
+                )
+            )
+        }
+
+        updatePersonalPreferences {
+            copy(
+                lastLoginDate = time,
+                maxStreakCount = maxStreak,
+                currentStreakCount = currentStreak
+            )
+        }
     }
 }
