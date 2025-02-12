@@ -1,5 +1,6 @@
 package com.venom.di
 
+import com.venom.data.api.GithubApi
 import com.venom.data.api.OcrService
 import com.venom.data.api.TranslationService
 import dagger.Module
@@ -15,6 +16,21 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(GithubApi.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGithubApi(retrofit: Retrofit): GithubApi {
+        return retrofit.create(GithubApi::class.java)
+    }
 
     @Provides
     @Singleton
