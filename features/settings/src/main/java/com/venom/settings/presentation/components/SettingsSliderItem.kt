@@ -1,5 +1,6 @@
 package com.venom.settings.presentation.components
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun SettingsSliderItem(
-    title: String,
+    @StringRes title: Int,
     icon: ImageVector,
     value: Float,
     onValueChange: (Float) -> Unit,
@@ -29,7 +31,7 @@ fun SettingsSliderItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -45,7 +47,7 @@ fun SettingsSliderItem(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
-                Text(text = title)
+                Text(text = stringResource(title))
             }
             Text(
                 text = valueText, style = MaterialTheme.typography.bodyMedium
