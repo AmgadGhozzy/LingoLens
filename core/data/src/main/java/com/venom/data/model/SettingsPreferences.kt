@@ -2,44 +2,30 @@ package com.venom.data.model
 
 import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
-import com.venom.domain.model.ColorStyle
-import com.venom.domain.model.FontFamilyStyle
+import com.venom.domain.model.FontStyles
+import com.venom.domain.model.PaletteStyle
 import kotlinx.serialization.Serializable
-import java.util.Locale
 
 @Serializable
 data class SettingsPreferences(
+    val appLanguage: AppLanguage = AppLanguage.ENGLISH,
+    val nativeLanguage: AppLanguage = AppLanguage.ARABIC,
+    val speechRate: Float = 1.2f,
 
     val themePrefs: ThemePreference = ThemePreference(),
-
-    val speechRate: Float = 1.0f,
-
-    // Language Settings
-    val appLanguage: AppLanguage = AppLanguage.FOLLOW_SYSTEM,
-    val nativeLanguage: AppLanguage = AppLanguage.entries.firstOrNull {
-        it.isoCode == Locale.getDefault().language
-    } ?: AppLanguage.NOT_SPECIFIED,
-
-    // Personal Settings
     val personalPrefs: PersonalPreference = PersonalPreference(),
 
-    // Feature Settings
     val autoPronounciation: Boolean = true,
-    val autoTranslate: Boolean = true,
-    val autoCopy: Boolean = true,
-    val lastUpdated: Long = System.currentTimeMillis()
 )
 
 @Serializable
 data class ThemePreference(
-    val appTheme: AppTheme = AppTheme.FOLLOW_SYSTEM,
+    val appTheme: AppTheme = AppTheme.SYSTEM,
     val extractWallpaperColor: Boolean = false,
-    val isAmoledBlack: Boolean = false,
-    val randomColor: Boolean = false,
-    val colorfulBackground: Boolean = false,
-    val colorStyle: ColorStyle = ColorStyle.TonalSpot,
-    val fontFamily: FontFamilyStyle = FontFamilyStyle.SANS_SERIF,
-    val primaryColor: Int = 0xFF00C853.toInt()
+    val isAmoledBlack: Boolean = true,
+    val colorStyle: PaletteStyle = PaletteStyle.Neutral,
+    val fontFamily: FontStyles = FontStyles.Default,
+    val primaryColor: Int = 0xFF0096EA.toInt()
 )
 
 @Serializable
