@@ -6,5 +6,5 @@ import com.venom.resources.R
 enum class AppTheme(@StringRes val title: Int) {
     DARK(R.string.dark_mode),
     LIGHT(R.string.light_mode),
-    FOLLOW_SYSTEM(R.string.follow_system)
+    SYSTEM(R.string.follow_system)
 }
