@@ -6,9 +6,10 @@ import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.model.SettingsDialog
+import com.venom.domain.model.ThemeColor
 import com.venom.resources.R
 import com.venom.settings.presentation.screen.AboutScreen
-import com.venom.ui.viewmodel.SettingsDialog
 import com.venom.ui.viewmodel.SettingsUiState
 
 @Composable
@@ -20,7 +21,7 @@ fun SettingsDialogController(
     onUpdateNativeLanguage: (AppLanguage) -> Unit,
     onUpdateTheme: (AppTheme) -> Unit,
     onUpdateColorStyle: (PaletteStyle) -> Unit,
-    onUpdatePrimaryColor: (Int) -> Unit,
+    onUpdatePrimaryColor: (ThemeColor) -> Unit,
     onUpdateFontFamily: (FontStyles) -> Unit
 ) {
     when (dialogType) {
