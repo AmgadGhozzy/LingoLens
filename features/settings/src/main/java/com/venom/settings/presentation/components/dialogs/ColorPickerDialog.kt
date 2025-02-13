@@ -19,14 +19,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.venom.domain.model.ThemeColor
+import com.venom.domain.model.generateThemeColors
 import com.venom.resources.R
-import com.venom.ui.viewmodel.generateThemeColors
 
 @Composable
 fun ColorPickerDialog(
-    onColorSelected: (color: Int) -> Unit,
-    defaultColors: List<Int> = generateThemeColors(),
-    initialColor: Int? = null,
+    onColorSelected: (color: ThemeColor) -> Unit,
+    defaultColors: List<ThemeColor> = generateThemeColors(),
+    initialColor: ThemeColor? = null,
     onDismiss: () -> Unit
 ) {
     var selectedColor by remember { mutableStateOf(initialColor) }
@@ -51,9 +52,9 @@ fun ColorPickerDialog(
 
 @Composable
 private fun ColorGrid(
-    colors: List<Int>,
-    selectedColor: Int?,
-    onColorSelected: (Int) -> Unit
+    colors: List<ThemeColor>,
+    selectedColor: ThemeColor?,
+    onColorSelected: (ThemeColor) -> Unit
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(5),
@@ -61,11 +62,11 @@ private fun ColorGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(16.dp),
     ) {
-        items(colors.take(15)) { colorInt ->
+        items(colors.take(15)) { color ->
             ColorItem(
-                color = Color(colorInt),
-                isSelected = selectedColor == colorInt,
-                onClick = { onColorSelected(colorInt) }
+                color = Color(color.color),
+                isSelected = selectedColor?.color == color.color,
+                onClick = { onColorSelected(color) }
             )
         }
     }
