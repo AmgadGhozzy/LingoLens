@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.venom.domain.model.SettingsDialog
 import com.venom.resources.R
 import com.venom.settings.presentation.components.*
 import com.venom.settings.presentation.components.dialogs.SettingsDialogController
@@ -50,7 +51,12 @@ private fun DisplaySettings(
             subtitle = uiState.themePrefs.appTheme.name,
             leadingContent = { SettingsIcon(Icons.Rounded.DarkMode) },
             onClick = { onDialogTypeChange(SettingsDialog.SelectTheme) },
-            badgeText = "New"
+        )
+        SettingsItem(
+            title = R.string.primary_color,
+            subtitle = uiState.themePrefs.primaryColor.name,
+            leadingContent = { ColorPreviewIcon(uiState.themePrefs.primaryColor.color) },
+            onClick = { onDialogTypeChange(SettingsDialog.SelectPrimaryColor) }
         )
         SettingsItem(
             title = R.string.palette_style,
@@ -59,16 +65,11 @@ private fun DisplaySettings(
             onClick = { onDialogTypeChange(SettingsDialog.SelectPaletteStyle) }
         )
         SettingsItem(
-            title = R.string.primary_color,
-            subtitle = stringResource(R.string.primary_color_desc),
-            leadingContent = { ColorPreviewIcon(uiState.themePrefs.primaryColor) },
-            onClick = { onDialogTypeChange(SettingsDialog.SelectPrimaryColor) }
-        )
-        SettingsItem(
             title = R.string.font_type,
             subtitle = uiState.themePrefs.fontFamily.name,
             leadingContent = { SettingsIcon(Icons.Rounded.DocumentScanner) },
-            onClick = { onDialogTypeChange(SettingsDialog.SelectFont) }
+            onClick = { onDialogTypeChange(SettingsDialog.SelectFont) },
+            badgeText = "New"
         )
         SettingsSwitchItem(
             title = R.string.amoled_black,
