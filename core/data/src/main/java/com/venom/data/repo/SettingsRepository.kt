@@ -4,8 +4,8 @@ import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
 import com.venom.data.model.ThemePreference
 import com.venom.domain.model.AppLanguage
-import com.venom.domain.model.ColorStyle
-import com.venom.domain.model.FontFamilyStyle
+import com.venom.domain.model.FontStyles
+import com.venom.domain.model.PaletteStyle
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
@@ -15,15 +15,13 @@ interface SettingsRepository {
     suspend fun updateThemePreferences(update: ThemePreference.() -> ThemePreference)
     suspend fun updatePersonalPreferences(update: PersonalPreference.() -> PersonalPreference)
 
-    suspend fun setSpeechRate(rate: Float)
     suspend fun setAppLanguage(language: AppLanguage)
-    suspend fun setUserLanguage(language: AppLanguage)
-    suspend fun setColor(color: Int)
-    suspend fun setColorStyle(style: ColorStyle)
-    suspend fun setFontFamily(style: FontFamilyStyle)
+    suspend fun setSpeechRate(rate: Float)
+    suspend fun setNativeLanguage(language: AppLanguage)
+    suspend fun setPrimaryColor(color: Int)
+    suspend fun setPaletteStyle(style: PaletteStyle)
     suspend fun toggleAmoledBlack()
     suspend fun toggleWallpaperColor()
-    suspend fun toggleRandomColor()
-    suspend fun toggleColorfulBackground()
+    suspend fun setFontFamily(style: FontStyles)
     suspend fun updateStreak(time: Long)
 }
