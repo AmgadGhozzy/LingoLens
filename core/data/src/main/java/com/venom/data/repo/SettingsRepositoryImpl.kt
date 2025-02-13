@@ -8,8 +8,8 @@ import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
 import com.venom.data.model.ThemePreference
 import com.venom.domain.model.AppLanguage
-import com.venom.domain.model.ColorStyle
-import com.venom.domain.model.FontFamilyStyle
+import com.venom.domain.model.FontStyles
+import com.venom.domain.model.PaletteStyle
 import com.venom.utils.SETTING_FILE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -41,7 +41,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun updateSettings(update: SettingsPreferences.() -> SettingsPreferences) {
         context.settingsDataStore.updateData { prefs ->
-            update(prefs).copy(lastUpdated = System.currentTimeMillis())
+            update(prefs).copy()
         }
     }
 
@@ -53,34 +53,25 @@ class SettingsRepositoryImpl @Inject constructor(
         updateSettings { copy(personalPrefs = update(personalPrefs)) }
     }
 
-    override suspend fun setSpeechRate(rate: Float) {
-        updateSettings { copy(speechRate = rate) }
-    }
-
     override suspend fun setAppLanguage(language: AppLanguage) {
         updateSettings { copy(appLanguage = language) }
     }
 
-    override suspend fun setUserLanguage(language: AppLanguage) {
+    override suspend fun setSpeechRate(rate: Float) {
+        updateSettings { copy(speechRate = rate) }
+    }
+
+    override suspend fun setNativeLanguage(language: AppLanguage) {
         updateSettings { copy(nativeLanguage = language) }
     }
 
-    override suspend fun setColor(color: Int) {
+    override suspend fun setPrimaryColor(color: Int) {
         updateThemePreferences {
             copy(
                 primaryColor = color,
-                colorfulBackground = false,
                 extractWallpaperColor = false
             )
         }
-    }
-
-    override suspend fun setColorStyle(style: ColorStyle) {
-        updateThemePreferences { copy(colorStyle = style) }
-    }
-
-    override suspend fun setFontFamily(style: FontFamilyStyle) {
-        updateThemePreferences { copy(fontFamily = style) }
     }
 
     override suspend fun toggleAmoledBlack() {
@@ -88,25 +79,15 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleWallpaperColor() {
-        updateThemePreferences {
-            copy(
-                extractWallpaperColor = !extractWallpaperColor,
-                colorfulBackground = if (!extractWallpaperColor) false else colorfulBackground
-            )
-        }
+        updateThemePreferences { copy(extractWallpaperColor = !extractWallpaperColor) }
     }
 
-    override suspend fun toggleRandomColor() {
-        updateThemePreferences { copy(randomColor = !randomColor) }
+    override suspend fun setPaletteStyle(style: PaletteStyle) {
+        updateThemePreferences { copy(colorStyle = style) }
     }
 
-    override suspend fun toggleColorfulBackground() {
-        updateThemePreferences {
-            copy(
-                colorfulBackground = !colorfulBackground,
-                extractWallpaperColor = if (!colorfulBackground) false else extractWallpaperColor
-            )
-        }
+    override suspend fun setFontFamily(style: FontStyles) {
+        updateThemePreferences { copy(fontFamily = style) }
     }
 
     override suspend fun updateStreak(time: Long) {
