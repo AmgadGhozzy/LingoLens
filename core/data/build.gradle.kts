@@ -1,12 +1,28 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-kapt")
 }
+
+val versionFile = rootProject.file("version.properties")
+val localPropertiesFile = rootProject.file("local.properties")
+
+val localProperties = Properties()
+val versionProperties = Properties()
+
+localProperties.load(FileInputStream(localPropertiesFile))
+versionProperties.load(FileInputStream(versionFile))
+
+
+val localVersionName = versionProperties.getProperty("VERSION_NAME")
+val localVersionCode = versionProperties.getProperty("VERSION_CODE")
 
 android {
     namespace = "com.venom.data"
@@ -15,8 +31,10 @@ android {
     defaultConfig {
         minSdk = 24
 
-        buildConfigField("String", "OCR_API_KEY", "\"${project.properties["OCR_API_KEY"] ?: ""}\"")
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "APP_VERSION_NAME", "\"${localVersionName}\"")
+        buildConfigField("String", "VERSION_CODE", "\"${localVersionCode}\"")
+        buildConfigField("String", "OCR_API_KEY", localProperties.getProperty("OCR_API_KEY"))
+
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -49,11 +67,14 @@ dependencies {
     // Core Modules
     implementation(project(":core:domain"))
     implementation(project(":core:utils"))
+    implementation(project(":core:resources"))
 
     // Hilt
     api(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
+
+    implementation(libs.androidx.datastore)
 
     // Room
     api(libs.androidx.room.runtime)
