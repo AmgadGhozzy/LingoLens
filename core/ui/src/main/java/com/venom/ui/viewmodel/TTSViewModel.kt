@@ -5,7 +5,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.domain.repo.SettingsRepository
+import com.venom.data.repo.SettingsRepository
 import com.venom.domain.repo.tts.MediaPlayerFactory
 import com.venom.domain.repo.tts.TTSUrlGenerator
 import com.venom.domain.repo.tts.TextToSpeechFactory
@@ -41,8 +41,8 @@ class TTSViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settingsRepository.speechRate.collect { rate ->
-                tts?.setSpeechRate(rate)
+            settingsRepository.settings.collect { settings ->
+                tts?.setSpeechRate(settings.speechRate)
             }
         }
         initTTS() // Initialize TextToSpeech
