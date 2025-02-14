@@ -15,4 +15,9 @@ class UpdateChecker @Inject constructor(
             UpdateConfig()
         }
     }
+
+    companion object {
+        const val BASE_URL = "https://raw.githubusercontent.com/AmgadGhozzy/LingoLens/main/"
+    }
 }
+
