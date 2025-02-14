@@ -6,6 +6,7 @@ import com.venom.data.model.ThemePreference
 import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.model.ThemeColor
 import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
@@ -18,7 +19,7 @@ interface SettingsRepository {
     suspend fun setAppLanguage(language: AppLanguage)
     suspend fun setSpeechRate(rate: Float)
     suspend fun setNativeLanguage(language: AppLanguage)
-    suspend fun setPrimaryColor(color: Int)
+    suspend fun setPrimaryColor(color: ThemeColor)
     suspend fun setPaletteStyle(style: PaletteStyle)
     suspend fun toggleAmoledBlack()
     suspend fun toggleWallpaperColor()
