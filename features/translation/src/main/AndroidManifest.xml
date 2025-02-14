@@ -11,12 +11,12 @@
             android:theme="@style/Theme.QuickTr">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.Rounded" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.Rounded" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
