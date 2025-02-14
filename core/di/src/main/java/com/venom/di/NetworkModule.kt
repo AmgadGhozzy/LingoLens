@@ -3,6 +3,7 @@ package com.venom.di
 import com.venom.data.api.GithubApi
 import com.venom.data.api.OcrService
 import com.venom.data.api.TranslationService
+import com.venom.data.repo.UpdateChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +22,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(GithubApi.BASE_URL)
+            .baseUrl(UpdateChecker.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
