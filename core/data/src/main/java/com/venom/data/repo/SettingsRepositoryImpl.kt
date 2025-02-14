@@ -10,6 +10,7 @@ import com.venom.data.model.ThemePreference
 import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.model.ThemeColor
 import com.venom.utils.SETTING_FILE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -65,7 +66,7 @@ class SettingsRepositoryImpl @Inject constructor(
         updateSettings { copy(nativeLanguage = language) }
     }
 
-    override suspend fun setPrimaryColor(color: Int) {
+    override suspend fun setPrimaryColor(color: ThemeColor) {
         updateThemePreferences {
             copy(
                 primaryColor = color,
