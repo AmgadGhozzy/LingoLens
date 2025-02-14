@@ -21,8 +21,8 @@ import com.venom.settings.presentation.components.SettingsScaffold
 import com.venom.ui.viewmodel.UpdateState
 import com.venom.ui.viewmodel.UpdateViewModel
 import com.venom.utils.PLAY_STORE
-import com.venom.utils.finishActivity
-import com.venom.utils.openLink
+import com.venom.utils.findActivity
+import com.venom.utils.openUrl
 
 @Composable
 fun UpdateScreen(
@@ -33,7 +33,7 @@ fun UpdateScreen(
     val context = LocalContext.current
 
     fun onBackPressed() {
-        if (state.isForceUpdate) context.finishActivity() else onDismiss()
+        if (state.isForceUpdate) context.findActivity() else onDismiss()
     }
 
     BackHandler(onBack = ::onBackPressed)
@@ -119,7 +119,7 @@ fun UpdateButtons(state: UpdateState, onDismiss: () -> Unit) {
         }
 
         Button(
-            onClick = { context.openLink(PLAY_STORE) },
+            onClick = { context.openUrl(PLAY_STORE) },
             modifier = Modifier.weight(1f),
             colors = if (state.isForceUpdate) {
                 ButtonDefaults.buttonColors(
