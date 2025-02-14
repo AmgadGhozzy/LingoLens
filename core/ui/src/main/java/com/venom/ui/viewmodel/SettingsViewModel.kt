@@ -9,6 +9,7 @@ import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.model.ThemeColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -82,7 +83,7 @@ class SettingsViewModel @Inject constructor(
         updateSettings { copy(themePrefs = themePrefs.copy(appTheme = theme)) }
     }
 
-    fun setPrimaryColor(color: Int) = updateSetting { this.setPrimaryColor(color) }
+    fun setPrimaryColor(color: ThemeColor) = updateSetting { this.setPrimaryColor(color) }
     fun setColorStyle(style: PaletteStyle) = updateSetting { setPaletteStyle(style) }
     fun setFontFamily(style: FontStyles) = updateSetting { setFontFamily(style) }
     fun toggleAmoledBlack() = updateSetting { toggleAmoledBlack() }
