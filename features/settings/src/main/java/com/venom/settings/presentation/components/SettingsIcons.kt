@@ -50,7 +50,7 @@ fun UpdateBadge(hasUpdate: Boolean) {
 }
 
 @Composable
-fun ColorPreviewIcon(color: Int) {
+fun ColorPreviewIcon(color: Long) {
     Surface(
         modifier = Modifier.size(SettingsSpacing.colorPreviewSize),
         shape = CircleShape,
