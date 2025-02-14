@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -116,9 +115,6 @@ object Extensions {
     fun Context.getInputMethodManager(): InputMethodManager =
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-    fun Context.isDarkMode(): Boolean =
-        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-
     /**
      * Intent & Navigation
      */
@@ -138,19 +134,18 @@ object Extensions {
         })
     }
 
+    fun Context.openTTSSettings() {
+        startActivity(Intent().apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = "com.android.settings.TTS_SETTINGS"
+        })
+    }
+
     fun <T> Context.openActivity(it: Class<T>, flags: Int? = null) {
         startActivity(Intent(this, it).apply {
             flags?.let { f -> this.flags = f }
         })
     }
-
-
-    /**
-     * Collection Extensions
-     */
-    fun <T> List<T>?.isNotNullOrEmpty(): Boolean = !this.isNullOrEmpty()
-
-    fun <T> Collection<T>?.isNotNullOrEmpty(): Boolean = !this.isNullOrEmpty()
 
     /**
      * Time Conversions
@@ -158,6 +153,8 @@ object Extensions {
 
     fun Long.formatTimestamp(): String =
         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(this))
+
+    fun Int.formatTime(): String = "%02d:%02d".format(this / 60, this % 60)
 
     fun Long.millisToSeconds(): Long = this / 1000
 
