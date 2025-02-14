@@ -4,6 +4,8 @@ import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.model.ThemeColor
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -25,9 +27,8 @@ data class ThemePreference(
     val isAmoledBlack: Boolean = true,
     val colorStyle: PaletteStyle = PaletteStyle.Neutral,
     val fontFamily: FontStyles = FontStyles.Default,
-    val primaryColor: Int = 0xFF0096EA.toInt()
+    @Contextual val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF00B8FF)
 )
-
 @Serializable
 data class PersonalPreference(
     val maxStreakCount: Int = 0,
