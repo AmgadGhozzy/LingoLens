@@ -36,14 +36,14 @@ fun OptionItem(
     onSpeakClick: (() -> Unit)? = null
 ) {
     val backgroundColor = when {
-        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.secondaryContainer
+        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.primaryContainer
         isAnswered && option.isSelected -> MaterialTheme.colorScheme.errorContainer
         option.isSelected -> MaterialTheme.colorScheme.primaryContainer
         else -> MaterialTheme.colorScheme.surface
     }
 
     val contentColor = when {
-        option.isSelected && isAnswered && option.isCorrect -> MaterialTheme.colorScheme.onSecondaryContainer
+        option.isSelected && isAnswered && option.isCorrect -> MaterialTheme.colorScheme.onPrimaryContainer
         option.isSelected && isAnswered && !option.isCorrect -> MaterialTheme.colorScheme.onErrorContainer
         option.isSelected -> MaterialTheme.colorScheme.primary
         else -> MaterialTheme.colorScheme.onSurface
