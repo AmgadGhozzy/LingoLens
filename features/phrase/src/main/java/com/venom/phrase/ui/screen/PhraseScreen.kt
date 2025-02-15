@@ -23,6 +23,7 @@ fun PhrasesScreen(
     onDismiss: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val ttsState by ttsViewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -41,6 +42,7 @@ fun PhrasesScreen(
         state = state,
         scrollBehavior = scrollBehavior,
         onBookmarkClick = viewModel::toggleBookmark,
+        isSpeaking = ttsState.isSpeaking,
         onSpeakClick = ttsViewModel::speak,
         onSearchQueryChanged = viewModel::onSearchQueryChange,
         onCopy = copyAction,
