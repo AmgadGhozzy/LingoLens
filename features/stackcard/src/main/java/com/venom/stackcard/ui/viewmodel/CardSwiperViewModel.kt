@@ -1,12 +1,14 @@
 package com.venom.stackcard.ui.viewmodel
 
 import androidx.compose.runtime.Stable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.repo.PhraseRepository
 import com.venom.stackcard.data.model.WordEntity
 import com.venom.stackcard.data.repo.WordRepository
+import com.venom.stackcard.domain.model.WordLevels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -71,8 +73,14 @@ sealed class CardSwiperEvent {
 
 @HiltViewModel
 class CardSwiperViewModel @Inject constructor(
-    private val wordRepository: WordRepository, private val phraseRepository: PhraseRepository
+    private val wordRepository: WordRepository,
+    private val phraseRepository: PhraseRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private val selectedLevel = savedStateHandle.get<String>("level")?.let { levelTitle ->
+        WordLevels.values().find { it.title == levelTitle }
+    } ?: WordLevels.Beginner
+
     private val _state = MutableStateFlow(CardSwiperState())
     val state: StateFlow<CardSwiperState> = _state.asStateFlow()
 
@@ -90,14 +98,14 @@ class CardSwiperViewModel @Inject constructor(
     }
 
     private suspend fun loadWords() {
-        wordRepository.get10UnseenWords().catch { error ->
-            _state.update { it.copy(error = error.message, isLoading = false) }
-        }.collect { words ->
-            _state.update {
-                it.copy(
-                    visibleCards = words.map { word -> WordCard(word) }, isLoading = false
-                )
-            }
+        val level = selectedLevel
+        val words = wordRepository.getWordsFromLevel(level = level)
+
+        _state.update { currentState ->
+            currentState.copy(
+                visibleCards = words.map { word -> WordCard(word) },
+                isLoading = false
+            )
         }
     }
 
