@@ -12,6 +12,7 @@ import com.venom.ui.components.common.DynamicStyledText
 fun PhraseCardHeader(
     phrase: Phrase,
     sourceLang: String,
+    isSpeaking: Boolean,
     isBookmarked: Boolean,
     onBookmarkClick: () -> Unit,
     onSpeakClick: () -> Unit
@@ -28,6 +29,7 @@ fun PhraseCardHeader(
         )
 
         ExpandCardActions(
+            isSpeaking = isSpeaking,
             isBookmarked = isBookmarked,
             onBookmarkClick = onBookmarkClick,
             onSpeakClick = onSpeakClick,

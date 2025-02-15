@@ -30,6 +30,7 @@ fun SectionWithPhrasesList(
     sourceLang: String,
     targetLang: String,
     onBookmarkClick: (Phrase) -> Unit,
+    isSpeaking: Boolean,
     onSpeakClick: (String, String) -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
@@ -81,6 +82,7 @@ fun SectionWithPhrasesList(
                         sourceLang = sourceLang,
                         targetLang = targetLang,
                         onBookmarkClick = { onBookmarkClick(phrase) },
+                        isSpeaking = isSpeaking,
                         onSpeakClick = {
                             onSpeakClick(
                                 phrase.getTranslation(sourceLang), sourceLang

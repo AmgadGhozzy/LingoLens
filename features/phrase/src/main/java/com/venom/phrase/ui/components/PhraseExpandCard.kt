@@ -29,6 +29,7 @@ fun PhraseExpandCard(
     sourceLang: String,
     targetLang: String,
     onBookmarkClick: () -> Unit,
+    isSpeaking: Boolean,
     onSpeakClick: () -> Unit,
     onCopy: () -> Unit,
     onShare: () -> Unit,
@@ -59,6 +60,7 @@ fun PhraseExpandCard(
             PhraseCardHeader(
                 phrase = phrase,
                 sourceLang = sourceLang,
+                isSpeaking = isSpeaking,
                 isBookmarked = phrase.isBookmarked,
                 onBookmarkClick = onBookmarkClick,
                 onSpeakClick = onSpeakClick
