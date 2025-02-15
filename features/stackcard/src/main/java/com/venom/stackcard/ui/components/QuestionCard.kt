@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.venom.ui.components.buttons.BookmarkFilledButton
 import com.venom.ui.components.buttons.SpeechFilledButton
@@ -52,7 +53,9 @@ fun QuestionCard(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 DynamicStyledText(
-                    text = question, color = MaterialTheme.colorScheme.onPrimaryContainer
+                    text = question,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 if (translation != null) {
@@ -60,7 +63,9 @@ fun QuestionCard(
                         visible = showTranslation
                     ) {
                         DynamicStyledText(
-                            text = translation, color = MaterialTheme.colorScheme.primary
+                            text = translation,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
