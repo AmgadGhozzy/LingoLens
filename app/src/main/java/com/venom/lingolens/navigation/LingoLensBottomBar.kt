@@ -15,20 +15,28 @@ import com.venom.ui.navigation.Screen
 
 @Composable
 fun LingoLensBottomBar(
-    navController: NavHostController, selectedScreen: Screen, onScreenSelected: (Screen) -> Unit
+    navController: NavHostController,
+    currentScreen: Screen,
+    onScreenSelected: (Screen) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     CustomCard {
-        NavigationBar(modifier = Modifier.height(72.dp)) {
-            NavigationItems.entries.forEach { item ->
-                NavigationBarItem(icon = {
-                    Icon(
-                        painter = painterResource(id = item.icon),
-                        contentDescription = stringResource(item.titleRes)
-                    )
-                }, selected = selectedScreen == item.screen, onClick = {
-                    onScreenSelected(item.screen)
-                    navController.navigateToStart(item.screen)
-                }, alwaysShowLabel = false
+        NavigationBar(modifier = modifier.height(72.dp)) {
+            NavigationItems.entries.filter { it.showInBottomBar }.forEach { item ->
+                val isSelected =  currentScreen == item.screen
+                NavigationBarItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(id = item.icon),
+                            contentDescription = stringResource(item.titleRes)
+                        )
+                    },
+                    selected = isSelected,
+                    onClick = {
+                        onScreenSelected(item.screen)
+                        navController.navigateToStart(item.screen)
+                    },
+                    alwaysShowLabel = false
                 )
             }
         }
