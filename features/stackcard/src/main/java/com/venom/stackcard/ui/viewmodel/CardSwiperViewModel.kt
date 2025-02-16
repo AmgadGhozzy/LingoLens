@@ -1,12 +1,15 @@
 package com.venom.stackcard.ui.viewmodel
 
 import androidx.compose.runtime.Stable
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.domain.model.WordLevels
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.repo.PhraseRepository
+import com.venom.stackcard.data.local.PreferencesKeys
 import com.venom.stackcard.data.model.WordEntity
 import com.venom.stackcard.data.repo.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +17,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 sealed interface CardItem {
@@ -75,14 +80,26 @@ sealed class CardSwiperEvent {
 class CardSwiperViewModel @Inject constructor(
     private val wordRepository: WordRepository,
     private val phraseRepository: PhraseRepository,
+    private val dataStore: DataStore<Preferences>,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val initialLevel = savedStateHandle.get<String>("level")?.let { levelTitle ->
         WordLevels.values().find { it.id == levelTitle }
-    } ?: WordLevels.Beginner
+    } ?: run {
+        runBlocking {
+            dataStore.data.firstOrNull()?.get(PreferencesKeys.UNLOCKED_LEVELS)
+                ?.let { unlockedLevels ->
+                    WordLevels.values()
+                        .filter { it.id in unlockedLevels }
+                        .maxByOrNull { level ->
+                            WordLevels.values().indexOf(level)
+                        }
+                } ?: WordLevels.Beginner
+        }
+    }
 
-    private val _selectedLevel = MutableStateFlow<WordLevels>(initialLevel)
+    private val _selectedLevel = MutableStateFlow(initialLevel)
     val selectedLevel: StateFlow<WordLevels> = _selectedLevel.asStateFlow()
 
     fun setLevel(level: WordLevels) {
