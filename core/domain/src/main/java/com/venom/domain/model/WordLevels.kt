@@ -1,4 +1,4 @@
-package com.venom.stackcard.domain.model
+package com.venom.domain.model
 
 import com.venom.resources.R
 
