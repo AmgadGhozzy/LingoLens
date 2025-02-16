@@ -5,11 +5,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.domain.model.QuizTestState
+import com.venom.domain.model.WordLevels
 import com.venom.stackcard.data.local.PreferencesKeys
 import com.venom.stackcard.data.model.WordEntity
 import com.venom.stackcard.data.repo.WordRepository
-import com.venom.stackcard.domain.model.QuizTestState
-import com.venom.stackcard.domain.model.WordLevels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class QuizUiState(
-    val testState: QuizTestState = QuizTestState.NotStarted,
+    val testState: QuizTestState = QuizTestState.Initial,
     val currentLevel: WordLevels = WordLevels.Beginner,
     val currentWord: WordEntity? = null,
     val options: List<String> = emptyList(),
@@ -30,7 +30,7 @@ data class QuizUiState(
     val isAnswered: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val unlockedLevels: Set<String> = setOf(WordLevels.Beginner.title)
+    val unlockedLevels: Set<String> = setOf(WordLevels.Beginner.id)
 )
 
 data class QuizOption(
@@ -60,7 +60,7 @@ class QuizViewModel @Inject constructor(
         viewModelScope.launch {
             dataStore.data
                 .map { preferences ->
-                    preferences[PreferencesKeys.UNLOCKED_LEVELS] ?: setOf(WordLevels.Beginner.title)
+                    preferences[PreferencesKeys.UNLOCKED_LEVELS] ?: setOf(WordLevels.Beginner.id)
                 }
                 .collect { unlockedLevels ->
                     _state.update { it.copy(unlockedLevels = unlockedLevels) }
@@ -92,7 +92,7 @@ class QuizViewModel @Inject constructor(
                             totalQuestions = questionCount,
                             timeRemaining = questionCount * 15,
                             hearts = 3,
-                            score = 0,
+                            score = 0f,
                             streak = 0
                         )
                     )
@@ -192,7 +192,9 @@ class QuizViewModel @Inject constructor(
         _state.update {
             it.copy(
                 testState = QuizTestState.Completed(
-                    score = score,
+                    level = currentState.currentLevel,
+                    levelPercentage = testState.score,
+                    totalQuestions = testState.totalQuestions,
                     passed = passed,
                     nextLevel = nextLevel
                 )
@@ -206,7 +208,7 @@ class QuizViewModel @Inject constructor(
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 val currentUnlocked = preferences[PreferencesKeys.UNLOCKED_LEVELS] ?: setOf()
-                preferences[PreferencesKeys.UNLOCKED_LEVELS] = currentUnlocked + level.title
+                preferences[PreferencesKeys.UNLOCKED_LEVELS] = currentUnlocked + level.id
             }
         }
     }
