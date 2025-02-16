@@ -4,11 +4,11 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.domain.model.WordLevels
 import com.venom.phrase.data.model.Phrase
 import com.venom.phrase.data.repo.PhraseRepository
 import com.venom.stackcard.data.model.WordEntity
 import com.venom.stackcard.data.repo.WordRepository
-import com.venom.stackcard.domain.model.WordLevels
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,9 +77,17 @@ class CardSwiperViewModel @Inject constructor(
     private val phraseRepository: PhraseRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val selectedLevel = savedStateHandle.get<String>("level")?.let { levelTitle ->
-        WordLevels.values().find { it.title == levelTitle }
+
+    private val initialLevel = savedStateHandle.get<String>("level")?.let { levelTitle ->
+        WordLevels.values().find { it.id == levelTitle }
     } ?: WordLevels.Beginner
+
+    private val _selectedLevel = MutableStateFlow<WordLevels>(initialLevel)
+    val selectedLevel: StateFlow<WordLevels> = _selectedLevel.asStateFlow()
+
+    fun setLevel(level: WordLevels) {
+        _selectedLevel.value = level
+    }
 
     private val _state = MutableStateFlow(CardSwiperState())
     val state: StateFlow<CardSwiperState> = _state.asStateFlow()
@@ -99,7 +107,7 @@ class CardSwiperViewModel @Inject constructor(
 
     private suspend fun loadWords() {
         val level = selectedLevel
-        val words = wordRepository.getWordsFromLevel(level = level)
+        val words = wordRepository.getWordsFromLevel(level = level.value)
 
         _state.update { currentState ->
             currentState.copy(
