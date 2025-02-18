@@ -12,14 +12,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.speech.SpeechToTextDialog
-import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.dictionary.DictionaryScreen
 import com.venom.ui.screen.dictionary.TranslationsCard
 import com.venom.ui.viewmodel.LangSelectorViewModel
@@ -35,7 +33,7 @@ fun TranslationScreen(
     ttsViewModel: TTSViewModel = hiltViewModel(),
     sttViewModel: STTViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
-    navController: NavController,
+    onNavigateToOcr: () -> Unit,
     initialText: String? = null,
     isDialog: Boolean = false,
     onDismiss: () -> Unit = {}
@@ -50,9 +48,17 @@ fun TranslationScreen(
     var sourceTextFieldValue by remember {
         mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
     }
+
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(state.clearTextFlag) {
+        if (state.clearTextFlag) {
+            sourceTextFieldValue = TextFieldValue("")
+            viewModel.clearTranslation()
+        }
+    }
 
     LaunchedEffect(langSelectorState) {
         viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
@@ -92,7 +98,7 @@ fun TranslationScreen(
                     viewModel.onSourceTextChanged(text)
                 }
             },
-            onOcr = { navController.navigate(Screen.Ocr.route) },
+            onOcr = onNavigateToOcr,
             onFullscreen = { fullscreenState = it })
     }
 
