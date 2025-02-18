@@ -4,11 +4,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import com.venom.domain.model.QuizTestState
 import com.venom.domain.model.WordLevels
 import com.venom.stackcard.ui.components.QuizCompleted
@@ -27,9 +26,7 @@ fun QuizContent(
         modifier = modifier
             .fillMaxSize()
             .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(Color(0xFF232E40), Color(0xFF1A2F40), Color(0xFF1B373A))
-                )
+                color = MaterialTheme.colorScheme.background
             )
     ) {
         when (val testState = state.testState) {
@@ -43,7 +40,8 @@ fun QuizContent(
                         state = state,
                         testState = testState,
                         onOptionSelected = onOptionSelected,
-                        onNext = onNext
+                        onNext = onNext,
+                        onBackClick = { onComplete(false, state.currentLevel) }
                     )
                 }
             }

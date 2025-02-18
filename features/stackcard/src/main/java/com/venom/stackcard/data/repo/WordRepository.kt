@@ -1,8 +1,8 @@
 package com.venom.stackcard.data.repo
 
+import com.venom.domain.model.WordLevels
 import com.venom.stackcard.data.local.dao.WordDao
 import com.venom.stackcard.data.model.WordEntity
-import com.venom.stackcard.domain.model.WordLevels
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext

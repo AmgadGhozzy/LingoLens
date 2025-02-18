@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +34,7 @@ fun QuizHeader(
     totalQuestions: Int,
     hearts: Int,
     timeRemaining: Int,
+    onBackClick: () -> Unit
 ) {
 
     var showHeartAnimation by remember { mutableStateOf(false) }
@@ -81,5 +84,14 @@ fun QuizHeader(
         )
 
         TimerDisplay(timeRemaining = timeRemaining)
+
+        Button(
+            onClick = onBackClick,
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.ArrowBackIosNew,
+                contentDescription = stringResource(R.string.action_back)
+            )
+        }
     }
 }

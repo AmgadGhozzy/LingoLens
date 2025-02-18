@@ -26,12 +26,13 @@ fun QuizInProgress(
     state: QuizUiState,
     testState: QuizTestState.InProgress,
     onOptionSelected: (String) -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal =16.dp)
             .systemBarsPadding()
     ) {
         QuizHeader(
@@ -39,6 +40,7 @@ fun QuizInProgress(
             totalQuestions = testState.totalQuestions,
             hearts = testState.hearts,
             timeRemaining = testState.timeRemaining,
+            onBackClick = onBackClick,
         )
 
         Spacer(modifier = Modifier.height(24.dp))

@@ -7,9 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -40,24 +38,24 @@ fun QuestionCard(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
                 )
-            ), shape = MaterialTheme.shapes.large, colors = CardDefaults.elevatedCardColors(
+            ), shape = MaterialTheme.shapes.extraLarge, colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ), elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 2.dp, pressedElevation = 4.dp
+            defaultElevation = 4.dp, pressedElevation = 6.dp
         )
     ) {
         Column(
             modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 DynamicStyledText(
                     text = question,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 if (translation != null) {
                     AnimatedVisibility(
                         visible = showTranslation
