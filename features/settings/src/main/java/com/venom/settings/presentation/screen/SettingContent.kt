@@ -30,7 +30,7 @@ fun SettingsContent(
         dialogType = dialogType,
         uiState = uiState,
         onDismiss = { dialogType = SettingsDialog.None },
-        onUpdateLanguage = viewModel::updateLanguage,
+        onUpdateLanguage = viewModel::setAppLanguage,
         onUpdateNativeLanguage = viewModel::updateNativeLanguage,
         onUpdateTheme = viewModel::updateAppTheme,
         onUpdateColorStyle = viewModel::setColorStyle,
@@ -94,12 +94,12 @@ private fun LanguageSettings(
     SettingsCard(title = R.string.language) {
         SettingsItem(
             title = R.string.app_language,
-            subtitle = stringResource(uiState.appLanguage.readableResId),
+            subtitle = uiState.appLanguage.englishName,
             onClick = { onDialogTypeChange(SettingsDialog.SelectAppLanguage) }
         )
         SettingsItem(
-            title = R.string.app_language,
-            subtitle = stringResource(uiState.nativeLanguage.readableResId),
+            title = R.string.native_language,
+            subtitle = uiState.nativeLanguage.englishName,
             onClick = { onDialogTypeChange(SettingsDialog.SelectNativeLanguage) }
         )
     }

@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.settings.presentation.screen.WaveShape
+import com.venom.ui.components.other.WaveShape
 
 @Composable
 fun AppHeader() {

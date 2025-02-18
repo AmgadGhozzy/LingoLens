@@ -29,7 +29,7 @@ fun UpdateScreen(
     viewModel: UpdateViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
-    val state = viewModel.state.collectAsState().value
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
     fun onBackPressed() {
