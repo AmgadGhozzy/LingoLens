@@ -24,7 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.domain.model.LanguageItem
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.resources.R
 
 /**
@@ -89,18 +90,11 @@ fun LanguageListItem(
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun LanguageListItemPreview() {
-    LanguageListItem(language = LanguageItem(
-        code = "en",
-        name = "English",
-        nativeName = "English",
-        flagResId = R.drawable.flag_en
-    ), isSelected = true, onClick = {})
+    LanguageListItem(language = LANGUAGES_LIST[0], isSelected = true, onClick = {})
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 fun LanguageListItemUnselectedPreview() {
-    LanguageListItem(LanguageItem(
-        code = "ar", name = "Arabic", nativeName = "العربية", flagResId = R.drawable.flag_ar
-    ), isSelected = false, onClick = {})
+    LanguageListItem(LANGUAGES_LIST[0], isSelected = false, onClick = {})
 }
