@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.venom.data.model.LanguageItem
 import com.venom.dialog.ui.component.MicButton
-import com.venom.domain.model.LanguageItem
 import com.venom.resources.R
 import com.venom.ui.components.items.LanguageItemView
 import com.venom.ui.screen.LangSelectorBottomSheet

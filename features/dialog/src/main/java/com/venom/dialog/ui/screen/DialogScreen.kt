@@ -68,9 +68,9 @@ fun DialogScreen(
                         languageState.targetLang.code
                     },
                     sourceLanguageName = if (isSourceLanguage) {
-                        languageState.sourceLang.name
+                        languageState.sourceLang.englishName
                     } else {
-                        languageState.targetLang.name
+                        languageState.targetLang.englishName
                     },
                     targetLanguageCode = if (isSourceLanguage) {
                         languageState.targetLang.code
@@ -78,9 +78,9 @@ fun DialogScreen(
                         languageState.sourceLang.code
                     },
                     targetLanguageName = if (isSourceLanguage) {
-                        languageState.targetLang.name
+                        languageState.targetLang.englishName
                     } else {
-                        languageState.sourceLang.name
+                        languageState.sourceLang.englishName
                     },
                     isSender = isSourceLanguage
                 )
