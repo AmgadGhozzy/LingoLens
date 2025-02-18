@@ -2,14 +2,18 @@ package com.venom.settings.presentation.components.dialogs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.venom.domain.model.AppLanguage
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
+import com.venom.data.model.ThemeColor
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
 import com.venom.domain.model.SettingsDialog
-import com.venom.domain.model.ThemeColor
 import com.venom.resources.R
 import com.venom.settings.presentation.screen.AboutScreen
+import com.venom.ui.components.dialogs.BaseDialog
+import com.venom.ui.components.dialogs.DialogRadioOption
+import com.venom.ui.components.dialogs.DialogScrollableContent
 import com.venom.ui.viewmodel.SettingsUiState
 
 @Composable
@@ -17,8 +21,8 @@ fun SettingsDialogController(
     dialogType: SettingsDialog,
     uiState: SettingsUiState,
     onDismiss: () -> Unit,
-    onUpdateLanguage: (AppLanguage) -> Unit,
-    onUpdateNativeLanguage: (AppLanguage) -> Unit,
+    onUpdateLanguage: (LanguageItem) -> Unit,
+    onUpdateNativeLanguage: (LanguageItem) -> Unit,
     onUpdateTheme: (AppTheme) -> Unit,
     onUpdateColorStyle: (PaletteStyle) -> Unit,
     onUpdatePrimaryColor: (ThemeColor) -> Unit,
@@ -95,9 +99,9 @@ fun SettingsDialogController(
                 onDismiss = onDismiss
             ) {
                 DialogScrollableContent {
-                    AppLanguage.entries.forEach { language ->
+                    LANGUAGES_LIST.take(10).forEach { language ->
                         DialogRadioOption(
-                            text = stringResource(language.readableResId),
+                            text = language.englishName,
                             selected = language == uiState.appLanguage,
                             onClick = { onUpdateLanguage(language) }
                         )
@@ -112,10 +116,10 @@ fun SettingsDialogController(
                 onDismiss = onDismiss
             ) {
                 DialogScrollableContent {
-                    AppLanguage.entries.forEach { language ->
+                    LANGUAGES_LIST.take(10).forEach { language ->
                         DialogRadioOption(
-                            text = stringResource(language.readableResId),
-                            selected = language == uiState.appLanguage,
+                            text = language.englishName,
+                            selected = language == uiState.nativeLanguage,
                             onClick = { onUpdateNativeLanguage(language) }
                         )
                     }
