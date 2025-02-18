@@ -19,9 +19,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.venom.domain.model.ThemeColor
-import com.venom.domain.model.generateThemeColors
+import com.venom.data.model.ThemeColor
+import com.venom.data.model.generateThemeColors
 import com.venom.resources.R
+import com.venom.ui.components.dialogs.BaseDialog
 
 @Composable
 fun ColorPickerDialog(
