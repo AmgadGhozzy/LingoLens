@@ -1,24 +1,19 @@
 package com.venom.ui.components.bars
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 
@@ -36,7 +31,7 @@ import com.venom.resources.R
 fun TopBar(
     title: String,
     modifier: Modifier = Modifier,
-    @DrawableRes leadingIcon: Int,
+    leadingIcon: Any = Icons.Rounded.ArrowBackIosNew,
     onLeadingIconClick: () -> Unit,
     actions: @Composable (RowScope.() -> Unit) = {}
 ) {
@@ -49,15 +44,7 @@ fun TopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onLeadingIconClick) {
-                Icon(
-                    painter = painterResource(leadingIcon), contentDescription = when (leadingIcon) {
-                        R.drawable.icon_menu -> stringResource(R.string.action_menu)
-                        else -> stringResource(R.string.action_back)
-                    }
-                )
-
-            }
+            NavigationIcon(leadingIcon, onLeadingIconClick)
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
@@ -71,4 +58,32 @@ fun TopBar(
             .height(82.dp)
             .wrapContentHeight(align = Alignment.CenterVertically)
     )
+}
+
+@Composable
+private fun NavigationIcon(
+    leadingIcon: Any,
+    onLeadingIconClick: () -> Unit
+) {
+    IconButton(onClick = onLeadingIconClick) {
+        when (leadingIcon) {
+            is Int -> Icon(
+                painter = painterResource(id = leadingIcon),
+                contentDescription = getIconContentDescription(leadingIcon)
+            )
+
+            is ImageVector -> Icon(
+                imageVector = leadingIcon,
+                contentDescription = getIconContentDescription(leadingIcon)
+            )
+        }
+    }
+}
+
+@Composable
+private fun getIconContentDescription(leadingIcon: Any): String {
+    return when (leadingIcon) {
+        R.drawable.icon_menu -> stringResource(id = R.string.action_menu)
+        else -> stringResource(id = R.string.action_back)
+    }
 }
