@@ -2,6 +2,7 @@
 .gradle
 .kotlin
 /local.properties
+g
 /.idea
 .DS_Store
 /build
@@ -10,3 +11,4 @@
 .cxx
 local.properties
 .env
+.aiexclude
