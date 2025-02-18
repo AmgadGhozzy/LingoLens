@@ -1,5 +1,6 @@
 package com.venom.phrase.ui.screen
 
+import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +22,7 @@ fun PhrasebookScreen(
 
     LaunchedEffect(langState.sourceLang, langState.targetLang) {
         viewModel.updateLanguages(langState.sourceLang, langState.targetLang)
+        Log.d("PhrasebookScreen", "sourceLang: ${langState.sourceLang}, targetLang: ${langState.targetLang}")
         viewModel.loadCategories()
     }
 
@@ -37,6 +39,6 @@ fun PhrasebookScreen(
     )
 
     selectedCategoryId?.let { categoryId ->
-        PhrasesDialog(categoryId = categoryId, onDismiss = { selectedCategoryId = null })
+        PhrasesDialog(viewModel = viewModel, categoryId = categoryId, onDismiss = { selectedCategoryId = null })
     }
 }

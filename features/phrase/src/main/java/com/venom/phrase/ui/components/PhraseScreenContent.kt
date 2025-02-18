@@ -36,7 +36,7 @@ fun PhraseScreenContent(
             Text(
                 text = state.selectedCategory?.getTranslation(state.sourceLang.code) ?:
                 stringResource(R.string.bookmarks_title),
-                style = MaterialTheme.typography.headlineMedium.copy(
+                style = MaterialTheme.typography.headlineSmall.copy(
                     color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold
                 )
             )

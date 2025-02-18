@@ -2,8 +2,8 @@ package com.venom.phrase.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.domain.model.LANGUAGES_LIST
-import com.venom.domain.model.LanguageItem
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
 import com.venom.phrase.data.model.Phrase
@@ -21,8 +21,8 @@ data class PhraseUiState(
     val sections: List<SectionWithPhrases> = emptyList(),
     val filteredSections: List<SectionWithPhrases> = emptyList(),
     val selectedCategory: Category? = null,
-    val sourceLang: LanguageItem = LANGUAGES_LIST[2],
-    val targetLang: LanguageItem = LANGUAGES_LIST[3],
+    val sourceLang: LanguageItem = LANGUAGES_LIST[1],
+    val targetLang: LanguageItem = LANGUAGES_LIST[2],
     val searchQuery: String = "",
     val isBookmarkedView: Boolean = false
 )
