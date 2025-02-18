@@ -49,6 +49,7 @@ fun SettingsScaffold(
         ) {
             Text(
                 text = stringResource(title),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -61,6 +62,7 @@ fun SettingsScaffold(
                 Icon(
                     Icons.Rounded.Close,
                     contentDescription = stringResource(id = R.string.action_close)
+                    , tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
