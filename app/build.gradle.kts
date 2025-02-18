@@ -1,13 +1,27 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
+
+val versionFile = rootProject.file("version.properties")
+
+val localProperties = Properties()
+val versionProperties = Properties()
+localProperties.load(FileInputStream(rootProject.file("local.properties")))
+versionProperties.load(FileInputStream(versionFile))
+
+val localVersionCode = versionProperties.getProperty("VERSION_CODE").toInt()
 
 android {
     namespace = "com.venom.lingolens"
@@ -17,8 +31,8 @@ android {
         applicationId = "com.venom.lingolens"
         minSdk = 24
         targetSdk = 34
-        versionCode = 11
-        versionName = "3.8.6"
+        versionCode = localVersionCode
+        versionName = "3.8.${localVersionCode}"
 
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,11 +55,30 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    // Auto increment app version
+    gradle.startParameter.taskNames.forEach {
+        if (it.contains(":app:assembleRelease")) {
+            versionFile.bufferedWriter().use { file ->
+                file.write("VERSION_CODE=${(localVersionCode + 1)}")
+            }
+        }
     }
 }
 
+
 dependencies {
 
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+
+    implementation("com.google.firebase:firebase-config")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Ads
     api(libs.play.services.ads)
 
     // Core
@@ -76,6 +109,7 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
+    implementation(libs.androidx.navigation.compose)
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
