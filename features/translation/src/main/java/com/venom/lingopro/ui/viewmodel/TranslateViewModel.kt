@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.mapper.extractSynonyms
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationEntry
 import com.venom.data.model.TranslationResponse
 import com.venom.data.repo.TranslationRepository
-import com.venom.domain.model.LANGUAGES_LIST
-import com.venom.domain.model.LanguageItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TranslationUiState(
-    val sourceLanguage: LanguageItem = LanguageItem("en", "English"),
-    val targetLanguage: LanguageItem = LanguageItem("ar", "Arabic"),
+    val sourceLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val targetLanguage: LanguageItem = LANGUAGES_LIST[0],
     val sourceText: String = "",
     val translatedText: String = "",
     val translationResult: TranslationResponse = TranslationResponse(),
@@ -30,7 +30,8 @@ data class TranslationUiState(
     val isNetworkAvailable: Boolean = true,
     val isBookmarked: Boolean = false,
     val translationHistory: List<TranslationEntry> = emptyList(),
-    val availableLanguages: List<LanguageItem> = LANGUAGES_LIST
+    val availableLanguages: List<LanguageItem> = LANGUAGES_LIST,
+    val clearTextFlag: Boolean = false
 )
 
 @OptIn(FlowPreview::class)
@@ -58,11 +59,11 @@ class TranslateViewModel @Inject constructor(
     }
 
     fun onSourceTextChanged(input: String) {
-        if (input.isBlank()) {
+        if (input.isBlank() || input == _uiState.value.sourceText) {
             clearTranslation()
             return
         }
-        _uiState.update { it.copy(sourceText = input) }
+        _uiState.update { it.copy(sourceText = input, clearTextFlag = false) }
         viewModelScope.launch {
             textChangeFlow.emit(input)
         }
@@ -132,8 +133,8 @@ class TranslateViewModel @Inject constructor(
                     TranslationEntry(
                         sourceText = sourceText,
                         translatedText = translatedText,
-                        sourceLangName = sourceLanguage.name,
-                        targetLangName = targetLanguage.name,
+                        sourceLangName = sourceLanguage.englishName,
+                        targetLangName = targetLanguage.englishName,
                         sourceLangCode = sourceLanguage.code,
                         targetLangCode = targetLanguage.code,
                         isBookmarked = isBookmarked,
@@ -153,6 +154,7 @@ class TranslateViewModel @Inject constructor(
             it.copy(
                 sourceText = "",
                 translatedText = "",
+                clearTextFlag = true,
                 isBookmarked = false,
                 synonyms = emptyList(),
                 isLoading = false,
