@@ -27,6 +27,7 @@ include(":features:translation")
 include(":features:phrase")
 include(":features:dialog")
 include(":features:stackcard")
+include(":features:settings")
 include(":features:ocr")
 
 
@@ -37,4 +38,4 @@ include(":core:resources")
 include(":core:utils")
 include(":core:domain")
 
-include(":features:settings")
+
