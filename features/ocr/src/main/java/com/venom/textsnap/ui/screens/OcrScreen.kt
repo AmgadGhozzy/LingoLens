@@ -9,15 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.common.CustomDragHandle
-import com.venom.ui.navigation.navigateToTranslation
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
@@ -37,7 +33,7 @@ import kotlinx.coroutines.launch
 fun OcrScreen(
     viewModel: OcrViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
-    navController: NavController = rememberNavController(),
+    onNavigateToTranslation: (String) -> Unit,
     onFileClick: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
@@ -93,22 +89,15 @@ fun OcrScreen(
             )
         },
         sheetContent = {
-            OcrBottomSheetContent(uiState = uiState,
+            OcrBottomSheetContent(
+                uiState = uiState,
                 maxHeight = maxHeight.dp,
                 peekHeight = peekHeight,
                 sheetState = sheetState,
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
                 onSpeak = { text -> ttsViewModel.speak(text) },
-                onTranslate = { text -> navController.navigateToTranslation(text.trim()) }
+                onTranslate = onNavigateToTranslation
             )
         })
 }
-
-
-@Preview
-@Composable
-fun OcrScreenPreview() {
-    OcrScreen(onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
-}
-
