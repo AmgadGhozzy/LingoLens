@@ -2,14 +2,15 @@ package com.venom.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.data.model.SettingsPreferences
+import com.venom.data.model.ThemeColor
 import com.venom.data.model.ThemePreference
 import com.venom.data.repo.SettingsRepository
-import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
-import com.venom.domain.model.ThemeColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,9 +22,9 @@ import javax.inject.Inject
 
 data class SettingsUiState(
     val themePrefs: ThemePreference = ThemePreference(),
-    val appLanguage: AppLanguage = AppLanguage.ENGLISH,
-    val nativeLanguage: AppLanguage = AppLanguage.ARABIC,
-    val selectedLanguage: AppLanguage = AppLanguage.ENGLISH,
+    val appLanguage: LanguageItem = LANGUAGES_LIST[0],
+    val nativeLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
     val speechRate: Float = 1f,
     val autoPronounciation: Boolean = true,
     val error: String? = null
@@ -49,7 +50,7 @@ class SettingsViewModel @Inject constructor(
         speechRate = speechRate,
         appLanguage = appLanguage,
         nativeLanguage = nativeLanguage,
-        selectedLanguage = appLanguage,
+        targetLanguage = targetLanguage,
         autoPronounciation = autoPronounciation,
         themePrefs = themePrefs
     )
@@ -63,12 +64,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateLanguage(language: AppLanguage) = updateSetting {
+    fun setAppLanguage(language: LanguageItem) = updateSetting {
         updateSettings { copy(appLanguage = language) }
     }
 
-    fun updateNativeLanguage(language: AppLanguage) = updateSetting {
+    fun updateNativeLanguage(language: LanguageItem) = updateSetting {
         updateSettings { copy(nativeLanguage = language) }
+    }
+
+    fun updateTargetLanguage(language: LanguageItem) = updateSetting {
+        updateSettings { copy(targetLanguage = language) }
     }
 
     fun updateSpeechRate(rate: Float) = updateSetting {
