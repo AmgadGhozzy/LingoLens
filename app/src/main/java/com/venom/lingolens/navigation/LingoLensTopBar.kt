@@ -14,7 +14,8 @@ fun LingoLensTopBar(
     currentScreen: Screen,
     onNavigateBack: () -> Unit,
     onBookmarkClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onAboutClick: () -> Unit
 ) {
     TopBar(
         title = stringResource(
@@ -30,7 +31,7 @@ fun LingoLensTopBar(
         },
         onLeadingIconClick = when {
             currentScreen == Screen.Ocr -> onNavigateBack
-            else -> onSettingsClick
+            else -> onAboutClick
         },
         actions = {
             TopBarActions(onBookmarkClick, onSettingsClick)
