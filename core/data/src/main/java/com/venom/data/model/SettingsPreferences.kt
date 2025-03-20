@@ -1,17 +1,16 @@
 package com.venom.data.model
 
-import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
-import com.venom.domain.model.ThemeColor
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class SettingsPreferences(
-    val appLanguage: AppLanguage = AppLanguage.ENGLISH,
-    val nativeLanguage: AppLanguage = AppLanguage.ARABIC,
+    val appLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val nativeLanguage: LanguageItem = LANGUAGES_LIST[0],
+    val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
+
     val speechRate: Float = 1.2f,
 
     val themePrefs: ThemePreference = ThemePreference(),
@@ -24,11 +23,12 @@ data class SettingsPreferences(
 data class ThemePreference(
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val extractWallpaperColor: Boolean = false,
-    val isAmoledBlack: Boolean = true,
+    val isAmoledBlack: Boolean = false,
     val colorStyle: PaletteStyle = PaletteStyle.Neutral,
     val fontFamily: FontStyles = FontStyles.Default,
-    @Contextual val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF00B8FF)
+    val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF00B8FF)
 )
+
 @Serializable
 data class PersonalPreference(
     val maxStreakCount: Int = 0,
