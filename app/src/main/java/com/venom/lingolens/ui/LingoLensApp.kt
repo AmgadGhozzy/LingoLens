@@ -15,6 +15,7 @@ import com.venom.lingolens.navigation.LingoLensBottomBar
 import com.venom.lingolens.navigation.LingoLensTopBar
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.phrase.ui.screen.PhrasesDialog
+import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.settings.presentation.screen.SettingsBottomSheet
 import com.venom.stackcard.ui.screen.WordBookmarksDialog
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
@@ -72,6 +73,12 @@ private fun LingoLensAppContent(
                 onDismiss = { appState.showSettings = false }
             )
         }
+
+        appState.showAbout -> {
+            AboutBottomSheet(
+                onDismiss = { appState.showAbout = false }
+            )
+        }
     }
 
     Scaffold(
@@ -81,7 +88,8 @@ private fun LingoLensAppContent(
                     currentScreen = appState.currentScreen,
                     onNavigateBack = { appState.navController.popBackStack() },
                     onBookmarkClick = { appState.showBookmarkHistory = true },
-                    onSettingsClick = { appState.showSettings = true }
+                    onSettingsClick = { appState.showSettings = true },
+                    onAboutClick = { appState.showAbout = true }
                 )
             }
         },
