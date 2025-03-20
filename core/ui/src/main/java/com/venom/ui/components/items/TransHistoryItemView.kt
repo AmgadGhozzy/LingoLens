@@ -85,13 +85,12 @@ private fun TranslationContent(
             ) {
                 SynonymsSection(synonyms = entry.synonyms!!)
             }
+            ExpandIndicator(
+                expanded = isExpanded,
+                onClick = onExpandClick,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
-
-        ExpandIndicator(
-            expanded = isExpanded,
-            onClick = onExpandClick,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
     }
 }
 
