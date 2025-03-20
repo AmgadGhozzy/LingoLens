@@ -5,6 +5,7 @@ import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.model.TranslationEntry
 import com.venom.data.model.TranslationResponse
+import com.venom.utils.Extensions.preprocessText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -18,7 +19,7 @@ class TranslationRepository @Inject constructor(
     ): Result<TranslationResponse> = withContext(Dispatchers.IO) {
         try {
             val response = translationService.getTranslation(
-                sourceLanguage = sourceLanguage, targetLanguage = targetLanguage, query = query
+                sourceLanguage = sourceLanguage, targetLanguage = targetLanguage, query = query.preprocessText()
             )
             Result.success(response)
         } catch (e: Exception) {
