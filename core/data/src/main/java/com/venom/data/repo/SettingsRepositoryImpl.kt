@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.venom.data.local.SettingsPreferencesSerializer
+import com.venom.data.model.LanguageItem
 import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
+import com.venom.data.model.ThemeColor
 import com.venom.data.model.ThemePreference
-import com.venom.domain.model.AppLanguage
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
-import com.venom.domain.model.ThemeColor
 import com.venom.utils.SETTING_FILE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -54,16 +54,20 @@ class SettingsRepositoryImpl @Inject constructor(
         updateSettings { copy(personalPrefs = update(personalPrefs)) }
     }
 
-    override suspend fun setAppLanguage(language: AppLanguage) {
+    override suspend fun setAppLanguage(language: LanguageItem) {
         updateSettings { copy(appLanguage = language) }
+    }
+
+    override suspend fun setNativeLanguage(language: LanguageItem) {
+        updateSettings { copy(nativeLanguage = language) }
+    }
+
+    override suspend fun setTargetLanguage(language: LanguageItem) {
+        updateSettings { copy(targetLanguage = language) }
     }
 
     override suspend fun setSpeechRate(rate: Float) {
         updateSettings { copy(speechRate = rate) }
-    }
-
-    override suspend fun setNativeLanguage(language: AppLanguage) {
-        updateSettings { copy(nativeLanguage = language) }
     }
 
     override suspend fun setPrimaryColor(color: ThemeColor) {
