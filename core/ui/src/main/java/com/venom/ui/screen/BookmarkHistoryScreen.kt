@@ -109,7 +109,6 @@ fun BookmarkHistoryScreen(
         ) {
             TopBar(title = viewResources.title,
                 onLeadingIconClick = onBackClick,
-                leadingIcon = R.drawable.icon_back,
                 actions = {
                     CustomButton(
                         icon = R.drawable.icon_delete,
