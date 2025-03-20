@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
 
             val showDialog = remember { showUpdateDialog }
 
-            UpdateLanguage(selectedLanguage.isoCode)
+            UpdateLanguage(selectedLanguage.code)
             LingoLensTheme(
                 primaryColor = Color(themePrefs.primaryColor.color),
                 isAmoledBlack = themePrefs.isAmoledBlack,
