@@ -1,5 +1,8 @@
-package com.venom.domain.model
+package com.venom.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ThemeColor(
     val name: String,
     val color: Long
