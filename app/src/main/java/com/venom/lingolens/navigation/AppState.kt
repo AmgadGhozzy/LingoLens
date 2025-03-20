@@ -13,6 +13,7 @@ class AppState(
     var currentBackStackEntry: NavBackStackEntry? by mutableStateOf(null)
     var showBookmarkHistory by mutableStateOf(false)
     var showSettings by mutableStateOf(false)
+    var showAbout by mutableStateOf(false)
 
     val currentRoute: String?
         get() = currentBackStackEntry?.destination?.route
