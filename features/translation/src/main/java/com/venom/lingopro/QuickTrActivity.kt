@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation.compose.rememberNavController
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.ui.theme.LingoLensTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +28,7 @@ class QuickTrActivity : ComponentActivity() {
             LingoLensTheme {
                 TranslationScreen(
                     isDialog = true, onDismiss = { finish() }, initialText = selectedText,
-                    navController = rememberNavController()
+                    onNavigateToOcr = {}
                 )
             }
         }
