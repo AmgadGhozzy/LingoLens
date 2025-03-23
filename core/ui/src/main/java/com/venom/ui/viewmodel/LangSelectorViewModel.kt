@@ -139,19 +139,12 @@ class LangSelectorViewModel @Inject constructor(
                     settingsRepository.setTargetLanguage(currentState.sourceLang)
                     currentState.copy(
                         sourceLang = currentState.targetLang,
-                        targetLang = currentState.sourceLang,
-                        didSwap = true
+                        targetLang = currentState.sourceLang
                     )
                 }
             } finally {
                 isInternalUpdate = false
             }
-        }
-    }
-
-    fun resetSwapFlag() {
-        _state.update { currentState ->
-            currentState.copy(didSwap = false)
         }
     }
 }
