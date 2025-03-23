@@ -34,54 +34,94 @@ fun QuestionCard(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(16.dp)
             .animateContentSize(
                 animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
                 )
-            ), shape = MaterialTheme.shapes.extraLarge, colors = CardDefaults.elevatedCardColors(
+            ),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
-        ), elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = 4.dp, pressedElevation = 6.dp
+        ),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp
         )
     ) {
         Column(
-            modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            // Question content section
+            QuestionContent(
+                question = question,
+                translation = translation,
+                showTranslation = showTranslation
+            )
+
+            // Action buttons row
+            ActionButtons(
+                isBookmarked = isBookmarked,
+                isSpeaking = isSpeaking,
+                onBookmarkClick = onBookmarkClick,
+                onSpeakClick = onSpeakClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuestionContent(
+    question: String,
+    translation: String?,
+    showTranslation: Boolean
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Main question text
+        DynamicStyledText(
+            text = question,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        // Optional translation with animation
+        if (translation != null) {
+            AnimatedVisibility(visible = showTranslation) {
                 DynamicStyledText(
-                    text = question,
+                    text = translation,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                if (translation != null) {
-                    AnimatedVisibility(
-                        visible = showTranslation
-                    ) {
-                        DynamicStyledText(
-                            text = translation,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
-                    space = 8.dp, alignment = Alignment.End
-                ), verticalAlignment = Alignment.CenterVertically
-            ) {
-                SpeechFilledButton(
-                    isSpeaking = isSpeaking, onSpeakClick = onSpeakClick
-                )
-
-                BookmarkFilledButton(
-                    isBookmarked = isBookmarked, onToggleBookmark = onBookmarkClick
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ActionButtons(
+    isBookmarked: Boolean,
+    isSpeaking: Boolean,
+    onBookmarkClick: () -> Unit,
+    onSpeakClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(
+            space = 8.dp, alignment = Alignment.End
+        ), verticalAlignment = Alignment.CenterVertically
+    ) {
+        SpeechFilledButton(
+            isSpeaking = isSpeaking,
+            onSpeakClick = onSpeakClick
+        )
+
+        BookmarkFilledButton(
+            isBookmarked = isBookmarked,
+            onToggleBookmark = onBookmarkClick
+        )
     }
 }
