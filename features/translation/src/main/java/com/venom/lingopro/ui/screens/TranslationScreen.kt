@@ -13,7 +13,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.lingopro.ui.components.sections.TranslationSection
-import com.venom.lingopro.ui.viewmodel.TranslateViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
@@ -23,6 +22,7 @@ import com.venom.ui.screen.dictionary.TranslationsCard
 import com.venom.ui.viewmodel.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
+import com.venom.ui.viewmodel.TranslateViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.pasteFromClipboard
 import com.venom.utils.Extensions.shareText
@@ -74,7 +74,6 @@ fun TranslationScreen(
                 selection = currentSelection,
                 composition = currentComposition
             )
-            langSelectorViewModel.resetSwapFlag()
         }
     }
 
