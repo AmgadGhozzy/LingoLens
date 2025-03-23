@@ -3,10 +3,13 @@ package com.venom.stackcard.ui.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.Card
@@ -35,20 +38,10 @@ fun OptionItem(
     onClick: () -> Unit,
     onSpeakClick: (() -> Unit)? = null
 ) {
-    val backgroundColor = when {
-        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.primaryContainer
-        isAnswered && option.isSelected -> MaterialTheme.colorScheme.errorContainer
-        option.isSelected -> MaterialTheme.colorScheme.primaryContainer
-        else -> MaterialTheme.colorScheme.surface
-    }
+    // Determine colors based on selection and answer state
+    val colors = getOptionColors(option, isAnswered)
 
-    val contentColor = when {
-        option.isSelected && isAnswered && option.isCorrect -> MaterialTheme.colorScheme.onPrimaryContainer
-        option.isSelected && isAnswered && !option.isCorrect -> MaterialTheme.colorScheme.onErrorContainer
-        option.isSelected -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onSurface
-    }
-
+    // Animation for selection feedback
     val scale by animateFloatAsState(
         targetValue = if (option.isSelected) 1f else 0.96f,
         label = "scale animation"
@@ -63,62 +56,45 @@ fun OptionItem(
                 scaleY = scale
             },
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor
+            containerColor = colors.background,
+            contentColor = colors.content
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (option.isSelected) 12.dp else 8.dp
         ),
         shape = ShapeDefaults.Large
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Option label
-            Surface(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(ShapeDefaults.Small)
-                    .align(Alignment.CenterStart),
-                color = if (option.isSelected) {
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            OptionLabel(
+                label = if (isAnswered) {
+                    if (option.isCorrect) "✓" else "✗"
                 } else {
-                    MaterialTheme.colorScheme.surfaceVariant
+                    option.label
                 },
-                contentColor = contentColor
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (isAnswered) {
-                            if (option.isCorrect) "✔" else "✘"
-                        } else {
-                            option.label
-                        },
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-
-            // Option content
-            DynamicStyledText(
-                text = option.text,
-                textAlign = TextAlign.Center,
-                color = contentColor,
-                modifier = Modifier.align(Alignment.Center)
+                isSelected = option.isSelected,
+                contentColor = colors.content
             )
 
-            // Speak button
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Option content (main text)
+            DynamicStyledText(
+                text = option.text,
+                textAlign = TextAlign.Start,
+                color = colors.content,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Speak button (if provided)
             onSpeakClick?.let {
                 IconButton(
                     onClick = onSpeakClick,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .align(Alignment.CenterEnd)
+                    modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
@@ -127,7 +103,59 @@ fun OptionItem(
                     )
                 }
             }
-
         }
     }
+}
+
+@Composable
+private fun OptionLabel(
+    label: String,
+    isSelected: Boolean,
+    contentColor: androidx.compose.ui.graphics.Color
+) {
+    Surface(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(ShapeDefaults.Small),
+        color = if (isSelected) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        },
+        contentColor = contentColor
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
+
+private data class OptionColors(
+    val background: androidx.compose.ui.graphics.Color,
+    val content: androidx.compose.ui.graphics.Color
+)
+
+@Composable
+private fun getOptionColors(option: QuizOption, isAnswered: Boolean): OptionColors {
+    val backgroundColor = when {
+        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.primaryContainer
+        isAnswered && option.isSelected -> MaterialTheme.colorScheme.errorContainer
+        option.isSelected -> MaterialTheme.colorScheme.primaryContainer
+        else -> MaterialTheme.colorScheme.surface
+    }
+
+    val contentColor = when {
+        option.isSelected && isAnswered && option.isCorrect -> MaterialTheme.colorScheme.onPrimaryContainer
+        option.isSelected && isAnswered && !option.isCorrect -> MaterialTheme.colorScheme.onErrorContainer
+        option.isSelected -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    return OptionColors(backgroundColor, contentColor)
 }
