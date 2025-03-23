@@ -4,75 +4,77 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.mapper.extractSynonyms
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationEntry
 import com.venom.data.model.TranslationResponse
 import com.venom.data.repo.TranslationRepository
-import com.venom.domain.model.LANGUAGES_LIST
-import com.venom.domain.model.LanguageItem
+import com.venom.utils.Extensions.postprocessText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TranslationUiState(
-    val sourceLanguage: LanguageItem = LanguageItem("en", "English"),
-    val targetLanguage: LanguageItem = LanguageItem("ar", "Arabic"),
+    val sourceLanguage: LanguageItem = LANGUAGES_LIST[0],
+    val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
     val sourceText: String = "",
     val translatedText: String = "",
-    val translationResult: TranslationResponse? = null,
+    val translationResult: TranslationResponse = TranslationResponse(),
     val synonyms: List<String> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val isNetworkAvailable: Boolean = true,
     val isBookmarked: Boolean = false,
-    val translationHistory: List<TranslationEntry> = emptyList(),
-    val availableLanguages: List<LanguageItem> = LANGUAGES_LIST
+    val clearTextFlag: Boolean = false
 )
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class TranslateViewModel @Inject constructor(
     private val repository: TranslationRepository
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(TranslationUiState())
-    val uiState: StateFlow<TranslationUiState> = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
-    fun onSourceTextChanged(input: String) {
-        if (input.isBlank()) {
-            _uiState.update { it.copy(
-                sourceText = input,
-                translationResult = null,
-                translatedText = "",
-                synonyms = emptyList()
-            )}
-            return
-        }
+    private val textChangeFlow = MutableSharedFlow<String>()
+    private var translationJob: Job? = null
+    private var textCollectionJob: Job? = null
 
-        if (input != _uiState.value.sourceText) {
-            _uiState.update { it.copy(sourceText = input) }
-            translate(input)
+    init {
+        startTextCollection()
+    }
+
+    private fun startTextCollection() {
+        textCollectionJob = viewModelScope.launch {
+            textChangeFlow.debounce(500)
+                .filterNot { it.isBlank() && it != _uiState.value.sourceText }
+                .collect { translate(it) }
         }
     }
 
-    fun updateLanguages(
-        sourceLanguage: LanguageItem,
-        targetLanguage: LanguageItem
-    ) {
-        val currentState = _uiState.value
-        if (sourceLanguage == currentState.sourceLanguage &&
-            targetLanguage == currentState.targetLanguage) {
+    fun onSourceTextChanged(input: String) {
+        if (input.isBlank() || input == _uiState.value.sourceText) {
             return
         }
+        _uiState.update { it.copy(sourceText = input, clearTextFlag = false) }
+        viewModelScope.launch {
+            textChangeFlow.emit(input)
+        }
+    }
 
-        _uiState.update { it.copy(
-            sourceLanguage = sourceLanguage,
-            targetLanguage = targetLanguage
-        )}
+    fun updateLanguages(source: LanguageItem, target: LanguageItem) {
+        val currentState = _uiState.value
+        if (source == currentState.sourceLanguage && target == currentState.targetLanguage) return
 
-        currentState.sourceText.takeIf { it.isNotBlank() }?.let { translate(it) }
+        _uiState.update { it.copy(sourceLanguage = source, targetLanguage = target) }
+        if (currentState.sourceText.isNotBlank()) {
+            translate(currentState.sourceText)
+        }
     }
 
     fun toggleBookmark() {
@@ -82,59 +84,81 @@ class TranslateViewModel @Inject constructor(
 
     private fun translate(input: String) {
         Log.d("TranslateViewModel", "Input: $input")
-        viewModelScope.launch {
+        // Cancel any ongoing translation
+        translationJob?.cancel()
+
+        translationJob = viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
+
+            val existingEntry = repository.getTranslationEntry(
+                input, _uiState.value.sourceLanguage.code, _uiState.value.targetLanguage.code
+            )
 
             repository.getTranslation(
                 _uiState.value.sourceLanguage.code, _uiState.value.targetLanguage.code, input
-            ).onSuccess { response ->
-                Log.d("TranslateViewModel", "Response: $response")
-                _uiState.update {
-                    it.copy(
-                        translationResult = response,
-                        synonyms = extractSynonyms(response),
-                        translatedText = response.sentences?.getOrNull(0)?.trans?.toString() ?: "",
-                        isLoading = false,
-                        error = null
-                    )
+            ).fold(onSuccess = { response ->
+                if (currentCoroutineContext().isActive) {
+                    _uiState.update {
+                        it.copy(
+                            translationResult = response,
+                            translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText().orEmpty(),
+                            synonyms = extractSynonyms(response),
+                            isLoading = false,
+                            error = null,
+                            isBookmarked = existingEntry?.isBookmarked == true
+                        )
+                    }
+                    saveTranslation()
                 }
-                // Create and save translation entry to history
-                saveTranslation()
-            }.onFailure { exception ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false, error = exception.message ?: "Unknown error occurred"
-                    )
+            }, onFailure = { error ->
+                if (currentCoroutineContext().isActive) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = error.message ?: "Unknown error occurred"
+                        )
+                    }
                 }
+            })
+        }
+    }
+
+    private fun saveTranslation() {
+        viewModelScope.launch {
+            with(_uiState.value) {
+                repository.saveTranslationEntry(
+                    TranslationEntry(
+                        sourceText = sourceText,
+                        translatedText = translatedText,
+                        sourceLangName = sourceLanguage.englishName,
+                        targetLangName = targetLanguage.englishName,
+                        sourceLangCode = sourceLanguage.code,
+                        targetLangCode = targetLanguage.code,
+                        isBookmarked = isBookmarked,
+                        synonyms = synonyms
+                    )
+                )
             }
         }
     }
 
-    fun saveTranslation() {
-        viewModelScope.launch {
-            val currentState = _uiState.value
-            val translationEntry = TranslationEntry(
-                sourceText = currentState.sourceText,
-                translatedText = currentState.translatedText,
-                sourceLangName = currentState.sourceLanguage.name,
-                targetLangName = currentState.targetLanguage.name,
-                sourceLangCode = currentState.sourceLanguage.code,
-                targetLangCode = currentState.targetLanguage.code,
-                isBookmarked = currentState.isBookmarked,
-                synonyms = currentState.synonyms
-            )
-            repository.saveTranslationEntry(translationEntry)
-        }
-    }
+    fun clearTranslation() {
+        // Cancel ongoing translation and text collection
+        translationJob?.cancel()
+        textCollectionJob?.cancel()
 
-    fun clearText() {
         _uiState.update {
             it.copy(
                 sourceText = "",
                 translatedText = "",
-                translationResult = null,
-                synonyms = emptyList()
+                clearTextFlag = true,
+                isBookmarked = false,
+                synonyms = emptyList(),
+                isLoading = false,
+                error = null
             )
         }
+
+        startTextCollection()
     }
 }
