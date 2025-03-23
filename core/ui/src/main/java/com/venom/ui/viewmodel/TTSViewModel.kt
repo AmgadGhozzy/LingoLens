@@ -9,6 +9,7 @@ import com.venom.data.repo.SettingsRepository
 import com.venom.domain.repo.tts.MediaPlayerFactory
 import com.venom.domain.repo.tts.TTSUrlGenerator
 import com.venom.domain.repo.tts.TextToSpeechFactory
+import com.venom.utils.Extensions.cleanForTTS
 import com.venom.utils.Extensions.sanitize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -90,12 +91,12 @@ class TTSViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 stopSpeaking() // Stop any previous speech
-                _uiState.update { it.copy(currentText = text) }
+                _uiState.update { it.copy(currentText = text.cleanForTTS()) }
 
-                val locale = language?.let { Locale(it) } ?: determineLocale(text)
+                val locale = language?.let { Locale(it) } ?: determineLocale(_uiState.value.currentText)
                 when (tts?.isLanguageAvailable(locale)) {
-                    TextToSpeech.LANG_AVAILABLE -> speakLocally(text, locale)
-                    else -> speakOnline(text, locale)
+                    TextToSpeech.LANG_AVAILABLE -> speakLocally(_uiState.value.currentText, locale)
+                    else -> speakOnline(_uiState.value.currentText, locale)
                 }
             } catch (e: Exception) {
                 handleError(e.message ?: "Unknown error")
