@@ -84,6 +84,37 @@ object Extensions {
 
     fun String.postprocessText(): String = replace("☆", "\n").replace("★", ".")
 
+
+    /**
+     * Extension function to clean text for TTS by removing or replacing special characters
+     * such as underscores, hyphens, apostrophes, and other symbols that may affect TTS quality.
+     *
+     * @return Cleaned text optimized for TTS
+     */
+    fun String.cleanForTTS(): String {
+        return this
+            .replace("_", " ")
+            .replace("-", " ")
+            .replace("'", "")
+            .replace("\"", "")
+            .replace("/", " ")
+            .replace("\\", " ")
+            .replace("(", "")
+            .replace(")", "")
+            .replace("[", "")
+            .replace("]", "")
+            .replace("{", "")
+            .replace("}", "")
+            .replace("*", "")
+            .replace("+", " plus ")
+            .replace("=", " equals ")
+            .replace("&", " and ")
+            .replace("#", "")
+            .replace("@", " at ")
+            .replace("  ", " ")
+            .trim()
+    }
+
     /**
      * Keyboard Management
      */
