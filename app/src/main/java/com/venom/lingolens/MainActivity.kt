@@ -49,54 +49,33 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    // ViewModels
     private val ocrViewModel: OcrViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
-    val updateViewModel: UpdateViewModel by viewModels()
-    val showUpdateDialog = mutableStateOf(false)
-    private var currentPhotoUri: Uri? = null
+    private val updateViewModel: UpdateViewModel by viewModels()
 
+    // UI State
+    private val showUpdateDialog = mutableStateOf(false)
+
+    // Camera and file handling
+    private var currentPhotoUri: Uri? = null
     private lateinit var remoteConfig: FirebaseRemoteConfig
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        askNotificationPermission()
 
-        remoteConfig = Firebase.remoteConfig
-
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 3600
-            fetchTimeoutInSeconds = 10
-        }
-
-        remoteConfig.setConfigSettingsAsync(configSettings)
-
-        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
-
-        fetchAndActivateRemoteConfig()
-        runtimeEnableAutoInit()
-        addConfigUpdateListener()
-
-        val selectedLanguage = settingsViewModel.uiState.value.appLanguage
-
-        @Composable
-        fun UpdateLanguage(iso: String) {
-            val locale = if (iso.isEmpty()) Locale.getDefault() else Locale(iso)
-            val config = LocalConfiguration.current
-            config.setLocale(locale)
-            val res = LocalContext.current.resources
-            res.updateConfiguration(config, res.displayMetrics)
-        }
+        setupPermissions()
+        setupRemoteConfig()
 
         setContent {
-
             val userPrefs = settingsViewModel.uiState.collectAsState().value
             val themePrefs = userPrefs.themePrefs
-
             val showDialog = remember { showUpdateDialog }
 
-            UpdateLanguage(selectedLanguage.code)
+            ApplySelectedLanguage(userPrefs.appLanguage.code)
+
             LingoLensTheme(
                 primaryColor = Color(themePrefs.primaryColor.color),
                 isAmoledBlack = themePrefs.isAmoledBlack,
@@ -105,48 +84,111 @@ class MainActivity : ComponentActivity() {
                 colorStyle = themePrefs.colorStyle,
                 fontFamilyStyle = themePrefs.fontFamily
             ) {
-                //AppNavigation()
-                fetchAndActivateRemoteConfig()
                 LingoLensApp(
                     ocrViewModel = ocrViewModel,
                     startCamera = { startCamera() },
-                    imageSelector = { imageSelector.launch("image/*") }
+                    imageSelector = { selectImageFromGallery() },
+                    fileSelector = { selectDocumentFromFileManager() }
                 )
 
                 if (showDialog.value) {
-                    UpdateScreen(viewModel = updateViewModel, onDismiss = {
-                        showDialog.value = false
-                        finish()
-                    })
+                    UpdateScreen(
+                        viewModel = updateViewModel,
+                        onDismiss = {
+                            showDialog.value = false
+                            finish()
+                        }
+                    )
                 }
             }
 
+            CheckForForceUpdate()
+        }
+    }
 
-            LaunchedEffect(key1 = Unit) {
-                updateViewModel.state.collectLatest { updateState ->
-                    if (updateState.isForceUpdate) {
-                        showDialog.value = true
-                    }
+    @Composable
+    private fun ApplySelectedLanguage(languageCode: String) {
+        val locale = if (languageCode.isEmpty()) Locale.getDefault() else Locale(languageCode)
+        val config = LocalConfiguration.current
+        config.setLocale(locale)
+        val res = LocalContext.current.resources
+        res.updateConfiguration(config, res.displayMetrics)
+    }
+
+    @Composable
+    private fun CheckForForceUpdate() {
+        LaunchedEffect(key1 = Unit) {
+            updateViewModel.state.collectLatest { updateState ->
+                if (updateState.isForceUpdate) {
+                    showUpdateDialog.value = true
                 }
             }
         }
     }
 
-    private val imageSelector =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
-            }
+    private fun setupPermissions() {
+        askNotificationPermission()
+    }
+
+    private fun setupRemoteConfig() {
+        remoteConfig = Firebase.remoteConfig
+
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+            fetchTimeoutInSeconds = 10
         }
 
-    private val cameraCapture =
-        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success) {
-                currentPhotoUri?.let { uri ->
-                    ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
-                }
+        remoteConfig.apply {
+            setConfigSettingsAsync(configSettings)
+            setDefaultsAsync(R.xml.remote_config_defaults)
+        }
+
+        fetchAndActivateRemoteConfig()
+        runtimeEnableAutoInit()
+        addConfigUpdateListener()
+    }
+
+    // Image selection from gallery
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
+        }
+    }
+
+    // Document selection from file manager
+    private val documentLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            // Request persistent permission to access the file
+            contentResolver.takePersistableUriPermission(
+                uri,
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
+        }
+    }
+
+    // Camera capture
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            currentPhotoUri?.let { uri ->
+                ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
             }
         }
+    }
+
+    private fun selectImageFromGallery() {
+        galleryLauncher.launch("image/*")
+    }
+
+    private fun selectDocumentFromFileManager() {
+        documentLauncher.launch(arrayOf("image/*", "application/pdf"))
+    }
 
     private fun startCamera() {
         val photoFile = createImageCacheFile()
@@ -154,7 +196,7 @@ class MainActivity : ComponentActivity() {
             this, "${packageName}.provider", photoFile
         )
         currentPhotoUri = photoUri
-        cameraCapture.launch(photoUri)
+        cameraLauncher.launch(photoUri)
     }
 
     private fun createImageCacheFile(): File {
@@ -165,14 +207,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
+        ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-        if (isGranted) {
-            // FCM can post notifications.
-        } else {
-            this.showToast("Notification permission denied. Your app will not show notifications.")
+        if (!isGranted) {
+            showToast("Notification permission denied. Your app will not show notifications.")
         }
     }
 
@@ -182,14 +221,21 @@ class MainActivity : ComponentActivity() {
 
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                // Permission granted
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                this.showToast("This app needs notification permission to send you important updates and alerts")
-            } else {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission already granted
+                }
+
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    showToast("This app needs notification permission for important updates")
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
             }
         }
     }
@@ -199,10 +245,7 @@ class MainActivity : ComponentActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val message = remoteConfig.getString("welcome_message")
-                    Log.d(
-                        "RemoteConfig",
-                        "Config fetched successfully. New Welcome Message:$message"
-                    )
+                    Log.d("RemoteConfig", "Config fetched successfully: $message")
                 } else {
                     Log.e("RemoteConfig", "Fetch failed", task.exception)
                 }
@@ -212,7 +255,7 @@ class MainActivity : ComponentActivity() {
     private fun addConfigUpdateListener() {
         remoteConfig.addOnConfigUpdateListener(object : ConfigUpdateListener {
             override fun onUpdate(configUpdate: ConfigUpdate) {
-                Log.d("config", "Updated keys: ${configUpdate.updatedKeys}")
+                Log.d("RemoteConfig", "Updated keys: ${configUpdate.updatedKeys}")
 
                 if (configUpdate.updatedKeys.contains("welcome_message")) {
                     remoteConfig.activate().addOnCompleteListener {
@@ -223,9 +266,8 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onError(error: FirebaseRemoteConfigException) {
-                Log.w("config", "Config update error with code: ${error.code}", error)
+                Log.w("RemoteConfig", "Config update error: ${error.code}", error)
             }
         })
     }
 }
-
