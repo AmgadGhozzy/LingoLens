@@ -90,7 +90,7 @@ class QuizViewModel @Inject constructor(
                         testState = QuizTestState.InProgress(
                             currentQuestion = 1,
                             totalQuestions = questionCount,
-                            timeRemaining = questionCount * 15,
+                            timeRemaining = questionCount * 10,
                             hearts = 3,
                             score = 0f,
                             streak = 0
@@ -133,7 +133,7 @@ class QuizViewModel @Inject constructor(
         val newHearts = if (isCorrect) testState.hearts else testState.hearts - 1
         val newStreak = if (isCorrect) testState.streak + 1 else 0
         val newScore =
-            if (isCorrect) testState.score + (10 * (testState.streak + 1)) else testState.score
+            if (isCorrect) testState.score + (testState.streak + 1) else testState.score
 
         viewModelScope.launch {
             _state.update {
