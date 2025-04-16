@@ -4,8 +4,11 @@ import androidx.navigation.NavHostController
 import com.venom.ui.navigation.Screen
 
 fun NavHostController.navigateToStart(screen: Screen) {
-    if (currentDestination?.route != screen.route) {
-        navigate(screen.route) {
+    val currentRoute = currentDestination?.route?.substringBefore("?")
+    val targetRoute = screen.route
+
+    if (currentRoute != targetRoute) {
+        navigate(targetRoute) {
             popUpTo(graph.startDestinationId) {
                 saveState = true
             }
