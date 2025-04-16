@@ -3,8 +3,11 @@ package com.venom.ui.navigation
 import com.venom.domain.model.WordLevels
 
 sealed class Screen(val route: String) {
-    object Translation : Screen("translation/{text}") {
-        fun createRoute(text: String? = null) = "translation/${text ?: ""}"
+    object Translation : Screen("translation") {
+        const val ARG_TEXT = "text"
+        fun createRoute(text: String? = null) =
+            if (text.isNullOrBlank()) route
+            else "$route?$ARG_TEXT=$text"
     }
 
     object Ocr : Screen("ocr")
