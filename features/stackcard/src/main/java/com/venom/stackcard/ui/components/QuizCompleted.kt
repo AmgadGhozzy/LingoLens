@@ -195,7 +195,7 @@ private fun ScoreCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${(score * 100).toInt()}%",
+                text = "${score.toInt()}%",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
