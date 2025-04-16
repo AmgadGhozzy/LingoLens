@@ -43,4 +43,5 @@ dependencies {
     api(libs.androidx.exifinterface)
 
     implementation(libs.androidx.core.ktx)
+    implementation(project(":core:resources"))
 }
