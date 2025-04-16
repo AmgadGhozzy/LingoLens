@@ -6,12 +6,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,48 +30,53 @@ fun QuizInProgress(
     onNext: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal =16.dp)
-            .systemBarsPadding()
+            .systemBarsPadding(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        QuizHeader(
-            currentQuestion = testState.currentQuestion,
-            totalQuestions = testState.totalQuestions,
-            hearts = testState.hearts,
-            timeRemaining = testState.timeRemaining,
-            onBackClick = onBackClick,
-        )
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        QuestionCard(
-            question = state.currentWord?.englishEn ?: "",
-            translation = state.currentWord?.arabicAr ?: "",
-            showTranslation = state.isAnswered
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OptionsList(
-            options = state.options,
-            selectedOption = state.selectedOption,
-            isAnswered = state.isAnswered,
-            correctAnswer = state.currentWord?.arabicAr,
-            onOptionSelected = onOptionSelected
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        AnimatedVisibility(
-            visible = state.isAnswered,
-            enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically()
-        ) {
-            NextButton(
-                enabled = state.isAnswered,
-                onClick = onNext
+        item {
+            QuizHeader(
+                currentQuestion = testState.currentQuestion,
+                totalQuestions = testState.totalQuestions,
+                hearts = testState.hearts,
+                timeRemaining = testState.timeRemaining,
+                onBackClick = onBackClick,
             )
+        }
+
+        item {
+            QuestionCard(
+                question = state.currentWord?.englishEn ?: "",
+                translation = state.currentWord?.arabicAr ?: "",
+                showTranslation = state.isAnswered
+            )
+        }
+
+        item {
+            OptionsList(
+                options = state.options,
+                selectedOption = state.selectedOption,
+                isAnswered = state.isAnswered,
+                correctAnswer = state.currentWord?.arabicAr,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        item {
+            AnimatedVisibility(
+                visible = state.isAnswered,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
+            ) {
+                NextButton(
+                    enabled = state.isAnswered,
+                    onClick = onNext
+                )
+            }
         }
     }
 }
