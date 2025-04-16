@@ -27,7 +27,8 @@ import com.venom.ui.screen.ContentType
 fun LingoLensApp(
     ocrViewModel: OcrViewModel,
     startCamera: () -> Unit,
-    imageSelector: () -> Unit
+    imageSelector: () -> Unit,
+    fileSelector: () -> Unit,
 ) {
     val navController = rememberNavController()
     val appState = remember(navController) {
@@ -40,7 +41,8 @@ fun LingoLensApp(
         appState = appState,
         ocrViewModel = ocrViewModel,
         startCamera = startCamera,
-        imageSelector = imageSelector
+        imageSelector = imageSelector,
+        fileSelector = fileSelector
     )
 }
 
@@ -49,7 +51,8 @@ private fun LingoLensAppContent(
     appState: AppState,
     ocrViewModel: OcrViewModel,
     startCamera: () -> Unit,
-    imageSelector: () -> Unit
+    imageSelector: () -> Unit,
+    fileSelector: () -> Unit,
 ) {
     BackHandler(enabled = appState.showBookmarkHistory || appState.showSettings) {
         appState.handleBackPress()
@@ -112,7 +115,8 @@ private fun LingoLensAppContent(
                 navController = appState.navController,
                 ocrViewModel = ocrViewModel,
                 startCamera = startCamera,
-                imageSelector = imageSelector
+                imageSelector = imageSelector,
+                fileSelector = fileSelector
             )
         }
     }
