@@ -13,8 +13,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,7 +43,7 @@ fun QuestionCard(
     onSpeakClick: () -> Unit = {},
     shape: Shape = MaterialTheme.shapes.extraLarge
 ) {
-    // Separate animation specs with proper types
+    // Animation specs
     val floatAnimSpec = spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
         stiffness = Spring.StiffnessLow
@@ -53,55 +54,53 @@ fun QuestionCard(
         stiffness = Spring.StiffnessLow
     )
 
-    // Combined visual feedback for active state
     val activeScale by animateFloatAsState(
         targetValue = if (isSpeaking) 1.01f else 1f,
         animationSpec = floatAnimSpec,
         label = "card scale"
     )
 
-    ElevatedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .graphicsLayer {
-                scaleX = activeScale
-                scaleY = activeScale
-            }
-            .animateContentSize(sizeAnimSpec)
-            .semantics {
-                contentDescription = "Question card: $question" +
-                        if (isSpeaking) ", currently speaking" else ""
-            },
-        shape = shape,
-        colors = CardDefaults.elevatedCardColors(),
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = if (isSpeaking) 8.dp else 4.dp,
-            pressedElevation = if (isSpeaking) 8.dp else 4.dp
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+    Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    scaleX = activeScale
+                    scaleY = activeScale
+                }
+                .animateContentSize(sizeAnimSpec)
+                .semantics {
+                    contentDescription = "Question card: $question" +
+                            if (isSpeaking) ", currently speaking" else ""
+                },
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            // Question content section - pass the properly typed animation spec
-            QuestionContent(
-                question = question,
-                translation = translation,
-                showTranslation = showTranslation,
-                isSpeaking = isSpeaking,
-                animationSpec = floatAnimSpec  // This is now correctly typed
-            )
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                // Question content section
+                QuestionContent(
+                    question = question,
+                    translation = translation,
+                    showTranslation = showTranslation,
+                    isSpeaking = isSpeaking,
+                    animationSpec = floatAnimSpec
+                )
 
-            // Action buttons row
-            ActionButtons(
-                isBookmarked = isBookmarked,
-                isSpeaking = isSpeaking,
-                onBookmarkClick = onBookmarkClick,
-                onSpeakClick = onSpeakClick
-            )
+                // Action buttons row
+                ActionButtons(
+                    isBookmarked = isBookmarked,
+                    isSpeaking = isSpeaking,
+                    onBookmarkClick = onBookmarkClick,
+                    onSpeakClick = onSpeakClick
+                )
+            }
         }
-    }
+
 }
 
 @Composable
