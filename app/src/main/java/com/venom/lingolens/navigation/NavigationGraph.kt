@@ -22,23 +22,32 @@ fun NavigationGraph(
     navController: NavHostController,
     ocrViewModel: OcrViewModel,
     startCamera: () -> Unit,
-    imageSelector: () -> Unit
+    imageSelector: () -> Unit,
+    fileSelector: () -> Unit,
 ) {
     AnimatedNavHost(
         navController = navController, startDestination = Screen.Translation.route
     ) {
         // Translation Screen with optional text parameter
-        composable(route = Screen.Translation.route, arguments = listOf(navArgument("text") {
-            type = NavType.StringType
-            nullable = true
-            defaultValue = null
-        }), deepLinks = listOf(navDeepLink {
-            uriPattern = "lingolens://translation?text={text}"
-        })
+        composable(
+            route = "${Screen.Translation.route}?${Screen.Translation.ARG_TEXT}={${Screen.Translation.ARG_TEXT}}",
+            arguments = listOf(
+                navArgument(Screen.Translation.ARG_TEXT) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            ),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "lingolens://translation?text={${Screen.Translation.ARG_TEXT}}"
+                }
+            )
         ) { backStackEntry ->
-            val text = backStackEntry.arguments?.getString("text")
+            val text = backStackEntry.arguments?.getString(Screen.Translation.ARG_TEXT)
             TranslationScreen(
-                onNavigateToOcr = { navController.navigate(Screen.Ocr.route) }, initialText = text
+                onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
+                initialText = text?.takeUnless { it == "null" || it == "{text}" }
             )
         }
 
@@ -61,8 +70,8 @@ fun NavigationGraph(
                 onNavigateToTranslation = { text ->
                     navController.navigate(Screen.Translation.createRoute(text))
                 },
+                onFileClick = fileSelector,
                 onCameraClick = startCamera,
-                onFileClick = imageSelector,
                 onGalleryClick = imageSelector
             )
         }
