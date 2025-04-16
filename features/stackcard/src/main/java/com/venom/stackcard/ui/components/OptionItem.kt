@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,11 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
@@ -65,7 +60,7 @@ fun OptionItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Simplified animation states
+    // Animation states
     val scale by animateFloatAsState(
         targetValue = when {
             isPressed -> 0.95f
@@ -76,7 +71,7 @@ fun OptionItem(
         label = "scale"
     )
 
-    // Pulsing animation only for correct answers
+    // Pulsing animation for correct answers
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseGlow by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -92,13 +87,13 @@ fun OptionItem(
     val isCorrectAnswer = isAnswered && option.isCorrect
     val isIncorrectSelection = isAnswered && option.isSelected && !option.isCorrect
 
-    // Animated colors for smoother transitions
+    // Animated colors - improved color states
     val backgroundColor by animateColorAsState(
         targetValue = when {
-            isCorrectAnswer -> MaterialTheme.colorScheme.primaryContainer
-            isIncorrectSelection -> MaterialTheme.colorScheme.errorContainer
-            option.isSelected -> MaterialTheme.colorScheme.primaryContainer
-            else -> MaterialTheme.colorScheme.surface
+            isCorrectAnswer -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
+            isIncorrectSelection -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f)
+            option.isSelected -> MaterialTheme.colorScheme.secondaryContainer
+            else -> MaterialTheme.colorScheme.surfaceVariant
         },
         label = "background"
     )
@@ -117,81 +112,84 @@ fun OptionItem(
         targetValue = when {
             isCorrectAnswer -> MaterialTheme.colorScheme.primary
             isIncorrectSelection -> MaterialTheme.colorScheme.error
-            else -> MaterialTheme.colorScheme.primary
+            option.isSelected -> MaterialTheme.colorScheme.secondary
+            else -> MaterialTheme.colorScheme.outline
         },
         label = "border"
     )
 
-    // Dynamic elevation for visual hierarchy
+    // Dynamic elevation
     val elevation = when {
         isCorrectAnswer -> 8.dp + (pulseGlow.dp * 0.5f)
         option.isSelected -> 6.dp
         else -> 2.dp
     }
 
-    Card(
+    // Add a Box wrapper with padding to prevent shadow clipping
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .shadow(
-                elevation = elevation,
-                shape = ShapeDefaults.Large,
-                ambientColor = if (isCorrectAnswer) MaterialTheme.colorScheme.primary else Color.Transparent,
-                spotColor = if (isCorrectAnswer) MaterialTheme.colorScheme.primary else Color.Transparent
-            )
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .semantics {
-                contentDescription = "Option ${option.label}: ${option.text}"
-                role = Role.RadioButton
-                onClick(label = "Select option") { onClick(); true }
-            },
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor
-        ),
-        border = BorderStroke(width = 2.dp, color = borderColor),
-        shape = ShapeDefaults.Large,
-        onClick = if (!isAnswered) onClick else ({}),
-        enabled = !isAnswered,
-        interactionSource = interactionSource
+            .padding(horizontal = 4.dp, vertical = 8.dp)
     ) {
-        Row(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Option label/indicator
-            OptionIndicator(
-                option = option,
-                isAnswered = isAnswered,
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    shadowElevation = elevation.toPx()
+                    shape = ShapeDefaults.Large
+                }
+                .semantics {
+                    contentDescription = "Option ${option.label}: ${option.text}"
+                    role = Role.RadioButton
+                    onClick(label = "Select option") { onClick(); true }
+                },
+            colors = CardDefaults.cardColors(
+                containerColor = backgroundColor,
                 contentColor = contentColor
-            )
+            ),
+            border = BorderStroke(width = 2.dp, color = borderColor),
+            shape = ShapeDefaults.Large,
+            onClick = if (!isAnswered) onClick else ({}),
+            enabled = !isAnswered,
+            interactionSource = interactionSource
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Option indicator
+                OptionIndicator(
+                    option = option,
+                    isAnswered = isAnswered,
+                    contentColor = contentColor
+                )
 
-            Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
-            // Option text content
-            DynamicStyledText(
-                text = option.text,
-                textAlign = TextAlign.Start,
-                color = contentColor,
-                modifier = Modifier.weight(1f)
-            )
+                // Option text
+                DynamicStyledText(
+                    text = option.text,
+                    textAlign = TextAlign.Start,
+                    color = contentColor,
+                    modifier = Modifier.weight(1f)
+                )
 
-            // Optional speak button
-            onSpeakClick?.let {
-                IconButton(
-                    onClick = onSpeakClick,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                        contentDescription = "Read option ${option.label} aloud",
-                        tint = contentColor.copy(alpha = 0.7f)
-                    )
+                // Optional speak button
+                onSpeakClick?.let {
+                    IconButton(
+                        onClick = onSpeakClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                            contentDescription = "Read option ${option.label} aloud",
+                            tint = contentColor.copy(alpha = 0.7f)
+                        )
+                    }
                 }
             }
         }
@@ -204,24 +202,21 @@ private fun OptionIndicator(
     isAnswered: Boolean,
     contentColor: Color
 ) {
-    // Simplified background color determination
-    val backgroundColor = if (option.isSelected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-    } else {
-        MaterialTheme.colorScheme.surfaceVariant
+    val backgroundColor = when {
+        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        isAnswered && option.isSelected -> MaterialTheme.colorScheme.error.copy(alpha = 0.2f)
+        option.isSelected -> MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
+        else -> MaterialTheme.colorScheme.surfaceVariant
     }
 
-    // Determine icon based on state
-    val icon: ImageVector? = when {
-        isAnswered && option.isCorrect -> Icons.Default.Check
-        isAnswered && option.isSelected -> Icons.Default.Close
-        else -> null
+    val textColor = when {
+        isAnswered && option.isCorrect -> MaterialTheme.colorScheme.primary
+        isAnswered -> MaterialTheme.colorScheme.error
+        else -> contentColor
     }
-
-    // Animation for correct icon
-    val iconScale by animateFloatAsState(
+    val textScale by animateFloatAsState(
         targetValue = if (isAnswered && option.isCorrect) 1.2f else 1f,
-        label = "icon scale"
+        label = "text scale"
     )
 
     Surface(
@@ -235,22 +230,19 @@ private fun OptionIndicator(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = if (option.isCorrect) "Correct" else "Incorrect",
-                    tint = contentColor,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .scale(iconScale)
-                )
-            } else {
-                Text(
-                    text = option.label,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = contentColor
-                )
-            }
+            Text(
+                text = if (isAnswered) {
+                    if (option.isCorrect) "✓" else "✗"
+                } else {
+                    option.label
+                },
+                style = MaterialTheme.typography.titleMedium,
+                color = textColor,
+                modifier = Modifier.graphicsLayer {
+                    scaleX = textScale
+                    scaleY = textScale
+                }
+            )
         }
     }
 }
