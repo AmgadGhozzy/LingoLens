@@ -75,6 +75,6 @@ We may terminate or suspend your access to the Service immediately, without prio
 
 ## Contact Us
 If you have any questions about these Terms, please contact us at:  
-**support@lingolens.app**
+**AmgadGhozzy@gmail.com**
 
 **Effective Date: April 17, 2025**

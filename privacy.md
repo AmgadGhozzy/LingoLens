@@ -69,4 +69,4 @@ You are advised to review this Privacy Policy periodically for any changes. Chan
 
 ## Contact Us
 If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at:  
-**support@lingolens.app**
+**AmgadGhozzy@gmail.com**
