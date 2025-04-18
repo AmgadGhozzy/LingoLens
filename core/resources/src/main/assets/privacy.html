@@ -5,84 +5,283 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Privacy Policy - LingoLens</title>
   <style>
-    body { font-family: Arial, sans-serif; line-height: 1.7; padding: 24px; max-width: 900px; margin: auto; }
-    h1, h2, h3 { color: #2c3e50; }
-    ul { padding-left: 20px; }
+    :root {
+      --primary: #4b6cb7;
+      --secondary: #182848;
+      --text: #333;
+      --light-bg: #f7f9fc;
+      --accent: #3cba92;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.7;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+      color: var(--text);
+      background-color: var(--light-bg);
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      color: var(--secondary);
+      font-size: 2rem;
+      margin-top: 0;
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-top: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--light-bg);
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      color: var(--secondary);
+      font-size: 1.2rem;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .info-card {
+      background-color: rgba(60, 186, 146, 0.1);
+      padding: 1rem;
+      border-left: 4px solid var(--accent);
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .permission-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+    }
+
+    .permission-icon {
+      background: rgba(75, 108, 183, 0.1);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+
+    .permission-details {
+      flex-grow: 1;
+    }
+
+    .permission-details h4 {
+      margin: 0 0 0.3rem 0;
+      color: var(--primary);
+    }
+
+    .permission-details p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
   </style>
 </head>
 <body>
+<div class="container">
+  <header>
+    <div class="logo">LingoLens</div>
+    <h1>Privacy Policy</h1>
+    <p>Last updated: April 17, 2025</p>
+  </header>
 
-<h1>Privacy Policy</h1>
+  <div class="info-card">
+    <p>🔒 <strong>Your privacy matters to us.</strong> We've written this policy in plain language to help you understand what information we collect, why we collect it, and how we use it to make LingoLens better for you.</p>
+  </div>
 
-<h2>Introduction</h2>
-<p>GTTM Team ("we," "our," or "us") built the LingoLens app ("Service," "app," "our app") to provide users with advanced language translation and learning tools. This Privacy Policy explains how we collect, use, and share information about you when you use our app.</p>
-<p>By downloading, installing, or using LingoLens, you agree to the collection and use of information in accordance with this Privacy Policy. If you do not agree with our policies and practices, please do not use our Service.</p>
+  <div class="section">
+    <h2>👋 Introduction</h2>
+    <p>The GTTM Team built LingoLens to help you break down language barriers and enhance your learning journey. This privacy policy explains how we handle your information when you use our app.</p>
+    <p>By using LingoLens, you're agreeing to the practices described here. If you're not comfortable with these terms, you might want to reconsider using our app.</p>
+  </div>
 
-<h2>Information We Collect</h2>
+  <div class="section">
+    <h2>📊 Information We Collect</h2>
+    <p>To provide you with the best possible experience, we collect certain information. Here's what that includes:</p>
 
-<h3>Information You Provide</h3>
-<ul>
-  <li><strong>User-Created Content:</strong> Words, phrases, and translations you create, save, or customize</li>
-  <li><strong>Learning Progress:</strong> Quiz scores, practice history, and learning statistics</li>
-  <li><strong>Custom Settings:</strong> Language preferences, UI customizations, and app settings</li>
-</ul>
+    <h3>Information You Provide</h3>
+    <ul>
+      <li><strong>Your learning content:</strong> Words, phrases, and translations you save or customize</li>
+      <li><strong>Learning progress:</strong> Quiz results, practice history, and other learning stats that help us personalize your experience</li>
+      <li><strong>Your preferences:</strong> Language settings, interface customizations, and other app settings you choose</li>
+    </ul>
 
-<h3>Automatically Collected Information</h3>
-<ul>
-  <li><strong>Usage Data:</strong> How you interact with the app, features used, time spent, and actions taken</li>
-  <li><strong>Device Information:</strong> Device type, operating system version, unique device identifiers</li>
-  <li><strong>Log Data:</strong> In case of errors, we collect data such as your device IP address, device name, operating system version, app configuration, time and date of use, and other statistics</li>
-</ul>
+    <h3>Information Collected Automatically</h3>
+    <ul>
+      <li><strong>How you use LingoLens:</strong> Which features you use most, time spent in different sections, and actions you take</li>
+      <li><strong>Device details:</strong> What type of device you're using, operating system version, and device identifiers</li>
+      <li><strong>Technical data:</strong> If something goes wrong, we collect data like your IP address and app configuration to help fix the problem</li>
+    </ul>
+  </div>
 
-<h3>Permissions We Request</h3>
-<ul>
-  <li><strong>Camera:</strong> Used only for OCR (Optical Character Recognition) text extraction from images</li>
-  <li><strong>Microphone:</strong> Used only for speech recognition and voice-to-text translation features</li>
-  <li><strong>Internet Access:</strong> Required for translation services, dictionary lookups, and app functionality</li>
-  <li><strong>Network State:</strong> To determine connectivity and provide offline features when appropriate</li>
-  <li><strong>Notification Access:</strong> To provide important updates and information about the service</li>
-</ul>
+  <div class="section">
+    <h2>📱 App Permissions Explained</h2>
+    <p>We only request permissions that are necessary for specific features:</p>
 
-<h2>How We Use Your Information</h2>
-<ul>
-  <li>Provide and maintain our Service</li>
-  <li>Improve and personalize your experience</li>
-  <li>Develop new features based on how the app is used</li>
-  <li>Monitor app performance and fix technical issues</li>
-  <li>Communicate with you about the app</li>
-</ul>
+    <div class="permission-card">
+      <div class="permission-icon">📷</div>
+      <div class="permission-details">
+        <h4>Camera</h4>
+        <p>Only used when you want to scan text from images or documents for translation</p>
+      </div>
+    </div>
 
-<h2>Data Sharing and Disclosure</h2>
-<p>We do not sell or rent your personal data to third parties. However, we may share information in the following cases:</p>
-<ul>
-  <li><strong>Third-Party Service Providers:</strong> For translation APIs, OCR, voice recognition, analytics, and ads</li>
-  <li><strong>Legal Requirements:</strong> When required by law or governmental request</li>
-</ul>
+    <div class="permission-card">
+      <div class="permission-icon">🎤</div>
+      <div class="permission-details">
+        <h4>Microphone</h4>
+        <p>Only activated when you use speech recognition or voice-to-text features</p>
+      </div>
+    </div>
 
-<h2>Third-Party Services</h2>
-<p>Our app uses third-party services that may collect identifiable information:</p>
-<ul>
-  <li>Google Play Services</li>
-  <li>AdMob</li>
-  <li>Google Analytics for Firebase</li>
-  <li>Firebase Crashlytics</li>
-</ul>
+    <div class="permission-card">
+      <div class="permission-icon">🌐</div>
+      <div class="permission-details">
+        <h4>Internet Access</h4>
+        <p>Required for translation services, dictionary lookups, and core app functionality</p>
+      </div>
+    </div>
 
-<h2>Advertising</h2>
-<p>Ads may be shown using third-party networks which may use cookies and technologies to serve personalized ads.</p>
+    <div class="permission-card">
+      <div class="permission-icon">📶</div>
+      <div class="permission-details">
+        <h4>Network State</h4>
+        <p>Helps us determine when to use offline features if you're not connected</p>
+      </div>
+    </div>
 
-<h2>Data Security</h2>
-<p>We implement appropriate security measures to protect your personal data against unauthorized access or misuse.</p>
+    <div class="permission-card">
+      <div class="permission-icon">🔔</div>
+      <div class="permission-details">
+        <h4>Notifications</h4>
+        <p>Allows us to send you learning reminders and important updates</p>
+      </div>
+    </div>
+  </div>
 
-<h2>Children’s Privacy</h2>
-<p>We do not knowingly collect personal information from children under 13. If such data is discovered, it will be deleted.</p>
+  <div class="section">
+    <h2>🧩 How We Use Your Information</h2>
+    <p>We use the information we collect to:</p>
+    <ul>
+      <li>Make sure LingoLens works properly and reliably</li>
+      <li>Personalize your experience based on your learning patterns</li>
+      <li>Develop new features that match how people actually use our app</li>
+      <li>Fix technical issues and improve performance</li>
+      <li>Keep you updated about changes and improvements</li>
+    </ul>
+  </div>
 
-<h2>Changes to This Privacy Policy</h2>
-<p>We may update our Privacy Policy from time to time. Changes will be posted on this page with the updated effective date.</p>
+  <div class="section">
+    <h2>🤝 Sharing Your Information</h2>
+    <p>Your trust is important to us. We <strong>never</strong> sell or rent your personal data to third parties. However, we do share information in these limited cases:</p>
+    <ul>
+      <li><strong>Service providers:</strong> Companies that help us deliver services like translation, voice recognition, analytics, and ads</li>
+      <li><strong>Legal requirements:</strong> When we're required to do so by law or valid government request</li>
+    </ul>
+  </div>
 
-<h2>Contact Us</h2>
-<p>If you have any questions or suggestions, contact us at: <a href="mailto:AmgadGhozzy@gmail.com">support
-  @lingolens.app</a></p>
+  <div class="section">
+    <h2>🔄 Third-Party Services</h2>
+    <p>LingoLens integrates with some third-party services that may collect information:</p>
+    <ul>
+      <li>Google Play Services</li>
+      <li>AdMob</li>
+      <li>Google Analytics for Firebase</li>
+      <li>Firebase Crashlytics</li>
+    </ul>
+    <p>Each of these services has its own privacy policy, and we encourage you to review them if you'd like more details.</p>
+  </div>
 
+  <div class="section">
+    <h2>📣 Advertising</h2>
+    <p>Our free version includes ads powered by third-party networks. These networks may use cookies and similar technologies to show you relevant ads based on your interests.</p>
+  </div>
+
+  <div class="section">
+    <h2>🔒 Data Security</h2>
+    <p>We implement reasonable security measures to protect your information against unauthorized access, alteration, or destruction. While no system is 100% secure, we continuously work to improve our security practices.</p>
+  </div>
+
+  <div class="section">
+    <h2>👶 Children's Privacy</h2>
+    <p>LingoLens is not designed for children under 13, and we don't knowingly collect their personal information. If we discover we've collected data from a child under 13, we'll promptly delete it.</p>
+  </div>
+
+  <div class="section">
+    <h2>📝 Changes to This Policy</h2>
+    <p>As LingoLens evolves, we may update this Privacy Policy. We'll post any changes here, along with the updated effective date. For significant changes, we'll try to notify you directly through the app.</p>
+  </div>
+
+  <div class="section">
+    <h2>💬 Let's Talk</h2>
+    <p>Have questions or concerns about your privacy? We'd love to hear from you! Reach out anytime at <a href="mailto:support@lingolens.app">support@lingolens.app</a></p>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 GTTM Team. All rights reserved.</p>
+  </div>
+</div>
 </body>
 </html>
