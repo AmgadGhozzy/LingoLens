@@ -17,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.resources.R
 import com.venom.settings.presentation.components.AppHeader
 import com.venom.settings.presentation.components.SettingsCard
-import com.venom.settings.presentation.components.SettingsScaffold
+import com.venom.ui.components.common.SettingsScaffold
 import com.venom.ui.viewmodel.UpdateState
 import com.venom.ui.viewmodel.UpdateViewModel
 import com.venom.utils.PLAY_STORE
