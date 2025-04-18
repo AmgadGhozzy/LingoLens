@@ -11,6 +11,7 @@ import com.venom.domain.model.PaletteStyle
 import com.venom.domain.model.SettingsDialog
 import com.venom.resources.R
 import com.venom.settings.presentation.screen.AboutScreen
+import com.venom.ui.components.common.CustomBottomSheet
 import com.venom.ui.components.dialogs.BaseDialog
 import com.venom.ui.components.dialogs.DialogRadioOption
 import com.venom.ui.components.dialogs.DialogScrollableContent
@@ -128,7 +129,9 @@ fun SettingsDialogController(
         }
 
         SettingsDialog.About -> {
-            AboutScreen(onDismiss = onDismiss)
+            CustomBottomSheet(
+                onDismiss = onDismiss
+            ) { AboutScreen(onDismiss = onDismiss) }
         }
 
         SettingsDialog.None -> {}
