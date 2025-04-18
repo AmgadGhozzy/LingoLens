@@ -23,14 +23,14 @@ import com.venom.ui.components.common.BaseActionBar
 
 @Composable
 fun TranslatedTextActionBar(
-    onBookmark: () -> Unit,
+    modifier: Modifier = Modifier,
+    onBookmark: (() -> Unit)? = null,
     isSaved: Boolean,
     onCopy: () -> Unit,
     onShare: () -> Unit,
-    onFullscreen: () -> Unit,
+    onFullscreen: (() -> Unit)? = null,
     onSpeak: () -> Unit,
-    isSpeaking: Boolean,
-    modifier: Modifier = Modifier
+    isSpeaking: Boolean
 ) {
     val leftAction = ActionItem.Action(
         icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
@@ -38,12 +38,14 @@ fun TranslatedTextActionBar(
         onClick = onSpeak
     )
 
-    val actions = listOf(
-        ActionItem.Action(
-            icon = R.drawable.icon_fullscreen,
-            description = R.string.action_fullscreen_source,
-            onClick = onFullscreen
-        ),
+    val actions = listOfNotNull(
+        onFullscreen?.let {
+            ActionItem.Action(
+                icon = R.drawable.icon_fullscreen,
+                description = R.string.action_fullscreen_source,
+                onClick = it
+            )
+        },
         ActionItem.Action(
             icon = R.drawable.icon_share,
             description = R.string.action_share,
@@ -54,11 +56,13 @@ fun TranslatedTextActionBar(
             description = R.string.action_copy_source,
             onClick = onCopy
         ),
-        ActionItem.Action(
-            icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
-            description = R.string.action_save,
-            onClick = onBookmark
-        )
+        onBookmark?.let {
+            ActionItem.Action(
+                icon = if (isSaved) R.drawable.icon_bookmark_filled else R.drawable.icon_bookmark_outline,
+                description = R.string.action_save,
+                onClick = it
+            )
+        }
     )
 
     BaseActionBar(
