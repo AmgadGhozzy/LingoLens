@@ -34,12 +34,12 @@ import com.venom.utils.Extensions.getSelectedOrFullText
  */
 @Composable
 fun FullscreenTextDialog(
+    modifier: Modifier = Modifier,
     textValue: TextFieldValue,
     onDismiss: () -> Unit,
     onCopy: (String) -> Unit = {},
     onShare: (String) -> Unit = {},
-    onSpeak: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    onSpeak: (String) -> Unit = {}
 ) {
     Dialog(
         onDismissRequest = onDismiss, properties = DialogProperties(
@@ -77,13 +77,13 @@ fun FullscreenTextDialog(
             )
 
             CustomCard(modifier = Modifier.padding(bottom = 32.dp)) {
-                TranslatedTextActionBar(onBookmark = {},
+                TranslatedTextActionBar(
                     onCopy = { onCopy(textValue.getSelectedOrFullText()) },
                     onShare = { onShare(textValue.getSelectedOrFullText()) },
                     onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
                     isSaved = false,
-                    isSpeaking = false,
-                    onFullscreen = {})
+                    isSpeaking = false
+                )
             }
         }
     }
