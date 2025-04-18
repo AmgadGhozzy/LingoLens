@@ -50,14 +50,17 @@ fun RecognizedTextSection(
     }
 
     fullscreenState?.let { fullscreenText ->
-        FullscreenTextDialog(
-            textValue = TextFieldValue(fullscreenText),
-            onDismiss = { fullscreenState = null },
-            onCopy = onCopy,
-            onShare = onShare,
-            onSpeak = onSpeak
-        )
+        fullscreenText.takeIf { it.isNotEmpty() }?.let {
+            FullscreenTextDialog(
+                textValue = TextFieldValue(it),
+                onDismiss = { fullscreenState = null },
+                onCopy = onCopy,
+                onShare = onShare,
+                onSpeak = onSpeak
+            )
+        }
     }
+
 
     Box {
         SelectionContainer(
@@ -77,12 +80,14 @@ fun RecognizedTextSection(
                 isReadOnly = true
             )
         }
-
-        CustomButton(
-            icon = R.drawable.icon_fullscreen,
-            contentDescription = stringResource(R.string.action_fullscreen),
-            modifier = Modifier.align(Alignment.TopEnd),
-            onClick = { fullscreenState = text },
-        )
+        text.takeIf { it.isNotEmpty() }?.let {
+            CustomButton(
+                icon = R.drawable.icon_fullscreen,
+                contentDescription = stringResource(R.string.action_fullscreen),
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = { fullscreenState = text },
+            )
+        }
     }
+
 }
