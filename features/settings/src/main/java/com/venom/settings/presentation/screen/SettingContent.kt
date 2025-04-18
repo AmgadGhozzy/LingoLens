@@ -3,13 +3,18 @@ package com.venom.settings.presentation.screen
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.venom.data.BuildConfig
 import com.venom.domain.model.SettingsDialog
 import com.venom.resources.R
 import com.venom.settings.presentation.components.*
 import com.venom.settings.presentation.components.dialogs.SettingsDialogController
+import com.venom.ui.components.common.SettingsScaffold
 import com.venom.ui.viewmodel.*
+import com.venom.utils.PLAY_STORE
+import com.venom.utils.openUrl
 
 @Composable
 fun SettingsContent(
@@ -133,6 +138,7 @@ private fun SpeechSettings(
 private fun AboutSettings(
     onDialogTypeChange: (SettingsDialog) -> Unit
 ) {
+    val context = LocalContext.current
     SettingsCard(title = R.string.about) {
         SettingsItem(
             title = R.string.about,
@@ -140,18 +146,13 @@ private fun AboutSettings(
             onClick = { onDialogTypeChange(SettingsDialog.About) }
         )
         SettingsItem(
-            title = R.string.privacy_policy,
-            leadingContent = { SettingsIcon(Icons.Rounded.Security) },
-            onClick = {}
-        )
-        SettingsItem(
             title = R.string.rate_app,
             leadingContent = { SettingsIcon(Icons.Rounded.Star) },
-            onClick = {}
+            onClick = { context.openUrl(PLAY_STORE) }
         )
         SettingsItem(
             title = R.string.app_version,
-            subtitle = "3.8.11",
+            subtitle = BuildConfig.VERSION_CODE,
             leadingContent = { SettingsIcon(Icons.Rounded.Info) },
             trailingContent = { UpdateBadge(hasUpdate = true) },
             onClick = {}
