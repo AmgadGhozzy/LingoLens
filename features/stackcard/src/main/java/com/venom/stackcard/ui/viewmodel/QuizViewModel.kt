@@ -52,6 +52,12 @@ class QuizViewModel @Inject constructor(
     private var currentIndex = 0
     private var timerJob: Job? = null
 
+    // Define scoring constants
+    private val MAX_POINTS_PER_QUESTION = 10
+    private val INITIAL_HEARTS = 3
+    private val TIMER_DURATION = 150 // seconds
+    private val PASSING_SCORE_THRESHOLD = 0.7f // 70%
+
     init {
         loadUnlockedLevels()
     }
@@ -80,7 +86,7 @@ class QuizViewModel @Inject constructor(
 
                 if (currentWords.isNotEmpty()) {
                     loadQuestion(0)
-                    startTimer(150)
+                    startTimer(TIMER_DURATION)
                 }
 
                 _state.update {
@@ -90,8 +96,8 @@ class QuizViewModel @Inject constructor(
                         testState = QuizTestState.InProgress(
                             currentQuestion = 1,
                             totalQuestions = questionCount,
-                            timeRemaining = questionCount * 10,
-                            hearts = 3,
+                            timeRemaining = TIMER_DURATION,
+                            hearts = INITIAL_HEARTS,
                             score = 0f,
                             streak = 0
                         )
@@ -130,10 +136,21 @@ class QuizViewModel @Inject constructor(
         val testState = currentState.testState as? QuizTestState.InProgress ?: return
         val isCorrect = answer == currentState.currentWord?.arabicAr
 
-        val newHearts = if (isCorrect) testState.hearts else testState.hearts - 1
+        // Calculate streak - increment if correct, reset if wrong
         val newStreak = if (isCorrect) testState.streak + 1 else 0
-        val newScore =
-            if (isCorrect) testState.score + (testState.streak + 1) else testState.score
+
+        // Calculate score - using a consistent point system with streak bonuses
+        // Base points for correct answer + streak bonus (capped to avoid excessive score)
+        val pointsEarned = if (isCorrect) {
+            val streakBonus = minOf(newStreak, 5) // Cap streak bonus at 5x
+            MAX_POINTS_PER_QUESTION * streakBonus
+        } else {
+            0
+        }
+        val newScore = testState.score + pointsEarned
+
+        // Hearts only decrease on wrong answers
+        val newHearts = if (isCorrect) testState.hearts else testState.hearts - 1
 
         viewModelScope.launch {
             _state.update {
@@ -148,8 +165,15 @@ class QuizViewModel @Inject constructor(
                 )
             }
 
-            if (newHearts <= 0 || testState.currentQuestion >= testState.totalQuestions) {
+            delay(1000) // Give user time to see the answer result
+
+            // Check if quiz should end (out of hearts) or proceed to next question
+            if (newHearts <= 0) {
                 completeQuiz()
+            } else if (testState.currentQuestion >= testState.totalQuestions) {
+                completeQuiz()
+            } else {
+                onNextQuestion()
             }
         }
     }
@@ -169,6 +193,8 @@ class QuizViewModel @Inject constructor(
                     )
                 }
             }
+        } else {
+            completeQuiz()
         }
     }
 
@@ -176,8 +202,10 @@ class QuizViewModel @Inject constructor(
         val currentState = _state.value
         val testState = currentState.testState as? QuizTestState.InProgress ?: return
 
-        val score = testState.score.toFloat() / (testState.totalQuestions * 10)
-        val passed = score >= 0.7f
+        // Calculate final score as percentage of maximum possible points
+        val maxPossibleScore = testState.totalQuestions * MAX_POINTS_PER_QUESTION
+        val scorePercentage = (testState.score / maxPossibleScore)
+        val passed = scorePercentage >= PASSING_SCORE_THRESHOLD
 
         val nextLevel = if (passed) {
             val levels = WordLevels.values()
@@ -193,7 +221,7 @@ class QuizViewModel @Inject constructor(
             it.copy(
                 testState = QuizTestState.Completed(
                     level = currentState.currentLevel,
-                    levelPercentage = testState.score,
+                    levelPercentage = scorePercentage,
                     totalQuestions = testState.totalQuestions,
                     passed = passed,
                     nextLevel = nextLevel
