@@ -195,14 +195,17 @@ private fun ScoreCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "${score.toInt()}%",
+                text = "${(score * 100).toInt()}%",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
 
+            // Calculate correct answers based on score percentage
+            val correctAnswers = (score * totalQuestions).toInt()
+
             Text(
-                text = "${(score * totalQuestions).toInt()}/$totalQuestions correct",
+                text = "$correctAnswers/$totalQuestions correct",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
