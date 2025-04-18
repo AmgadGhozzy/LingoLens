@@ -1,4 +1,4 @@
-package com.venom.settings.presentation.components
+package com.venom.ui.components.common
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
@@ -32,6 +32,7 @@ import com.venom.resources.R
 fun SettingsScaffold(
     @StringRes title: Int = R.string.settings,
     onDismiss: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
     content: LazyListScope.() -> Unit
 ) {
     Column(
@@ -72,7 +73,7 @@ fun SettingsScaffold(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceContainerLow)
                 .animateContentSize(),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = contentPadding,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             content = content
         )
