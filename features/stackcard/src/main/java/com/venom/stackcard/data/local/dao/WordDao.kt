@@ -36,6 +36,13 @@ interface WordDao {
         pageSize: Int = 10
     ): List<WordEntity>
 
+    // Add to WordDao.kt
+    @Query("SELECT COUNT(*) FROM words WHERE ranking BETWEEN :minRank AND :maxRank")
+    suspend fun getWordCountInLevel(minRank: Int, maxRank: Int): Int
+
+    @Query("SELECT COUNT(*) FROM words WHERE ranking BETWEEN :minRank AND :maxRank AND (isRemembered = 1 OR isBookmarked = 1)")
+    suspend fun getSeenWordCountInLevel(minRank: Int, maxRank: Int): Int
+
     @Query("SELECT * FROM words WHERE isBookmarked = 1")
     fun getBookmarkedWords(): Flow<List<WordEntity>>
 
