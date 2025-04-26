@@ -34,6 +34,20 @@ class WordRepository @Inject constructor(
         )
     }
 
+    // Add to WordRepository.kt
+    suspend fun getLevelProgress(level: WordLevels): Float = withContext(Dispatchers.IO) {
+        val totalWords = wordDao.getWordCountInLevel(level.range.start, level.range.end)
+        val seenWords = wordDao.getSeenWordCountInLevel(level.range.start, level.range.end)
+
+        if (totalWords == 0) 0f else seenWords.toFloat() / totalWords.toFloat()
+    }
+
+    suspend fun getLevelsProgress(): Map<String, Float> = withContext(Dispatchers.IO) {
+        WordLevels.values().associate { level ->
+            level.id to getLevelProgress(level)
+        }
+    }
+
     fun getBookmarkedWords(): Flow<List<WordEntity>> = wordDao.getBookmarkedWords()
 
     fun getRememberedWords(): Flow<List<WordEntity>> = wordDao.getRememberedWords()
