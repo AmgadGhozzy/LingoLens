@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.venom.data.model.TranslationProvider
 import com.venom.lingolens.navigation.AppState
 import com.venom.lingolens.navigation.LingoLensBottomBar
 import com.venom.lingolens.navigation.LingoLensTopBar
@@ -22,6 +24,7 @@ import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.ui.screen.ContentType
+import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
 fun LingoLensApp(
@@ -37,9 +40,12 @@ fun LingoLensApp(
         currentBackStackEntry = navController.currentBackStackEntryAsState().value
     }
 
+    val translateViewModel: TranslateViewModel = hiltViewModel()
+
     LingoLensAppContent(
         appState = appState,
         ocrViewModel = ocrViewModel,
+        translateViewModel = translateViewModel,
         startCamera = startCamera,
         imageSelector = imageSelector,
         fileSelector = fileSelector
@@ -50,6 +56,7 @@ fun LingoLensApp(
 private fun LingoLensAppContent(
     appState: AppState,
     ocrViewModel: OcrViewModel,
+    translateViewModel: TranslateViewModel,
     startCamera: () -> Unit,
     imageSelector: () -> Unit,
     fileSelector: () -> Unit,
@@ -58,7 +65,8 @@ private fun LingoLensAppContent(
         appState.handleBackPress()
     }
 
-    // Handle Dialogs and Sheets
+    val translationUiState by translateViewModel.uiState.collectAsStateWithLifecycle()
+
     when {
         appState.showBookmarkHistory -> {
             BookmarkHistoryDialog(
@@ -84,6 +92,7 @@ private fun LingoLensAppContent(
         }
     }
 
+
     Scaffold(
         topBar = {
             if (appState.shouldShowTopBar) {
@@ -92,7 +101,16 @@ private fun LingoLensAppContent(
                     onNavigateBack = { appState.navController.popBackStack() },
                     onBookmarkClick = { appState.showBookmarkHistory = true },
                     onSettingsClick = { appState.showSettings = true },
-                    onAboutClick = { appState.showAbout = true }
+                    onAboutClick = { appState.showAbout = true },
+
+                    showProviderSelector = appState.currentScreen == Screen.Translation,
+                    selectedProvider = if (appState.currentScreen == Screen.Translation) translationUiState.selectedProvider else TranslationProvider.GOOGLE, // Default or null
+                    availableProviders = if (appState.currentScreen == Screen.Translation) translationUiState.availableProviders else emptyList(),
+                    onProviderSelected = { provider ->
+                        if (appState.currentScreen == Screen.Translation) {
+                            translateViewModel.updateProvider(provider)
+                        }
+                    }
                 )
             }
         },
@@ -114,6 +132,7 @@ private fun LingoLensAppContent(
             NavigationGraph(
                 navController = appState.navController,
                 ocrViewModel = ocrViewModel,
+                translateViewModel = translateViewModel,
                 startCamera = startCamera,
                 imageSelector = imageSelector,
                 fileSelector = fileSelector
