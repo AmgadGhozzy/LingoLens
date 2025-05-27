@@ -13,21 +13,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CloseButton
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScaffold(
     @StringRes title: Int = R.string.settings,
@@ -35,35 +38,43 @@ fun SettingsScaffold(
     contentPadding: PaddingValues = PaddingValues(16.dp),
     content: LazyListScope.() -> Unit
 ) {
+    val titleText = stringResource(title)
+    val closeButtonDescription = stringResource(id = R.string.action_close)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.Center
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = stringResource(title),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.align(Alignment.CenterEnd)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Rounded.Close,
-                    contentDescription = stringResource(id = R.string.action_close)
-                    , tint = MaterialTheme.colorScheme.onSurfaceVariant
+                Text(
+                    text = titleText,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.semantics {
+                        contentDescription = "Settings: $titleText"
+                    }
+                )
+
+                CloseButton(
+                    onClick = onDismiss,
+                    contentDescription = closeButtonDescription,
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
         }
