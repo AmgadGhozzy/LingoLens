@@ -185,7 +185,7 @@ class SpeechToTextManager @Inject constructor(
 
         // Required overrides
         override fun onBeginningOfSpeech() {/* . */}
-        override fun onEndOfSpeech() {/* */}
+        override fun onEndOfSpeech() {/* . */}
         override fun onRmsChanged(rmsdB: Float) {/* . */}
         override fun onBufferReceived(buffer: ByteArray?) {/* . */}
         override fun onEvent(eventType: Int, params: Bundle?) {/* . */}
