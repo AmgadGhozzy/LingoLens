@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">LingoLens</string>
+    <string name="default_notification_channel_id">lingo_lens_channel</string>
 
     <!-- Actions -->
     <string name="action_back">Back</string>
@@ -13,6 +14,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_close">Close</string>
     <string name="action_speak">Speak</string>
+    <string name="action_speaking">Speaking</string>
     <string name="action_speak_source">Speak Source Text</string>
     <string name="action_search">Search</string>
     <string name="action_expand">Expand</string>
@@ -48,6 +50,7 @@
 
     <string name="bookmarks_empty_title">No Bookmarks</string>
     <string name="bookmarks_empty_subtitle">Save translations to view them later.</string>
+    <string name="words_bookmarks">Bookmarked Words</string>
 
     <string name="ocr_empty_state_title">Scan an Image</string>
     <string name="ocr_empty_state_description">Scan an image or select one from gallery</string>
@@ -111,6 +114,7 @@
 
     <string name="ocr_title">OCR</string>
     <string name="translate_title">Translate</string>
+    <string name="quiz_title">Quiz</string>
 
 
     <string name="retry">Retry</string>
@@ -153,7 +157,134 @@
     <string name="action_ocr">Ocr Image to Text</string>
     <string name="type_something">Type something…</string>
     <string name="settings">Settings</string>
-    <string name="words_bookmarks">Bookmarked Words</string>
 
+
+    <!-- General -->
+    <string name="display">Display</string>
+    <string name="language">Language</string>
+    <string name="speech">Speech</string>
+    <string name="about">About</string>
+    <string name="close">Close</string>
+    <string name="next">NEXT</string>
+
+    <!-- Theme and Colors -->
+    <string name="theme">THEME</string>
+    <string name="app_theme">App theme</string>
+    <string name="dark_mode">Dark</string>
+    <string name="light_mode">Light</string>
+    <string name="follow_system">Follow system</string>
+    <string name="amoled_black">Pure black</string>
+    <string name="amoled_black_desc">Use black color on background in dark mode</string>
+    <string name="monochrome">Monochrome</string>
+    <string name="monochrome_desc">Use monochrome colors</string>
+    <string name="colors">COLORS</string>
+    <string name="primary_color">Primary color</string>
+    <string name="primary_color_desc">The theme primary color</string>
+    <string name="palette_style">Palette style</string>
+    <string name="wallpaper_color">Material you</string>
+    <string name="wallpaper_color_desc">Use wallpapers color</string>
+    <string name="random_color">Random color</string>
+    <string name="random_color_desc">Use random color that updates every time you open the app</string>
+    <string name="font_type">Font type</string>
+    <string name="theme_and_colors">Theme and colors</string>
+
+    <!-- Language -->
+    <string name="app_language">App language</string>
+    <string name="native_language">Native language</string>
+
+    <string name="lang_follow_system">Follow System</string>
+
+
+    <!-- Speech -->
+    <string name="auto_pronunciation">Auto Pronunciation</string>
+    <string name="auto_pronunciation_desc">Pronounce words after translation</string>
+    <string name="speech_rate">Speech Rate</string>
+
+    <!-- About & Info -->
+    <string name="info">Info</string>
+    <string name="credits">Credits</string>
+    <string name="about_credits">Designed and developed by Amgad Ghozzy in Egypt</string>
+    <string name="connect_with_us">Connect With Us</string>
+    <string name="legal">Legal Information</string>
+    <string name="licenses">Open Source Licenses</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms">Terms of Service</string>
+    <string name="rate_app">Rate App</string>
+    <string name="report_issue">Report Issue</string>
+    <string name="help_translate">Help Translate</string>
+    <string name="share_app">Share App</string>
+
+    <!-- Social/Contact -->
+    <string name="github">Github</string>
+    <string name="email">Email</string>
+    <string name="twitter">Twitter</string>
+    <string name="linkedin">Linkedin</string>
+    <string name="report_bugs">Report bugs</string>
+    <string name="donate">Donate</string>
+    <string name="share">Share</string>
+
+    <!-- Update Dialog -->
+    <string name="force_update_description">This update is required to continue using the app. Please update to the latest version.</string>
+    <string name="destination_update_available_desc">A new version of the app is available. Update now to enjoy the latest features and improvements.</string>
+    <string name="update_required">Update Required</string>
+    <string name="update_available">Update Available</string>
+    <string name="whats_new">Whats New</string>
+    <string name="update">Update</string>
+    <string name="app_version">App Version</string>
+    <string name="share_app_desc">Share app link</string>
+    <string name="report_issue_desc">Send us feedback</string>
+    <string name="rate_app_desc">Rate us on Play Store</string>
+    <string name="hearts">Hearts</string>
+    <string name="select_color">Select Color</string>
+    <string name="action_select">Select</string>
+    <string name="wallpaper_colors">Use Wallpaper Color</string>
+    <string name="wallpaper_colors_desc">Use wallpaper colors as primary color</string>
+
+
+    <string name="level_beginner">Beginner</string>
+    <string name="desc_beginner">Most common words in daily use</string>
+
+    <string name="level_elementary">Elementary</string>
+    <string name="desc_elementary">Basic vocabulary for everyday communication</string>
+
+    <string name="level_intermediate">Intermediate</string>
+    <string name="desc_intermediate">Expanded vocabulary for fluent conversation</string>
+
+    <string name="level_upper_intermediate">Upper Intermediate</string>
+    <string name="desc_upper_intermediate">Advanced communication skills</string>
+
+    <string name="level_advanced">Advanced</string>
+    <string name="desc_advanced">Professional and academic vocabulary</string>
+
+    <string name="level_mastery">Mastery</string>
+    <string name="desc_mastery">Expert level vocabulary</string>
+
+    <string name="title_language_learning">Language Learning</string>
+    <string name="description_master_vocab">Master vocabulary across different proficiency levels</string>
+
+    <!-- Provider Names -->
+    <string name="provider_google">Google Translate</string>
+    <string name="provider_chatgpt">ChatGPT</string>
+    <string name="provider_gemini">Gemini</string>
+
+    <!-- Provider Descriptions -->
+    <string name="change_translation_provider_cd">Change translation provider, current is %s</string>
+    <string name="selected_indicator_cd">Selected</string>
+    <string name="provider_google_description">Fast and reliable translation service</string>
+    <string name="provider_chatgpt_description">AI-powered translations with context understanding</string>
+    <string name="provider_gemini_description">AI-powered translations with context understanding</string>
+
+    <!-- Provider Selection UI -->
+    <string name="provider_premium_badge">PRO</string>
+    <string name="translation_provider_selector">Translation provider selector</string>
+    <string name="translation_provider_selector_with_current">Translation provider: %1$s. Tap to change</string>
+    <string name="select_provider">Select %1$s as translation provider</string>
+    <string name="current_provider">Currently using %1$s as translation provider</string>
+    <string name="expand_providers_list">Tap to show all providers</string>
+    <string name="collapse_providers_list">Tap to hide provider list</string>
+    <string name="dropdown_role">Translation provider dropdown</string>
+    <string name="provider_selected">Selected</string>
+    <string name="provider_icon">%1$s icon</string>
+    <string name="premium_feature_description">Premium feature requires subscription</string>
 
 </resources>
