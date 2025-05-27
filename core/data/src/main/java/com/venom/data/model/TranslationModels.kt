@@ -8,7 +8,9 @@ data class TranslationResponse(
     val dict: List<DictionaryEntry>? = null,
     val synsets: List<Synset>? = null,
     val definitions: List<Definition>? = null
-)
+) {
+    companion object
+}
 
 data class Sentence(
     val trans: String,
