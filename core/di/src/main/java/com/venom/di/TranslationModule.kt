@@ -1,5 +1,7 @@
 package com.venom.di
 
+import com.venom.data.api.ChatGPTService
+import com.venom.data.api.GeminiService
 import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.repo.TranslationRepository
@@ -18,9 +20,15 @@ object TranslationModule {
     @Provides
     @Singleton
     fun provideTranslationRepository(
-        translationService: TranslationService, translationDao: TranslationDao
+        translationService: TranslationService,
+        chatGPTService: ChatGPTService,
+        geminiService: GeminiService,
+        translationDao: TranslationDao,
     ): TranslationRepository = TranslationRepository(
-        translationService, translationDao
+        translationService,
+        chatGPTService,
+        geminiService,
+        translationDao
     )
 
     @Provides
