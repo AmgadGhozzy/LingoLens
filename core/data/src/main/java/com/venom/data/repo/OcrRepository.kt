@@ -15,16 +15,17 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import javax.inject.Inject
 
+private val TEXT_PLAIN = "text/plain".toMediaTypeOrNull()!!
+
 class OcrRepository @Inject constructor(private val ocrService: OcrService,private val ocrDao: OcrDao) {
     suspend fun performOcr(imageFile: File): Result<OcrResponse> = withContext(Dispatchers.IO) {
         try {
             val authToken = BuildConfig.OCR_API_KEY
-            val showOriginalResponse = "true".toRequestBody("text/plain".toMediaTypeOrNull())
-            val fallbackProviders = "".toRequestBody("text/plain".toMediaTypeOrNull())
-            val providers = "google".toRequestBody("text/plain".toMediaTypeOrNull())
-            val language = "au".toRequestBody("text/plain".toMediaTypeOrNull())
+            val showOriginalResponse = "true".toRequestBody(TEXT_PLAIN)
+            val fallbackProviders = "".toRequestBody(TEXT_PLAIN)
+            val providers = "google".toRequestBody(TEXT_PLAIN)
+            val language = "au".toRequestBody(TEXT_PLAIN)
             val filePart = MultipartBody.Part.createFormData("file", imageFile.name, imageFile.asRequestBody("image/*".toMediaTypeOrNull()))
-
             val response = ocrService.performOcr(
                 authToken, showOriginalResponse, fallbackProviders, providers, filePart, language
             )
