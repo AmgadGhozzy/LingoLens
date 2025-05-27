@@ -5,9 +5,8 @@ import com.venom.data.api.ChatGPTMessage
 import com.venom.data.api.ChatGPTRequestBody
 import com.venom.data.api.ChatGPTService
 import com.venom.data.api.GeminiContent
-import com.venom.data.api.GeminiGenerationConfig
 import com.venom.data.api.GeminiPart
-import com.venom.data.api.GeminiRequestBody
+import com.venom.data.api.GeminiRequest
 import com.venom.data.api.GeminiService
 import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
@@ -57,7 +56,8 @@ class TranslationRepository @Inject constructor(
     }
 
     private suspend fun getChatGPTTranslation(sourceLanguage: String, targetLanguage: String, query: String): ChatGPTResponse {
-        val promptMessage = "Translate from $sourceLanguage to $targetLanguage: \"$query\""
+        val promptMessage = "Translate the following text from $sourceLanguage " +
+                "to $targetLanguage: \"$query\". Only provide the translation without any explanations or additional text."
         val requestBody = ChatGPTRequestBody(
             messages = listOf(
                 ChatGPTMessage(role = "system", content = "You are a translation assistant."),
@@ -68,14 +68,15 @@ class TranslationRepository @Inject constructor(
     }
 
     private suspend fun getGeminiTranslation(sourceLanguage: String, targetLanguage: String, query: String): GeminiResponse {
-        val promptMessage = "Translate from $sourceLanguage to $targetLanguage: \"$query\""
-        val requestBody = GeminiRequestBody(
+        val promptMessage =
+            "Translate the following text from $sourceLanguage to $targetLanguage: \"$query\". Only provide the translation without any explanations or additional text."
+
+        val requestBody = GeminiRequest(
             contents = listOf(
                 GeminiContent(parts = listOf(GeminiPart(text = promptMessage)))
-            ),
-            generationConfig = GeminiGenerationConfig(responseMimeType = "text/plain")
+            )
         )
-        return geminiService.translate(GeminiService.LATEST_MODEL, BuildConfig.GEMINI_API_KEY, requestBody)
+        return geminiService.translate(GeminiService.FLASH_MODEL, BuildConfig.GEMINI_API_KEY, requestBody)
     }
 
     private fun convertChatGPTToTranslationResponse(chatGPTResponse: ChatGPTResponse, originalText: String): TranslationResponse {
@@ -88,7 +89,7 @@ class TranslationRepository @Inject constructor(
     }
 
     private fun convertGeminiToTranslationResponse(geminiResponse: GeminiResponse, originalText: String): TranslationResponse {
-        val translatedText = geminiResponse.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text ?: ""
+        val translatedText = geminiResponse.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text ?: ""
         return TranslationResponse(
             sentences = listOf(
                 Sentence(orig = originalText, trans = translatedText, translit = null)
