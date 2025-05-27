@@ -2,12 +2,15 @@ package com.venom.lingolens.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
+import com.venom.data.model.TranslationProvider
+import com.venom.lingopro.ui.components.sections.ProviderSelectorAction
 import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.navigation.Screen
+
 
 @Composable
 fun LingoLensTopBar(
@@ -15,7 +18,12 @@ fun LingoLensTopBar(
     onNavigateBack: () -> Unit,
     onBookmarkClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onAboutClick: () -> Unit
+    onAboutClick: () -> Unit,
+
+    showProviderSelector: Boolean,
+    selectedProvider: TranslationProvider,
+    availableProviders: List<TranslationProvider>,
+    onProviderSelected: (TranslationProvider) -> Unit
 ) {
     TopBar(
         title = stringResource(
@@ -34,6 +42,13 @@ fun LingoLensTopBar(
             else -> onAboutClick
         },
         actions = {
+            if (showProviderSelector) {
+                ProviderSelectorAction(
+                    selectedProvider = selectedProvider,
+                    availableProviders = availableProviders,
+                    onProviderSelected = onProviderSelected
+                )
+            }
             TopBarActions(onBookmarkClick, onSettingsClick)
         }
     )
