@@ -20,6 +20,7 @@ data class TranslationEntry(
     val sourceLangCode: String,
     val targetLangCode: String,
     val synonyms: List<String>? = null,
+    val providerName: String = TranslationProvider.GOOGLE.id, // Added provider information
     override val timestamp: Long = System.currentTimeMillis(),
     override val isBookmarked: Boolean = false
 ) : IHistoryEntry
