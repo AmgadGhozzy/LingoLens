@@ -16,10 +16,12 @@ import com.venom.stackcard.ui.screen.QuizScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
+import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
+    translateViewModel: TranslateViewModel,
     ocrViewModel: OcrViewModel,
     startCamera: () -> Unit,
     imageSelector: () -> Unit,
@@ -46,6 +48,7 @@ fun NavigationGraph(
         ) { backStackEntry ->
             val text = backStackEntry.arguments?.getString(Screen.Translation.ARG_TEXT)
             TranslationScreen(
+                viewModel = translateViewModel,
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
                 initialText = text?.takeUnless { it == "null" || it == "{text}" }
             )
