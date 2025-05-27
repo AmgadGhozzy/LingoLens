@@ -2,8 +2,10 @@ package com.venom.ui.components.buttons
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -53,6 +55,16 @@ fun CustomButton(
     selectedTint: Color? = null,
     disabledTint: Color? = null
 ) {
+    // Interaction source for press effect
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Scale animation based on press state
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else if (selected) 1.1f else 1f,
+        label = "buttonScale"
+    )
+
     // Animated color logic with more flexible tinting
     val defaultDisabledColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
     val defaultSelectedColor = MaterialTheme.colorScheme.onSecondary
@@ -66,10 +78,12 @@ fun CustomButton(
         }, animationSpec = spring(stiffness = Spring.StiffnessLow), label = "Icon Color"
     )
 
-    IconButton(onClick = onClick,
-        modifier = modifier.scale(if (selected) 1.1f else 1f),
+    IconButton(
+        onClick = onClick,
+        modifier = modifier.scale(scale), // Using the new press-based scale
         enabled = enabled,
-        interactionSource = remember { MutableInteractionSource() }) {
+        interactionSource = interactionSource // Pass the interaction source
+    ) {
         when (icon) {
             is Int -> Icon(
                 painter = painterResource(id = icon),
