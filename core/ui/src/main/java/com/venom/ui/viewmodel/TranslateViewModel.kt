@@ -7,6 +7,7 @@ import com.venom.data.mapper.extractSynonyms
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationProvider
 import com.venom.data.model.TranslationResponse
 import com.venom.data.repo.TranslationRepository
 import com.venom.utils.Extensions.postprocessText
@@ -30,7 +31,9 @@ data class TranslationUiState(
     val error: String? = null,
     val isNetworkAvailable: Boolean = true,
     val isBookmarked: Boolean = false,
-    val clearTextFlag: Boolean = false
+    val clearTextFlag: Boolean = false,
+    val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE,
+    val availableProviders: List<TranslationProvider> = TranslationProvider.ALL
 )
 
 @OptIn(FlowPreview::class)
@@ -82,6 +85,15 @@ class TranslateViewModel @Inject constructor(
         saveTranslation()
     }
 
+    fun updateProvider(provider: TranslationProvider) {
+        _uiState.update { it.copy(selectedProvider = provider) }
+        if (_uiState.value.sourceText.isNotEmpty()) {
+            translate(
+                input = _uiState.value.sourceText
+            )
+        }
+    }
+
     private fun translate(input: String) {
         Log.d("TranslateViewModel", "Input: $input")
         // Cancel any ongoing translation
@@ -95,17 +107,21 @@ class TranslateViewModel @Inject constructor(
             )
 
             repository.getTranslation(
-                _uiState.value.sourceLanguage.code, _uiState.value.targetLanguage.code, input
+                _uiState.value.sourceLanguage.code,
+                _uiState.value.targetLanguage.code,
+                input,
+                _uiState.value.selectedProvider
             ).fold(onSuccess = { response ->
                 if (currentCoroutineContext().isActive) {
                     _uiState.update {
                         it.copy(
                             translationResult = response,
-                            translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText().orEmpty(),
+                            translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText()
+                                .orEmpty(),
                             synonyms = extractSynonyms(response),
                             isLoading = false,
                             error = null,
-                            isBookmarked = existingEntry?.isBookmarked == true
+                            isBookmarked = existingEntry?.isBookmarked == true,
                         )
                     }
                     saveTranslation()
