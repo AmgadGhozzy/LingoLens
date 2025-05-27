@@ -34,6 +34,8 @@ android {
         buildConfigField("String", "APP_VERSION_NAME", "\"${localVersionName}\"")
         buildConfigField("String", "VERSION_CODE", "\"${localVersionCode}\"")
         buildConfigField("String", "OCR_API_KEY", localProperties.getProperty("OCR_API_KEY"))
+        buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
+        buildConfigField("String", "GEMINI_API_KEY", localProperties.getProperty("GEMINI_API_KEY"))
 
         consumerProguardFiles("consumer-rules.pro")
     }
