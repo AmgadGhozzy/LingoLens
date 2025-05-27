@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -67,7 +68,7 @@ fun DrawBoundingBox(
             .pointerInput(Unit) { detectTapGestures(onTap = { onSelect() }) }
 
             .background(
-                if (isSelected) colors.backgroundColor
+                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 else colors.backgroundColor, RoundedCornerShape(6.dp)
             )) {
 
