@@ -44,7 +44,6 @@ fun TranslationScreen(
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
     val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-
     var sourceTextFieldValue by remember {
         mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
     }
@@ -78,10 +77,11 @@ fun TranslationScreen(
     }
 
     val actions = remember(context) {
-        TranslationActions(onTextChange = { newValue ->
-            sourceTextFieldValue = newValue
-            viewModel.onSourceTextChanged(newValue.text)
-        },
+        TranslationActions(
+            onTextChange = { newValue ->
+                sourceTextFieldValue = newValue
+                viewModel.onSourceTextChanged(newValue.text)
+            },
             onClearText = {
                 sourceTextFieldValue = TextFieldValue("")
                 viewModel.clearTranslation()
@@ -98,7 +98,8 @@ fun TranslationScreen(
                 }
             },
             onOcr = onNavigateToOcr,
-            onFullscreen = { fullscreenState = it })
+            onFullscreen = { fullscreenState = it }
+        )
     }
 
     @Composable
@@ -143,13 +144,15 @@ fun TranslationScreen(
     )
 
     if (showDictionaryDialog) Dialog(
-        onDismissRequest = { showDictionaryDialog = false }, properties = DialogProperties(
+        onDismissRequest = { showDictionaryDialog = false },
+        properties = DialogProperties(
             usePlatformDefaultWidth = false,
             decorFitsSystemWindows = false,
             dismissOnBackPress = true
         )
     ) {
-        DictionaryScreen(translationResponse = state.translationResult,
+        DictionaryScreen(
+            translationResponse = state.translationResult,
             onWordClick = { selectedWord ->
 //                sourceTextFieldValue = TextFieldValue(selectedWord)
 //                viewModel.onSourceTextChanged(selectedWord)
