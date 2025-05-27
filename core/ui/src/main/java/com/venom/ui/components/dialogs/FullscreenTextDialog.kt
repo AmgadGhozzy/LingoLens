@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +16,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.resources.R
 import com.venom.ui.components.bars.TranslatedTextActionBar
-import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.inputs.CustomTextField
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.utils.Extensions.getSelectedOrFullText
@@ -55,11 +53,10 @@ fun FullscreenTextDialog(
                 .padding(16.dp)
 
         ) {
-            CustomButton(
-                icon = Icons.Rounded.Close,
+            CloseButton(
+                modifier = Modifier.align(Alignment.End),
                 contentDescription = stringResource(R.string.action_close),
-                onClick = onDismiss,
-                modifier = Modifier.align(Alignment.End)
+                onClick = onDismiss
             )
 
             CustomTextField(
