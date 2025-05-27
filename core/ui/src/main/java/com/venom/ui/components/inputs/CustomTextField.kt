@@ -86,7 +86,7 @@ fun CustomTextField(
         placeholder = {
             Text(
                 text = placeHolderText,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 fontSize = 20.sp,
                 style = TextStyle(textDirection = getTextDirection(textValue.text))
             )
