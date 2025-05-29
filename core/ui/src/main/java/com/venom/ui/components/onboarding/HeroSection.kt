@@ -79,8 +79,11 @@ fun HeroSection(
             modifier = Modifier
                 .fillMaxSize(0.7f)
                 .background(
-                    color = Color.White.copy(alpha = 0.2f),
-                    shape = CircleShape
+                    Brush.radialGradient(
+                        listOf(page.primaryColor, Color.Transparent),
+                        radius = 200f
+                    ),
+                    CircleShape
                 )
         )
 
@@ -88,7 +91,7 @@ fun HeroSection(
             imageVector = page.icon,
             contentDescription = null,
             tint = Color.White,
-            modifier = Modifier.size(size * 0.5f)
+            modifier = Modifier.size(size * 0.6f)
         )
     }
 }
