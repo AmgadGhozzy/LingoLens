@@ -33,7 +33,7 @@ fun ActionButton(
             ),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            contentColor = MaterialTheme.colorScheme.onBackground
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 8.dp,
@@ -44,7 +44,7 @@ fun ActionButton(
             text = text,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }
