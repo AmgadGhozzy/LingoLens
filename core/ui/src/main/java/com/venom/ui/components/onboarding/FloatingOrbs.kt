@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -36,8 +35,8 @@ fun FloatingOrbs(screen: OnboardingPage) {
     )
 
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.1f,
-        targetValue = 0.3f,
+        initialValue = 0.2f,
+        targetValue = 0.6f,
         animationSpec = infiniteRepeatable(tween(5000, easing = EaseInOutCubic), RepeatMode.Reverse)
     )
 
@@ -52,22 +51,13 @@ fun FloatingOrbs(screen: OnboardingPage) {
             Triple(320.dp, screen.primaryColor, scale1) to Modifier.align(Alignment.TopStart).offset((-100).dp, (-80).dp + offsetY.dp),
             Triple(280.dp, screen.secondaryColor, scale2) to Modifier.align(Alignment.CenterEnd).offset(60.dp, (-offsetY).dp),
             Triple(240.dp, screen.primaryColor, scale3) to Modifier.align(Alignment.BottomStart).offset((-60).dp, 100.dp + (offsetY * 0.5f).dp),
-            Triple(180.dp, screen.secondaryColor, scale2 * 0.8f) to Modifier.align(Alignment.Center).offset(120.dp, (-offsetY * 0.8f).dp),
             Triple(160.dp, screen.primaryColor, scale1 * 0.6f) to Modifier.align(Alignment.TopEnd).offset(40.dp, 120.dp + (offsetY * 0.3f).dp)
         ).forEach { (sizeColorScale, baseModifier) ->
             val (size, color, scale) = sizeColorScale
-            val blur = when (size) {
-                320.dp -> 30.dp
-                280.dp -> 25.dp
-                240.dp -> 20.dp
-                180.dp -> 15.dp
-                else -> 12.dp
-            }
             val alphaMultiplier = when (size) {
-                280.dp -> 0.5f
-                240.dp -> 0.3f
-                180.dp -> 0.2f
-                160.dp -> 0.1f
+                280.dp -> 0.7f
+                240.dp -> 0.5f
+                160.dp -> 0.3f
                 else -> 1f
             }
 
@@ -77,11 +67,11 @@ fun FloatingOrbs(screen: OnboardingPage) {
                     .scale(scale)
                     .background(
                         Brush.radialGradient(
-                            listOf(color.copy(alpha = alpha * alphaMultiplier), Color.Transparent)
+                            listOf(color.copy(alpha = alpha * alphaMultiplier), Color.Transparent),
+                            radius = 500f
                         ),
                         CircleShape
                     )
-                    .blur(blur)
             )
         }
     }
