@@ -2,7 +2,7 @@ package com.venom.ui.components.onboarding
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,7 +53,7 @@ fun ContentSection(page: OnboardingPage) {
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
+                            imageVector = Icons.Default.Circle,
                             contentDescription = null,
                             tint = page.primaryColor,
                             modifier = Modifier.size(20.dp)
