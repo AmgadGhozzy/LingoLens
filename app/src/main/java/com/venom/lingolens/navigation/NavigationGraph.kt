@@ -13,8 +13,8 @@ import com.venom.phrase.ui.screen.PhrasebookScreen
 import com.venom.stackcard.ui.screen.CardScreen
 import com.venom.stackcard.ui.screen.MainLevelScreen
 import com.venom.stackcard.ui.screen.QuizScreen
-import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.onboarding.OnboardingScreens
 import com.venom.ui.navigation.Screen
 import com.venom.ui.viewmodel.TranslateViewModel
 
@@ -68,15 +68,16 @@ fun NavigationGraph(
 
         // OCR Screen
         composable(Screen.Ocr.route) {
-            OcrScreen(
-                viewModel = ocrViewModel,
-                onNavigateToTranslation = { text ->
-                    navController.navigate(Screen.Translation.createRoute(text))
-                },
-                onFileClick = fileSelector,
-                onCameraClick = startCamera,
-                onGalleryClick = imageSelector
-            )
+            OnboardingScreens()
+//            OcrScreen(
+//                viewModel = ocrViewModel,
+//                onNavigateToTranslation = { text ->
+//                    navController.navigate(Screen.Translation.createRoute(text))
+//                },
+//                onFileClick = fileSelector,
+//                onCameraClick = startCamera,
+//                onGalleryClick = imageSelector
+//            )
         }
 
         // Phrasebook Screen
