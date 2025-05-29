@@ -166,6 +166,9 @@
     <string name="about">About</string>
     <string name="close">Close</string>
     <string name="next">NEXT</string>
+    <string name="continu">Continue</string>
+    <string name="skip">Skip</string>
+    <string name="get_started">Get Started</string>
 
     <!-- Theme and Colors -->
     <string name="theme">THEME</string>
@@ -286,5 +289,44 @@
     <string name="provider_selected">Selected</string>
     <string name="provider_icon">%1$s icon</string>
     <string name="premium_feature_description">Premium feature requires subscription</string>
+
+    <!-- Onboarding Pages -->
+    <string name="onboarding_page1_title">Welcome to LingoLens</string>
+    <string name="onboarding_page1_subtitle">Your AI Language Partner</string>
+    <string name="onboarding_page1_description">LingoLens is your trusted companion for language learning. Our advanced language translation and text-to-speech capabilities will help you communicate effortlessly with anyone, anywhere.</string>
+
+    <string name="onboarding_page2_title">Smart Translation</string>
+    <string name="onboarding_page2_description">Real-time translation across 100+ languages with advanced AI and context awareness.</string>
+    <string name="onboarding_feature1">100+ Languages</string>
+    <string name="onboarding_feature2">AI-Powered Translation</string>
+    <string name="onboarding_feature3">Context Awareness</string>
+
+    <string name="onboarding_page3_title">AI-Powered OCR</string>
+    <string name="onboarding_page3_subtitle">Text in a Snap</string>
+    <string name="onboarding_page3_description">Instantly extract and translate text from images, documents, and real-world objects with our advanced OCR technology.</string>
+    <string name="onboarding_feature4">Image to Text</string>
+    <string name="onboarding_feature5">Document Scanning</string>
+    <string name="onboarding_feature6">Handwriting Support</string>
+
+    <string name="onboarding_page4_title">Immersive Learning</string>
+    <string name="onboarding_page4_subtitle">Learn by Doing</string>
+    <string name="onboarding_page4_description">Engage with interactive lessons and real-world scenarios that make learning natural and effective.</string>
+    <string name="onboarding_feature7">Interactive Lessons</string>
+    <string name="onboarding_feature8">Real Conversations</string>
+    <string name="onboarding_feature9">Daily Challenges</string>
+
+    <string name="onboarding_page5_title">Voice Recognition</string>
+    <string name="onboarding_page5_subtitle">Unleash Your Voice</string>
+    <string name="onboarding_page5_description">Unleash your creativity with our voice recognition feature, perfect for writing, speaking, and more.</string>
+    <string name="onboarding_feature10">Speech Recognition</string>
+    <string name="onboarding_feature11">Text-to-Speech</string>
+    <string name="onboarding_feature12">Voice-to-Text</string>
+
+    <string name="onboarding_page6_title">Start Your Journey</string>
+    <string name="onboarding_page6_subtitle">Fluency Awaits</string>
+    <string name="onboarding_page6_description">Join millions of users mastering new languages with our comprehensive learning platform.</string>
+    <string name="onboarding_feature13">User-Friendly Interface</string>
+    <string name="onboarding_feature14">Progress Tracking</string>
+    <string name="onboarding_feature15">Adaptive Learning</string>
 
 </resources>
