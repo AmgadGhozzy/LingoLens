@@ -45,8 +45,8 @@ fun PageIndicators(
                         .size(width = width, height = 8.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(
-                            if (isActive) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                            if (isActive) MaterialTheme.colorScheme.onBackground
+                            else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
                         )
                         .clickable { onPageClick(index) }
                 )
