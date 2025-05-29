@@ -1,4 +1,4 @@
-package com.venom.ui.components.onboarding
+package com.venom.ui.screen
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.resources.R
+import com.venom.ui.components.onboarding.ActionButton
+import com.venom.ui.components.onboarding.ContentSection
+import com.venom.ui.components.onboarding.FloatingOrbs
+import com.venom.ui.components.onboarding.HeroSection
+import com.venom.ui.components.onboarding.OnboardingPage
+import com.venom.ui.components.onboarding.PageIndicators
+import com.venom.ui.components.onboarding.getPages
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -29,7 +36,7 @@ fun OnboardingScreens(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
         contentAlignment = Alignment.Center
     ) {
         FloatingOrbs(pages[pagerState.currentPage])
@@ -91,6 +98,8 @@ private fun TopSection(
                     fontWeight = FontWeight.Medium
                 )
             }
+        } else {
+            Spacer(modifier = Modifier.size(48.dp))
         }
     }
 }
