@@ -3,30 +3,21 @@ package com.venom.ui.components.inputs
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
@@ -57,17 +48,11 @@ fun CustomSearchBar(
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
 ) {
-    val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val interactionSource = remember { MutableInteractionSource() }
 
     Surface(
-        modifier = modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .clip(shape)
-            .semantics { contentDescription = searchHint },
+        modifier = modifier.padding(8.dp).fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         tonalElevation = if (isFocused) 2.dp else 0.dp,
         shape = shape
@@ -77,57 +62,50 @@ fun CustomSearchBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Search Icon
             CustomButton(
                 icon = R.drawable.icon_search,
                 selectedTint = searchIconTint,
                 contentDescription = stringResource(R.string.nav_search),
-                onClick = {
-                    if (enabled) {
-                        onSearchTriggered()
-                        focusRequester.requestFocus()
-                    }
-                },
+                onClick = { if (enabled) onSearchTriggered() },
             )
 
-            Box(modifier = Modifier.weight(1f)) {
-                BasicTextField(value = searchQuery,
-                    onValueChange = onSearchQueryChanged,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { isFocused = it.isFocused },
-                    enabled = enabled,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = if (searchQuery.isNotEmpty()) ImeAction.Search else ImeAction.None
-                    ),
-                    keyboardActions = KeyboardActions(onSearch = {
-                        onSearchTriggered()
-                        keyboardController?.hide()
-                    }),
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    interactionSource = interactionSource,
-                    visualTransformation = VisualTransformation.None,
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (searchQuery.isEmpty()) {
-                                Text(
-                                    text = searchHint,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            }
-                            innerTextField()
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChanged,
+                modifier = Modifier
+                    .weight(1f)
+                    .onFocusChanged { isFocused = it.isFocused },
+                enabled = enabled,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = if (searchQuery.isNotEmpty()) ImeAction.Search else ImeAction.None
+                ),
+                keyboardActions = KeyboardActions(onSearch = {
+                    onSearchTriggered()
+                    keyboardController?.hide()
+                }),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (searchQuery.isEmpty()) {
+                            Text(
+                                text = searchHint,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                         }
-                    })
-            }
+                        innerTextField()
+                    }
+                }
+            )
 
             AnimatedVisibility(
-                visible = searchQuery.isNotEmpty() && enabled, enter = fadeIn(), exit = fadeOut()
+                visible = searchQuery.isNotEmpty() && enabled,
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 CustomButton(
                     icon = R.drawable.icon_clear,
@@ -137,7 +115,6 @@ fun CustomSearchBar(
                         onSearchQueryChanged("")
                         keyboardController?.hide()
                     },
-                    enabled = enabled,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -145,7 +122,7 @@ fun CustomSearchBar(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun SearchBarPreview() {
     MaterialTheme {
