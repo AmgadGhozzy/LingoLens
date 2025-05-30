@@ -1,21 +1,15 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -46,7 +40,7 @@ import com.venom.resources.R
 fun CustomButton(
     icon: Any, // Can be @DrawableRes Int or ImageVector
     contentDescription: String,
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean = false,
@@ -55,83 +49,64 @@ fun CustomButton(
     selectedTint: Color? = null,
     disabledTint: Color? = null
 ) {
-    // Interaction source for press effect
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Scale animation based on press state
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.95f else if (selected) 1.1f else 1f,
         label = "buttonScale"
     )
 
-    // Animated color logic with more flexible tinting
-    val defaultDisabledColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-    val defaultSelectedColor = MaterialTheme.colorScheme.onSecondary
-    val defaultUnselectedColor = MaterialTheme.colorScheme.primary
-
     val iconColor by animateColorAsState(
         targetValue = when {
-            !enabled -> disabledTint ?: defaultDisabledColor
-            selected -> selectedTint ?: defaultSelectedColor
-            else -> defaultUnselectedColor
-        }, animationSpec = spring(stiffness = Spring.StiffnessLow), label = "Icon Color"
+            !enabled -> disabledTint ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+            selected -> selectedTint ?: MaterialTheme.colorScheme.onSecondary
+            else -> MaterialTheme.colorScheme.primary
+        }
     )
 
     IconButton(
         onClick = onClick,
-        modifier = modifier.scale(scale), // Using the new press-based scale
+        modifier = modifier.scale(scale),
         enabled = enabled,
-        interactionSource = interactionSource // Pass the interaction source
+        interactionSource = interactionSource
     ) {
         when (icon) {
             is Int -> Icon(
                 painter = painterResource(id = icon),
                 contentDescription = contentDescription,
                 tint = iconColor,
-                modifier = Modifier
-                    .padding(iconPadding)
-                    .size(iconSize)
+                modifier = Modifier.padding(iconPadding).size(iconSize)
             )
-
             is ImageVector -> Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = iconColor,
-                modifier = Modifier
-                    .padding(iconPadding)
-                    .size(iconSize)
+                modifier = Modifier.padding(iconPadding).size(iconSize)
             )
-
-            else -> throw IllegalArgumentException("Icon must be either a drawable resource ID or an ImageVector")
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview
 @Composable
 fun CustomButtonPreview() {
     MaterialTheme {
         CustomButton(
             icon = R.drawable.icon_translate,
             contentDescription = stringResource(R.string.action_translate),
-            onClick = {},
-            selected = true,
-            enabled = true
+            selected = true
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview
 @Composable
 fun CustomButtonVectorPreview() {
     MaterialTheme {
         CustomButton(
             icon = Icons.Rounded.Add,
-            contentDescription = "Add",
-            onClick = {},
-            selected = false,
-            enabled = true
+            contentDescription = "Add"
         )
     }
 }
