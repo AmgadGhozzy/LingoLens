@@ -23,31 +23,38 @@ fun ExpandIndicator(
     containerColor: Color = Color.Transparent,
 ) {
     val rotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f, animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
-        ), label = ""
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
     )
 
     val scale by animateFloatAsState(
-        targetValue = if (expanded) 1.2f else 1f, animationSpec = spring(
+        targetValue = if (expanded) 1.2f else 1f,
+        animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy
-        ), label = ""
+        )
     )
 
     IconButton(
         onClick = onClick,
         modifier = modifier.padding(vertical = 4.dp),
         colors = IconButtonDefaults.iconButtonColors(
-            containerColor = containerColor, contentColor = tint
+            containerColor = containerColor,
+            contentColor = tint
         )
     ) {
         Icon(
-            imageVector = Icons.Rounded.ExpandMore, contentDescription = stringResource(
+            imageVector = Icons.Rounded.ExpandMore,
+            contentDescription = stringResource(
                 if (expanded) R.string.action_collapse
                 else R.string.action_expand
-            ), modifier = Modifier
+            ),
+            modifier = Modifier
                 .scale(scale)
-                .rotate(rotation), tint = tint
+                .rotate(rotation),
+            tint = tint
         )
     }
 }

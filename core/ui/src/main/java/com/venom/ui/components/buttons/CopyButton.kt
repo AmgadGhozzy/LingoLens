@@ -1,9 +1,7 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,7 +31,9 @@ fun CopyButton(
                 delay(2000)
                 showCopiedToast = false
             }
-        }, enabled = enabled, modifier = modifier.size(56.dp)
+        },
+        enabled = enabled,
+        modifier = modifier.size(56.dp)
     ) {
         Icon(
             modifier = Modifier.size(iconSize),
