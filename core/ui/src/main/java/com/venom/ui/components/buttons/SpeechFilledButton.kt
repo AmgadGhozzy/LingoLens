@@ -2,10 +2,7 @@ package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -58,7 +55,7 @@ fun SpeechFilledButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SpeechFilledButtonPreview() {
     MaterialTheme {
@@ -69,7 +66,7 @@ private fun SpeechFilledButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun SpeechFilledButtonSpeakingPreview() {
     MaterialTheme {
