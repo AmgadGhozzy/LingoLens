@@ -2,12 +2,8 @@ package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Shape
@@ -29,10 +25,14 @@ fun BookmarkFilledButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = IconButtonDefaults.filledIconButtonColors(
-        containerColor = if (isBookmarked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primaryContainer.copy(
-            alpha = 0.8f
-        ),
-        contentColor = if (isBookmarked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+        containerColor = if (isBookmarked)
+            MaterialTheme.colorScheme.primaryContainer
+        else
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+        contentColor = if (isBookmarked)
+            MaterialTheme.colorScheme.onPrimaryContainer
+        else
+            MaterialTheme.colorScheme.onSurfaceVariant
     )
 
     FilledIconButton(
@@ -49,7 +49,8 @@ fun BookmarkFilledButton(
             painter = painterResource(
                 if (isBookmarked) R.drawable.icon_bookmark_filled
                 else R.drawable.icon_bookmark_outline
-            ), contentDescription = stringResource(
+            ),
+            contentDescription = stringResource(
                 if (isBookmarked) R.string.bookmark_remove
                 else R.string.bookmark_add
             )
@@ -57,7 +58,7 @@ fun BookmarkFilledButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun BookmarkFilledButtonPreview() {
     MaterialTheme {
@@ -65,7 +66,7 @@ private fun BookmarkFilledButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun BookmarkFilledButtonBookmarkedPreview() {
     MaterialTheme {
