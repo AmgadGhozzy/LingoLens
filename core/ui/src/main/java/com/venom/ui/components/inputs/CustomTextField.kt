@@ -8,14 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.venom.resources.R
 import com.venom.utils.getTextDirection
 
 /**
@@ -30,7 +28,6 @@ import com.venom.utils.getTextDirection
  * @param maxHeight Maximum height of the text field
  * @param minFontSize Minimum font size for the text
  * @param maxFontSize Maximum font size for the text
- * @param colors Custom colors for the text field
  * @param modifier Additional modifier for customization
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,33 +36,16 @@ fun CustomTextField(
     textValue: TextFieldValue,
     onTextChange: (TextFieldValue) -> Unit = {},
     isReadOnly: Boolean = false,
-    placeHolderText: String = stringResource(R.string.type_something),
+    placeHolderText: String = "",
     maxLines: Int = 12,
     minLines: Int = 1,
-
     minFontSize: Int = 14,
     maxFontSize: Int = 22,
-
     minHeight: Dp = 48.dp,
     maxHeight: Dp = 148.dp,
-    colors: TextFieldColors = TextFieldDefaults.colors(
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
-        disabledContainerColor = Color.Transparent,
-
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent,
-
-        cursorColor = MaterialTheme.colorScheme.primary,
-        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-    ),
     modifier: Modifier = Modifier
 ) {
-    val dynamicFontSize = remember(textValue.text) {
-        (maxFontSize - (textValue.text.length / 50)).coerceAtLeast(minFontSize).sp
-    }
+    val dynamicFontSize = (maxFontSize - (textValue.text.length / 50)).coerceAtLeast(minFontSize).sp
 
     val scrollState = remember { ScrollState(0) }
 
@@ -77,12 +57,8 @@ fun CustomTextField(
         readOnly = isReadOnly,
         maxLines = maxLines,
         minLines = minLines,
-        onValueChange = { newText ->
-            onTextChange(TextFieldValue(newText, textValue.selection))
-        },
-        textStyle = TextStyle(
-            fontSize = dynamicFontSize, textDirection = getTextDirection(textValue.text)
-        ),
+        onValueChange = { onTextChange(TextFieldValue(it, textValue.selection)) },
+        textStyle = TextStyle(fontSize = dynamicFontSize, textDirection = getTextDirection(textValue.text)),
         placeholder = {
             Text(
                 text = placeHolderText,
@@ -91,7 +67,17 @@ fun CustomTextField(
                 style = TextStyle(textDirection = getTextDirection(textValue.text))
             )
         },
-        colors = colors
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+        )
     )
 }
 
