@@ -1,19 +1,12 @@
 package com.venom.ui.components.buttons
 
-import android.util.Log
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -31,7 +24,6 @@ import androidx.compose.ui.unit.dp
  * @param icon Either a drawable resource ID (Int) or ImageVector
  * @param contentDescription Accessibility description for the icon
  * @param onClick Callback invoked when button is clicked
- * @param onLongPress Callback invoked when button is long pressed (optional)
  * @param modifier Modifier for the button
  * @param enabled Whether the button is enabled
  * @param selected Whether the button is in selected state
@@ -47,11 +39,10 @@ fun CustomFilledIconButton(
     icon: Any,
     contentDescription: String,
     onClick: () -> Unit,
-    onLongPress: () -> Unit = {},
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean = false,
     isAlpha: Boolean = false,
-    modifier: Modifier = Modifier,
     shape: Shape = IconButtonDefaults.filledShape,
     colors: IconButtonColors = selectedFilledIconButtonColors(
         isSelected = selected,
@@ -62,19 +53,11 @@ fun CustomFilledIconButton(
     iconSize: Dp = 24.dp,
     iconPadding: Dp = 8.dp
 ) {
-    val scale = if (selected && enabled) 1.1f else 1f
-
-    FilledIconButton(onClick = onClick,
+    FilledIconButton(
+        onClick = onClick,
         modifier = modifier
-            .scale(scale)
-            .size(size)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = {
-                    Log.d("CustomFilledIconButton", "Long press detected")
-                    onLongPress()
-                }
-            ),
+            .scale(if (selected && enabled) 1.1f else 1f)
+            .size(size),
         enabled = enabled,
         shape = shape,
         colors = colors,
@@ -84,39 +67,27 @@ fun CustomFilledIconButton(
             is Int -> Icon(
                 painter = painterResource(id = icon),
                 contentDescription = contentDescription,
-                modifier = Modifier
-                    .padding(iconPadding)
-                    .size(iconSize)
+                modifier = Modifier.padding(iconPadding).size(iconSize)
             )
-
             is ImageVector -> Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                modifier = Modifier
-                    .padding(iconPadding)
-                    .size(iconSize)
+                modifier = Modifier.padding(iconPadding).size(iconSize)
             )
-
-            else -> throw IllegalArgumentException("Icon must be either a drawable resource ID or an ImageVector")
         }
     }
 }
 
-// Custom color scheme for selected state
 @Composable
 fun selectedFilledIconButtonColors(
     isAlpha: Boolean = false,
     isSelected: Boolean = false,
-
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-
     containerColorAlpha: Color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f),
     contentColorAlpha: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-
     selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
     selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
-
     disabledContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
 ) = IconButtonDefaults.filledIconButtonColors(
@@ -134,15 +105,19 @@ fun selectedFilledIconButtonColors(
     disabledContentColor = disabledContentColor
 )
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun EnhancedFilledIconButtonPreview() {
+private fun CustomFilledIconButtonPreview() {
     MaterialTheme {
-        CustomFilledIconButton(icon = Icons.Rounded.Add, contentDescription = "Add", onClick = {})
+        CustomFilledIconButton(
+            icon = Icons.Rounded.Add,
+            contentDescription = "Add",
+            onClick = {}
+        )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun CustomFilledIconButtonSelectedPreview() {
     MaterialTheme {
@@ -150,8 +125,7 @@ private fun CustomFilledIconButtonSelectedPreview() {
             icon = Icons.Rounded.Add,
             contentDescription = "Add",
             onClick = {},
-            selected = true,
-            colors = selectedFilledIconButtonColors(isSelected = true)
+            selected = true
         )
     }
 }
