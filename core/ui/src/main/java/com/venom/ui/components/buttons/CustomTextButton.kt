@@ -1,7 +1,6 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
@@ -31,8 +30,6 @@ import com.venom.resources.R
  * @param textStyle The style for the text.
  * @param textColor The color for the text.
  * @param contentPadding The padding around the button's content.
- *
- * @sample TextActionButtonPreview
  */
 @Composable
 fun CustomTextButton(
@@ -49,10 +46,13 @@ fun CustomTextButton(
     contentPadding: PaddingValues = PaddingValues(vertical = 4.dp)
 ) {
     TextButton(
-        onClick = onClick, modifier = modifier, enabled = enabled, contentPadding = contentPadding
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        contentPadding = contentPadding
     ) {
         Column(
-            modifier = modifier.padding(6.dp),
+            modifier = Modifier.padding(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
@@ -63,38 +63,43 @@ fun CustomTextButton(
                     tint = if (enabled) iconTint else iconTint.copy(alpha = 0.38f),
                     modifier = Modifier.size(iconSize)
                 )
-
                 is Int -> Icon(
                     painter = painterResource(id = icon),
                     contentDescription = text,
                     tint = if (enabled) iconTint else iconTint.copy(alpha = 0.38f),
                     modifier = Modifier.size(iconSize)
                 )
-
-                else -> throw IllegalArgumentException("Icon must be either ImageVector or DrawableRes Int")
             }
-            if (withText) Text(
-                text = text,
-                style = textStyle,
-                color = if (enabled) textColor else textColor.copy(alpha = 0.38f),
-                maxLines = 1,
-            )
+            if (withText) {
+                Text(
+                    text = text,
+                    style = textStyle,
+                    color = if (enabled) textColor else textColor.copy(alpha = 0.38f),
+                    maxLines = 1,
+                )
+            }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-private fun TextActionButtonPreview() {
+private fun CustomTextButtonPreview() {
     MaterialTheme {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(8.dp)
         ) {
             CustomTextButton(
-                onClick = { }, icon = Icons.Rounded.Add, text = "Add Item"
+                onClick = {},
+                icon = Icons.Rounded.Add,
+                text = "Add Item"
             )
             CustomTextButton(
-                onClick = { }, icon = R.drawable.icon_ocr_mode, text = "Settings", enabled = false
+                onClick = {},
+                icon = R.drawable.icon_ocr_mode,
+                text = "Settings",
+                enabled = false
             )
         }
     }
