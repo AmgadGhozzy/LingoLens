@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,13 +27,13 @@ fun CopiedToast(
         modifier = modifier
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.small
+            color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(24.dp)
         ) {
             Text(
                 text = stringResource(R.string.copied_message),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             )
         }
     }
