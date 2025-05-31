@@ -1,4 +1,4 @@
-package com.venom.lingolens.navigation
+package com.venom.lingolens.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew

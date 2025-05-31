@@ -13,8 +13,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.venom.data.model.TranslationProvider
 import com.venom.lingolens.navigation.AppState
-import com.venom.lingolens.navigation.LingoLensBottomBar
-import com.venom.lingolens.navigation.LingoLensTopBar
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.settings.presentation.screen.AboutBottomSheet
