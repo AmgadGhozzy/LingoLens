@@ -1,12 +1,13 @@
 package com.venom.ui.components.buttons
 
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.dialogs.CopiedToast
@@ -16,31 +17,45 @@ import kotlinx.coroutines.launch
 @Composable
 fun CopyButton(
     onClick: () -> Unit,
-    enabled: Boolean = true,
-    iconSize: Dp = 24.dp,
-    modifier: Modifier = Modifier
+    enabled: Boolean = true
 ) {
-    var showCopiedToast by remember { mutableStateOf(false) }
+    var showToast by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    IconButton(
-        onClick = {
-            onClick()
-            showCopiedToast = true
-            scope.launch {
-                delay(2000)
-                showCopiedToast = false
+    Box(contentAlignment = Alignment.Center) {
+        Button(
+            onClick = {
+                onClick()
+                showToast = true
+                scope.launch {
+                    delay(2000)
+                    showToast = false
+                }
+            },
+            enabled = enabled,
+            shape = RoundedCornerShape(24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_copy),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = stringResource(R.string.action_copy),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
-        },
-        enabled = enabled,
-        modifier = modifier.size(56.dp)
-    ) {
-        Icon(
-            modifier = Modifier.size(iconSize),
-            painter = painterResource(id = R.drawable.icon_copy),
-            contentDescription = stringResource(R.string.action_copy),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        CopiedToast(visible = showCopiedToast)
+        }
+        CopiedToast(visible = showToast)
     }
 }
