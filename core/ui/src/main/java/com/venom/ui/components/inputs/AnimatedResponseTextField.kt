@@ -79,7 +79,7 @@ fun AnimatedResponseTextField(
         modifier = modifier
             .heightIn(min = minHeight, max = maxHeight)
             .verticalScroll(scrollState),
-        value = if (showCursor) "$displayedText●" else displayedText,
+        value = if (showCursor) "$displayedText ⬤" else displayedText,
         onValueChange = { },
         readOnly = true,
         maxLines = maxLines,
