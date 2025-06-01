@@ -1,6 +1,7 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,6 +39,7 @@ fun BookmarkFilledButton(
     FilledIconButton(
         onClick = onToggleBookmark,
         modifier = modifier
+            .padding(4.dp)
             .scale(if (isBookmarked) 1.1f else 1f)
             .size(size),
         enabled = enabled,
