@@ -56,6 +56,7 @@ fun CustomFilledIconButton(
     FilledIconButton(
         onClick = onClick,
         modifier = modifier
+            .padding(4.dp)
             .scale(if (selected && enabled) 1.1f else 1f)
             .size(size),
         enabled = enabled,
