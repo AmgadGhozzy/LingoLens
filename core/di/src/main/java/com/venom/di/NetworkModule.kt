@@ -1,16 +1,14 @@
 package com.venom.di
 
-import com.venom.data.api.ChatGPTService
-import com.venom.data.api.GeminiService
-import com.venom.data.api.GithubApi
-import com.venom.data.api.OcrService
-import com.venom.data.api.TranslationService
+import com.venom.data.BuildConfig
+import com.venom.data.api.*
 import com.venom.data.repo.UpdateChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -23,7 +21,47 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        val level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+        return HttpLoggingInterceptor().apply { this.level = level }
+    }
+
+    @Provides
+    @Singleton
+    @Named("RegularOkHttpClient")
+    fun provideRegularOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("AiOkHttpClient")
+    fun provideAiOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    private fun createRetrofit(baseUrl: String, client: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGithubRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl(UpdateChecker.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -38,75 +76,52 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("RegularOkHttpClient")
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
-    }
-
-    @Provides
-    @Singleton
-    @Named("AiOkHttpClient")
-    fun provideAiOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-
-    @Provides
-    @Singleton
     @Named("OcrRetrofit")
-    fun provideOcrRetrofit(@Named("RegularOkHttpClient") okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(OcrService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    fun provideOcrRetrofit(@Named("RegularOkHttpClient") client: OkHttpClient): Retrofit {
+        return createRetrofit(OcrService.BASE_URL, client)
     }
 
     @Provides
     @Singleton
     @Named("TranslationRetrofit")
-    fun provideTranslationRetrofit(@Named("RegularOkHttpClient") okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(TranslationService.BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    fun provideTranslationRetrofit(@Named("RegularOkHttpClient") client: OkHttpClient): Retrofit {
+        return createRetrofit(TranslationService.BASE_URL, client)
     }
 
     @Provides
     @Singleton
-    @Named("ChatGPTRetrofit")
-    fun provideChatGPTRetrofit(@Named("AiOkHttpClient") aiOkHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(ChatGPTService.BASE_URL)
-            .client(aiOkHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    fun provideTranslationService(@Named("TranslationRetrofit") retrofit: Retrofit): TranslationService {
+        return retrofit.create(TranslationService::class.java)
+    }
+
+    // AI services
+    @Provides
+    @Singleton
+    fun provideChatGPTService(@Named("AiOkHttpClient") client: OkHttpClient): ChatGPTService {
+        return createRetrofit(ChatGPTService.BASE_URL, client).create(ChatGPTService::class.java)
     }
 
     @Provides
     @Singleton
-    @Named("GeminiRetrofit")
-    fun provideGeminiRetrofit(@Named("AiOkHttpClient") aiOkHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(GeminiService.BASE_URL)
-            .client(aiOkHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    fun provideGeminiService(@Named("AiOkHttpClient") client: OkHttpClient): GeminiService {
+        return createRetrofit(GeminiService.BASE_URL, client).create(GeminiService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideChatGPTService(@Named("ChatGPTRetrofit") retrofit: Retrofit): ChatGPTService {
-        return retrofit.create(ChatGPTService::class.java)
+    fun provideGroqService(@Named("AiOkHttpClient") client: OkHttpClient): GroqService {
+        return createRetrofit(GroqService.BASE_URL, client).create(GroqService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideGeminiService(@Named("GeminiRetrofit") retrofit: Retrofit): GeminiService {
-        return retrofit.create(GeminiService::class.java)
+    fun provideDeepSeekService(@Named("AiOkHttpClient") client: OkHttpClient): DeepSeekService {
+        return createRetrofit(DeepSeekService.BASE_URL, client).create(DeepSeekService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHuggingFaceService(@Named("AiOkHttpClient") client: OkHttpClient): HuggingFaceService {
+        return createRetrofit(HuggingFaceService.BASE_URL, client).create(HuggingFaceService::class.java)
     }
 }
