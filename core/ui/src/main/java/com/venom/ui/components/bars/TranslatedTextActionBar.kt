@@ -28,6 +28,7 @@ fun TranslatedTextActionBar(
     isSaved: Boolean,
     onCopy: () -> Unit,
     onShare: () -> Unit,
+    onMoveUp: (() -> Unit)? = null,
     onFullscreen: (() -> Unit)? = null,
     onSpeak: () -> Unit,
     isSpeaking: Boolean
@@ -43,6 +44,13 @@ fun TranslatedTextActionBar(
             ActionItem.Action(
                 icon = R.drawable.icon_fullscreen,
                 description = R.string.action_fullscreen_source,
+                onClick = it
+            )
+        },
+        onMoveUp?.let {
+            ActionItem.Action(
+                icon = R.drawable.icon_moveup,
+                description = R.string.action_move_up,
                 onClick = it
             )
         },
@@ -83,6 +91,7 @@ fun TranslatedTextActionBarPreview() {
         onFullscreen = { },
         onCopy = { },
         onBookmark = { },
+        onMoveUp = {},
         onShare = {},
     )
 }
