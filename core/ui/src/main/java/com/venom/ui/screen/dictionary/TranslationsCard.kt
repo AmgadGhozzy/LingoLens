@@ -14,23 +14,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.DictionaryEntry
+import com.venom.data.model.DictionaryTerm
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.CustomCard
-import kotlin.collections.forEach
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TranslationsCard(
+    modifier: Modifier = Modifier,
     translations: List<DictionaryEntry>,
     onWordClick: (String) -> Unit,
     onSpeak: (String) -> Unit,
     onExpand: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
-
     var showAll by remember { mutableStateOf(false) }
 
     CustomCard {
@@ -69,12 +69,39 @@ fun TranslationsCard(
                 CustomButton(
                     icon = R.drawable.icon_fullscreen,
                     onClick = it,
+                    contentDescription = stringResource(R.string.action_expand),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 8.dp),
-                    contentDescription = stringResource(R.string.action_expand)
+                        .padding(top = 8.dp)
                 )
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun TranslationsCardPreview() {
+    val translations = listOf(
+        DictionaryEntry(
+            pos = "noun",
+            terms = listOf("apple"),
+            entry = listOf(
+                DictionaryTerm(
+                    word = "apple",
+                    reverseTranslation = listOf("fruit"),
+                    score = 1.0
+                )
+            ),
+            baseForm = "apple"
+        )
+    )
+
+    TranslationsCard(
+        translations = translations,
+        onWordClick = { },
+        onSpeak = { },
+        onExpand = { },
+        modifier = Modifier
+    )
 }
