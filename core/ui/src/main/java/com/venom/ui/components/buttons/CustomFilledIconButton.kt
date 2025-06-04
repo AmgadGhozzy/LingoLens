@@ -1,6 +1,7 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
  * @param iconSize Size of the icon
  * @param iconPadding Padding around the icon
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomFilledIconButton(
     icon: Any,
@@ -53,28 +55,44 @@ fun CustomFilledIconButton(
     iconSize: Dp = 24.dp,
     iconPadding: Dp = 8.dp
 ) {
-    FilledIconButton(
-        onClick = onClick,
-        modifier = modifier
-            .padding(4.dp)
-            .scale(if (selected && enabled) 1.1f else 1f)
-            .size(size),
-        enabled = enabled,
-        shape = shape,
-        colors = colors,
-        interactionSource = interactionSource
-    ) {
-        when (icon) {
-            is Int -> Icon(
-                painter = painterResource(id = icon),
-                contentDescription = contentDescription,
-                modifier = Modifier.padding(iconPadding).size(iconSize)
-            )
-            is ImageVector -> Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                modifier = Modifier.padding(iconPadding).size(iconSize)
-            )
+
+    Box(modifier = modifier) {
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = {
+                PlainTooltip(caretSize = TooltipDefaults.caretSize) { Text(contentDescription) }
+            },
+            state = rememberTooltipState()
+        ) {
+            FilledIconButton(
+                onClick = onClick,
+                modifier = modifier
+                    .padding(4.dp)
+                    .scale(if (selected && enabled) 1.1f else 1f)
+                    .size(size),
+                enabled = enabled,
+                shape = shape,
+                colors = colors,
+                interactionSource = interactionSource
+            ) {
+                when (icon) {
+                    is Int -> Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = contentDescription,
+                        modifier = Modifier
+                            .padding(iconPadding)
+                            .size(iconSize)
+                    )
+
+                    is ImageVector -> Icon(
+                        imageVector = icon,
+                        contentDescription = contentDescription,
+                        modifier = Modifier
+                            .padding(iconPadding)
+                            .size(iconSize)
+                    )
+                }
+            }
         }
     }
 }
