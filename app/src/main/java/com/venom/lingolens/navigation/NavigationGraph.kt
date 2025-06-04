@@ -11,11 +11,12 @@ import com.venom.domain.model.WordLevels
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
 import com.venom.stackcard.ui.screen.CardScreen
-import com.venom.stackcard.ui.screen.MainLevelScreen
-import com.venom.stackcard.ui.screen.QuizScreen
+import com.venom.stackcard.ui.screen.quiz.MainLevelScreen
+import com.venom.stackcard.ui.screen.quiz.QuizScreen1
+import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
-import com.venom.ui.components.onboarding.OnboardingScreens
 import com.venom.ui.navigation.Screen
+import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
@@ -50,7 +51,7 @@ fun NavigationGraph(
             TranslationScreen(
                 viewModel = translateViewModel,
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
-                initialText = text?.takeUnless { it == "null" || it == "{text}" }
+                //initialText = text?.takeUnless { it == "null" || it == "{text}" }
             )
         }
 
@@ -68,16 +69,19 @@ fun NavigationGraph(
 
         // OCR Screen
         composable(Screen.Ocr.route) {
-            OnboardingScreens()
-//            OcrScreen(
-//                viewModel = ocrViewModel,
-//                onNavigateToTranslation = { text ->
-//                    navController.navigate(Screen.Translation.createRoute(text))
-//                },
-//                onFileClick = fileSelector,
-//                onCameraClick = startCamera,
-//                onGalleryClick = imageSelector
-//            )
+            OcrScreen(
+                viewModel = ocrViewModel,
+                onNavigateToTranslation = { text ->
+                    navController.navigate(Screen.Translation.createRoute(text))
+                },
+                onFileClick = fileSelector,
+                onCameraClick = startCamera,
+                onGalleryClick = imageSelector
+            )
+        }
+
+        composable(Screen.Onboarding.route) {
+            OnboardingScreens(onGetStarted = { navController.navigate(Screen.Translation.createRoute()) })
         }
 
         // Phrasebook Screen
@@ -107,15 +111,18 @@ fun NavigationGraph(
                 it.id == backStackEntry.arguments?.getString("level")
             } ?: WordLevels.Beginner
 
-            QuizScreen(level = level, onComplete = { passed, nextLevel ->
-                if (passed && nextLevel != null) {
-                    navController.navigate(Screen.StackCard.createRoute(level)) {
-                        popUpTo(Screen.Quiz.MainLevel.route)
-                    }
-                } else {
-                    navController.popBackStack()
+            QuizScreen1(
+                level = level, onComplete = { passed, nextLevel ->
+                    if (passed && nextLevel != null) {
+                        navController.navigate(Screen.StackCard.createRoute(level)) {
+                            popUpTo(Screen.Quiz.MainLevel.route)
+                        }
+                    } else { navController.popBackStack() }
+                },
+                onNavigateToLearn = { level ->
+                    navController.navigate(Screen.StackCard.createRoute(level))
                 }
-            })
+            )
         }
     }
 }
