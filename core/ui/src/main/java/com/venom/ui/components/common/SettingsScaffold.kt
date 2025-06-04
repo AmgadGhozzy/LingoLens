@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.buttons.CloseButton
+import com.venom.ui.components.buttons.CustomFilledIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +42,6 @@ fun SettingsScaffold(
     content: LazyListScope.() -> Unit
 ) {
     val titleText = stringResource(title)
-    val closeButtonDescription = stringResource(id = R.string.action_close)
 
     Column(
         modifier = Modifier
@@ -71,10 +73,16 @@ fun SettingsScaffold(
                     }
                 )
 
-                CloseButton(
+                CustomFilledIconButton(
+                    icon = Icons.Rounded.Close,
+                    modifier = Modifier.align(Alignment.CenterEnd),
                     onClick = onDismiss,
-                    contentDescription = closeButtonDescription,
-                    modifier = Modifier.align(Alignment.CenterEnd)
+                    contentDescription = stringResource(R.string.action_close),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    size = 38.dp
                 )
             }
         }
