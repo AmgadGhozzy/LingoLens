@@ -1,11 +1,16 @@
 package com.venom.ui.components.dialogs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,7 +21,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.resources.R
 import com.venom.ui.components.bars.TranslatedTextActionBar
-import com.venom.ui.components.buttons.CloseButton
+import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.inputs.CustomTextField
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.utils.Extensions.getSelectedOrFullText
@@ -30,6 +35,7 @@ import com.venom.utils.Extensions.getSelectedOrFullText
  * @param onShare Callback for sharing the text
  * @param onSpeak Callback for speaking the text
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullscreenTextDialog(
     modifier: Modifier = Modifier,
@@ -39,6 +45,9 @@ fun FullscreenTextDialog(
     onShare: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {}
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    var fontSize by remember { mutableFloatStateOf(24f) }
+
     Dialog(
         onDismissRequest = onDismiss, properties = DialogProperties(
             dismissOnBackPress = true, usePlatformDefaultWidth = false
@@ -46,34 +55,68 @@ fun FullscreenTextDialog(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
+                .padding(12.dp)
 
         ) {
-            CloseButton(
-                modifier = Modifier.align(Alignment.End),
-                contentDescription = stringResource(R.string.action_close),
-                onClick = onDismiss
-            )
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                CustomFilledIconButton(
+                    icon = Icons.Rounded.Close,
+                    onClick = onDismiss,
+                    contentDescription = stringResource(R.string.action_close),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    size = 38.dp
+                )
+            }
 
-            CustomTextField(
-                textValue = textValue,
-                minFontSize = 24,
-                maxFontSize = 32,
-                maxLines = 50,
-                minHeight = 128.dp,
-                maxHeight = 256.dp,
-                isReadOnly = true,
+            Surface(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                tonalElevation = 2.dp
+            ) {
+                CustomTextField(
+                    textValue = textValue,
+                    minFontSize = (fontSize * 0.8f).toInt(),
+                    maxFontSize = (fontSize * 1.2f).toInt(),
+                    maxLines = Int.MAX_VALUE,
+                    minHeight = 200.dp,
+                    maxHeight = 600.dp,
+                    isReadOnly = true,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState())
+                )
+            }
+
+            Slider(
+                value = fontSize,
+                onValueChange = { fontSize = it },
+                valueRange = 16f..56f,
+                steps = 8,
+                thumb = {
+                    SliderDefaults.Thumb(
+                        interactionSource = interactionSource, modifier = modifier.height(24.dp)
+                    )
+                },
+                track = {
+                    SliderDefaults.Track(
+                        sliderState = it, modifier = modifier.height(8.dp)
+                    )
+                },
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            CustomCard(modifier = Modifier.padding(bottom = 32.dp)) {
+            Card(modifier = Modifier.padding(bottom = 24.dp),shape = RoundedCornerShape(18.dp)) {
                 TranslatedTextActionBar(
                     onCopy = { onCopy(textValue.getSelectedOrFullText()) },
                     onShare = { onShare(textValue.getSelectedOrFullText()) },
