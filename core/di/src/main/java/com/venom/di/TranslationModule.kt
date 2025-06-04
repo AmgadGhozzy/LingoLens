@@ -1,7 +1,10 @@
 package com.venom.di
 
 import com.venom.data.api.ChatGPTService
+import com.venom.data.api.DeepSeekService
 import com.venom.data.api.GeminiService
+import com.venom.data.api.GroqService
+import com.venom.data.api.HuggingFaceService
 import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.repo.TranslationRepository
@@ -9,8 +12,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -23,16 +24,17 @@ object TranslationModule {
         translationService: TranslationService,
         chatGPTService: ChatGPTService,
         geminiService: GeminiService,
-        translationDao: TranslationDao,
+        groqService: GroqService,
+        deepSeekService: DeepSeekService,
+        huggingFaceService: HuggingFaceService,
+        translationDao: TranslationDao
     ): TranslationRepository = TranslationRepository(
         translationService,
         chatGPTService,
         geminiService,
+        groqService,
+        deepSeekService,
+        huggingFaceService,
         translationDao
     )
-
-    @Provides
-    @Singleton
-    fun provideTranslationService(@Named("TranslationRetrofit") retrofit: Retrofit): TranslationService =
-        retrofit.create(TranslationService::class.java)
 }
