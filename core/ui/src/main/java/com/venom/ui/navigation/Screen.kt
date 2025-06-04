@@ -20,6 +20,7 @@ sealed class Screen(val route: String) {
     object Dictionary : Screen("dictionary")
     object History : Screen("history")
     object Bookmarks : Screen("bookmarks")
+    object Onboarding : Screen("onboarding")
 
     // Quiz screens
     sealed class Quiz(route: String) : Screen(route) {
@@ -44,6 +45,7 @@ sealed class Screen(val route: String) {
                 route == "dictionary" -> Dictionary
                 route == "history" -> History
                 route == "bookmarks" -> Bookmarks
+                route == "onboarding" -> Onboarding
                 else -> Translation
             }
         }
