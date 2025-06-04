@@ -48,6 +48,7 @@ fun TabItemContent(
             )
             Text(
                 text = title,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 8.dp),
                 style = MaterialTheme.typography.labelLarge
             )
