@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.OcrEntry
-import com.venom.ui.components.items.OcrHistoryItemView
+import com.venom.ui.screen.history.OcrHistoryItemView
 
 @Composable
 fun OcrBookmarkList(

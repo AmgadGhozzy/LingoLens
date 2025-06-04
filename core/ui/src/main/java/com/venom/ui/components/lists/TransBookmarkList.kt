@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationEntry
-import com.venom.ui.components.items.TransHistoryItemView
+import com.venom.ui.screen.history.TransHistoryItemView
 
 @Composable
 fun TransBookmarkList(
