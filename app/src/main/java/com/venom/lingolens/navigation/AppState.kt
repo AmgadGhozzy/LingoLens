@@ -22,11 +22,13 @@ class AppState(
         get() = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
 
     val shouldShowTopBar: Boolean
-        get() = currentRoute != Screen.Quiz.LevelTest.route
+        get() = currentRoute != Screen.Quiz.LevelTest.route &&
+                currentRoute != Screen.Onboarding.route
 
     val shouldShowBottomBar: Boolean
         get() = currentRoute != Screen.Ocr.route &&
-                currentRoute != Screen.Quiz.LevelTest.route
+                currentRoute != Screen.Quiz.LevelTest.route &&
+                currentRoute != Screen.Onboarding.route
 
     fun navigateToScreen(screen: Screen) {
         when (screen) {
