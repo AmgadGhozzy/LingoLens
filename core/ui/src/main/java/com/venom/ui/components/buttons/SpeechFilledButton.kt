@@ -48,7 +48,7 @@ fun SpeechFilledButton(
         interactionSource = interactionSource
     ) {
         Icon(
-            painter = painterResource(R.drawable.icon_sound),
+            painter = if (isSpeaking) painterResource(R.drawable.icon_record) else painterResource(R.drawable.icon_sound),
             contentDescription = stringResource(
                 if (isSpeaking) R.string.action_speaking
                 else R.string.action_speak
