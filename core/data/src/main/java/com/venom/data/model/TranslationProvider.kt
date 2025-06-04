@@ -44,6 +44,27 @@ data class TranslationProvider(
             descriptionResId = R.string.provider_gemini_description
         )
 
-        val ALL = listOf(GOOGLE, CHATGPT, GEMINI)
+        val GROQ = TranslationProvider(
+            id = "Groq",
+            nameResId = R.string.provider_groq,
+            iconResId = R.drawable.icon_groq,
+            descriptionResId = R.string.provider_groq_description
+        )
+
+        val DEEPSEEK = TranslationProvider(
+            id = "DeepSeek",
+            nameResId = R.string.provider_deepseek,
+            iconResId = R.drawable.icon_deepseek,
+            descriptionResId = R.string.provider_deepseek_description
+        )
+
+        val HUGGINGFACE = TranslationProvider(
+            id = "HuggingFace",
+            nameResId = R.string.provider_huggingface,
+            iconResId = R.drawable.icon_huggingface,
+            descriptionResId = R.string.provider_huggingface_description
+        )
+
+        val ALL = listOf(GOOGLE, CHATGPT, GEMINI, GROQ, DEEPSEEK, HUGGINGFACE)
     }
 }
