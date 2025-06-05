@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen
+package com.venom.stackcard.ui.screen.quiz
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -44,57 +44,41 @@ fun MainLevelScreen(
             enter = fadeIn()
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxSize()
             ) {
-                // Header section with icon
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.School,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.title_language_learning),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    ScreenHeader()
+                    ScreenDescription()
                 }
 
-                // Description text
-                Text(
-                    text = stringResource(R.string.description_master_vocab),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(
+                        top = 8.dp,
+                        bottom = 24.dp
+                    )
                 ) {
                     itemsIndexed(WordLevels.values()) { index, level ->
                         var cardVisible by remember { mutableStateOf(false) }
 
                         LaunchedEffect(key1 = Unit) {
-                            delay(100L * index)
+                            delay(60L * index)
                             cardVisible = true
                         }
 
                         AnimatedVisibility(
                             visible = cardVisible,
-                            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 5 })
+                            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
                         ) {
                             LevelCard(
                                 level = level,
                                 isUnlocked = state.unlockedLevels.contains(level.id),
+                                isCurrentLevel = state.currentLevel.id == level.id,
                                 progress = state.levelProgress[level.id] ?: 0f,
                                 onTestClick = { onNavigateToTest(level) },
                                 onLearnClick = { onNavigateToLearn(level) }
@@ -105,4 +89,36 @@ fun MainLevelScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ScreenHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.School,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = stringResource(R.string.title_language_learning),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@Composable
+private fun ScreenDescription() {
+    Text(
+        text = stringResource(R.string.description_master_vocab),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
