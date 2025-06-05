@@ -1,18 +1,10 @@
 package com.venom.dialog.ui.component.sections
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,15 +39,7 @@ fun ChatMessages(
                     MessageBubble(message = message, onPlayClick = { onPlayClick(message) })
                 }
             }
-        } else {
-            EmptyState(
-                icon = R.drawable.icon_dialog,
-                title = stringResource(R.string.no_messages_found),
-                subtitle = stringResource(R.string.start_conversation),
-            )
-        }
 
-        if (messages.isNotEmpty()) {
             CustomFilledIconButton(
                 modifier = Modifier
                     .padding(12.dp)
@@ -66,7 +50,13 @@ fun ChatMessages(
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
+                )
+            )
+        } else {
+            EmptyState(
+                icon = R.drawable.icon_dialog,
+                title = stringResource(R.string.no_messages_found),
+                subtitle = stringResource(R.string.start_conversation)
             )
         }
     }

@@ -3,12 +3,11 @@ package com.venom.dialog.ui.component.sections
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.dialog.data.local.model.DialogMessage
 import com.venom.dialog.ui.component.AnimatedPlayButton
@@ -16,16 +15,13 @@ import com.venom.ui.components.common.DynamicStyledText
 
 @Composable
 fun MessageBubble(
-    message: DialogMessage, onPlayClick: () -> Unit, modifier: Modifier = Modifier
+    message: DialogMessage,
+    onPlayClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val bubbleColor =
-        if (message.isSender) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
-
-    val textColor =
-        if (message.isSender) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer
-
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val maxWidth = screenWidth * 0.8f
+    val bubbleColor = if (message.isSender) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
+    val textColor = if (message.isSender) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer
+    val maxWidth = LocalConfiguration.current.screenWidthDp.dp * 0.8f
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -51,12 +47,14 @@ fun MessageBubble(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
-                    modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // SourceText
                     DynamicStyledText(
-                        text = message.sourceText, maxFontSize = 24, color = textColor,modifier =
-                        Modifier.fillMaxWidth()
+                        text = message.sourceText,
+                        maxFontSize = 24,
+                        color = textColor,
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     HorizontalDivider(
@@ -81,39 +79,5 @@ fun MessageBubble(
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun MessageBubblePreview() {
-    val initialMessages = listOf(
-        DialogMessage(
-            id = "welcome_1",
-            sourceText = "Welcome to LingoLens!",
-            translatedText = "مرحباً بك في LingoLens!",
-            sourceLanguageCode = "en",
-            sourceLanguageName = "English",
-            targetLanguageCode = "ar",
-            targetLanguageName = "Arabic",
-            timestamp = System.currentTimeMillis(),
-            isSender = true
-        ), DialogMessage(
-            id = "welcome_2",
-            sourceText = "Tap",
-            translatedText = "انقر",
-            sourceLanguageCode = "en",
-            sourceLanguageName = "English",
-            targetLanguageCode = "ar",
-            targetLanguageName = "Arabic",
-            timestamp = System.currentTimeMillis() + 1000,
-            isSender = false
-        )
-    )
-
-    Column {
-        MessageBubble(message = initialMessages[0], onPlayClick = {})
-        Spacer(modifier = Modifier.height(8.dp))
-        MessageBubble(message = initialMessages[1], onPlayClick = {})
     }
 }
