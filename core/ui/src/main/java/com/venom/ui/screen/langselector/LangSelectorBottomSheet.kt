@@ -1,4 +1,4 @@
-package com.venom.ui.screen
+package com.venom.ui.screen.langselector
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,8 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.venom.ui.components.sections.LangSelectorContent
-import com.venom.ui.viewmodel.LangSelectorViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +41,10 @@ fun LangSelectorBottomSheet(
             onSearchQueryChange = viewModel::onSearchQueryChange,
             onLanguageSelected = { language ->
                 viewModel.onLanguageSelected(language)
-                scope.launch { sheetState.hide(); onDismiss() }
+                scope.launch { sheetState.hide(); onDismiss() } 
             },
+            onDownloadLanguage = viewModel::downloadLanguage,
+            onDeleteLanguage = viewModel::deleteLanguage
         )
     }
 }

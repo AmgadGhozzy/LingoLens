@@ -1,4 +1,4 @@
-package com.venom.ui.components.sections
+package com.venom.ui.screen.langselector
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
@@ -12,23 +12,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.resources.R
-import com.venom.ui.components.bars.LanguageBar
 import com.venom.ui.components.common.EmptyState
 import com.venom.ui.components.inputs.CustomSearchBar
-import com.venom.ui.components.items.LanguageListItem
-import com.venom.ui.viewmodel.LanguageSelectorState
 
 @Composable
 fun LangSelectorContent(
     state: LanguageSelectorState,
     onSearchQueryChange: (String) -> Unit,
     onLanguageSelected: (LanguageItem) -> Unit,
+    onDownloadLanguage: (LanguageItem) -> Unit,
+    onDeleteLanguage: (LanguageItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -66,31 +63,15 @@ fun LangSelectorContent(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(items = languages, key = { it.code }) { language ->
-                        LanguageListItem(language = language,
+                        LanguageListItem(
+                            language = language,
                             isSelected = language == (if (state.isSelectingSourceLanguage) state.sourceLang else state.targetLang),
-                            onClick = { onLanguageSelected(language) })
+                            onClick = { onLanguageSelected(language) },
+                            onDownloadClick = { onDownloadLanguage(language) },
+                            onDeleteClick = { onDeleteLanguage(language) })
                     }
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun LanguageSelectorContentPreview() {
-    LangSelectorContent(
-        state = LanguageSelectorState(
-            sourceLang = LANGUAGES_LIST[0],
-            targetLang = LANGUAGES_LIST[1],
-            searchQuery = "",
-            filteredLanguages = LANGUAGES_LIST,
-            isSelectingSourceLanguage = true
-        ),
-        onSearchQueryChange = {},
-        onLanguageSelected = {},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-    )
 }

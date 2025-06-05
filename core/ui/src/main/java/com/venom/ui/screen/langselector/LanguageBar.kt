@@ -1,4 +1,4 @@
-package com.venom.ui.components.bars
+package com.venom.ui.screen.langselector
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -23,9 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.items.LanguageItemView
-import com.venom.ui.screen.LangSelectorBottomSheet
-import com.venom.ui.viewmodel.LangSelectorViewModel
 
 /**
  * A customizable top bar for language translation.
