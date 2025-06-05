@@ -19,7 +19,7 @@ import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.screen.dictionary.DictionaryScreen
 import com.venom.ui.screen.dictionary.TranslationsCard
-import com.venom.ui.viewmodel.LangSelectorViewModel
+import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.ui.viewmodel.TranslateViewModel
@@ -39,52 +39,56 @@ fun TranslationScreen(
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.uiState.collectAsState()
     val langSelectorState by langSelectorViewModel.state.collectAsStateWithLifecycle()
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
     val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-    var sourceTextFieldValue by remember {
-        mutableStateOf(TextFieldValue(initialText ?: state.sourceText))
-    }
-
+    var sourceTextFieldValue by remember { mutableStateOf(TextFieldValue(initialText ?: state.sourceText)) }
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(state.clearTextFlag) {
-        if (state.clearTextFlag) {
-            sourceTextFieldValue = TextFieldValue("")
-            viewModel.clearTranslation()
+    // Handle initial text only once
+    LaunchedEffect(initialText) {
+        initialText?.let { text ->
+            if (text.isNotBlank() && sourceTextFieldValue.text != text) {
+                sourceTextFieldValue = TextFieldValue(text)
+                viewModel.onSourceTextChanged(text)
+            }
         }
     }
 
-    LaunchedEffect(langSelectorState) {
-        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
-
-        if (sourceTextFieldValue.text.isNotBlank()) {
-            // Preserve cursor position and selection when swapping
-            val currentSelection = sourceTextFieldValue.selection
-            val currentComposition = sourceTextFieldValue.composition
-
-            viewModel.onSourceTextChanged(sourceTextFieldValue.text)
+    // Update source text field when state changes (e.g., from moveUp)
+    LaunchedEffect(state.sourceText) {
+        if (state.sourceText != sourceTextFieldValue.text) {
             sourceTextFieldValue = TextFieldValue(
-                text = sourceTextFieldValue.text,
-                selection = currentSelection,
-                composition = currentComposition
+                text = state.sourceText,
+                selection = sourceTextFieldValue.selection
             )
         }
+    }
+
+    // Handle language changes - only update if languages actually changed
+    LaunchedEffect(langSelectorState.sourceLang, langSelectorState.targetLang) {
+        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
     }
 
     val actions = remember(context) {
         TranslationActions(
             onTextChange = { newValue ->
-                sourceTextFieldValue = newValue
-                viewModel.onSourceTextChanged(newValue.text)
+                // Only update if text actually changed
+                if (newValue.text != sourceTextFieldValue.text) {
+                    sourceTextFieldValue = newValue
+                    viewModel.onSourceTextChanged(newValue.text)
+                } else {
+                    // Update only selection/composition without triggering translation
+                    sourceTextFieldValue = newValue
+                }
             },
             onClearText = {
                 sourceTextFieldValue = TextFieldValue("")
-                viewModel.clearTranslation()
+                viewModel.clearAll()
             },
             onCopy = { text -> context.copyToClipboard(text) },
             onShare = { text -> context.shareText(text) },
@@ -93,10 +97,13 @@ fun TranslationScreen(
             onSpeechToText = { showSpeechToTextDialog = true },
             onPaste = {
                 context.pasteFromClipboard()?.let { text ->
-                    sourceTextFieldValue = TextFieldValue(text)
-                    viewModel.onSourceTextChanged(text)
+                    if (text != sourceTextFieldValue.text) {
+                        sourceTextFieldValue = TextFieldValue(text)
+                        viewModel.onSourceTextChanged(text)
+                    }
                 }
             },
+            onMoveUp = viewModel::moveUp,
             onOcr = onNavigateToOcr,
             onFullscreen = { fullscreenState = it }
         )
@@ -112,7 +119,7 @@ fun TranslationScreen(
                 actions = actions,
                 isLoading = state.isLoading,
                 isSpeaking = ttsState.isSpeaking,
-                isBookmarked = state.isBookmarked,
+                isBookmarked = state.isBookmarked
             )
 
             if (!isDialog && state.synonyms.isNotEmpty()) {
@@ -121,27 +128,22 @@ fun TranslationScreen(
                     TranslationsCard(
                         translations = translations,
                         onWordClick = { selectedWord ->
-                            sourceTextFieldValue = TextFieldValue(selectedWord)
-                            viewModel.onSourceTextChanged(selectedWord)
+                            if (selectedWord != sourceTextFieldValue.text) {
+                                sourceTextFieldValue = TextFieldValue(selectedWord)
+                                viewModel.onSourceTextChanged(selectedWord)
+                            }
                         },
                         onExpand = { showDictionaryDialog = true },
                         onSpeak = ttsViewModel::speak,
-                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        modifier = Modifier.verticalScroll(rememberScrollState())
                     )
                 }
             }
         }
     }
 
-
-    if (isDialog) DraggableDialog(onDismissRequest = onDismiss) {
-        TranslationContent()
-    }
-    else TranslationContent(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize()
-    )
+    if (isDialog) DraggableDialog(onDismissRequest = onDismiss) { TranslationContent() }
+    else TranslationContent(modifier = Modifier.padding(8.dp).fillMaxSize())
 
     if (showDictionaryDialog) Dialog(
         onDismissRequest = { showDictionaryDialog = false },
@@ -159,7 +161,8 @@ fun TranslationScreen(
             },
             onSpeak = ttsViewModel::speak,
             onCopy = actions.onCopy,
-            onDismiss = { showDictionaryDialog = false })
+            onDismiss = { showDictionaryDialog = false }
+        )
     }
 
     if (showSpeechToTextDialog) SpeechToTextDialog(
@@ -171,7 +174,7 @@ fun TranslationScreen(
                 viewModel.onSourceTextChanged(it)
                 sttViewModel.stopRecognition()
             }
-        },
+        }
     )
 
     fullscreenState?.let { text ->
