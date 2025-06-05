@@ -41,6 +41,9 @@ ksp = "2.1.0-1.0.29"
 serialization = "2.1.0"
 aboutlibraries = "10.5.2"
 navigationCompose = "2.9.0-alpha06"
+loggingInterceptor = "5.0.0-alpha.16"
+translate = "17.0.3"
+kotlinxCoroutinesPlayServices = "1.8.0"
 
 [libraries]
 # Android Jetpack
@@ -98,6 +101,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
+translate = { group = "com.google.mlkit", name = "translate", version.ref = "translate" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
