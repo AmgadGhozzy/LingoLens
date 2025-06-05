@@ -4,6 +4,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
@@ -45,15 +46,17 @@ fun CustomFilledIconButton(
     enabled: Boolean = true,
     selected: Boolean = false,
     isAlpha: Boolean = false,
-    shape: Shape = IconButtonDefaults.filledShape,
+    shape: Shape = CircleShape,
+    color: Color? = null,
     colors: IconButtonColors = selectedFilledIconButtonColors(
         isSelected = selected,
+        color = color,
         isAlpha = isAlpha
     ),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    size: Dp = 48.dp,
+    size: Dp = 56.dp,
     iconSize: Dp = 24.dp,
-    iconPadding: Dp = 8.dp
+    iconPadding: Dp = 0.dp
 ) {
 
     Box(modifier = modifier) {
@@ -65,7 +68,7 @@ fun CustomFilledIconButton(
             state = rememberTooltipState()
         ) {
             FilledIconButton(
-                onClick = onClick,
+                onClick = { if (enabled) onClick() },
                 modifier = modifier
                     .padding(4.dp)
                     .scale(if (selected && enabled) 1.1f else 1f)
@@ -99,6 +102,7 @@ fun CustomFilledIconButton(
 
 @Composable
 fun selectedFilledIconButtonColors(
+    color: Color? = null,
     isAlpha: Boolean = false,
     isSelected: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
@@ -113,11 +117,13 @@ fun selectedFilledIconButtonColors(
     containerColor = when {
         isSelected -> selectedContainerColor
         isAlpha -> containerColorAlpha
+        color != null -> color.copy(alpha = 0.1f)
         else -> containerColor
     },
     contentColor = when {
         isSelected -> selectedContentColor
         isAlpha -> contentColorAlpha
+        color != null -> color
         else -> contentColor
     },
     disabledContainerColor = disabledContainerColor,
