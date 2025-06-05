@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import com.venom.ui.components.bars.LanguageBar
-import com.venom.ui.viewmodel.LangSelectorViewModel
+import com.venom.ui.screen.langselector.LangSelectorViewModel
+import com.venom.ui.screen.langselector.LanguageBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

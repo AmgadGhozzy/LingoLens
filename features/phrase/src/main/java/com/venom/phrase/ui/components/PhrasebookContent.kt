@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.ui.viewmodel.PhraseUiState
-import com.venom.ui.viewmodel.LangSelectorViewModel
+import com.venom.ui.screen.langselector.LangSelectorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
