@@ -29,6 +29,13 @@ data class TranslationProvider(
             descriptionResId = R.string.provider_google_description
         )
 
+        val OFFLINE = TranslationProvider(
+            id = "offline",
+            nameResId = R.string.provider_offline,
+            iconResId = R.drawable.icon_offline,
+            descriptionResId = R.string.provider_offline_description
+        )
+
         val CHATGPT = TranslationProvider(
             id = "chatgpt",
             nameResId = R.string.provider_chatgpt,
@@ -65,6 +72,6 @@ data class TranslationProvider(
             descriptionResId = R.string.provider_huggingface_description
         )
 
-        val ALL = listOf(GOOGLE, CHATGPT, GEMINI, GROQ, DEEPSEEK, HUGGINGFACE)
+        val ALL = listOf(GOOGLE,OFFLINE, CHATGPT, GEMINI, GROQ, DEEPSEEK, HUGGINGFACE)
     }
 }
