@@ -46,11 +46,13 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
 
+    implementation(libs.logging.interceptor)
+
     // Hilt
     api(libs.hilt.android)
+
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
-
 
     implementation(libs.androidx.core.ktx)
 }
