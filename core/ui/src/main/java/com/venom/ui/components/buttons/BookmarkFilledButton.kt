@@ -27,9 +27,9 @@ fun BookmarkFilledButton(
 ) {
     val colors = IconButtonDefaults.filledIconButtonColors(
         containerColor = if (isBookmarked)
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
         else
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
         contentColor = if (isBookmarked)
             MaterialTheme.colorScheme.onPrimaryContainer
         else
