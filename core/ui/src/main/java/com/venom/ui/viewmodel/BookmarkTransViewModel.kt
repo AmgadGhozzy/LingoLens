@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.TranslationEntry
-import com.venom.data.repo.TranslationRepository
+import com.venom.data.repo.TranslationHistoryOperations
 import com.venom.ui.screen.ViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 data class BookmarkState(
     val items: List<TranslationEntry> = emptyList(),
@@ -24,7 +23,7 @@ data class BookmarkState(
 
 @HiltViewModel
 class BookmarkViewModel @Inject constructor(
-    private val translationRepository: TranslationRepository
+    private val translationHistoryOperations: TranslationHistoryOperations
 ) : ViewModel() {
 
     private val _bookmarkState = MutableStateFlow(BookmarkState())
@@ -41,8 +40,8 @@ class BookmarkViewModel @Inject constructor(
                 _bookmarkState.update { it.copy(isLoading = true, viewType = viewType) }
 
                 val itemsFlow = when (viewType) {
-                    ViewType.BOOKMARKS -> translationRepository.getBookmarkedTranslations()
-                    ViewType.HISTORY -> translationRepository.getTranslationHistory()
+                    ViewType.BOOKMARKS -> translationHistoryOperations.getBookmarkedTranslations()
+                    ViewType.HISTORY -> translationHistoryOperations.getTranslationHistory()
                 }
 
                 itemsFlow.collect { items ->
@@ -72,7 +71,7 @@ class BookmarkViewModel @Inject constructor(
     fun removeItem(entry: TranslationEntry) {
         viewModelScope.launch {
             try {
-                translationRepository.deleteTranslationEntry(entry)
+                translationHistoryOperations.deleteTranslationEntry(entry)
                 // Refresh current view
                 fetchItems(_bookmarkState.value.viewType)
             } catch (e: Exception) {
@@ -88,8 +87,8 @@ class BookmarkViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 when (_bookmarkState.value.viewType) {
-                    ViewType.BOOKMARKS -> translationRepository.clearBookmarks()
-                    ViewType.HISTORY -> translationRepository.deleteNonBookmarkedEntries()
+                    ViewType.BOOKMARKS -> translationHistoryOperations.clearBookmarks()
+                    ViewType.HISTORY -> translationHistoryOperations.deleteNonBookmarkedEntries()
                 }
                 fetchItems(_bookmarkState.value.viewType)
             } catch (e: Exception) {
@@ -105,7 +104,7 @@ class BookmarkViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val updatedEntry = entry.copy(isBookmarked = !entry.isBookmarked)
-                translationRepository.updateTranslationEntry(updatedEntry)
+                translationHistoryOperations.updateTranslationEntry(updatedEntry)
                 fetchItems(_bookmarkState.value.viewType)
             } catch (e: Exception) {
                 _bookmarkState.update {
