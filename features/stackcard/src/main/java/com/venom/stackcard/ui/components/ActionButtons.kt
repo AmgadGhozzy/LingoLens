@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,9 @@ import com.venom.resources.R
 import com.venom.stackcard.ui.viewmodel.CardItem
 import com.venom.ui.components.buttons.BookmarkFilledButton
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.theme.ThemeColors.BitcoinColor
+import com.venom.ui.theme.ThemeColors.TONColor
+import com.venom.ui.theme.ThemeColors.USDTColor
 
 @Composable
 fun ActionButtons(
@@ -38,30 +39,21 @@ fun ActionButtons(
             CustomFilledIconButton(
                 icon = R.drawable.icon_copy,
                 contentDescription = "Copy ${card.englishEn}",
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
+                color = BitcoinColor,
                 onClick = onCopy
             )
 
             CustomFilledIconButton(
                 icon = Icons.Rounded.Refresh,
                 contentDescription = "Flip card for ${card.englishEn}",
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f),
-                    contentColor = MaterialTheme.colorScheme.onTertiary
-                ),
+                color = USDTColor,
                 onClick = onFlip
             )
 
             CustomFilledIconButton(
                 icon = R.drawable.icon_sound,
                 contentDescription = "Speech-to-text for ${card.englishEn}",
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
+                color = TONColor,
                 onClick = onSpeak
             )
         }
