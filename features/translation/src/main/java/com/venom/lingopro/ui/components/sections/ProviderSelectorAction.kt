@@ -1,24 +1,12 @@
 package com.venom.lingopro.ui.components.sections
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -30,7 +18,6 @@ import com.venom.data.model.TranslationProvider
 import com.venom.resources.R
 import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.menus.AnimatedDropdownMenu
-import com.venom.ui.components.other.PremiumBadge
 
 @Composable
 fun ProviderSelectorAction(
@@ -41,16 +28,11 @@ fun ProviderSelectorAction(
     enabled: Boolean = true
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
-
     val providerActions = availableProviders.map { provider ->
         ActionItem.Action(
             icon = provider.iconResId,
             description = provider.descriptionResId,
-            onClick = {
-                if (provider.id != selectedProvider.id) {
-                    onProviderSelected(provider)
-                }
-            }
+            onClick = { onProviderSelected(provider) }
         )
     }
 
@@ -65,11 +47,8 @@ fun ProviderSelectorAction(
                 R.string.change_translation_provider_cd,
                 stringResource(selectedProvider.nameResId)
             ),
-            tint = if (enabled) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-            },
+            tint = if (enabled) MaterialTheme.colorScheme.primary
+                  else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
             modifier = Modifier.size(32.dp)
         )
     }
@@ -101,21 +80,15 @@ private fun ProviderItem(
     ) {
         Surface(
             shape = CircleShape,
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-            },
+            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                   else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 painter = painterResource(provider.iconResId),
                 contentDescription = null,
-                tint = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSecondaryContainer
-                },
+                tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
+                      else MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(8.dp)
             )
         }
@@ -126,19 +99,15 @@ private fun ProviderItem(
         ) {
             Text(
                 text = stringResource(provider.nameResId),
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
+                color = if (isSelected) MaterialTheme.colorScheme.primary
+                       else MaterialTheme.colorScheme.onSurface,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            val description = stringResource(provider.descriptionResId)
-            if (description.isNotEmpty()) {
+            stringResource(provider.descriptionResId).takeIf { it.isNotEmpty() }?.let { description ->
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
@@ -149,22 +118,27 @@ private fun ProviderItem(
             }
         }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (provider.isPremium) {
-                PremiumBadge()
-            }
-
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Rounded.Check,
-                    contentDescription = stringResource(R.string.selected_indicator_cd),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+        if (provider.isPremium) {
+            Surface(
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+                shape = MaterialTheme.shapes.small
+            ) {
+                Text(
+                    text = "PRO",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                 )
             }
+        }
+
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Rounded.Check,
+                contentDescription = stringResource(R.string.selected_indicator_cd),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }
