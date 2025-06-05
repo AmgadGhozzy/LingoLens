@@ -36,6 +36,9 @@ android {
         buildConfigField("String", "OCR_API_KEY", localProperties.getProperty("OCR_API_KEY"))
         buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
         buildConfigField("String", "GEMINI_API_KEY", localProperties.getProperty("GEMINI_API_KEY"))
+        buildConfigField("String", "GROQ_API_KEY", localProperties.getProperty("GROQ_API_KEY"))
+        buildConfigField("String", "DEEPSEEK_API_KEY", localProperties.getProperty("DEEPSEEK_API_KEY"))
+        buildConfigField("String", "HUGGINGFACE_API_KEY", localProperties.getProperty("HUGGINGFACE_API_KEY"))
 
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -73,6 +76,7 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
+
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
@@ -87,6 +91,12 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.json)
 
+    // ML Kit
+    implementation(libs.translate)
+    implementation(libs.kotlinx.coroutines.play.services) // Added for ML Kit Task.await()
+//    implementation("com.google.mlkit:language-id:17.0.5")
+//    implementation("com.google.mlkit:text-recognition:16.0.0")
+//    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 
     // Testing
     androidTestImplementation(libs.androidx.espresso.core)
