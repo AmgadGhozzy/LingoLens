@@ -49,18 +49,17 @@ import com.venom.data.model.LanguageItem
 
 @Composable
 fun LanguageListItem(
+    modifier: Modifier = Modifier,
     language: LanguageItem,
     isSelected: Boolean,
     onClick: () -> Unit,
     onDownloadClick: (LanguageItem) -> Unit = {},
     onDeleteClick: (LanguageItem) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1.02f else 1f,
-        animationSpec = tween(300),
-        label = "scale"
+        animationSpec = tween(300)
     )
 
     Card(
@@ -179,6 +178,7 @@ fun LanguageListItem(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
+
                     language.isDownloaded -> {
                         IconButton(
                             onClick = { onDeleteClick(language) },
@@ -192,6 +192,7 @@ fun LanguageListItem(
                             )
                         }
                     }
+
                     language.downloadSizeMb != null -> {
                         IconButton(
                             onClick = { onDownloadClick(language) },

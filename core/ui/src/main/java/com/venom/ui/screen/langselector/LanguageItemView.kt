@@ -1,4 +1,4 @@
-package com.venom.ui.components.items
+package com.venom.ui.screen.langselector
 
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
