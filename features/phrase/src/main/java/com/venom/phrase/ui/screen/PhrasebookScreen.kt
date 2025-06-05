@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.phrase.ui.components.PhrasebookContent
 import com.venom.phrase.ui.viewmodel.PhraseViewModel
-import com.venom.ui.viewmodel.LangSelectorViewModel
+import com.venom.ui.screen.langselector.LangSelectorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
