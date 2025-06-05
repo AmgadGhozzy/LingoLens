@@ -8,7 +8,10 @@ data class LanguageItem(
     val englishName: String,
     val nativeName: String,
     val flag: String,
-    val countryCode: String
+    val countryCode: String,
+    val isDownloaded: Boolean = false,
+    val downloadSizeMb: Float? = null,
+    val isDownloading: Boolean = false
 )
 
 val LANGUAGES_LIST = listOf(
