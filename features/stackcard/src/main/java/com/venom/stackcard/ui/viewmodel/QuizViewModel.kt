@@ -319,7 +319,7 @@ class QuizViewModel @Inject constructor(
                 val currentLevel = levels[i]
                 val nextLevel = levels[i + 1]
                 if (currentUnlocked.contains(currentLevel.id) &&
-                    progress[currentLevel.id] ?: 0f >= 0.95f &&
+                    (progress[currentLevel.id] ?: 0f) >= 0.95f &&
                     !currentUnlocked.contains(nextLevel.id)
                 ) {
                     currentUnlocked.add(nextLevel.id)
