@@ -12,6 +12,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.venom.resources.R
+import com.venom.ui.theme.ThemeColors.CoralPrimary
+import com.venom.ui.theme.ThemeColors.CoralSecondary
+import com.venom.ui.theme.ThemeColors.CyanPrimary
+import com.venom.ui.theme.ThemeColors.CyanSecondary
+import com.venom.ui.theme.ThemeColors.MagentaPrimary
+import com.venom.ui.theme.ThemeColors.MagentaSecondary
+import com.venom.ui.theme.ThemeColors.OrangePrimary
+import com.venom.ui.theme.ThemeColors.OrangeSecondary
+import com.venom.ui.theme.ThemeColors.PurplePrimary
+import com.venom.ui.theme.ThemeColors.PurpleSecondary
+import com.venom.ui.theme.ThemeColors.TealPrimary
+import com.venom.ui.theme.ThemeColors.TealSecondary
 
 @Composable
 fun getPages(): List<OnboardingPage> = listOf(
@@ -20,17 +32,17 @@ fun getPages(): List<OnboardingPage> = listOf(
         subtitle = stringResource(id = R.string.onboarding_page1_subtitle),
         description = stringResource(id = R.string.onboarding_page1_description),
         icon = Icons.Rounded.Psychology,
-        primaryColor = Color(0xFF6C63FF),
-        secondaryColor = Color(0xFF5A4BDA),
+        primaryColor = PurplePrimary,
+        secondaryColor = PurpleSecondary,
         features = emptyList()
     ),
     OnboardingPage(
         title = stringResource(id = R.string.onboarding_page2_title),
-        subtitle = "",
+        subtitle = stringResource(R.string.onboarding_page2_subtitle),
         description = stringResource(id = R.string.onboarding_page2_description),
         icon = Icons.Default.GTranslate,
-        primaryColor = Color(0xFF00C4CC),
-        secondaryColor = Color(0xFF00A8B5),
+        primaryColor = TealPrimary,
+        secondaryColor = TealSecondary,
         features = listOf(
             stringResource(id = R.string.onboarding_feature1),
             stringResource(id = R.string.onboarding_feature2),
@@ -42,8 +54,8 @@ fun getPages(): List<OnboardingPage> = listOf(
         subtitle = stringResource(id = R.string.onboarding_page3_subtitle),
         description = stringResource(id = R.string.onboarding_page3_description),
         icon = Icons.Rounded.PhotoCamera,
-        primaryColor = Color(0xFFFF6B6B),
-        secondaryColor = Color(0xFFFF5252),
+        primaryColor = CoralPrimary,
+        secondaryColor = CoralSecondary,
         features = listOf(
             stringResource(id = R.string.onboarding_feature4),
             stringResource(id = R.string.onboarding_feature5),
@@ -55,8 +67,8 @@ fun getPages(): List<OnboardingPage> = listOf(
         subtitle = stringResource(id = R.string.onboarding_page4_subtitle),
         description = stringResource(id = R.string.onboarding_page4_description),
         icon = Icons.AutoMirrored.Rounded.MenuBook,
-        primaryColor = Color(0xFF4ECDC4),
-        secondaryColor = Color(0xFF45B7D1),
+        primaryColor = CyanPrimary,
+        secondaryColor = CyanSecondary,
         features = listOf(
             stringResource(id = R.string.onboarding_feature7),
             stringResource(id = R.string.onboarding_feature8),
@@ -68,8 +80,8 @@ fun getPages(): List<OnboardingPage> = listOf(
         subtitle = stringResource(id = R.string.onboarding_page5_subtitle),
         description = stringResource(id = R.string.onboarding_page5_description),
         icon = Icons.Rounded.Mic,
-        primaryColor = Color(0xFFFF9E80),
-        secondaryColor = Color(0xFFFF6E40),
+        primaryColor = OrangePrimary,
+        secondaryColor = OrangeSecondary,
         features = listOf(
             stringResource(id = R.string.onboarding_feature10),
             stringResource(id = R.string.onboarding_feature11),
@@ -81,8 +93,8 @@ fun getPages(): List<OnboardingPage> = listOf(
         subtitle = stringResource(id = R.string.onboarding_page6_subtitle),
         description = stringResource(id = R.string.onboarding_page6_description),
         icon = Icons.Default.RocketLaunch,
-        primaryColor = Color(0xFF9C27B0),
-        secondaryColor = Color(0xFF7B1FA2),
+        primaryColor = MagentaPrimary,
+        secondaryColor = MagentaSecondary,
         features = listOf(
             stringResource(id = R.string.onboarding_feature13),
             stringResource(id = R.string.onboarding_feature14),
