@@ -22,6 +22,24 @@ object ThemeColors {
     val USDTColor = Color(0xFF50AF95)
     val TONSpaceColor = Color(0xFF232328)
     val TONColor = Color(0xFF0098EA)
+
+    val PurplePrimary = Color(0xFF6C63FF)
+    val PurpleSecondary = Color(0xFF5A4BDA)
+
+    val TealPrimary = Color(0xFF00C4CC)
+    val TealSecondary = Color(0xFF00A8B5)
+
+    val CoralPrimary = Color(0xFFFF6B6B)
+    val CoralSecondary = Color(0xFFFF5252)
+
+    val CyanPrimary = Color(0xFF4ECDC4)
+    val CyanSecondary = Color(0xFF45B7D1)
+
+    val OrangePrimary = Color(0xFFFF9E80)
+    val OrangeSecondary = Color(0xFFFF6E40)
+
+    val MagentaPrimary = Color(0xFF9C27B0)
+    val MagentaSecondary = Color(0xFF7B1FA2)
 }
 
 @Composable
@@ -45,10 +63,7 @@ fun createDynamicColorScheme(
 }
 
 private fun createColorScheme(
-    keyColor: Color,
-    style: PaletteStyle,
-    isDark: Boolean,
-    isAmoledBlack: Boolean
+    keyColor: Color, style: PaletteStyle, isDark: Boolean, isAmoledBlack: Boolean
 ): ColorScheme {
     val backgroundColor = when {
         isDark && isAmoledBlack -> Color.Black
@@ -119,9 +134,7 @@ private class ColorSchemeGenerator(
     }
 
     private fun createScheme(block: ColorSchemeBuilder.() -> Unit): ColorScheme {
-        return ColorSchemeBuilder(isDark, backgroundColor, surfaceColor)
-            .apply(block)
-            .build()
+        return ColorSchemeBuilder(isDark, backgroundColor, surfaceColor).apply(block).build()
     }
 
     private fun rotateHue(color: Int, degrees: Float): Color {
@@ -151,9 +164,7 @@ private class ColorSchemeGenerator(
 }
 
 private class ColorSchemeBuilder(
-    private val isDark: Boolean,
-    private val backgroundColor: Color,
-    private val surfaceColor: Color
+    private val isDark: Boolean, private val backgroundColor: Color, private val surfaceColor: Color
 ) {
     var primary: Color = Color.Unspecified
     var secondary: Color = Color.Unspecified
