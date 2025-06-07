@@ -93,7 +93,6 @@ fun FloatingCircleMenu(
                 .shadow(
                     elevation = 16.dp,
                     shape = CircleShape,
-                    spotColor = Color.Black.copy(alpha = 0.25f),
                     ambientColor = Color.Black.copy(alpha = 0.15f)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
