@@ -1,6 +1,11 @@
 package com.venom.stackcard.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,8 +20,14 @@ import com.venom.stackcard.ui.viewmodel.CardSwiperEvent
 import com.venom.stackcard.ui.viewmodel.CardSwiperEvent.SetCardType
 import com.venom.stackcard.ui.viewmodel.CardSwiperViewModel
 import com.venom.stackcard.ui.viewmodel.CardType
+import com.venom.ui.components.other.FloatingCircleMenu
+import com.venom.ui.components.other.FloatingMenuItem
 import com.venom.ui.components.sections.CustomTabs
 import com.venom.ui.components.sections.TabItem
+import com.venom.ui.theme.ThemeColors.BitcoinColor
+import com.venom.ui.theme.ThemeColors.PurplePrimary
+import com.venom.ui.theme.ThemeColors.TONColor
+import com.venom.ui.theme.ThemeColors.USDTColor
 import com.venom.ui.viewmodel.TTSViewModel
 import com.venom.utils.Extensions.copyToClipboard
 
@@ -82,5 +93,31 @@ fun CardScreen(
             onSpeak = speakAction,
             onCopy = copyAction,
             onUndoLastAction = { })
+
+        FloatingCircleMenu(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            items = listOf(
+                FloatingMenuItem(
+                    icon = Icons.Rounded.Bookmark,
+                    color = USDTColor,
+                    onClick = {},
+                ),
+                FloatingMenuItem(
+                    icon = Icons.AutoMirrored.Rounded.MenuBook,
+                    color = PurplePrimary,
+                    onClick = {},
+                ),
+                FloatingMenuItem(
+                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                    color = BitcoinColor,
+                    onClick = {},
+                ),
+                FloatingMenuItem(
+                    icon = Icons.Rounded.Share,
+                    color = TONColor,
+                    onClick = {}
+                )
+            )
+        )
     }
 }
