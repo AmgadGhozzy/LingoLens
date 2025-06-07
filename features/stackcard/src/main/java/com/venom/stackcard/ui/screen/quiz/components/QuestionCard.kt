@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,6 +23,7 @@ import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.other.FloatingCircleMenu
 import com.venom.ui.components.other.FloatingMenuItem
 import com.venom.ui.theme.ThemeColors.BitcoinColor
+import com.venom.ui.theme.ThemeColors.PurplePrimary
 import com.venom.ui.theme.ThemeColors.TONColor
 import com.venom.ui.theme.ThemeColors.USDTColor
 import kotlin.collections.listOf
@@ -93,11 +94,33 @@ fun QuestionCard(
                         onClick = {}
                     )
 
-                    CustomFilledIconButton(
-                        icon = Icons.AutoMirrored.Rounded.MenuBook,
-                        contentDescription = "",
-                        color = USDTColor,
-                        onClick = {}
+                    FloatingCircleMenu(
+                        items = listOf(
+                            FloatingMenuItem(
+                                icon = Icons.Rounded.Bookmark,
+                                color = USDTColor,
+                                description = "Bookmark $question",
+                                onClick = onBookmark
+                            ),
+                            FloatingMenuItem(
+                                icon = Icons.AutoMirrored.Rounded.MenuBook,
+                                color = TONColor,
+                                description = "Lock in dictionary for $question",
+                                onClick = onLockInDictionary
+                            ),
+                            FloatingMenuItem(
+                                icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                                color = BitcoinColor,
+                                description = "Speech-to-text for $question",
+                                onClick = onSpeak
+                            ),
+                            FloatingMenuItem(
+                                icon = Icons.Rounded.Share,
+                                color = PurplePrimary,
+                                description = "Share $question and its answer",
+                                onClick = onShare
+                            )
+                        )
                     )
 
                     CustomFilledIconButton(
@@ -109,35 +132,5 @@ fun QuestionCard(
                 }
             }
         }
-
-        FloatingCircleMenu(
-            items = listOf(
-                FloatingMenuItem(
-                    icon = Icons.Rounded.Bookmark,
-                    color = Color(0xFFFF6B35),
-                    description = "Bookmark $question",
-                    onClick = onBookmark
-                ),
-                FloatingMenuItem(
-                    icon = Icons.Rounded.Lock,
-                    color = Color(0xFF6C5CE7),
-                    description = "Lock in dictionary for $question",
-                    onClick = onLockInDictionary
-                ),
-                FloatingMenuItem(
-                    icon = Icons.Rounded.VolumeUp,
-                    color = Color(0xFF00B4D8),
-                    description = "Speech-to-text for $question",
-                    onClick = onSpeak
-                ),
-                FloatingMenuItem(
-                    icon = Icons.Rounded.Share,
-                    color = Color(0xFF06FFA5),
-                    description = "Share $question and its answer",
-                    onClick = onShare
-                )
-            ),
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
     }
 }
