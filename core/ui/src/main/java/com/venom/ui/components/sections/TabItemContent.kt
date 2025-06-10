@@ -47,7 +47,7 @@ fun TabItemContent(
         modifier = modifier
             .scale(scale)
             .clip(RoundedCornerShape(28.dp)),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Color.Transparent
     ) {
         Box(
@@ -69,7 +69,7 @@ fun TabItemContent(
                         )
                     }
                 )
-                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Row(
                 modifier = Modifier.alpha(alpha),
@@ -95,7 +95,7 @@ fun TabItemContent(
                 Text(
                     text = title,
                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(start = 12.dp),
+                    modifier = Modifier.padding(start = 8.dp),
                     style = MaterialTheme.typography.labelLarge.copy(
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
                     )

@@ -48,7 +48,7 @@ fun CustomTabs(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(32.dp),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         tonalElevation = 0.dp,
         shadowElevation = 0.dp
     ) {
@@ -62,7 +62,7 @@ fun CustomTabs(
                         )
                     )
                 )
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 6.dp, vertical = 2.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
