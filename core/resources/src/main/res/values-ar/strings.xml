@@ -167,6 +167,9 @@
     <string name="about">حول</string>
     <string name="close">إغلاق</string>
     <string name="next">التالي</string>
+    <string name="continu">متابعة</string>
+    <string name="skip">تخطي</string>
+    <string name="get_started">ابدأ</string>
 
     <!-- Theme and Colors -->
     <string name="theme">المظهر</string>

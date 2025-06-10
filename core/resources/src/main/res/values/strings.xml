@@ -12,6 +12,7 @@
     <string name="action_save">Save</string>
     <string name="action_share">Share</string>
     <string name="action_delete">Delete</string>
+    <string name="action_move_up">Move Up</string>
     <string name="action_close">Close</string>
     <string name="action_speak">Speak</string>
     <string name="action_speaking">Speaking</string>
@@ -164,6 +165,7 @@
     <string name="language">Language</string>
     <string name="speech">Speech</string>
     <string name="about">About</string>
+    <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="next">NEXT</string>
     <string name="continu">Continue</string>
@@ -265,17 +267,60 @@
     <string name="title_language_learning">Language Learning</string>
     <string name="description_master_vocab">Master vocabulary across different proficiency levels</string>
 
+
+    <!-- Translation Error Messages -->
+    <string name="error_generic_translation">Translation failed. Please try again.</string>
+    <string name="error_network">No internet connection. Please check your network and try again.</string>
+    <string name="error_timeout">Request timed out. Please try again.</string>
+    <string name="error_authentication">Authentication failed. Please check your API configuration.</string>
+    <string name="error_rate_limit">Too many requests. Please wait a moment before trying again.</string>
+    <string name="error_server">Server temporarily unavailable. Please try again later.</string>
+    <string name="error_unsupported_provider">This translation provider is not supported.</string>
+    <string name="error_invalid_response">Invalid response from translation service.</string>
+    <string name="error_database">Database error occurred. Please try again.</string>
+    <string name="error_validation">Invalid input provided. Please check your text.</string>
+    <string name="error_generic">An unexpected error occurred. Please try again.</string>
+
+    <!-- Provider Specific Errors -->
+    <string name="error_chatgpt_quota">ChatGPT quota exceeded. Please try another provider.</string>
+    <string name="error_gemini_safety">Content blocked by Gemini safety filters.</string>
+    <string name="error_groq_model">Groq model unavailable. Please try again later.</string>
+    <string name="error_deepseek_api">DeepSeek API error. Please check your configuration.</string>
+    <string name="error_huggingface_model">HuggingFace model loading. Please wait and try again.</string>
+
+    <!-- Success Messages -->
+    <string name="translation_success">Translation completed successfully</string>
+    <string name="translation_saved">Translation saved to history</string>
+    <string name="translation_bookmarked">Translation bookmarked</string>
+
+    <!-- Loading Messages -->
+    <string name="translation_loading">Translating…</string>
+    <string name="translation_loading_provider">Translating with %s…</string>
+
+    <!-- Retry Actions -->
+    <string name="action_retry">Retry</string>
+    <string name="action_try_another_provider">Try Another Provider</string>
+    <string name="action_check_settings">Check Settings</string>
+
     <!-- Provider Names -->
     <string name="provider_google">Google Translate</string>
+    <string name="provider_offline">Offline</string>
     <string name="provider_chatgpt">ChatGPT</string>
     <string name="provider_gemini">Gemini</string>
+    <string name="provider_groq">Groq</string>
+    <string name="provider_deepseek">DeepSeek</string>
+    <string name="provider_huggingface">HuggingFace</string>
 
     <!-- Provider Descriptions -->
     <string name="change_translation_provider_cd">Change translation provider, current is %s</string>
     <string name="selected_indicator_cd">Selected</string>
     <string name="provider_google_description">Fast and reliable translation service</string>
+    <string name="provider_offline_description">Offline translation</string>
     <string name="provider_chatgpt_description">AI-powered translations with context understanding</string>
     <string name="provider_gemini_description">AI-powered translations with context understanding</string>
+    <string name="provider_groq_description">AI-powered translations with context understanding</string>
+    <string name="provider_deepseek_description">AI-powered translations with context understanding</string>
+    <string name="provider_huggingface_description">AI-powered translations with context understanding</string>
 
     <!-- Provider Selection UI -->
     <string name="provider_premium_badge">PRO</string>
@@ -296,6 +341,7 @@
     <string name="onboarding_page1_description">LingoLens is your trusted companion for language learning. Our advanced language translation and text-to-speech capabilities will help you communicate effortlessly with anyone, anywhere.</string>
 
     <string name="onboarding_page2_title">Smart Translation</string>
+    <string name="onboarding_page2_subtitle">Real-time Translation</string>
     <string name="onboarding_page2_description">Real-time translation across 100+ languages with advanced AI and context awareness.</string>
     <string name="onboarding_feature1">100+ Languages</string>
     <string name="onboarding_feature2">AI-Powered Translation</string>
@@ -328,5 +374,21 @@
     <string name="onboarding_feature13">User-Friendly Interface</string>
     <string name="onboarding_feature14">Progress Tracking</string>
     <string name="onboarding_feature15">Adaptive Learning</string>
+
+    <!-- Learning UI -->
+    <string name="start_learning">Start Learning</string>
+    <string name="learn">Learn</string>
+    <string name="test">Test</string>
+    <string name="next_level">Next Level</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="try_again">Try Again</string>
+    <string name="words">Words</string>
+    <string name="next_level_unlocked">Next Level Unlocked!</string>
+    <string name="correct_answers">Correct</string>
+    <string name="percentage">%</string>
+    <string name="score">Your Score</string>
+    <string name="level_completed">Level Complete</string>
+    <string name="delete_language_model">Delete Language Model</string>
+    <string name="download_language_model">Download Language Model</string>
 
 </resources>
