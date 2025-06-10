@@ -19,7 +19,7 @@ fun TranslatedTextSection(
     AnimatedResponseTextField(
         text = translatedTextValue.text,
         placeHolderText = stringResource(R.string.translate_result_placeholder),
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
     )
