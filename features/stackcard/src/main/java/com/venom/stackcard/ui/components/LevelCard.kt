@@ -55,7 +55,7 @@ fun LevelCard(
     val cardColors = getCardColors(isUnlocked, isCompleted)
 
     val elevation by animateDpAsState(
-        targetValue = if (expanded) 2.dp else 16.dp,
+        targetValue = if (expanded) 2.dp else 8.dp,
         animationSpec = spring(dampingRatio = 0.6f)
     )
 
