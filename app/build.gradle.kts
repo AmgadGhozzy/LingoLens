@@ -66,6 +66,16 @@ android {
             }
         }
     }
+
+    tasks.whenTaskAdded {
+        if (name == "assembleDebug") {
+            doLast {
+                exec {
+                    commandLine("cmd", "/c", "D:\\Amgad\\unlock_device.bat")
+                }
+            }
+        }
+    }
 }
 
 
