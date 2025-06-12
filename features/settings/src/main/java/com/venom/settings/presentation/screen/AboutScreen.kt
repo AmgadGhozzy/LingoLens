@@ -7,11 +7,13 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.venom.resources.R
 import com.venom.settings.presentation.components.AppHeader
 import com.venom.settings.presentation.components.SettingsCard
@@ -22,7 +24,6 @@ import com.venom.ui.components.dialogs.WebViewDialog
 import com.venom.utils.EMAIL
 import com.venom.utils.Extensions.shareText
 import com.venom.utils.GITHUB
-import com.venom.utils.LICENSE
 import com.venom.utils.LINKEDIN
 import com.venom.utils.PLAY_STORE
 import com.venom.utils.openUrl
@@ -35,6 +36,7 @@ fun AboutScreen(
     val context = LocalContext.current
     var showTermsDialog by remember { mutableStateOf(false) }
     var showPrivacyDialog by remember { mutableStateOf(false) }
+    var showLicensesDialog by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -52,9 +54,10 @@ fun AboutScreen(
             item { SocialSection(context) }
             item {
                 LegalSection(
-                    context,
                     onTermsClick = { showTermsDialog = true },
-                    onPrivacyClick = { showPrivacyDialog = true })
+                    onPrivacyClick = { showPrivacyDialog = true },
+                    onLicensesClick = { showLicensesDialog = true }
+                )
             }
         }
     }
@@ -72,6 +75,12 @@ fun AboutScreen(
             title = R.string.privacy_policy,
             assetPath = "privacy.html",
             onDismiss = { showPrivacyDialog = false }
+        )
+    }
+
+    if (showLicensesDialog) {
+        OpenSourceLicensesDialog(
+            onDismiss = { showLicensesDialog = false }
         )
     }
 }
@@ -116,15 +125,16 @@ private fun SocialSection(context: Context) {
 
 @Composable
 private fun LegalSection(
-    context: Context,
     onTermsClick: () -> Unit,
-    onPrivacyClick: () -> Unit
+    onPrivacyClick: () -> Unit,
+    onLicensesClick: () -> Unit
 ) {
     SettingsCard(title = R.string.legal) {
         SettingsItem(
             leadingContent = { SettingsIcon(Icons.Outlined.LocalLibrary) },
-            title = R.string.licenses,
-            onClick = { context.openUrl(LICENSE) }
+            title = R.string.open_source_licenses,
+            subtitle = stringResource(R.string.open_source_licenses_desc),
+            onClick = onLicensesClick
         )
         SettingsItem(
             leadingContent = { SettingsIcon(Icons.Outlined.Policy) },
@@ -135,6 +145,24 @@ private fun LegalSection(
             leadingContent = { SettingsIcon(Icons.Outlined.Description) },
             title = R.string.terms,
             onClick = onTermsClick
+        )
+    }
+}
+
+@Composable
+private fun OpenSourceLicensesDialog(
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        LibrariesContainer(
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
