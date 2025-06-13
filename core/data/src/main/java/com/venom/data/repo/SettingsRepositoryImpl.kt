@@ -9,6 +9,7 @@ import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
 import com.venom.data.model.ThemeColor
 import com.venom.data.model.ThemePreference
+import com.venom.data.model.TranslationProvider
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
 import com.venom.utils.SETTING_FILE
@@ -64,6 +65,10 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setTargetLanguage(language: LanguageItem) {
         updateSettings { copy(targetLanguage = language) }
+    }
+
+    override suspend fun setSelectedProvider(provider: TranslationProvider) {
+        updateSettings { copy(selectedProvider = provider) }
     }
 
     override suspend fun setSpeechRate(rate: Float) {

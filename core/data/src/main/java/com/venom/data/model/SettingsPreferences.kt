@@ -10,7 +10,7 @@ data class SettingsPreferences(
     val appLanguage: LanguageItem = LANGUAGES_LIST[1],
     val nativeLanguage: LanguageItem = LANGUAGES_LIST[0],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
-
+    val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE,
     val speechRate: Float = 1.2f,
 
     val themePrefs: ThemePreference = ThemePreference(),
