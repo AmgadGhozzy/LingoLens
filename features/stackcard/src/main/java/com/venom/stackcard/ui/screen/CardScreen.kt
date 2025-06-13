@@ -37,6 +37,7 @@ fun CardScreen(
     wordViewModel: CardSwiperViewModel = hiltViewModel(),
     phraseViewModel: CardSwiperViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
+    onNavigateToSentence: (String) -> Unit = {},
     initialLevel: WordLevels? = null
 ) {
     val context = LocalContext.current
@@ -50,8 +51,10 @@ fun CardScreen(
     // Determine the current view model based on the selected tab
     val currentViewModel = if (selectedTab == 0) wordViewModel else phraseViewModel
 
-    // Actions for card events using the current view model
+    val state by currentViewModel.state.collectAsState()
 
+
+    // Actions for card events using the current view model
     val onBookmarkWord: (CardItem) -> Unit =
         { currentViewModel.onEvent(CardSwiperEvent.Bookmark(it)) }
     val onRememberWord: (CardItem) -> Unit =
@@ -60,7 +63,7 @@ fun CardScreen(
 
     // Set initial CardType for each ViewModel
     LaunchedEffect(selectedTab) {
-        initialLevel?.let { wordViewModel.setLevel(initialLevel)}
+        initialLevel?.let { wordViewModel.setLevel(initialLevel) }
         if (selectedTab == 0) wordViewModel.onEvent(SetCardType(CardType.WORD))
         else wordViewModel.onEvent(SetCardType(CardType.PHRASE))
     }
@@ -105,7 +108,7 @@ fun CardScreen(
                 FloatingMenuItem(
                     icon = Icons.AutoMirrored.Rounded.MenuBook,
                     color = PurplePrimary,
-                    onClick = {},
+                    onClick = { onNavigateToSentence(state.visibleCards[state.currentCardIndex].englishEn) },
                 ),
                 FloatingMenuItem(
                     icon = Icons.AutoMirrored.Rounded.VolumeUp,
