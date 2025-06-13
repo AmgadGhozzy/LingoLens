@@ -12,11 +12,12 @@ import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
 import com.venom.stackcard.ui.screen.CardScreen
 import com.venom.stackcard.ui.screen.quiz.MainLevelScreen
-import com.venom.stackcard.ui.screen.quiz.QuizScreen1
+import com.venom.stackcard.ui.screen.quiz.QuizScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.OnboardingScreens
+import com.venom.ui.screen.SentenceScreen
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
@@ -51,7 +52,10 @@ fun NavigationGraph(
             TranslationScreen(
                 viewModel = translateViewModel,
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
-                //initialText = text?.takeUnless { it == "null" || it == "{text}" }
+                onNavigateToSentence = { text ->
+                    navController.navigate(Screen.Sentence.createRoute(text))
+                },
+                initialText = text?.takeUnless { it == "null" || it == "{text}" }
             )
         }
 
@@ -64,7 +68,11 @@ fun NavigationGraph(
             val level = backStackEntry.arguments?.getString("level")?.let { levelId ->
                 WordLevels.values().find { it.id == levelId }
             }
-            CardScreen(initialLevel = level)
+            CardScreen(initialLevel = level,
+                onNavigateToSentence = { text ->
+                    navController.navigate(Screen.Sentence.createRoute(text))
+                }
+            )
         }
 
         // OCR Screen
@@ -89,6 +97,20 @@ fun NavigationGraph(
             PhrasebookScreen()
         }
 
+        composable(
+            route = Screen.Sentence.route,
+            arguments = listOf(navArgument("word") {
+                type = NavType.StringType
+                nullable = true
+            }
+            )
+        ) { backStackEntry ->
+            val word = backStackEntry.arguments?.getString("word")
+            SentenceScreen(
+                word = word,
+                onNavigateBack = { navController.popBackStack() })
+        }
+
         // Dialog Screen
         composable(Screen.Dialog.route) {
             DialogScreen()
@@ -111,13 +133,15 @@ fun NavigationGraph(
                 it.id == backStackEntry.arguments?.getString("level")
             } ?: WordLevels.Beginner
 
-            QuizScreen1(
+            QuizScreen(
                 level = level, onComplete = { passed, nextLevel ->
                     if (passed && nextLevel != null) {
                         navController.navigate(Screen.StackCard.createRoute(level)) {
                             popUpTo(Screen.Quiz.MainLevel.route)
                         }
-                    } else { navController.popBackStack() }
+                    } else {
+                        navController.popBackStack()
+                    }
                 },
                 onNavigateToLearn = { level ->
                     navController.navigate(Screen.StackCard.createRoute(level))
