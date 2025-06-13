@@ -1,4 +1,4 @@
-package com.venom.ui.screen.dictionary
+package com.venom.ui.components.bars
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -23,7 +23,7 @@ fun ActionButtons(
     text: String,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
-    onShare: ((String) -> Unit),
+    onShare: (String) -> Unit,
     isSpeaking: Boolean = false,
 ) {
     Row(
