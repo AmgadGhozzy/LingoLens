@@ -22,6 +22,8 @@ object ThemeColors {
     val USDTColor = Color(0xFF50AF95)
     val TONSpaceColor = Color(0xFF232328)
     val TONColor = Color(0xFF0098EA)
+    val Indigo = Color(0xFF6366F1)
+    val Purple = Color(0xFF8B5CF6)
 
     val PurplePrimary = Color(0xFF6C63FF)
     val PurpleSecondary = Color(0xFF5A4BDA)
