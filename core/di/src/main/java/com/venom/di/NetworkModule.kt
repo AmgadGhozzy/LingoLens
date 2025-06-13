@@ -1,5 +1,7 @@
 package com.venom.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.venom.data.BuildConfig
 import com.venom.data.api.*
 import com.venom.data.repo.UpdateChecker
@@ -51,7 +53,7 @@ object NetworkModule {
             .build()
     }
 
-    private fun createRetrofit(baseUrl: String, client: OkHttpClient): Retrofit {
+    fun createRetrofit(baseUrl: String, client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
@@ -124,4 +126,10 @@ object NetworkModule {
     fun provideHuggingFaceService(@Named("AiOkHttpClient") client: OkHttpClient): HuggingFaceService {
         return createRetrofit(HuggingFaceService.BASE_URL, client).create(HuggingFaceService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder()
+        .setLenient()
+        .create()
 }
