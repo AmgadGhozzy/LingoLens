@@ -8,6 +8,7 @@ import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationEntry
 import com.venom.data.model.TranslationProvider
 import com.venom.data.model.TranslationResponse
+import com.venom.data.repo.SettingsRepository
 import com.venom.data.repo.TranslationRepository
 import com.venom.utils.Extensions.postprocessText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,8 @@ data class TranslationUiState(
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TranslateViewModel @Inject constructor(
-    private val repository: TranslationRepository
+    private val repository: TranslationRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TranslationUiState())
     val uiState = _uiState.asStateFlow()
@@ -41,6 +43,12 @@ class TranslateViewModel @Inject constructor(
     private var translationJob: Job? = null
 
     init {
+        viewModelScope.launch {
+            settingsRepository.settings.collect { settings ->
+                _uiState.update { it.copy(selectedProvider = settings.selectedProvider) }
+            }
+        }
+
         viewModelScope.launch {
             textChangeFlow
                 .debounce(300)
@@ -95,7 +103,6 @@ class TranslateViewModel @Inject constructor(
         val currentState = _uiState.value
         if (currentState.translatedText.isBlank()) return
 
-        // Cancel ongoing operations
         translationJob?.cancel()
 
         _uiState.update {
@@ -108,14 +115,15 @@ class TranslateViewModel @Inject constructor(
             )
         }
 
-        // Trigger translation for the moved text
         viewModelScope.launch {
             textChangeFlow.emit(currentState.translatedText)
         }
     }
 
     fun updateProvider(provider: TranslationProvider) {
-        _uiState.update { it.copy(selectedProvider = provider) }
+        viewModelScope.launch {
+            settingsRepository.setSelectedProvider(provider)
+        }
         if (_uiState.value.sourceText.isNotBlank()) {
             translate(_uiState.value.sourceText)
         }
