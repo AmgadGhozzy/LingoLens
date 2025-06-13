@@ -3,6 +3,7 @@ package com.venom.data.model
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.venom.resources.R
+import kotlinx.serialization.Serializable
 
 /**
  * Model representing a translation service provider
@@ -13,6 +14,7 @@ import com.venom.resources.R
  * @property descriptionResId String resource ID for provider description
  * @property isPremium Whether this provider requires a premium subscription
  */
+@Serializable
 data class TranslationProvider(
     val id: String,
     @StringRes val nameResId: Int,
