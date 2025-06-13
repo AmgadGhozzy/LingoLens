@@ -38,27 +38,18 @@ fun AboutScreen(
     var showPrivacyDialog by remember { mutableStateOf(false) }
     var showLicensesDialog by remember { mutableStateOf(false) }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
-        )
+    SettingsScaffold(
+        title = R.string.about,
+        onDismiss = onDismiss
     ) {
-        SettingsScaffold(
-            title = R.string.about,
-            onDismiss = onDismiss
-        ) {
-            item { AppHeader() }
-            item { SocialSection(context) }
-            item {
-                LegalSection(
-                    onTermsClick = { showTermsDialog = true },
-                    onPrivacyClick = { showPrivacyDialog = true },
-                    onLicensesClick = { showLicensesDialog = true }
-                )
-            }
+        item { AppHeader() }
+        item { SocialSection(context) }
+        item {
+            LegalSection(
+                onTermsClick = { showTermsDialog = true },
+                onPrivacyClick = { showPrivacyDialog = true },
+                onLicensesClick = { showLicensesDialog = true }
+            )
         }
     }
 
