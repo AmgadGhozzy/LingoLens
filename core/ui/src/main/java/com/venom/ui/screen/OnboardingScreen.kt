@@ -32,6 +32,7 @@ fun OnboardingScreens(
     val pages = getPages()
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
+    val currentPage = pages[pagerState.currentPage]
 
     Box(
         modifier = Modifier
@@ -39,7 +40,10 @@ fun OnboardingScreens(
             .background(MaterialTheme.colorScheme.surfaceContainerLowest),
         contentAlignment = Alignment.Center
     ) {
-        FloatingOrbs(pages[pagerState.currentPage])
+        FloatingOrbs(
+            primaryColor = currentPage.primaryColor,
+            secondaryColor = currentPage.secondaryColor
+        )
 
         Column(modifier = Modifier.fillMaxSize()) {
             TopSection(
