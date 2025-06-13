@@ -10,7 +10,7 @@ import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
 import com.venom.domain.model.SettingsDialog
 import com.venom.resources.R
-import com.venom.settings.presentation.screen.AboutScreen
+import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.ui.components.common.CustomBottomSheet
 import com.venom.ui.components.dialogs.BaseDialog
 import com.venom.ui.components.dialogs.DialogRadioOption
@@ -40,7 +40,10 @@ fun SettingsDialogController(
                         DialogRadioOption(
                             text = stringResource(id = theme.title),
                             selected = theme == uiState.themePrefs.appTheme,
-                            onClick = { onUpdateTheme(theme) }
+                            onClick = {
+                                onUpdateTheme(theme)
+                                onDismiss()
+                            }
                         )
                     }
                 }
@@ -59,7 +62,10 @@ fun SettingsDialogController(
                             DialogRadioOption(
                                 text = style.title,
                                 selected = style == uiState.themePrefs.colorStyle,
-                                onClick = { onUpdateColorStyle(style) }
+                                onClick = {
+                                    onUpdateColorStyle(style)
+                                    onDismiss()
+                                }
                             )
                         }
                 }
@@ -87,7 +93,10 @@ fun SettingsDialogController(
                         DialogRadioOption(
                             text = style.title,
                             selected = style == uiState.themePrefs.fontFamily,
-                            onClick = { onUpdateFontFamily(style) }
+                            onClick = {
+                                onUpdateFontFamily(style)
+                                onDismiss()
+                            }
                         )
                     }
                 }
@@ -104,7 +113,10 @@ fun SettingsDialogController(
                         DialogRadioOption(
                             text = language.englishName,
                             selected = language == uiState.appLanguage,
-                            onClick = { onUpdateLanguage(language) }
+                            onClick = {
+                                onUpdateLanguage(language)
+                                onDismiss()
+                            }
                         )
                     }
                 }
@@ -121,7 +133,10 @@ fun SettingsDialogController(
                         DialogRadioOption(
                             text = language.englishName,
                             selected = language == uiState.nativeLanguage,
-                            onClick = { onUpdateNativeLanguage(language) }
+                            onClick = {
+                                onUpdateNativeLanguage(language)
+                                onDismiss()
+                            }
                         )
                     }
                 }
@@ -131,7 +146,7 @@ fun SettingsDialogController(
         SettingsDialog.About -> {
             CustomBottomSheet(
                 onDismiss = onDismiss
-            ) { AboutScreen(onDismiss = onDismiss) }
+            ) { AboutBottomSheet(onDismiss = onDismiss) }
         }
 
         SettingsDialog.None -> {}
