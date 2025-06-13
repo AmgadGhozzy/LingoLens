@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,7 +36,7 @@ fun TopBar(
     onLeadingIconClick: () -> Unit,
     actions: @Composable (RowScope.() -> Unit) = {}
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
@@ -48,7 +49,8 @@ fun TopBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent,
             navigationIconContentColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             actionIconContentColor = MaterialTheme.colorScheme.primary
