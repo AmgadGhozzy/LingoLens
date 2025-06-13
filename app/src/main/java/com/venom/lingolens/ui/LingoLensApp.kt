@@ -90,7 +90,6 @@ private fun LingoLensAppContent(
         }
     }
 
-
     Scaffold(
         topBar = {
             if (appState.shouldShowTopBar) {
@@ -102,13 +101,9 @@ private fun LingoLensAppContent(
                     onAboutClick = { appState.showAbout = true },
 
                     showProviderSelector = appState.currentScreen == Screen.Translation,
-                    selectedProvider = if (appState.currentScreen == Screen.Translation) translationUiState.selectedProvider else TranslationProvider.GOOGLE, // Default or null
-                    availableProviders = if (appState.currentScreen == Screen.Translation) translationUiState.availableProviders else emptyList(),
-                    onProviderSelected = { provider ->
-                        if (appState.currentScreen == Screen.Translation) {
-                            translateViewModel.updateProvider(provider)
-                        }
-                    }
+                    selectedProvider = translationUiState.selectedProvider,
+                    availableProviders = if (appState.currentScreen == Screen.Translation) TranslationProvider.ALL else emptyList(),
+                    onProviderSelected = translateViewModel::updateProvider
                 )
             }
         },
