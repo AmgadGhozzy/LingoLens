@@ -10,69 +10,160 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.venom.ui.theme.ThemeColors.Indigo
+import com.venom.ui.theme.ThemeColors.Purple
+
+data class OrbConfig(
+    val size: Dp,
+    val color: Color,
+    val alignment: Alignment,
+    val offsetX: Dp = 0.dp,
+    val offsetY: Dp = 0.dp,
+    val scaleMultiplier: Float = 1f,
+    val alphaMultiplier: Float = 1f
+)
 
 @Composable
-fun FloatingOrbs(screen: OnboardingPage) {
-    val infiniteTransition = rememberInfiniteTransition()
+fun FloatingOrbs(
+    modifier: Modifier = Modifier,
+    primaryColor: Color = Indigo,
+    secondaryColor: Color = Purple,
+    customOrbs: List<OrbConfig>? = null,
+    animationDuration: Int = 6000,
+    enableFloatingAnimation: Boolean = true,
+    enableScaleAnimation: Boolean = true,
+    enableAlphaAnimation: Boolean = true
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "floating_orbs_transition")
 
+    // Scale animations
     val scale1 by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1.3f,
-        animationSpec = infiniteRepeatable(tween(6000, easing = EaseInOutCubic), RepeatMode.Reverse)
+        initialValue = if (enableScaleAnimation) 0.8f else 1f,
+        targetValue = if (enableScaleAnimation) 1.3f else 1f,
+        animationSpec = infiniteRepeatable(
+            tween(animationDuration, easing = EaseInOutCubic),
+            RepeatMode.Reverse
+        )
     )
 
     val scale2 by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1.1f,
-        animationSpec = infiniteRepeatable(tween(8000, easing = EaseInOutCubic), RepeatMode.Reverse)
+        initialValue = if (enableScaleAnimation) 0.6f else 1f,
+        targetValue = if (enableScaleAnimation) 1.1f else 1f,
+        animationSpec = infiniteRepeatable(
+            tween((animationDuration * 1.33f).toInt(), easing = EaseInOutCubic),
+            RepeatMode.Reverse
+        )
     )
 
     val scale3 by infiniteTransition.animateFloat(
-        initialValue = 0.9f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(tween(7000, easing = EaseInOutCubic), RepeatMode.Reverse)
+        initialValue = if (enableScaleAnimation) 0.9f else 1f,
+        targetValue = if (enableScaleAnimation) 1.2f else 1f,
+        animationSpec = infiniteRepeatable(
+            tween((animationDuration * 1.17f).toInt(), easing = EaseInOutCubic),
+            RepeatMode.Reverse
+        )
     )
 
+    // Alpha animation
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 0.6f,
-        animationSpec = infiniteRepeatable(tween(5000, easing = EaseInOutCubic), RepeatMode.Reverse)
+        initialValue = if (enableAlphaAnimation) 0.2f else 0.4f,
+        targetValue = if (enableAlphaAnimation) 0.6f else 0.4f,
+        animationSpec = infiniteRepeatable(
+            tween((animationDuration * 0.83f).toInt(), easing = EaseInOutCubic),
+            RepeatMode.Reverse
+        )
     )
 
+    // Floating animation
     val offsetY by infiniteTransition.animateFloat(
-        initialValue = -20f,
-        targetValue = 20f,
-        animationSpec = infiniteRepeatable(tween(4000, easing = EaseInOutCubic), RepeatMode.Reverse)
+        initialValue = if (enableFloatingAnimation) -20f else 0f,
+        targetValue = if (enableFloatingAnimation) 20f else 0f,
+        animationSpec = infiniteRepeatable(
+            tween((animationDuration * 0.67f).toInt(), easing = EaseInOutCubic),
+            RepeatMode.Reverse
+        )
     )
 
-    Box(Modifier.fillMaxSize()) {
-        listOf(
-            Triple(320.dp, screen.primaryColor, scale1) to Modifier.align(Alignment.TopStart).offset((-100).dp, (-80).dp + offsetY.dp),
-            Triple(280.dp, screen.secondaryColor, scale2) to Modifier.align(Alignment.CenterEnd).offset(60.dp, (-offsetY).dp),
-            Triple(240.dp, screen.primaryColor, scale3) to Modifier.align(Alignment.BottomStart).offset((-60).dp, 100.dp + (offsetY * 0.5f).dp),
-            Triple(160.dp, screen.primaryColor, scale1 * 0.6f) to Modifier.align(Alignment.TopEnd).offset(40.dp, 120.dp + (offsetY * 0.3f).dp)
-        ).forEach { (sizeColorScale, baseModifier) ->
-            val (size, color, scale) = sizeColorScale
-            val alphaMultiplier = when (size) {
-                280.dp -> 0.7f
-                240.dp -> 0.5f
-                160.dp -> 0.3f
-                else -> 1f
+    val orbs = customOrbs ?: getDefaultOrbs(primaryColor, secondaryColor)
+
+    Box(modifier = modifier.fillMaxSize()) {
+        orbs.forEachIndexed { index, orb ->
+            val scaleValue = when (index % 3) {
+                0 -> scale1 * orb.scaleMultiplier
+                1 -> scale2 * orb.scaleMultiplier
+                else -> scale3 * orb.scaleMultiplier
+            }
+
+            val dynamicOffsetY = when (index % 3) {
+                0 -> offsetY
+                1 -> -offsetY
+                else -> offsetY * 0.5f
             }
 
             Box(
-                modifier = baseModifier
-                    .size(size)
-                    .scale(scale)
+                modifier = Modifier
+                    .align(orb.alignment)
+                    .offset(
+                        x = orb.offsetX,
+                        y = orb.offsetY + dynamicOffsetY.dp
+                    )
+                    .size(orb.size)
+                    .scale(scaleValue)
                     .background(
                         Brush.radialGradient(
-                            listOf(color.copy(alpha = alpha * alphaMultiplier), Color.Transparent),
-                            radius = 500f
+                            listOf(
+                                orb.color.copy(alpha = alpha * orb.alphaMultiplier),
+                                orb.color.copy(alpha = alpha * orb.alphaMultiplier * 0.3f),
+                                Color.Transparent
+                            ),
+                            radius = orb.size.value * 1.5f
                         ),
                         CircleShape
                     )
             )
         }
     }
+}
+
+private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<OrbConfig> {
+    return listOf(
+        OrbConfig(
+            size = 320.dp,
+            color = primaryColor,
+            alignment = Alignment.TopStart,
+            offsetX = (-100).dp,
+            offsetY = (-80).dp,
+            scaleMultiplier = 1f,
+            alphaMultiplier = 0.8f
+        ),
+        OrbConfig(
+            size = 280.dp,
+            color = secondaryColor,
+            alignment = Alignment.CenterEnd,
+            offsetX = 60.dp,
+            offsetY = 0.dp,
+            scaleMultiplier = 1f,
+            alphaMultiplier = 0.6f
+        ),
+        OrbConfig(
+            size = 240.dp,
+            color = primaryColor,
+            alignment = Alignment.BottomStart,
+            offsetX = (-60).dp,
+            offsetY = 100.dp,
+            scaleMultiplier = 1f,
+            alphaMultiplier = 0.4f
+        ),
+        OrbConfig(
+            size = 160.dp,
+            color = primaryColor,
+            alignment = Alignment.TopEnd,
+            offsetX = 40.dp,
+            offsetY = 120.dp,
+            scaleMultiplier = 0.6f,
+            alphaMultiplier = 0.3f
+        )
+    )
 }
