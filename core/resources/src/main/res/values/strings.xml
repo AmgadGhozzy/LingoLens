@@ -211,6 +211,8 @@
     <string name="about_credits">Designed and developed by Amgad Ghozzy in Egypt</string>
     <string name="connect_with_us">Connect With Us</string>
     <string name="legal">Legal Information</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
+    <string name="open_source_licenses_desc">View licenses for open source libraries used in this app</string>
     <string name="licenses">Open Source Licenses</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="terms">Terms of Service</string>
@@ -390,5 +392,6 @@
     <string name="level_completed">Level Complete</string>
     <string name="delete_language_model">Delete Language Model</string>
     <string name="download_language_model">Download Language Model</string>
+    <string name="sentence_explorer">Sentence Explorer</string>
 
 </resources>
