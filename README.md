@@ -1,125 +1,193 @@
-# LingoLens
-
 <div align="center">
-  <img src="./screenshots/logo.png" width="200" />
+
+<img src="./images/logo/logo.png" width="200" alt="LingoLens Logo" />
+
+# 🌍 LingoLens – AI English Learning & Translator
+
+![API 21+](https://img.shields.io/badge/API%2021+-3ddc84?style=for-the-badge&logo=android&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
+![Material You](https://img.shields.io/badge/Material%20You-6200EA?style=for-the-badge&logo=materialdesign&logoColor=white)
+![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+
+[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen?style=for-the-badge&logo=semantic-release)](https://github.com/AmgadGhozzy/LingoLens/releases)
+[![License](https://img.shields.io/badge/License-Apache%202.0-orange?style=for-the-badge&logo=apache&logoColor=white)](https://opensource.org/licenses/Apache-2.0)
+
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.venom.lingolens)
+
+# 🗺️ Project Overview
+
+**A smart, feature-rich, AI-powered app that helps users translate, learn and practice English with tools like real-time OCR, speech translation, flashcard quizzes, sentence builders, and more.**
+
+Built with **Jetpack Compose**, **MVVM architecture**, and **modern Android libraries** for a smooth, accessible, and customizable learning experience.
+
+
 </div>
 
-<h1 align="center">LingoLens: Advanced Language Translation & Learning Tool</h1>
+<p align="middle">
+    <img src="./images/banner/banner1.png" width="99%" alt="LingoLens Banner" />
+    <img src="./images/phoneScreenshots/01.png" width="13%" />
+    <img src="./images/phoneScreenshots/02.png" width="13%" />
+    <img src="./images/phoneScreenshots/03.png" width="13%" />
+    <img src="./images/phoneScreenshots/04.png" width="13%" />
+    <img src="./images/phoneScreenshots/05.png" width="13%" />
+    <img src="./images/phoneScreenshots/06.png" width="13%" />
+    <img src="./images/phoneScreenshots/07.png" width="13%" />
+</p>
 
-## Overview
-LingoLens is a comprehensive language translation and learning application that combines powerful translation capabilities with interactive learning features. The app leverages advanced OCR technology, real-time speech recognition, and extensive dictionary integration to provide users with a seamless language learning experience across multiple languages.
+## ✨ Features
 
-## Key Features
+### 📖 Translation & Transliteration
+- **Instant Translation**: Translate text, voice, and images in real-time
+- **Voice Support**: Speak and hear accurate translations with natural pronunciation
+- **Multiple Engines**: Choose between Google Translate, DeepL, and other translation services
+- **Script Transliteration**: Convert between different writing systems
+- **Offline Mode**: Basic translation features work without internet connection
 
-### Transliteration & Translation
-- **Advanced Text Translation**: Translate text between multiple languages with high accuracy
-- **Real-time Transliteration**: Convert text from one script to another while preserving pronunciation
-- **Voice-to-Text Translation**: Speak in one language and get instant translations
-- **Language Detection**: Automatically detect the source language of input text
-- **Offline Translation Support**: Access basic translation features without internet connection
+### 📷 OCR Image Translation
+- **Smart Text Detection**: Extract and translate text from photos or screenshots
+- **Flexible Scanning**: Process full paragraphs or focus on specific words
+- **Interactive Selection**: Crop, select, and interact with detected text using bounding boxes
 
-### OCR Image Translation
-- **Text Recognition**: Extract text from images using advanced OCR technology
-- **Image Cropping**: Crop images to focus on specific text areas for better recognition
-- **Bounding Box Selection**: Select specific text portions from recognized text in images
-- **Paragraph Mode**: Detect and extract complete paragraphs from images
-- **Error Recovery**: Intelligent error handling for poor quality images
+### 🧠 Vocabulary & Learning Tools
+- **Interactive Flashcards**: Swipe through engaging word cards for vocabulary building
+- **Floating Word Cards**: Access vocabulary tools from anywhere in the app
+- **Level-Based Learning**: Progress through structured word stacks by difficulty
+- **Typing Practice**: Improve spelling with interactive typing drills
+- **Custom Quizzes**: Create personalized tests with real-time scoring and feedback
+- **Multi-Modal Practice**: Speaking and listening exercises included
 
-### Interactive Learning
-- **Swipeable Word Cards**: Learn vocabulary through interactive flashcard system
-- **Floating Word Cards**: Keep words accessible even outside the app
-- **Custom Word Groups**: Create and organize vocabulary by themes or difficulty
-- **Word Typing Practice**: Improve spelling and typing skills
-- **Custom Quizzes**: Test your knowledge with adjustable parameters
-- **Quiz Levels**: Progress through different difficulty levels (Easy, Intermediate, Advanced)
-- **Multi-format Tests**: Grammar, sentence completion, situations, TOEFL, IELTS, and more
-- **Real-time Scoring**: Immediate feedback on quiz performance
+### ✍️ Sentence Tools & Phrasebook
+- **Extensive Phrase Library**: Access 1000+ categorized phrases for travel, shopping, business, and daily conversations
+- **Sentence Builder**: Construct grammatically correct sentences with guided assistance
+- **Native Pronunciation**: Search YouTube for real-world pronunciation examples
 
-[//]: # (### Dictionary & Reference)
+### 🗣️ Speech Practice
+- **Text-to-Speech (TTS)**: Listen to natural English pronunciation
+- **Speech-to-Text (STT)**: Practice speaking for translation and vocabulary building
+- **Pronunciation Feedback**: Get instant feedback on your pronunciation accuracy
 
-[//]: # (- **Oxford Dictionary Integration**: Access comprehensive word definitions)
+### ⚙️ Personalization & Settings
+- **Theme Customization**: Choose from multiple themes, colors, and font options
+- **Multi-Language Interface**: Support for various interface languages
+- **Personal Library**: Save favorites and view translation history
+- **Progress Tracking**: Monitor learning statistics and performance metrics
 
-[//]: # (- **Wikipedia Integration**: Get additional contextual information about terms)
+## 🛠️ Tech Stack
 
-[//]: # (- **Thesaurus View**: Find synonyms and related words)
+<div align="center">
 
-[//]: # (- **Example Sentences**: See words used in context)
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
+![Material You](https://img.shields.io/badge/Material%20You-6200EA?style=for-the-badge&logo=materialdesign&logoColor=white)
+![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 
-[//]: # (- **Multi-language Dictionary**: Look up words across different languages)
+</div>
 
-[//]: # (- **Word Categories**: Browse words by topic or category)
+### Core Technologies
+- **[Kotlin](https://kotlinlang.org/)** - Modern, expressive programming language for Android
+- **[Jetpack Compose](https://developer.android.com/jetpack/compose)** - Declarative UI toolkit for native Android apps
+- **[MVVM Architecture](https://developer.android.com/jetpack/guide)** - Clean separation of concerns with ViewModel pattern
 
-### Speech & Pronunciation
-- **Text-to-Speech**: Listen to correct pronunciation of words and phrases
-- **Speech Recognition**: Practice pronunciation with immediate feedback
-- **Voice Input**: Dictate text instead of typing
+### Key Libraries & Frameworks
+- **[Hilt](https://dagger.dev/hilt/)** - Dependency injection framework
+- **[Retrofit](https://square.github.io/retrofit/)** - Type-safe HTTP client for REST API integration
+- **[Room Database](https://developer.android.com/training/data-storage/room)** - Local persistent storage solution
+- **[ML Kit](https://developers.google.com/ml-kit)** - Machine learning capabilities for text recognition
+- **[CameraX](https://developer.android.com/camerax)** - Camera functionality and image processing
+- **[Firebase](https://firebase.google.com/)** - Crashlytics, Analytics, and Remote Configuration
 
-### Organization & Personalization
-- **Bookmarks**: Save important words, phrases, or translations
-- **History Tracking**: Review past translations and searches
-- **Custom Categories**: Organize content by user-defined categories
-- **Search Functionality**: Quickly find previously translated content
-- **Customizable UI**: Adjust themes, fonts, and display settings
+## 🏗️ Architecture
 
-### Accessibility & User Experience
-- **Material You Design**: Modern and responsive user interface
-- **Dynamic Color Schemes**: Personalized color options with dark mode support
-- **Font Customization**: Multiple font styles for better readability
-- **Multi-language UI**: Interface available in multiple languages
-- **Drag Handles**: Intuitive UI manipulation
-- **Bottom Sheets**: Convenient access to additional features
+LingoLens follows a clean, modular architecture designed for scalability and maintainability:
 
-## Built With 🛠
+| Module | Purpose |
+|--------|---------|
+| `core/ui` | Shared UI components, themes, and styling |
+| `features/ocr` | Image scanning, text recognition, and OCR functionality |
+| `features/translation` | Translation services and language processing tools |
+| `features/stackcard` | Flashcards, quizzes, tests, and level progression |
+| `features/phrase` | Phrasebook management and contextual learning |
+| `features/settings` | User preferences, configurations, and app settings |
 
-- [Kotlin](https://kotlinlang.org/): Primary programming language for Android development
-- [Jetpack Compose](https://developer.android.com/jetpack/compose): Modern UI toolkit for native Android UI
-- [Android Architecture Components](https://developer.android.com/topic/architecture): Robust app architecture
-  - [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel): UI-related data management
-  - [Navigation component](https://developer.android.com/guide/navigation): In-app navigation handling
-  - [Room Database](https://developer.android.com/training/data-storage/room): Local database storage
-  - [LiveData](https://developer.android.com/topic/libraries/architecture/livedata): Observable data holder patterns
-  - [Data Binding](https://developer.android.com/topic/libraries/data-binding): Declarative UI binding
-- [Kotlin Coroutines](https://developer.android.com/kotlin/coroutines): Asynchronous programming
-- [Retrofit](https://square.github.io/retrofit/): Type-safe HTTP client
-- [MVVM Architecture](https://developer.android.com/topic/architecture): Separation of concerns pattern
-- [Material 3 Design](https://m3.material.io/): Latest Material Design guidelines
-- [Hilt](https://developer.android.com/training/dependency-injection/hilt-android): Dependency injection
-- [ML Kit](https://developers.google.com/ml-kit): Machine learning for mobile developers
-- [CameraX](https://developer.android.com/training/camerax): Camera API simplification
-- [Firebase](https://firebase.google.com/): Analytics, crash reporting, and cloud services
+## 🚀 Getting Started
 
-## Technical Architecture
-
-The app follows a modular architecture with distinct feature modules:
-
-- **core/ui**: Common UI components and themes
-- **features/dialog**: Conversational practice functionality
-- **features/ocr**: Image text recognition and translation
-- **features/phrase**: Phrasebook and language resources
-- **features/settings**: User preferences and configuration
-- **features/stackcard**: Flashcard system for vocabulary building
-- **features/translation**: Core translation functionality
-
-## Permissions Required
-
-- Camera: For OCR text recognition
-- Microphone: For speech recognition and input
-- Storage: For saving and loading user data
-- Internet: For translation services and dictionary lookups
-
-## Getting Started
+### Prerequisites
+- Android Studio Arctic Fox or later
+- Android SDK API 21+
+- Kotlin 1.8+
 
 ### Installation
-1. Clone the repository: `git clone https://github.com/AmgadGhozzy/LingoLens.git`
-2. Open the project in Android Studio
-3. Sync Gradle files
-4. Run the app on an emulator or physical device
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/AmgadGhozzy/LingoLens.git
+   ```
 
-## Support & Feedback
-For questions, feedback, or support, please contact us at [support@lingolens.app](mailto:support@lingolens.app)
+2. **Open the project in Android Studio**
 
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
+3. **Sync project with Gradle files**
 
-## License
-LingoLens is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+4. **Build and run the app on your device or emulator**
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Whether it's bug fixes, feature enhancements, or documentation improvements, your help is appreciated.
+
+### How to Contribute
+1. **Fork the repository**
+2. **Create a feature branch:**
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+3. **Commit your changes:**
+   ```bash
+   git commit -m "Add new feature"
+   ```
+4. **Push to the branch:**
+   ```bash
+   git push origin feature/your-feature
+   ```
+5. **Open a Pull Request**
+<div align="center">
+
+## 💬 Support & Feedback
+
+Need help? Found a bug? Have suggestions?
+
+📧 **Email:** [AmgadGhozzy@gmail.com](mailto:AmgadGhozzy@gmail.com)
+
+We're always looking for ways to improve LingoLens, so please don't hesitate to reach out with your feedback and ideas.
+
+## ⚖️ License
+
+```
+Copyright 2025 Amgad Ghozzy
+  Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except in compliance with the License.You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, softwaredistributed under the License is distributed on an "AS IS" BASIS,WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.See the License for the specific language governing permissions andlimitations under the License.
+```
+
+---
+
+## 💫 Love LingoLens?
+
+**Star us on GitHub and join our community!**
+
+[![Star Repository](https://img.shields.io/github/stars/AmgadGhozzy/LingoLens?style=for-the-badge&logo=github&color=yellow&logoColor=white)](https://github.com/AmgadGhozzy/LingoLens/stargazers)
+[![Follow Developer](https://img.shields.io/github/followers/AmgadGhozzy?style=for-the-badge&logo=github&color=blue&logoColor=white)](https://github.com/AmgadGhozzy)
+
+### *Helping learners become fluent, one word at a time* ✨
+
+### Connect With Us
+
+[![GitHub](https://img.shields.io/badge/GitHub-1A1A1A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AmgadGhozzy/LingoLens)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/amgadghozzy/)
+[![Email](https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:AmgadGhozzy@gmail.com)
+
+**Made with ❤️ by [Amgad Ghozzy](https://www.linkedin.com/in/amgadghozzy)**
+
+</div>
