@@ -44,6 +44,9 @@ navigationCompose = "2.9.0-alpha06"
 loggingInterceptor = "5.0.0-alpha.16"
 translate = "17.0.3"
 kotlinxCoroutinesPlayServices = "1.8.0"
+aboutlibrariesCore = "11.2.3"
+aboutlibrariesCompose = "11.2.3"
+datastorePreferencesVersion = "1.2.0-alpha02"
 
 [libraries]
 # Android Jetpack
@@ -104,6 +107,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 translate = { group = "com.google.mlkit", name = "translate", version.ref = "translate" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
+aboutlibraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "aboutlibrariesCore" }
+aboutlibraries-compose = { group = "com.mikepenz", name = "aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferencesVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
