@@ -56,6 +56,9 @@ dependencies {
     api(libs.androidx.lifecycle.viewmodel.ktx)
     api(libs.androidx.fragment.ktx)
 
+    // AboutLibraries
+    implementation(libs.aboutlibraries.core)
+    implementation(libs.aboutlibraries.compose)
 
     // Hilt
     api(libs.hilt.android)
