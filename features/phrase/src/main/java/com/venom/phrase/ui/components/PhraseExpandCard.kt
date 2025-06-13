@@ -41,12 +41,7 @@ fun PhraseExpandCard(
         modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = "Phrase card for ${phrase.englishEn}" }
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            ),
+            .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)),
         shape = RoundedCornerShape(16.dp),
         onClick = { expanded = !expanded },
         colors = CardDefaults.cardColors(
@@ -55,7 +50,7 @@ fun PhraseExpandCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             PhraseCardHeader(
                 phrase = phrase,
