@@ -20,20 +20,19 @@ fun SpeechFilledButton(
     isSpeaking: Boolean,
     onSpeakClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     size: Dp = 48.dp,
     shape: Shape = IconButtonDefaults.filledShape,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = IconButtonDefaults.filledIconButtonColors(
         containerColor = if (isSpeaking)
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
         else
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
         contentColor = if (isSpeaking)
             MaterialTheme.colorScheme.onPrimaryContainer
         else
-            MaterialTheme.colorScheme.onSurfaceVariant
+            MaterialTheme.colorScheme.primary
     )
 
     FilledIconButton(
@@ -42,7 +41,6 @@ fun SpeechFilledButton(
             .padding(4.dp)
             .scale(if (isSpeaking) 1.1f else 1f)
             .size(size),
-        enabled = enabled && !isSpeaking,
         shape = shape,
         colors = colors,
         interactionSource = interactionSource

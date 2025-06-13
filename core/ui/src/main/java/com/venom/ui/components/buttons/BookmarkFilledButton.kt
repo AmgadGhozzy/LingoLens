@@ -26,14 +26,10 @@ fun BookmarkFilledButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = IconButtonDefaults.filledIconButtonColors(
-        containerColor = if (isBookmarked)
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
-        else
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-        contentColor = if (isBookmarked)
-            MaterialTheme.colorScheme.onPrimaryContainer
-        else
-            MaterialTheme.colorScheme.onSurfaceVariant
+        containerColor = if (isBookmarked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        contentColor = if (isBookmarked) MaterialTheme.colorScheme.onPrimaryContainer
+        else MaterialTheme.colorScheme.primary
     )
 
     FilledIconButton(
@@ -51,8 +47,7 @@ fun BookmarkFilledButton(
             painter = painterResource(
                 if (isBookmarked) R.drawable.icon_bookmark_filled
                 else R.drawable.icon_bookmark_outline
-            ),
-            contentDescription = stringResource(
+            ), contentDescription = stringResource(
                 if (isBookmarked) R.string.bookmark_remove
                 else R.string.bookmark_add
             )

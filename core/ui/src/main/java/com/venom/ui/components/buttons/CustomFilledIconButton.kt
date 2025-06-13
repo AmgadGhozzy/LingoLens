@@ -54,7 +54,7 @@ fun CustomFilledIconButton(
         isAlpha = isAlpha
     ),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    size: Dp = 56.dp,
+    size: Dp = 48.dp,
     iconSize: Dp = 24.dp,
     iconPadding: Dp = 0.dp
 ) {
