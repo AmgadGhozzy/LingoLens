@@ -57,6 +57,15 @@ object Extensions {
         this, ClipboardManager::class.java
     )?.primaryClip?.getItemAt(0)?.text?.toString()
 
+    /*
+    * Text Validation
+    * */
+
+    fun isValidWordForSentences(text: String): Boolean {
+        val trimmedText = text.trim()
+        return trimmedText.isNotBlank() && !trimmedText.contains(Regex("\\s+")) && trimmedText.length >= 2
+    }
+
     /**
      * Text Processing
      */
