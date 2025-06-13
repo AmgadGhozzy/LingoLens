@@ -17,6 +17,9 @@ sealed class Screen(val route: String) {
     }
 
     object Phrases : Screen("phrases")
+    object Sentence : Screen("sentence/{word}") {
+        fun createRoute(word: String) = "sentence/$word"
+    }
     object Dictionary : Screen("dictionary")
     object History : Screen("history")
     object Bookmarks : Screen("bookmarks")
