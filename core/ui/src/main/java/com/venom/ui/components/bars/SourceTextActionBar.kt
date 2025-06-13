@@ -21,7 +21,6 @@ import com.venom.ui.components.common.BaseActionBar
  * @param modifier Optional modifier for the entire row.
  */
 
-
 @Composable
 fun SourceTextActionBar(
     onSpeak: () -> Unit,
@@ -31,6 +30,7 @@ fun SourceTextActionBar(
     onCopy: () -> Unit,
     onFullscreen: () -> Unit,
     onSpeechToText: () -> Unit,
+    onSentenceExplorer: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val leftAction = ActionItem.Action(
@@ -39,12 +39,20 @@ fun SourceTextActionBar(
         onClick = onSpeak
     )
 
-    val actions = listOf(
+    val actions = listOfNotNull(
         ActionItem.Action(
             icon = R.drawable.icon_fullscreen,
             description = R.string.action_fullscreen,
             onClick = onFullscreen
-        ), ActionItem.Action(
+        ),
+        onSentenceExplorer?.let {
+            ActionItem.Action(
+                icon = R.drawable.icon_quotes,
+                description = R.string.sentence_explorer,
+                onClick = onSentenceExplorer
+            )
+        },
+        ActionItem.Action(
             icon = R.drawable.icon_copy, description = R.string.action_copy, onClick = onCopy
         ), ActionItem.Action(
             icon = R.drawable.icon_paste, description = R.string.action_paste, onClick = onPaste
@@ -68,11 +76,14 @@ fun SourceTextActionBar(
 @Preview(showBackground = true)
 @Composable
 fun SourceActionBarPreview() {
-    SourceTextActionBar(onSpeak = { },
+    SourceTextActionBar(
+        onSpeak = { },
         isSpeaking = false,
         onFullscreen = { },
         onCopy = { },
         onPaste = { },
         onOcr = { },
-        onSpeechToText = { })
+        onSpeechToText = { },
+        onSentenceExplorer = { }
+    )
 }
