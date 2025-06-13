@@ -34,6 +34,7 @@ fun TranslationScreen(
     sttViewModel: STTViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
     onNavigateToOcr: () -> Unit,
+    onNavigateToSentence: (String) -> Unit = {},
     initialText: String? = null,
     isDialog: Boolean = false,
     onDismiss: () -> Unit = {}
@@ -44,7 +45,13 @@ fun TranslationScreen(
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
     val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-    var sourceTextFieldValue by remember { mutableStateOf(TextFieldValue(initialText ?: state.sourceText)) }
+    var sourceTextFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                initialText ?: state.sourceText
+            )
+        )
+    }
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
@@ -105,7 +112,8 @@ fun TranslationScreen(
             },
             onMoveUp = viewModel::moveUp,
             onOcr = onNavigateToOcr,
-            onFullscreen = { fullscreenState = it }
+            onFullscreen = { fullscreenState = it },
+            onSentenceExplorer = { word -> onNavigateToSentence(word) }
         )
     }
 
@@ -143,7 +151,9 @@ fun TranslationScreen(
     }
 
     if (isDialog) DraggableDialog(onDismissRequest = onDismiss) { TranslationContent() }
-    else TranslationContent(modifier = Modifier.padding(8.dp).fillMaxSize())
+    else TranslationContent(modifier = Modifier
+        .padding(8.dp)
+        .fillMaxSize())
 
     if (showDictionaryDialog) Dialog(
         onDismissRequest = { showDictionaryDialog = false },

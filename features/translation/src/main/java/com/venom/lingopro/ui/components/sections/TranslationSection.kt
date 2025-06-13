@@ -16,6 +16,7 @@ import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.screen.langselector.LanguageBar
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.utils.Extensions.getSelectedOrFullText
+import com.venom.utils.Extensions.isValidWordForSentences
 import com.venom.utils.Extensions.showToast
 
 @Composable
@@ -36,18 +37,21 @@ fun TranslationSection(
         else it()
     }
 
+    val sourceText = sourceTextValue.getSelectedOrFullText()
+    val translatedText = translatedTextValue.getSelectedOrFullText()
+
     CustomCard {
         LanguageBar(
             viewModel = viewModel,
             showNativeNameHint = showNativeNameHint,
             showFlag = showFlag
         )
-        
+
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outline,
             thickness = 0.5.dp
         )
-        
+
         SourceTextSection(
             sourceTextValue = sourceTextValue,
             onTextChange = actions.onTextChange,
@@ -59,9 +63,12 @@ fun TranslationSection(
             onSpeechToText = actions.onSpeechToText,
             onOcr = actions.onOcr,
             onPaste = actions.onPaste,
-            onCopy = { validateAndExecute { actions.onCopy(sourceTextValue.getSelectedOrFullText()) } },
-            onFullscreen = { validateAndExecute { actions.onFullscreen(sourceTextValue.getSelectedOrFullText()) } },
-            onSpeak = { validateAndExecute { actions.onSpeak(sourceTextValue.getSelectedOrFullText()) } },
+            onCopy = { validateAndExecute { actions.onCopy(sourceText) } },
+            onFullscreen = { validateAndExecute { actions.onFullscreen(sourceText) } },
+            onSpeak = { validateAndExecute { actions.onSpeak(sourceText) } },
+            onSentenceExplorer = if (isValidWordForSentences(sourceTextValue.text)) {
+                { validateAndExecute { actions.onSentenceExplorer?.let { it(sourceText) } } }
+            } else null,
             isSpeaking = isSpeaking
         )
 
@@ -69,10 +76,10 @@ fun TranslationSection(
 
         TranslatedTextActionBar(
             onBookmark = { validateAndExecute(actions.onBookmark) },
-            onCopy = { validateAndExecute { actions.onCopy(translatedTextValue.getSelectedOrFullText()) } },
-            onShare = { validateAndExecute { actions.onShare(translatedTextValue.getSelectedOrFullText()) } },
-            onFullscreen = { validateAndExecute { actions.onFullscreen(translatedTextValue.getSelectedOrFullText()) } },
-            onSpeak = { validateAndExecute { actions.onSpeak(translatedTextValue.getSelectedOrFullText()) } },
+            onCopy = { validateAndExecute { actions.onCopy(translatedText) } },
+            onShare = { validateAndExecute { actions.onShare(translatedText) } },
+            onFullscreen = { validateAndExecute { actions.onFullscreen(translatedText) } },
+            onSpeak = { validateAndExecute { actions.onSpeak(translatedText) } },
             onMoveUp = actions.onMoveUp,
             isSaved = isBookmarked,
             isSpeaking = isSpeaking

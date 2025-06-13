@@ -15,6 +15,7 @@ data class TranslationActions(
     val onBookmark: () -> Unit,
     val onSpeechToText: () -> Unit,
     val onFullscreen: (String) -> Unit,
+    val onSentenceExplorer: ((String) -> Unit)? = null,
     val onProviderChange: (TranslationProvider) -> Unit = {}
 ) {
     companion object {
