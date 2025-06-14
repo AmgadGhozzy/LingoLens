@@ -48,8 +48,8 @@ fun TranslationSection(
         )
 
         HorizontalDivider(
-            color = MaterialTheme.colorScheme.outline,
-            thickness = 0.5.dp
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+            thickness = 1.dp
         )
 
         SourceTextSection(
@@ -72,7 +72,7 @@ fun TranslationSection(
             isSpeaking = isSpeaking
         )
 
-        TranslatedTextSection(translatedTextValue = translatedTextValue)
+        TranslatedTextSection(translatedTextValue = translatedTextValue, isLoading)
 
         TranslatedTextActionBar(
             onBookmark = { validateAndExecute(actions.onBookmark) },
