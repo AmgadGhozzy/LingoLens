@@ -2,6 +2,7 @@ package com.venom.lingopro.ui.components.sections
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationProvider
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.menus.AnimatedDropdownMenu
 
@@ -23,9 +25,7 @@ import com.venom.ui.components.menus.AnimatedDropdownMenu
 fun ProviderSelectorAction(
     selectedProvider: TranslationProvider,
     availableProviders: List<TranslationProvider>,
-    onProviderSelected: (TranslationProvider) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    onProviderSelected: (TranslationProvider) -> Unit
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
     val providerActions = availableProviders.map { provider ->
@@ -36,22 +36,19 @@ fun ProviderSelectorAction(
         )
     }
 
-    IconButton(
-        onClick = { isMenuExpanded = true },
-        enabled = enabled,
-        modifier = modifier
-    ) {
-        Icon(
-            painter = painterResource(selectedProvider.iconResId),
-            contentDescription = stringResource(
-                R.string.change_translation_provider_cd,
-                stringResource(selectedProvider.nameResId)
-            ),
-            tint = if (enabled) MaterialTheme.colorScheme.primary
-                  else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
-            modifier = Modifier.size(32.dp)
-        )
-    }
+    CustomFilledIconButton(
+        icon = selectedProvider.iconResId,
+        contentDescription = stringResource(
+            R.string.change_translation_provider_cd,
+            stringResource(selectedProvider.nameResId)
+        ),
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            contentColor = MaterialTheme.colorScheme.primary
+        ),
+        shape = RoundedCornerShape(12.dp),
+        onClick = { isMenuExpanded = true }
+    )
 
     AnimatedDropdownMenu(
         expanded = isMenuExpanded,
@@ -81,14 +78,14 @@ private fun ProviderItem(
         Surface(
             shape = CircleShape,
             color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                   else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+            else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 painter = painterResource(provider.iconResId),
                 contentDescription = null,
                 tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                      else MaterialTheme.colorScheme.onSecondaryContainer,
+                else MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(8.dp)
             )
         }
@@ -101,21 +98,22 @@ private fun ProviderItem(
                 text = stringResource(provider.nameResId),
                 style = MaterialTheme.typography.bodyLarge,
                 color = if (isSelected) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurface,
+                else MaterialTheme.colorScheme.onSurface,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            stringResource(provider.descriptionResId).takeIf { it.isNotEmpty() }?.let { description ->
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            stringResource(provider.descriptionResId).takeIf { it.isNotEmpty() }
+                ?.let { description ->
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
         }
 
         if (provider.isPremium) {
