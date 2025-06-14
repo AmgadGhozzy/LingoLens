@@ -1,20 +1,12 @@
 package com.venom.ui.components.inputs
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.venom.utils.getTextDirection
 
 /**
  * A customizable text field supporting multiple languages and text directions
@@ -24,13 +16,16 @@ import com.venom.utils.getTextDirection
  * @param onTextChange Callback when text changes
  * @param isReadOnly Whether the text field is editable
  * @param placeHolderText Optional placeholder text
- * @param minHeight Minimum height of the text field
- * @param maxHeight Maximum height of the text field
+ * @param maxLines Maximum number of lines for the text field
+ * @param minLines Minimum number of lines for the text field
  * @param minFontSize Minimum font size for the text
  * @param maxFontSize Maximum font size for the text
+ * @param minHeight Minimum height of the text field
+ * @param maxHeight Maximum height of the text field
  * @param modifier Additional modifier for customization
+ *
+ * @see [TextField] for a simpler text field without scrollbar and dynamic font sizing
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(
     textValue: TextFieldValue,
@@ -39,63 +34,32 @@ fun CustomTextField(
     placeHolderText: String = "",
     maxLines: Int = 12,
     minLines: Int = 1,
-    minFontSize: Int = 14,
-    maxFontSize: Int = 22,
-    minHeight: Dp = 48.dp,
-    maxHeight: Dp = 148.dp,
+    minFontSize: Int = 16,
+    maxFontSize: Int = 24,
+    minHeight: Dp = 56.dp,
+    maxHeight: Dp = 160.dp,
     modifier: Modifier = Modifier
 ) {
-    val dynamicFontSize = (maxFontSize - (textValue.text.length / 50)).coerceAtLeast(minFontSize).sp
-
-    val scrollState = remember { ScrollState(0) }
-
-    TextField(
-        modifier = modifier
-            .heightIn(min = minHeight, max = maxHeight)
-            .verticalScroll(scrollState),
+    DynamicTextField(
         value = textValue.text,
+        onValueChange = { onTextChange(TextFieldValue(it, textValue.selection)) },
         readOnly = isReadOnly,
+        placeHolderText = placeHolderText,
         maxLines = maxLines,
         minLines = minLines,
-        onValueChange = { onTextChange(TextFieldValue(it, textValue.selection)) },
-        textStyle = TextStyle(fontSize = dynamicFontSize, textDirection = getTextDirection(textValue.text)),
-        placeholder = {
-            Text(
-                text = placeHolderText,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                fontSize = 20.sp,
-                style = TextStyle(textDirection = getTextDirection(textValue.text))
-            )
-        },
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            cursorColor = MaterialTheme.colorScheme.primary,
-            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-        )
+        minFontSize = minFontSize,
+        maxFontSize = maxFontSize,
+        minHeight = minHeight,
+        maxHeight = maxHeight,
+        modifier = modifier
     )
 }
 
 @Preview
 @Composable
-fun PreviewCustomTextFieldLTR() {
+fun PreviewCustomTextField() {
     CustomTextField(
-        textValue = TextFieldValue("This is a longer text to test the dynamic font size and scrolling functionality."),
+        textValue = TextFieldValue("User input text field"),
         placeHolderText = "Type something...",
-    )
-}
-
-@Preview
-@Composable
-fun PreviewCustomTextFieldRTL() {
-    CustomTextField(
-        textValue = TextFieldValue("هذه جملة لاختبار حجم الخط الديناميكي والتمرير."),
-        placeHolderText = "اكتب شيئا...",
-        isReadOnly = true,
     )
 }
