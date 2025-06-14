@@ -3,6 +3,10 @@ package com.venom.ui.viewmodel
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
+import com.venom.data.model.TranslationProvider
+import com.venom.data.repo.SettingsRepository
 import com.venom.data.repo.TranslationRepository
 import com.venom.utils.Extensions.postprocessText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,13 +21,26 @@ import javax.inject.Inject
 data class SentenceCardState(
     val isExpanded: Boolean = false,
     val translatedText: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val sourceLanguage: LanguageItem = LANGUAGES_LIST[0],
+    val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE
 )
 
 @HiltViewModel
 class SentenceCardViewModel @Inject constructor(
-    private val repository: TranslationRepository
+    private val repository: TranslationRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            settingsRepository.settings.collect { settings ->
+                _uiState.update { it.copy(selectedProvider = settings.selectedProvider) }
+                _uiState.update { it.copy(targetLanguage = settings.targetLanguage) }
+            }
+        }
+    }
 
     private val _uiState = MutableStateFlow(SentenceCardState())
     val uiState = _uiState.asStateFlow()
@@ -47,7 +64,11 @@ class SentenceCardViewModel @Inject constructor(
 
         translationJob?.cancel()
         translationJob = viewModelScope.launch {
-            repository.getTranslation(query = sentence)
+            repository.getTranslation(
+                query = sentence,
+                targetLanguage = _uiState.value.targetLanguage.code,
+                provider = _uiState.value.selectedProvider
+            )
                 .onSuccess { response ->
                     _uiState.update {
                         it.copy(
