@@ -7,6 +7,7 @@ import com.venom.data.local.SettingsPreferencesSerializer
 import com.venom.data.model.LanguageItem
 import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
+import com.venom.data.model.SplashPreferences
 import com.venom.data.model.ThemeColor
 import com.venom.data.model.ThemePreference
 import com.venom.data.model.TranslationProvider
@@ -55,6 +56,10 @@ class SettingsRepositoryImpl @Inject constructor(
         updateSettings { copy(personalPrefs = update(personalPrefs)) }
     }
 
+    override suspend fun updateSplashPreferences(update: SplashPreferences.() -> SplashPreferences) {
+        updateSettings { copy(splashPrefs = update(splashPrefs)) }
+    }
+
     override suspend fun setAppLanguage(language: LanguageItem) {
         updateSettings { copy(appLanguage = language) }
     }
@@ -98,6 +103,37 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setFontFamily(style: FontStyles) {
         updateThemePreferences { copy(fontFamily = style) }
+    }
+
+    // First launch state management
+    override suspend fun isFirstLaunch(): Boolean {
+        val prefs = context.settingsDataStore.data.first()
+        return prefs.personalPrefs.isFirstLaunch
+    }
+
+    override suspend fun markFirstLaunchComplete() {
+        updatePersonalPreferences {
+            copy(isFirstLaunch = false)
+        }
+    }
+
+    // Splash screen preferences
+    override suspend fun setSplashBackgroundColor(color: Long) {
+        updateSplashPreferences {
+            copy(splashBackgroundColor = color)
+        }
+    }
+
+    override suspend fun setSplashTextColor(color: Long) {
+        updateSplashPreferences {
+            copy(splashTextColor = color)
+        }
+    }
+
+    override suspend fun setSplashAnimationDuration(duration: Int) {
+        updateSplashPreferences {
+            copy(splashAnimationDuration = duration)
+        }
     }
 
     override suspend fun updateStreak(time: Long) {
