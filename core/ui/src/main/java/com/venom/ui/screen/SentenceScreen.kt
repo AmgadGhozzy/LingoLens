@@ -20,11 +20,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,10 +35,13 @@ import com.venom.data.model.SentenceResponse
 import com.venom.ui.components.bars.ActionButtons
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.DynamicStyledText
-import com.venom.ui.components.common.PulseAnimation
 import com.venom.ui.components.onboarding.FloatingOrbs
+import com.venom.ui.components.other.TextShimmer
 import com.venom.ui.viewmodel.SentenceCardViewModel
 import com.venom.ui.viewmodel.SentenceViewModel
+import com.venom.ui.viewmodel.TTSViewModel
+import com.venom.utils.Extensions.copyToClipboard
+import com.venom.utils.Extensions.shareText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +62,11 @@ fun SentenceScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
-        FloatingOrbs(enableAlphaAnimation = false)
+        FloatingOrbs(
+            primaryColor = MaterialTheme.colorScheme.primary,
+            secondaryColor = MaterialTheme.colorScheme.primaryContainer,
+            enableAlphaAnimation = false
+        )
 
         Column(modifier = Modifier.fillMaxSize()) {
             TopBar(onNavigateBack = onNavigateBack)
@@ -76,7 +85,10 @@ fun SentenceScreen(
                     .padding(horizontal = 20.dp)
             ) {
                 when {
-                    uiState.isLoading -> LoadingContent()
+                    uiState.isLoading -> repeat(3) {
+                        SentenceCardShimmer()
+                    }
+
                     uiState.sentenceResponse != null -> SentenceContent(
                         response = uiState.sentenceResponse!!
                     )
@@ -93,7 +105,7 @@ private fun TopBar(onNavigateBack: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
+            .padding(top = 20.dp, start = 20.dp, end = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -121,9 +133,7 @@ private fun TopBar(onNavigateBack: () -> Unit) {
 
 @Composable
 private fun SearchSection(
-    searchText: String,
-    onSearchTextChange: (String) -> Unit,
-    onSearch: () -> Unit
+    searchText: String, onSearchTextChange: (String) -> Unit, onSearch: () -> Unit
 ) {
     val scale by animateFloatAsState(
         targetValue = if (searchText.isNotEmpty()) 1.02f else 1f,
@@ -142,8 +152,7 @@ private fun SearchSection(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
                 value = searchText,
@@ -197,42 +206,6 @@ private fun SearchSection(
 }
 
 @Composable
-private fun LoadingContent() {
-    val rotation by rememberInfiniteTransition().animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing)
-        )
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(60.dp)
-                    .graphicsLayer { rotationZ = rotation },
-                color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 3.dp
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                "Finding sentences...",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Light
-                ),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-        }
-    }
-}
-
-@Composable
 private fun WelcomeContent() {
     val bookRotation by rememberInfiniteTransition().animateFloat(
         initialValue = -3f,
@@ -248,21 +221,16 @@ private fun WelcomeContent() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .graphicsLayer { rotationZ = bookRotation }
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                            Color.Transparent
-                        )
-                    ),
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier
+            .size(120.dp)
+            .graphicsLayer { rotationZ = bookRotation }
+            .background(
+                Brush.radialGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), Color.Transparent
+                    )
+                ), CircleShape
+            ), contentAlignment = Alignment.Center) {
             Icon(
                 Icons.AutoMirrored.Rounded.MenuBook,
                 contentDescription = null,
@@ -277,8 +245,7 @@ private fun WelcomeContent() {
             "Sentence Explorer",
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Bold
-            ),
-            color = MaterialTheme.colorScheme.primary
+            ), color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -310,16 +277,13 @@ private fun SentenceContent(
                 "Example Sentences",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
-                ),
-                modifier = Modifier.padding(vertical = 8.dp)
+                ), modifier = Modifier.padding(vertical = 8.dp)
             )
         }
 
         itemsIndexed(response.sentences) { index, sentence ->
             SentenceCard(
-                sentence = sentence,
-                index = index,
-                word = response.word
+                sentence = sentence, index = index, word = response.word
             )
         }
     }
@@ -330,13 +294,13 @@ private fun WordCard(response: SentenceResponse) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
-        )
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f))
+                .padding(24.dp)
         ) {
             Text(
                 response.word.uppercase(),
@@ -360,14 +324,34 @@ private fun WordCard(response: SentenceResponse) {
 
 @Composable
 private fun SentenceCard(
-    sentence: String,
-    index: Int,
-    word: String
+    sentence: String, index: Int, word: String
 ) {
     val viewModel: SentenceCardViewModel = hiltViewModel(key = sentence.hashCode().toString())
+    val ttsViewModel: TTSViewModel = hiltViewModel()
+    val ttsState by ttsViewModel.uiState.collectAsState()
     val cardState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Translate when expanded and no translation exists
+    val context = LocalContext.current
+
+    val highlightedText = remember(sentence, word) {
+        buildAnnotatedString {
+            val parts = sentence.split(word, ignoreCase = true)
+            parts.forEachIndexed { i, part ->
+                append(part)
+                if (i < parts.size - 1) {
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color(0xFF0098EA),
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) {
+                        append(word)
+                    }
+                }
+            }
+        }
+    }
+
     LaunchedEffect(cardState.isExpanded) {
         if (cardState.isExpanded && cardState.translatedText.isEmpty() && !cardState.isLoading) {
             viewModel.translate(sentence)
@@ -381,35 +365,25 @@ private fun SentenceCard(
         shape = RoundedCornerShape(16.dp),
         onClick = { viewModel.updateExpanded(!cardState.isExpanded) },
         colors = CardDefaults.cardColors(
-            containerColor = if (index % 2 == 0)
-                MaterialTheme.colorScheme.surfaceContainer
-            else
-                MaterialTheme.colorScheme.surface
+            containerColor = if (index % 2 == 0) MaterialTheme.colorScheme.surfaceContainer
+            else MaterialTheme.colorScheme.surface
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            val highlightedText = buildAnnotatedString {
-                val parts = sentence.split(word, ignoreCase = true)
-                parts.forEachIndexed { i, part ->
-                    append(part)
-                    if (i < parts.size - 1) {
-                        withStyle(
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append(word)
-                        }
-                    }
-                }
-            }
 
-            DynamicStyledText(
-                text = highlightedText,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = if (cardState.isExpanded) Int.MAX_VALUE else 2
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                SentenceBadge(number = index + 1)
+                DynamicStyledText(
+                    text = highlightedText,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = if (cardState.isExpanded) Int.MAX_VALUE else 2,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
             AnimatedVisibility(
                 visible = cardState.isExpanded, enter = fadeIn() + expandVertically(
@@ -422,7 +396,7 @@ private fun SentenceCard(
                     when {
                         cardState.isLoading -> {
                             Spacer(modifier = Modifier.height(16.dp))
-                            PulseAnimation(size = 32f)
+                            TextShimmer()
                         }
 
                         cardState.translatedText.isNotEmpty() -> {
@@ -431,20 +405,64 @@ private fun SentenceCard(
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f)
                             )
                             DynamicStyledText(
-                                text = cardState.translatedText,
-                                modifier = Modifier.fillMaxWidth()
+                                text = cardState.translatedText, modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
 
                     ActionButtons(
                         text = sentence,
-                        onSpeak = {},
-                        onCopy = {},
-                        onShare = {},
-                        isSpeaking = false
+                        onSpeak = ttsViewModel::speak,
+                        onCopy = { context.copyToClipboard(sentence) },
+                        onShare = { context.shareText(sentence) },
+                        isSpeaking = ttsState.isSpeaking
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SentenceBadge(number: Int) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier
+            .padding(top = 11.dp)
+            .wrapContentSize()
+    ) {
+        Text(
+            text = "$number:",
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 0.5.sp
+            ),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SentenceCardShimmer() {
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        repeat(3) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.2f)
+                )
+            ) {
+                TextShimmer(Modifier.padding(16.dp))
             }
         }
     }
