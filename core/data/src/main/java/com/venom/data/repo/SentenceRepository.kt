@@ -14,10 +14,14 @@ class SentenceRepository @Inject constructor(
     private val sentenceService: SentenceService,
     private val cacheManager: SentenceCacheManager
 ) {
-    fun getSentences(word: String): Flow<NetworkResult<SentenceResponse>> = flow {
+    fun getSentences(
+        word: String,
+        limit: Int? = null
+    ): Flow<NetworkResult<SentenceResponse>> = flow {
         val normalizedWord = word.trim().lowercase()
+        val cacheKey = if (limit != null) "${normalizedWord}_$limit" else normalizedWord
 
-        cacheManager.getCachedResponse(normalizedWord)?.let {
+        cacheManager.getCachedResponse(cacheKey)?.let {
             emit(NetworkResult.Success(it))
             return@flow
         }
@@ -25,12 +29,12 @@ class SentenceRepository @Inject constructor(
         emit(NetworkResult.Loading())
 
         runCatching {
-            sentenceService.getSentences(normalizedWord)
+            sentenceService.getSentences(normalizedWord, limit)
         }.onSuccess { response ->
-            response.body()?.let { sentenceResponse ->
-                cacheManager.cacheResponse(normalizedWord, sentenceResponse)
-                emit(NetworkResult.Success(sentenceResponse))
-            } ?: emit(NetworkResult.Error("No data received"))
+                response.body()?.let { sentenceResponse ->
+                    cacheManager.cacheResponse(cacheKey, sentenceResponse)
+                    emit(NetworkResult.Success(sentenceResponse))
+                } ?: emit(NetworkResult.Error("No data received"))
         }.onFailure {
             emit(NetworkResult.Error(it.message ?: "Network error"))
         }
