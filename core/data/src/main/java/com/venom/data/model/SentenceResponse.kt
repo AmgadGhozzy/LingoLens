@@ -5,10 +5,12 @@ import com.google.gson.annotations.SerializedName
 data class SentenceResponse(
     val word: String,
     val sentences: List<String>,
-    val imageUrl: String?,
     val sources: List<String>,
     @SerializedName("total_sentences")
-    val totalSentences: Int
+    val totalSentences: Int,
+    @SerializedName("returned_sentences")
+    val returnedSentences: Int,
+    val limit: Int
 )
 
 sealed class NetworkResult<T> {
