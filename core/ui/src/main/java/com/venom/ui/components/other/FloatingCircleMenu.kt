@@ -195,7 +195,7 @@ private fun FloatingMenuItemComponent(
                         spotColor = Color.Black.copy(alpha = 0.3f),
                         ambientColor = Color.Black.copy(alpha = 0.2f)
                     )
-                    .background(Color.White, CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLowest, CircleShape)
                     .clickable { onItemClick() },
                 contentAlignment = Alignment.Center
             ) {
