@@ -2,6 +2,7 @@ package com.venom.ui.screen
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,7 +15,7 @@ import com.venom.data.model.TranslationEntry
 import com.venom.domain.model.ViewResources
 import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
-import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.CustomSearchBar
 import com.venom.ui.components.lists.*
@@ -94,12 +95,15 @@ fun BookmarkHistoryScreen(
                 title = viewResources.title,
                 onLeadingIconClick = onBackClick,
                 actions = {
-                    CustomButton(
+                    CustomFilledIconButton(
                         icon = R.drawable.icon_delete,
-                        onClick = { showClearDialog = true },
-                        selected = true,
-                        selectedTint = MaterialTheme.colorScheme.error,
                         contentDescription = stringResource(R.string.action_clear_history),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        onClick = { showClearDialog = true }
                     )
                 }
             )
