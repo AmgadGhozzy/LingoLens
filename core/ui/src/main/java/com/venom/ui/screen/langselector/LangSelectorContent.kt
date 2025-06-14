@@ -62,7 +62,7 @@ fun LangSelectorContent(
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    items(items = languages, key = { it.code }) { language ->
+                    items(languages) { language ->
                         LanguageListItem(
                             language = language,
                             isSelected = language == (if (state.isSelectingSourceLanguage) state.sourceLang else state.targetLang),
