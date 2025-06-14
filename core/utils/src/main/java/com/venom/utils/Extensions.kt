@@ -63,7 +63,7 @@ object Extensions {
 
     fun isValidWordForSentences(text: String): Boolean {
         val trimmedText = text.trim()
-        return trimmedText.isNotBlank() && !trimmedText.contains(Regex("\\s+")) && trimmedText.length >= 2
+        return trimmedText.isNotBlank() && !trimmedText.contains(Regex("\\s+")) && trimmedText.length >= 2 && trimmedText.matches(Regex("[a-zA-Z]+"))
     }
 
     /**
