@@ -49,26 +49,30 @@ fun SourceTextSection(
             textValue = sourceTextValue,
             onTextChange = onTextChange,
             placeHolderText = stringResource(R.string.translate_type_text),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 12.dp)
         )
 
-        Box(modifier = Modifier.size(48.dp)) {
-            if (isLoading) PulseAnimation(
-                modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colorScheme.primary
-            )
-            androidx.compose.animation.AnimatedVisibility(
-                visible = sourceTextValue.text.isNotEmpty(),
-                modifier = Modifier.align(Alignment.Center),
-                enter = fadeIn(tween(300)),
-                exit = fadeOut(tween(300))
-            ) {
-                CustomButton(
-                    icon = R.drawable.icon_clear,
-                    contentDescription = "Clear",
-                    onClick = onClearText,
-                    iconSize = 18.dp
+        if (sourceTextValue.text.isNotEmpty()) {
+            Box(modifier = Modifier.size(48.dp)) {
+                if (isLoading) PulseAnimation(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
                 )
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = sourceTextValue.text.isNotEmpty(),
+                    modifier = Modifier.align(Alignment.Center),
+                    enter = fadeIn(tween(300)),
+                    exit = fadeOut(tween(300))
+                ) {
+                    CustomButton(
+                        icon = R.drawable.icon_clear,
+                        contentDescription = stringResource(R.string.action_clear),
+                        onClick = onClearText,
+                        iconSize = 18.dp
+                    )
+                }
             }
         }
     }
