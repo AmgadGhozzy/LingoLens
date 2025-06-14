@@ -120,6 +120,7 @@ dependencies {
     // Hilt
     api(libs.hilt.android)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.core.splashscreen)
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 

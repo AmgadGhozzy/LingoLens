@@ -47,6 +47,7 @@ kotlinxCoroutinesPlayServices = "1.8.0"
 aboutlibrariesCore = "11.2.3"
 aboutlibrariesCompose = "11.2.3"
 datastorePreferencesVersion = "1.2.0-alpha02"
+coreSplashscreen = "1.2.0-beta02"
 
 [libraries]
 # Android Jetpack
@@ -110,6 +111,7 @@ kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "ko
 aboutlibraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "aboutlibrariesCore" }
 aboutlibraries-compose = { group = "com.mikepenz", name = "aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferencesVersion" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
