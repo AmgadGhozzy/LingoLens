@@ -6,7 +6,10 @@ import retrofit2.http.*
 
 interface SentenceService {
     @GET("sentences/{word}")
-    suspend fun getSentences(@Path("word") word: String): Response<SentenceResponse>
+    suspend fun getSentences(
+        @Path("word") word: String,
+        @Query("limit") limit: Int? = null
+    ): Response<SentenceResponse>
 
     @GET("health")
     suspend fun healthCheck(): Response<Map<String, String>>
