@@ -26,16 +26,19 @@ import com.venom.stackcard.ui.screen.quiz.ProgressIndicator
 import com.venom.stackcard.ui.screen.quiz.ScoreDisplay
 import com.venom.stackcard.ui.screen.quiz.StreakDisplay
 
+data class QuizHeaderData(
+    val currentQuestion: Int,
+    val totalQuestions: Int,
+    val hearts: Int,
+    val timeRemaining: Int,
+    val streak: Int,
+    val score: Float,
+    val showHeartAnimation: Boolean
+)
+
 @Composable
 fun QuizHeader(
-    currentQuestion: Int,
-    totalQuestions: Int,
-    hearts: Int,
-    timeRemaining: Int,
-    streak: Int,
-    score: Float,
-    showHeartAnimation: Boolean,
-    onBackClick: () -> Unit
+    data: QuizHeaderData, onBackClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -46,8 +49,7 @@ fun QuizHeader(
         tonalElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -69,18 +71,18 @@ fun QuizHeader(
                 }
 
                 Text(
-                    text = "$currentQuestion / $totalQuestions",
+                    text = "${data.currentQuestion} / ${data.totalQuestions}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                HeartsDisplay(hearts = hearts, showAnimation = showHeartAnimation)
+                HeartsDisplay(hearts = data.hearts, showAnimation = data.showHeartAnimation)
             }
 
             ProgressIndicator(
-                progress = currentQuestion.toFloat() / totalQuestions,
-                timeRemaining = timeRemaining
+                progress = data.currentQuestion.toFloat() / data.totalQuestions,
+                timeRemaining = data.timeRemaining
             )
 
             Row(
@@ -88,9 +90,9 @@ fun QuizHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ScoreDisplay(score = score.toInt())
-                if (streak > 0) {
-                    StreakDisplay(streak = streak)
+                ScoreDisplay(score = data.score.toInt())
+                if (data.streak > 0) {
+                    StreakDisplay(streak = data.streak)
                 }
             }
         }

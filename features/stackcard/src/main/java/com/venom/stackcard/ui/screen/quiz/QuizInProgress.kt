@@ -30,6 +30,7 @@ import com.venom.stackcard.ui.screen.quiz.components.NextButton
 import com.venom.stackcard.ui.screen.quiz.components.OptionsList
 import com.venom.stackcard.ui.screen.quiz.components.QuestionCard
 import com.venom.stackcard.ui.screen.quiz.components.QuizHeader
+import com.venom.stackcard.ui.screen.quiz.components.QuizHeaderData
 import com.venom.stackcard.ui.viewmodel.QuizUiState
 import com.venom.utils.SoundManager
 import kotlinx.coroutines.delay
@@ -68,18 +69,20 @@ fun QuizInProgress(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding(),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(bottom = 100.dp, top = 48.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
                 QuizHeader(
-                    currentQuestion = testState.currentQuestion,
-                    totalQuestions = testState.totalQuestions,
-                    hearts = testState.hearts,
-                    timeRemaining = testState.timeRemaining,
-                    streak = testState.streak,
-                    score = testState.score,
-                    showHeartAnimation = state.showHeartAnimation,
+                    data = QuizHeaderData(
+                        currentQuestion = testState.currentQuestion,
+                        totalQuestions = testState.totalQuestions,
+                        timeRemaining = testState.timeRemaining,
+                        hearts = testState.hearts,
+                        streak = testState.streak,
+                        score = testState.score,
+                        showHeartAnimation = state.showHeartAnimation
+                    ),
                     onBackClick = { onComplete(false, state.currentLevel) }
                 )
             }
