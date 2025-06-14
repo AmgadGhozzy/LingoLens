@@ -15,9 +15,11 @@ data class SettingsPreferences(
 
     val themePrefs: ThemePreference = ThemePreference(),
     val personalPrefs: PersonalPreference = PersonalPreference(),
+    val splashPrefs: SplashPreferences = SplashPreferences(),
 
     val autoPronounciation: Boolean = true,
-)
+
+    )
 
 @Serializable
 data class ThemePreference(
@@ -33,5 +35,13 @@ data class ThemePreference(
 data class PersonalPreference(
     val maxStreakCount: Int = 0,
     val currentStreakCount: Int = 0,
-    val lastLoginDate: Long = 0L
+    val lastLoginDate: Long = 0L,
+    val isFirstLaunch: Boolean = true
+)
+
+@Serializable
+data class SplashPreferences(
+    val splashBackgroundColor: Long = 0xFF6200EE,
+    val splashTextColor: Long = 0xFFFFFFFF,
+    val splashAnimationDuration: Int = 1000
 )
