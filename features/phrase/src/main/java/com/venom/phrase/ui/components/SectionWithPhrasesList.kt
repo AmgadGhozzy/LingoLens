@@ -1,5 +1,7 @@
 package com.venom.phrase.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -77,19 +79,24 @@ fun SectionWithPhrasesList(
                     }
                 }
 
-                items(section.phrases, key = { it.phraseId }) { phrase ->
-                    PhraseExpandCard(phrase = phrase,
-                        sourceLang = sourceLang,
-                        targetLang = targetLang,
-                        onBookmarkClick = { onBookmarkClick(phrase) },
-                        isSpeaking = isSpeaking,
-                        onSpeakClick = {
-                            onSpeakClick(
-                                phrase.getTranslation(sourceLang), sourceLang
-                            )
-                        },
-                        onCopy = { onCopy(phrase.getTranslation(sourceLang)) },
-                        onShare = { onShare(phrase.getTranslation(sourceLang)) })
+                items(
+                    items = section.phrases,
+                    key = { it.phraseId }
+                ) { phrase ->
+                    AnimatedVisibility(visible = true, enter = fadeIn()) {
+                        PhraseExpandCard(phrase = phrase,
+                            sourceLang = sourceLang,
+                            targetLang = targetLang,
+                            onBookmarkClick = { onBookmarkClick(phrase) },
+                            isSpeaking = isSpeaking,
+                            onSpeakClick = {
+                                onSpeakClick(
+                                    phrase.getTranslation(sourceLang), sourceLang
+                                )
+                            },
+                            onCopy = { onCopy(phrase.getTranslation(sourceLang)) },
+                            onShare = { onShare(phrase.getTranslation(sourceLang)) })
+                    }
                 }
 
                 item {
