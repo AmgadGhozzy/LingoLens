@@ -1,10 +1,10 @@
 package com.venom.textsnap.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -19,15 +19,6 @@ import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
 import kotlinx.coroutines.launch
 
-/**
- * Main OCR screen that handles image processing and text recognition.
- *
- * @param viewModel ViewModel handling OCR business logic
- * @param ttsViewModel ViewModel for text-to-speech functionality
- * @param onFileClick Callback when file selection is requested
- * @param onCameraClick Callback when camera capture is requested
- * @param onGalleryClick Callback when gallery selection is requested
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrScreen(
@@ -38,13 +29,12 @@ fun OcrScreen(
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = true
     )
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
@@ -55,20 +45,16 @@ fun OcrScreen(
     }
     val maxHeight = screenHeight * 0.85
 
-    // back press when bottom sheet is expanded
     BackHandler(enabled = sheetState.currentValue == SheetValue.Expanded) {
-        scope.launch {
-            sheetState.partialExpand()
-        }
+        scope.launch { sheetState.partialExpand() }
     }
 
     DisposableEffect(Unit) {
-        onDispose {
-            ttsViewModel.stopSpeaking()
-        }
+        onDispose { ttsViewModel.stopSpeaking() }
     }
 
-    BottomSheetScaffold(scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
+    BottomSheetScaffold(
+        scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
         modifier = Modifier.navigationBarsPadding(),
         sheetPeekHeight = peekHeight,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
@@ -99,5 +85,6 @@ fun OcrScreen(
                 onSpeak = { text -> ttsViewModel.speak(text) },
                 onTranslate = onNavigateToTranslation
             )
-        })
+        }
+    )
 }

@@ -1,11 +1,7 @@
 package com.venom.textsnap.ui.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -28,7 +24,7 @@ fun OcrBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = maxHeight)
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 8.dp)
     ) {
         OcrBottomSheet(
             recognizedText = uiState.selectedTexts,
