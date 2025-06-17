@@ -1,17 +1,17 @@
 [versions]
 agp = "8.7.3"
 composeBom = "2025.02.00"
-composeCompiler = "2.1.0"
+composeCompiler = "2.0.0"
 composeAnimation = "1.8.0-beta02"
 coreKtx = "1.15.0"
 espressoCore = "3.6.1"
 fragmentKtx = "1.8.6"
-hiltAndroidCompiler = "2.52"
+hiltAndroidCompiler = "2.54"
 hiltNavigationCompose = "1.2.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 kotlin = "2.0.0"
-kotlinStdlib = "2.1.0"
+kotlinStdlib = "2.0.0"
 lifecycleRuntimeKtx = "2.8.7"
 lifecycleViewmodelCompose = "2.9.0-alpha10"
 lifecycleViewmodelKtx = "2.8.7"
@@ -34,11 +34,9 @@ kotlinxSerializationJson = "1.8.0"
 datastorePreferences = "1.1.2"
 activityKtx = "1.10.0"
 
-
-
-hilt = "2.51.1"
-ksp = "2.1.0-1.0.29"
-serialization = "2.1.0"
+hilt = "2.54"
+ksp = "2.0.0-1.0.24"
+serialization = "2.0.0"
 aboutlibraries = "10.5.2"
 navigationCompose = "2.9.0-alpha06"
 loggingInterceptor = "5.0.0-alpha.16"
@@ -46,7 +44,6 @@ translate = "17.0.3"
 kotlinxCoroutinesPlayServices = "1.8.0"
 aboutlibrariesCore = "11.2.3"
 aboutlibrariesCompose = "11.2.3"
-datastorePreferencesVersion = "1.2.0-alpha02"
 coreSplashscreen = "1.2.0-beta02"
 
 [libraries]
@@ -110,7 +107,6 @@ translate = { group = "com.google.mlkit", name = "translate", version.ref = "tra
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 aboutlibraries-core = { group = "com.mikepenz", name = "aboutlibraries-core", version.ref = "aboutlibrariesCore" }
 aboutlibraries-compose = { group = "com.mikepenz", name = "aboutlibraries-compose", version.ref = "aboutlibrariesCompose" }
-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferencesVersion" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
