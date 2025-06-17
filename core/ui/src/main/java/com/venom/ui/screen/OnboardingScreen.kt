@@ -4,10 +4,13 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,7 +40,8 @@ fun OnboardingScreens(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .systemBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         FloatingOrbs(
@@ -94,10 +98,15 @@ private fun TopSection(
         horizontalArrangement = Arrangement.End
     ) {
         if (showSkip) {
-            TextButton(onClick = onSkip) {
+            TextButton(
+                onClick = onSkip,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White.copy(alpha = 0.1f))
+            ) {
                 Text(
                     text = stringResource(id = R.string.skip),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
