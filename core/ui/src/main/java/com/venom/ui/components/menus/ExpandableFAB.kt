@@ -3,7 +3,8 @@ package com.venom.ui.components.menus
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -11,11 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -26,46 +25,41 @@ fun ExpandableFAB(
     contentDescription: String = "Add",
     icons: List<Pair<ImageVector, String>> = defaultIcons,
     primaryColor: Color = MaterialTheme.colorScheme.primary,
-    secondaryColor: Color = MaterialTheme.colorScheme.secondaryContainer
+    secondaryColor: Color = MaterialTheme.colorScheme.surface
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
-    val rotationAngle by animateFloatAsState(
-        targetValue = if (isExpanded) 45f else 0f, animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium
-        ), label = "FAB Rotation"
+    val rotation by animateFloatAsState(
+        if (isExpanded) 135f else 0f,
+        spring(dampingRatio = 0.6f)
     )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
+    val scale by animateFloatAsState(
+        if (isExpanded) 1.1f else 1f,
+        spring(dampingRatio = 0.6f)
+    )
+
+    Box(contentAlignment = Alignment.BottomCenter) {
         AnimatedVisibility(
-            visible = isExpanded,
-            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-            exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Top)
+            isExpanded,
+            enter = fadeIn() + slideInVertically { it / 2 },
+            exit = fadeOut() + slideOutVertically { it / 2 }
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.animateContentSize(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                )
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(bottom = 88.dp)
             ) {
-                icons.forEachIndexed { index, (icon, description) ->
-                    FABOption(icon = icon,
-                        contentDescription = description,
-                        containerColor = secondaryColor,
-                        onClick = {
-                            when (index) {
-                                0 -> onCameraClick()
-                                1 -> onGalleryClick()
-                                2 -> onFileClick()
-                            }
-                            isExpanded = false
-                        })
+                icons.reversed().forEachIndexed { i, (icon, desc) ->
+                    val index = icons.size - 1 - i
+                    FABOption(icon, desc, secondaryColor) {
+                        when (index) {
+                            0 -> onCameraClick()
+                            1 -> onGalleryClick()
+                            2 -> onFileClick()
+                        }
+                        isExpanded = false
+                    }
                 }
             }
         }
@@ -75,15 +69,14 @@ fun ExpandableFAB(
             containerColor = primaryColor,
             modifier = Modifier
                 .size(64.dp)
-                .scale(if (isExpanded) 1.1f else 1f)
-
+                .scale(scale)
         ) {
             Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = contentDescription,
+                Icons.Rounded.Add,
+                contentDescription,
                 modifier = Modifier
                     .size(32.dp)
-                    .rotate(rotationAngle)
+                    .rotate(rotation)
             )
         }
     }
@@ -92,23 +85,28 @@ fun ExpandableFAB(
 @Composable
 private fun FABOption(
     icon: ImageVector,
-    contentDescription: String,
-    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    desc: String,
+    color: Color,
     onClick: () -> Unit
 ) {
-    SmallFloatingActionButton(
+    FloatingActionButton(
         onClick = onClick,
-        containerColor = containerColor,
+        containerColor = color,
         modifier = Modifier
-            .padding(bottom = 8.dp)
-            .size(56.dp)
+            .size(48.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = CircleShape.copy(
+                    topStart = CornerSize(16.dp),
+                    topEnd = CornerSize(16.dp),
+                    bottomStart = CornerSize(16.dp),
+                    bottomEnd = CornerSize(16.dp)
+                ),
+                ambientColor = Color.Black.copy(alpha = 0.1f),
+                spotColor = Color.Black.copy(alpha = 0.1f)
+            )
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSecondaryContainer
-        )
+        Icon(icon, desc, modifier = Modifier.size(24.dp))
     }
 }
 
@@ -117,9 +115,3 @@ private val defaultIcons = listOf(
     Icons.Rounded.PhotoLibrary to "Gallery",
     Icons.Rounded.Folder to "Files"
 )
-
-@Preview(showBackground = true)
-@Composable
-fun ExpandableFABPreview() {
-    ExpandableFAB(onCameraClick = {}, onGalleryClick = {}, onFileClick = {})
-}
