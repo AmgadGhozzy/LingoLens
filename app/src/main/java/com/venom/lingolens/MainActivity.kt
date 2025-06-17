@@ -36,6 +36,7 @@ import com.venom.resources.R
 import com.venom.settings.presentation.screen.UpdateScreen
 import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.SettingsViewModel
 import com.venom.ui.viewmodel.UpdateViewModel
@@ -56,6 +57,7 @@ class MainActivity : ComponentActivity() {
 
     // UI State
     private val showUpdateDialog = mutableStateOf(false)
+    private val showOnboarding = mutableStateOf(false)
 
     // Camera and file handling
     private var currentPhotoUri: Uri? = null
@@ -66,6 +68,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Check if we should show onboarding
+        showOnboarding.value = intent.getBooleanExtra("show_onboarding", false)
+
         setupPermissions()
         setupRemoteConfig()
 
@@ -73,6 +78,7 @@ class MainActivity : ComponentActivity() {
             val userPrefs = settingsViewModel.uiState.collectAsState().value
             val themePrefs = userPrefs.themePrefs
             val showDialog = remember { showUpdateDialog }
+            val shouldShowOnboarding = remember { showOnboarding }
 
             ApplySelectedLanguage(userPrefs.appLanguage.code)
 
@@ -84,12 +90,23 @@ class MainActivity : ComponentActivity() {
                 colorStyle = themePrefs.colorStyle,
                 fontFamilyStyle = themePrefs.fontFamily
             ) {
-                LingoLensApp(
-                    ocrViewModel = ocrViewModel,
-                    startCamera = { startCamera() },
-                    imageSelector = { selectImageFromGallery() },
-                    fileSelector = { selectDocumentFromFileManager() }
-                )
+                if (shouldShowOnboarding.value) {
+                    OnboardingScreens(
+                        onGetStarted = {
+                            shouldShowOnboarding.value = false
+                        },
+                        onSkip = {
+                            shouldShowOnboarding.value = false
+                        }
+                    )
+                } else {
+                    LingoLensApp(
+                        ocrViewModel = ocrViewModel,
+                        startCamera = { startCamera() },
+                        imageSelector = { selectImageFromGallery() },
+                        fileSelector = { selectDocumentFromFileManager() }
+                    )
+                }
 
                 if (showDialog.value) {
                     UpdateScreen(
