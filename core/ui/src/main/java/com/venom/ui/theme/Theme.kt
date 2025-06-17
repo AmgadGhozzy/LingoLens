@@ -24,7 +24,7 @@ fun LingoLensTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
     colorStyle: PaletteStyle = PaletteStyle.Neutral,
     fontFamilyStyle: FontStyles = FontStyles.SANS_SERIF,
-    content: @Composable () -> Unit
+    content: @Composable (() -> Unit)
 ) {
     val view = LocalView.current
     val fontFamily = remember(fontFamilyStyle) { fontFamilyStyle.toFontFamily() }
@@ -49,12 +49,11 @@ fun LingoLensTheme(
         } else null
     } ?: primaryColor
 
-    // Since createDynamicColorScheme is @Composable, we use it directly
     val colorScheme = createDynamicColorScheme(
         isDark = !isLight,
         isAmoledBlack = isAmoledBlack,
         keyColor = keyColor,
-        style = colorStyle
+        style = colorStyle,
     )
 
     val surfaceColor = colorScheme.surfaceColorAtElevation(3.dp)
