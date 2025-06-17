@@ -99,7 +99,7 @@ fun BookmarkHistoryScreen(
                         icon = R.drawable.icon_delete,
                         contentDescription = stringResource(R.string.action_clear_history),
                         colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
+                            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
                             contentColor = MaterialTheme.colorScheme.error
                         ),
                         shape = RoundedCornerShape(12.dp),

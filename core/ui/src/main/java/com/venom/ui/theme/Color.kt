@@ -49,46 +49,87 @@ fun createDynamicColorScheme(
     keyColor: Color,
     style: PaletteStyle = PaletteStyle.Neutral,
     isDark: Boolean = isSystemInDarkTheme(),
-    isAmoledBlack: Boolean = false
+    isAmoledBlack: Boolean = false,
+    primaryColorValue: Color? = null
 ): ColorScheme {
     val context = LocalContext.current
     val supportsDynamic = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     return when {
+        // Use dynamic colors only for Neutral style and when supported
         style == PaletteStyle.Neutral && supportsDynamic -> {
             if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        isDark -> createColorScheme(keyColor, style, isDark, isAmoledBlack)
-        else -> createColorScheme(keyColor, style, isDark, isAmoledBlack)
+        // Use base color schemes with customization
+        else -> createCustomColorScheme(
+            keyColor = keyColor,
+            style = style,
+            isDark = isDark,
+            isAmoledBlack = isAmoledBlack,
+            primaryColorValue = primaryColorValue
+        )
     }
 }
 
-private fun createColorScheme(
-    keyColor: Color, style: PaletteStyle, isDark: Boolean, isAmoledBlack: Boolean
+private fun createCustomColorScheme(
+    keyColor: Color,
+    style: PaletteStyle,
+    isDark: Boolean,
+    isAmoledBlack: Boolean,
+    primaryColorValue: Color?
 ): ColorScheme {
+    // Start with base color schemes
+    val baseScheme = if (isDark) darkColorScheme else lightColorScheme
+
+    // Handle AMOLED black theme
     val backgroundColor = when {
         isDark && isAmoledBlack -> Color.Black
-        isDark -> Color(0xFF121212)
-        else -> Color(0xFFFAFAFA)
+        else -> baseScheme.background
     }
 
-    val surfaceColor = if (isDark) backgroundColor else Color.White
+    val surfaceColor = when {
+        isDark && isAmoledBlack -> Color.Black
+        else -> baseScheme.surface
+    }
 
-    val scheme = ColorSchemeGenerator(
-        keyColor = keyColor,
-        isDark = isDark,
-        backgroundColor = backgroundColor,
-        surfaceColor = surfaceColor
-    )
+    // Determine the primary color to use
+    val effectivePrimaryColor = primaryColorValue ?: keyColor
 
+    // Apply customizations based on style
     return when (style) {
-        PaletteStyle.Neutral -> scheme.generateNeutral()
-        PaletteStyle.Vibrant -> scheme.generateVibrant()
-        PaletteStyle.Expressive -> scheme.generateExpressive()
-        PaletteStyle.Rainbow -> scheme.generateRainbow()
-        PaletteStyle.FruitSalad -> scheme.generateFruitSalad()
-        PaletteStyle.Monochrome -> scheme.generateMonochrome()
+        PaletteStyle.Neutral -> baseScheme.copy(
+            primary = effectivePrimaryColor,
+            background = backgroundColor,
+            surface = surfaceColor,
+            // Update surface variants for AMOLED
+            surfaceVariant = if (isDark && isAmoledBlack) Color(0xFF1A1A1A) else baseScheme.surfaceVariant,
+            surfaceContainer = if (isDark && isAmoledBlack) Color(0xFF0A0A0A) else baseScheme.surfaceContainer,
+            surfaceContainerHigh = if (isDark && isAmoledBlack) Color(0xFF151515) else baseScheme.surfaceContainerHigh,
+            surfaceContainerHighest = if (isDark && isAmoledBlack) Color(0xFF202020) else baseScheme.surfaceContainerHighest,
+            surfaceContainerLow = if (isDark && isAmoledBlack) Color(0xFF050505) else baseScheme.surfaceContainerLow,
+            surfaceContainerLowest = if (isDark && isAmoledBlack) Color.Black else baseScheme.surfaceContainerLowest
+        )
+
+        else -> {
+            // For other styles, use the existing generator with base scheme as foundation
+            val generator = ColorSchemeGenerator(
+                keyColor = effectivePrimaryColor,
+                isDark = isDark,
+                backgroundColor = backgroundColor,
+                surfaceColor = surfaceColor,
+                baseScheme = baseScheme
+            )
+
+            when (style) {
+                PaletteStyle.Vibrant -> generator.generateVibrant()
+                PaletteStyle.Expressive -> generator.generateExpressive()
+                PaletteStyle.Rainbow -> generator.generateRainbow()
+                PaletteStyle.FruitSalad -> generator.generateFruitSalad()
+                PaletteStyle.Monochrome -> generator.generateMonochrome()
+                else -> generator.generateNeutral()
+            }
+        }
     }
 }
 
@@ -96,48 +137,56 @@ private class ColorSchemeGenerator(
     private val keyColor: Color,
     private val isDark: Boolean,
     private val backgroundColor: Color,
-    private val surfaceColor: Color
+    private val surfaceColor: Color,
+    private val baseScheme: ColorScheme // Add base scheme
 ) {
     private val baseColorInt = keyColor.toArgb()
 
-    fun generateNeutral() = createScheme {
-        primary = keyColor
-    }
+    fun generateNeutral() = baseScheme.copy(
+        primary = keyColor,
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
-    fun generateFruitSalad() = createScheme {
-        primary = keyColor
-        secondary = keyColor.copy(alpha = 0.7f)
-        tertiary = rotateHue(baseColorInt, 120f)
-    }
+    fun generateFruitSalad() = baseScheme.copy(
+        primary = keyColor,
+        secondary = keyColor.copy(alpha = 0.7f).harmonize(baseScheme.secondary),
+        tertiary = rotateHue(baseColorInt, 120f),
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
-    fun generateVibrant() = createScheme {
-        primary = saturateColor(keyColor)
-        secondary = saturateColor(keyColor.copy(alpha = 0.8f))
-        tertiary = saturateColor(rotateHue(baseColorInt, 180f))
-    }
+    fun generateVibrant() = baseScheme.copy(
+        primary = saturateColor(keyColor),
+        secondary = saturateColor(keyColor.copy(alpha = 0.8f)).harmonize(baseScheme.secondary),
+        tertiary = saturateColor(rotateHue(baseColorInt, 180f)),
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
-    fun generateExpressive() = createScheme {
-        primary = keyColor
-        secondary = rotateHue(baseColorInt, 180f)
-        tertiary = rotateHue(baseColorInt, 120f)
-    }
+    fun generateExpressive() = baseScheme.copy(
+        primary = keyColor,
+        secondary = rotateHue(baseColorInt, 180f),
+        tertiary = rotateHue(baseColorInt, 120f),
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
-    fun generateRainbow() = createScheme {
-        primary = keyColor
-        secondary = rotateHue(baseColorInt, 60f)
-        tertiary = rotateHue(baseColorInt, 120f)
-    }
+    fun generateRainbow() = baseScheme.copy(
+        primary = keyColor,
+        secondary = rotateHue(baseColorInt, 60f),
+        tertiary = rotateHue(baseColorInt, 120f),
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
-    fun generateMonochrome() = createScheme {
-        val (first, second, third) = createMonochromeTriple(baseColorInt)
-        primary = first
-        secondary = second
-        tertiary = third
-    }
-
-    private fun createScheme(block: ColorSchemeBuilder.() -> Unit): ColorScheme {
-        return ColorSchemeBuilder(isDark, backgroundColor, surfaceColor).apply(block).build()
-    }
+    fun generateMonochrome() = baseScheme.copy(
+        primary = keyColor,
+        secondary = createMonochromeVariant(baseColorInt, 0.8f),
+        tertiary = createMonochromeVariant(baseColorInt, 0.6f),
+        background = backgroundColor,
+        surface = surfaceColor
+    )
 
     private fun rotateHue(color: Int, degrees: Float): Color {
         val hsv = FloatArray(3)
@@ -153,43 +202,11 @@ private class ColorSchemeGenerator(
         return Color(android.graphics.Color.HSVToColor(hsv))
     }
 
-    private fun createMonochromeTriple(baseColor: Int): Triple<Color, Color, Color> {
+    private fun createMonochromeVariant(baseColor: Int, factor: Float): Color {
         val hsv = FloatArray(3)
         android.graphics.Color.colorToHSV(baseColor, hsv)
-
-        return Triple(
-            Color(baseColor),
-            Color(android.graphics.Color.HSVToColor(hsv.clone().apply { this[2] *= 0.8f })),
-            Color(android.graphics.Color.HSVToColor(hsv.clone().apply { this[2] *= 0.6f }))
-        )
-    }
-}
-
-private class ColorSchemeBuilder(
-    private val isDark: Boolean, private val backgroundColor: Color, private val surfaceColor: Color
-) {
-    var primary: Color = Color.Unspecified
-    var secondary: Color = Color.Unspecified
-    var tertiary: Color = Color.Unspecified
-
-    fun build(): ColorScheme {
-        return if (isDark) {
-            darkColorScheme(
-                primary = primary,
-                secondary = secondary,
-                tertiary = tertiary,
-                background = backgroundColor,
-                surface = surfaceColor
-            )
-        } else {
-            lightColorScheme(
-                primary = primary,
-                secondary = secondary,
-                tertiary = tertiary,
-                background = backgroundColor,
-                surface = surfaceColor
-            )
-        }
+        hsv[2] *= factor
+        return Color(android.graphics.Color.HSVToColor(hsv))
     }
 }
 
@@ -199,3 +216,81 @@ fun Color.harmonize(color: Color, fraction: Float = 0.2f): Color =
 @Composable
 fun Color.harmonizeWithPrimary(fraction: Float = 0.2f): Color =
     harmonize(MaterialTheme.colorScheme.primary, fraction)
+
+val lightColorScheme = ColorScheme(
+    primary = Color(0xFF00668B),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFC1E8FF),
+    onPrimaryContainer = Color(0xFF001E2C),
+    secondary = Color(0xFF4E616C),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFD1E5F4),
+    onSecondaryContainer = Color(0xFF091E28),
+    tertiary = Color(0xFF605A7C),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFE6DEFF),
+    onTertiaryContainer = Color(0xFF1D1736),
+    background = Color(0xFFF2FBFF),
+    onBackground = Color(0xFF161C20),
+    surface = Color(0xFFF2FBFF),
+    onSurface = Color(0xFF161C20),
+    surfaceVariant = Color(0xFFDCE3E9),
+    onSurfaceVariant = Color(0xFF40484D),
+    surfaceTint = Color(0xFF00668B),
+    inverseSurface = Color(0xFF2A3136),
+    inverseOnSurface = Color(0xFFEBF1F8),
+    error = Color(0xFFB3261E),
+    onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFF9DEDC),
+    onErrorContainer = Color(0xFF410E0B),
+    outline = Color(0xFF70777C),
+    outlineVariant = Color(0xFFC0C7CD),
+    scrim = Color(0xFF000000),
+    surfaceBright = Color(0xFFF2FBFF),
+    surfaceDim = Color(0xFFD3DBE2),
+    surfaceContainer = Color(0xFFE7EFF6),
+    surfaceContainerHigh = Color(0xFFE1E9F0),
+    surfaceContainerHighest = Color(0xFFDCE3E9),
+    surfaceContainerLow = Color(0xFFEDF5FC),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    inversePrimary = Color(0xFF76D1FF),
+)
+
+val darkColorScheme = ColorScheme(
+    primary = Color(0xFF76D1FF),
+    onPrimary = Color(0xFF003549),
+    primaryContainer = Color(0xFF004C69),
+    onPrimaryContainer = Color(0xFFC1E8FF),
+    secondary = Color(0xFFB5CAD7),
+    onSecondary = Color(0xFF20333D),
+    secondaryContainer = Color(0xFF374955),
+    onSecondaryContainer = Color(0xFFD1E5F4),
+    tertiary = Color(0xFFCAC1EA),
+    onTertiary = Color(0xFF322C4C),
+    tertiaryContainer = Color(0xFF484264),
+    onTertiaryContainer = Color(0xFFE6DEFF),
+    background = Color(0xFF0D1419),
+    onBackground = Color(0xFFDCE3E9),
+    surface = Color(0xFF0D1419),
+    onSurface = Color(0xFFDCE3E9),
+    surfaceVariant = Color(0xFF40484D),
+    onSurfaceVariant = Color(0xFFC0C7CD),
+    surfaceTint = Color(0xFF76D1FF),
+    inverseSurface = Color(0xFFDCE3E9),
+    inverseOnSurface = Color(0xFF2A3136),
+    error = Color(0xFFF2B8B5),
+    onError = Color(0xFF601410),
+    errorContainer = Color(0xFF8C1D18),
+    onErrorContainer = Color(0xFFF9DEDC),
+    outline = Color(0xFF8A9297),
+    outlineVariant = Color(0xFF40484D),
+    scrim = Color(0xFF000000),
+    surfaceBright = Color(0xFF343A40),
+    surfaceDim = Color(0xFF0D1419),
+    surfaceContainer = Color(0xFF1A2025),
+    surfaceContainerHigh = Color(0xFF242B30),
+    surfaceContainerHighest = Color(0xFF2F363B),
+    surfaceContainerLow = Color(0xFF161C20),
+    surfaceContainerLowest = Color(0xFF060F15),
+    inversePrimary = Color(0xFF00668B),
+)
