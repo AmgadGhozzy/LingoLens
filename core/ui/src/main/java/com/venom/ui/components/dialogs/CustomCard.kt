@@ -29,7 +29,7 @@ fun CustomCard(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.large,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    elevation: Dp = 5.dp,
+    elevation: Dp = 2.dp,
     contentAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable () -> Unit
 ) {
@@ -38,7 +38,7 @@ fun CustomCard(
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = elevation, pressedElevation = elevation + 2.dp
+            defaultElevation = elevation, hoveredElevation = elevation * 4
         )
     ) {
         Column(
