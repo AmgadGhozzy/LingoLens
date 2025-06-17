@@ -31,7 +31,7 @@ fun PulseAnimation(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
     size: Float = 100f,
-    animationDuration: Int = 600
+    animationDuration: Int = 1200
 ) {
     // Create an Animatable for smooth, controlled animation
     val pulseAnimation = remember { Animatable(0.6f) }
