@@ -1,6 +1,6 @@
 package com.venom.ui.components.bars
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,16 +49,25 @@ fun SourceTextActionBar(
             ActionItem.Action(
                 icon = R.drawable.icon_quotes,
                 description = R.string.sentence_explorer,
-                onClick = onSentenceExplorer
+                onClick = it
             )
         },
         ActionItem.Action(
-            icon = R.drawable.icon_copy, description = R.string.action_copy, onClick = onCopy
-        ), ActionItem.Action(
-            icon = R.drawable.icon_paste, description = R.string.action_paste, onClick = onPaste
-        ), ActionItem.Action(
-            icon = R.drawable.icon_camera, description = R.string.action_ocr, onClick = onOcr
-        ), ActionItem.Action(
+            icon = R.drawable.icon_copy,
+            description = R.string.action_copy,
+            onClick = onCopy
+        ),
+        ActionItem.Action(
+            icon = R.drawable.icon_paste,
+            description = R.string.action_paste,
+            onClick = onPaste
+        ),
+        ActionItem.Action(
+            icon = R.drawable.icon_camera,
+            description = R.string.action_ocr,
+            onClick = onOcr
+        ),
+        ActionItem.Action(
             icon = R.drawable.icon_mic,
             description = R.string.action_speech_to_text,
             onClick = onSpeechToText
@@ -76,14 +85,16 @@ fun SourceTextActionBar(
 @Preview(showBackground = true)
 @Composable
 fun SourceActionBarPreview() {
-    SourceTextActionBar(
-        onSpeak = { },
-        isSpeaking = false,
-        onFullscreen = { },
-        onCopy = { },
-        onPaste = { },
-        onOcr = { },
-        onSpeechToText = { },
-        onSentenceExplorer = { }
-    )
+    MaterialTheme {
+        SourceTextActionBar(
+            onSpeak = { },
+            isSpeaking = false,
+            onFullscreen = { },
+            onCopy = { },
+            onPaste = { },
+            onOcr = { },
+            onSpeechToText = { },
+            onSentenceExplorer = { }
+        )
+    }
 }

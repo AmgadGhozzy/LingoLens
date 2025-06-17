@@ -84,14 +84,16 @@ fun TranslatedTextActionBar(
 @Preview(showBackground = true)
 @Composable
 fun TranslatedTextActionBarPreview() {
-    TranslatedTextActionBar(
-        onSpeak = { },
-        isSpeaking = false,
-        isSaved = false,
-        onFullscreen = { },
-        onCopy = { },
-        onBookmark = { },
-        onMoveUp = {},
-        onShare = {},
-    )
+    MaterialTheme {
+        TranslatedTextActionBar(
+            onSpeak = { },
+            isSpeaking = false,
+            isSaved = true,
+            onFullscreen = { },
+            onCopy = { },
+            onBookmark = { },
+            onMoveUp = {},
+            onShare = {},
+        )
+    }
 }
