@@ -1,4 +1,3 @@
-// MainActivity.kt
 package com.venom.lingopro
 
 import android.content.Intent
@@ -27,8 +26,9 @@ class QuickTrActivity : ComponentActivity() {
         setContent {
             LingoLensTheme {
                 TranslationScreen(
-                    isDialog = true, onDismiss = { finish() }, initialText = selectedText,
-                    onNavigateToOcr = {}
+                    isDialog = true,
+                    onDismiss = { finish() },
+                    initialText = selectedText
                 )
             }
         }
