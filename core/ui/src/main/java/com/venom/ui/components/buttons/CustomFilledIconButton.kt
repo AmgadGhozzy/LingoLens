@@ -117,7 +117,7 @@ fun selectedFilledIconButtonColors(
     containerColor = when {
         isSelected -> selectedContainerColor
         isAlpha -> containerColorAlpha
-        color != null -> color.copy(alpha = 0.1f)
+        color != null -> color.copy(alpha = 0.2f)
         else -> containerColor
     },
     contentColor = when {
