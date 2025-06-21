@@ -6,8 +6,8 @@ import com.google.mlkit.nl.translate.TranslateLanguage
 import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
-import com.venom.data.model.Sentence
-import com.venom.data.model.TranslationResponse
+import com.venom.data.mapper.TranslateMapper
+import com.venom.domain.model.TranslationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class OfflineTranslationRepository @Inject constructor() : OfflineTranslationOperations {
 
-    override suspend fun getOfflineTranslation(sourceLang: String, targetLang: String, query: String): TranslationResponse = withContext(Dispatchers.IO) {
+    override suspend fun getOfflineTranslation(sourceLang: String, targetLang: String, query: String): TranslationResult = withContext(Dispatchers.IO) {
         val options = TranslatorOptions.Builder()
             .setSourceLanguage(TranslateLanguage.fromLanguageTag(sourceLang) ?: TranslateLanguage.ENGLISH)
             .setTargetLanguage(TranslateLanguage.fromLanguageTag(targetLang) ?: TranslateLanguage.ARABIC)
@@ -25,10 +25,15 @@ class OfflineTranslationRepository @Inject constructor() : OfflineTranslationOpe
         return@withContext try {
             val translatedText = translator.translate(query).await()
             translator.close()
-            convertToTranslationResponse(translatedText, query)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = translatedText,
+                sourceText = query,
+                sourceLang = sourceLang,
+                targetLang = targetLang,
+                providerId = "Offline"
+            )
         } catch (e: Exception) {
             translator.close()
-            // Consider logging the exception or rethrowing a custom exception
             throw e
         }
     }
@@ -66,10 +71,4 @@ class OfflineTranslationRepository @Inject constructor() : OfflineTranslationOpe
     }
     override fun getAllModels(): List<String> = TranslateLanguage.getAllLanguages()
 
-    private fun convertToTranslationResponse(translatedText: String?, originalText: String): TranslationResponse =
-        TranslationResponse(
-            sentences = listOf(
-                Sentence(orig = originalText, trans = translatedText ?: "", translit = null)
-            )
-        )
 }
