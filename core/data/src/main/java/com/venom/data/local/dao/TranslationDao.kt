@@ -1,43 +1,70 @@
 package com.venom.data.local.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import com.venom.data.model.TranslationEntry
+import androidx.room.*
+import com.venom.data.model.TranslationEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TranslationDao {
-    @Query("SELECT * FROM translation_history ORDER BY timestamp DESC")
-    fun getAllEntries(): Flow<List<TranslationEntry>>
 
-    @Query(
-        """
-    SELECT * FROM translation_history WHERE sourceText = :sourceText AND sourceLangCode = 
-    :sourceLangCode AND targetLangCode =:targetLangCode"""
-    )
-    suspend fun getTranslationEntry(
-        sourceText: String, sourceLangCode: String, targetLangCode: String
-    ): TranslationEntry?
+    @Query("""
+        SELECT * FROM translations 
+        WHERE sourceText = :sourceText 
+        AND sourceLang = :sourceLang 
+        AND targetLang = :targetLang 
+        AND providerId = :providerId
+        LIMIT 1
+    """)
+    suspend fun getCachedTranslation(
+        sourceText: String,
+        sourceLang: String,
+        targetLang: String,
+        providerId: String
+    ): TranslationEntity?
 
-    @Query("SELECT * FROM translation_history WHERE isBookmarked = 1 ORDER BY timestamp DESC")
-    fun getBookmarkedEntries(): Flow<List<TranslationEntry>>
+    @Query("SELECT * FROM translations WHERE id = :id LIMIT 1")
+    suspend fun getTranslationById(id: Long): TranslationEntity?
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insert(entry: TranslationEntry)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(translation: TranslationEntity): Long
 
     @Update
-    suspend fun update(entry: TranslationEntry)
+    suspend fun update(translation: TranslationEntity)
 
     @Delete
-    suspend fun delete(entry: TranslationEntry)
+    suspend fun delete(translation: TranslationEntity)
 
-    @Query("DELETE FROM translation_history WHERE isBookmarked = 1")
+    @Query("SELECT * FROM translations ORDER BY timestamp DESC")
+    fun getAllEntries(): Flow<List<TranslationEntity>>
+
+    @Query("SELECT * FROM translations WHERE isBookmarked = 1 ORDER BY timestamp DESC")
+    fun getBookmarkedEntries(): Flow<List<TranslationEntity>>
+
+    @Query("SELECT * FROM translations WHERE providerId = :providerId ORDER BY timestamp DESC")
+    fun getEntriesByProvider(providerId: String): Flow<List<TranslationEntity>>
+
+    @Query("UPDATE translations SET isBookmarked = :isBookmarked WHERE id = :id")
+    suspend fun updateBookmarkStatus(id: Long, isBookmarked: Boolean)
+
+    @Query("UPDATE translations SET isBookmarked = 0")
     suspend fun clearBookmarks()
 
-    @Query("DELETE FROM translation_history WHERE isBookmarked = 0")
+    @Query("DELETE FROM translations WHERE isBookmarked = 0")
     suspend fun deleteNonBookmarkedEntries()
+
+    @Query("DELETE FROM translations")
+    suspend fun clearAll()
+
+    @Query("""
+        SELECT * FROM translations 
+        WHERE sourceText = :sourceText 
+        AND sourceLang = :sourceLang 
+        AND targetLang = :targetLang
+        LIMIT 1
+    """)
+    suspend fun getTranslationEntity(
+        sourceText: String,
+        sourceLang: String,
+        targetLang: String
+    ): TranslationEntity?
 }
