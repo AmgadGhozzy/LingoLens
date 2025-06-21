@@ -4,15 +4,28 @@ import android.app.Application
 import android.os.StrictMode
 import android.util.Log
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 @HiltAndroidApp
 class Application : Application() {
-
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     var adsManager: AdsManager = AdsManager()
 
     override fun onCreate() {
         super.onCreate()
-        adsManager.initialize(this)
+        
+        // Initialize AdsManager on a background thread
+        applicationScope.launch {
+            try {
+                adsManager.initialize(this@Application)
+            } catch (e: Exception) {
+                Log.e("Application", "Failed to initialize AdsManager", e)
+            }
+        }
+        
         if (BuildConfig.DEBUG) {
             enableStrictMode()
         }
