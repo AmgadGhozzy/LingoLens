@@ -1,4 +1,4 @@
-package com.venom.data.local.typeconverter
+package com.venom.data.local.converters
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
