@@ -2,8 +2,8 @@ package com.venom.data.repo
 
 import com.venom.data.BuildConfig
 import com.venom.data.api.*
-import com.venom.data.model.Sentence
-import com.venom.data.model.TranslationResponse
+import com.venom.data.mapper.TranslateMapper
+import com.venom.domain.model.TranslationResult
 import com.venom.utils.Extensions.preprocessText
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
@@ -12,7 +12,7 @@ import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class OnlineTranslationRepository @Inject constructor(
-    private val translationService: TranslationService,
+    private val translationService: GoogleTranslateService,
     private val chatGPTService: ChatGPTService,
     private val geminiService: GeminiService,
     private val groqService: GroqService,
@@ -20,17 +20,23 @@ class OnlineTranslationRepository @Inject constructor(
     private val huggingFaceService: HuggingFaceService
 ) : OnlineTranslationOperations {
 
-    override suspend fun getGoogleTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getGoogleTranslation(source: String, target: String, query: String): TranslationResult {
         return safeCall {
-            translationService.getTranslation(
+            val response = translationService.translateWithGoogle(
                 sourceLanguage = source,
                 targetLanguage = target,
                 query = query.preprocessText()
             )
+            val result = TranslateMapper.mapGoogleResponseToTranslationResult(response, query)
+            result.copy(
+                sourceLang = source,
+                targetLang = target,
+                providerId = "google"
+            )
         }
     }
 
-    override suspend fun getChatGPTTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getChatGPTTranslation(source: String, target: String, query: String): TranslationResult {
         val prompt = buildPrompt(source, target, query)
         val request = ChatGPTRequestBody(
             messages = listOf(
@@ -38,18 +44,34 @@ class OnlineTranslationRepository @Inject constructor(
                 ChatGPTMessage("user", prompt)
             )
         )
-        val response = safeCall { chatGPTService.translate(BuildConfig.OPENAI_API_KEY, request) }
-        return convertToTranslationResponse(response.choices?.firstOrNull()?.message?.content, query)
+        return safeCall {
+            val response = chatGPTService.translate(BuildConfig.OPENAI_API_KEY, request)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = response.choices?.firstOrNull()?.message?.content,
+                sourceText = query,
+                sourceLang = source,
+                targetLang = target,
+                providerId = "chatgpt"
+            )
+        }
     }
 
-    override suspend fun getGeminiTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getGeminiTranslation(source: String, target: String, query: String): TranslationResult {
         val prompt = buildPrompt(source, target, query)
         val request = GeminiRequest(contents = listOf(GeminiContent(parts = listOf(GeminiPart(text = prompt)))))
-        val response = safeCall { geminiService.translate(GeminiService.FLASH_MODEL, BuildConfig.GEMINI_API_KEY, request) }
-        return convertToTranslationResponse(response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text?.trim(), query)
+        return safeCall {
+            val response = geminiService.translate(GeminiService.FLASH_MODEL, BuildConfig.GEMINI_API_KEY, request)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text,
+                sourceText = query,
+                sourceLang = source,
+                targetLang = target,
+                providerId = "gemini"
+            )
+        }
     }
 
-    override suspend fun getGroqTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getGroqTranslation(source: String, target: String, query: String): TranslationResult {
         val prompt = buildPrompt(source, target, query)
         val request = GroqRequestBody(
             messages = listOf(
@@ -57,11 +79,19 @@ class OnlineTranslationRepository @Inject constructor(
                 GroqMessage("user", prompt)
             )
         )
-        val response = safeCall { groqService.translate(BuildConfig.GROQ_API_KEY, request) }
-        return convertToTranslationResponse(response.choices?.firstOrNull()?.message?.content?.trim('"'), query)
+        return safeCall {
+            val response = groqService.translate(BuildConfig.GROQ_API_KEY, request)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = response.choices?.firstOrNull()?.message?.content,
+                sourceText = query,
+                sourceLang = source,
+                targetLang = target,
+                providerId = "groq"
+            )
+        }
     }
 
-    override suspend fun getDeepSeekTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getDeepSeekTranslation(source: String, target: String, query: String): TranslationResult {
         val prompt = buildPrompt(source, target, query)
         val request = DeepSeekRequestBody(
             messages = listOf(
@@ -69,11 +99,19 @@ class OnlineTranslationRepository @Inject constructor(
                 DeepSeekMessage("user", prompt)
             )
         )
-        val response = safeCall { deepSeekService.translate(BuildConfig.DEEPSEEK_API_KEY, request) }
-        return convertToTranslationResponse(response.choices?.firstOrNull()?.message?.content, query)
+        return safeCall {
+            val response = deepSeekService.translate(BuildConfig.DEEPSEEK_API_KEY, request)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = response.choices?.firstOrNull()?.message?.content,
+                sourceText = query,
+                sourceLang = source,
+                targetLang = target,
+                providerId = "deepseek"
+            )
+        }
     }
 
-    override suspend fun getHuggingFaceTranslation(source: String, target: String, query: String): TranslationResponse {
+    override suspend fun getHuggingFaceTranslation(source: String, target: String, query: String): TranslationResult {
         val request = HuggingFaceRequestBody(
             inputs = query,
             parameters = HuggingFaceParameters(
@@ -81,8 +119,16 @@ class OnlineTranslationRepository @Inject constructor(
                 tgtLang = mapLanguageCode(target)
             )
         )
-        val response = safeCall { huggingFaceService.translate(HuggingFaceService.DEFAULT_MODEL, BuildConfig.HUGGINGFACE_API_KEY, request) }
-        return convertToTranslationResponse(response.firstOrNull()?.translationText?.trim(), query)
+        return safeCall {
+            val response = huggingFaceService.translate(HuggingFaceService.DEFAULT_MODEL, BuildConfig.HUGGINGFACE_API_KEY, request)
+            TranslateMapper.mapAIProviderResponse(
+                translatedText = response.firstOrNull()?.translationText,
+                sourceText = query,
+                sourceLang = source,
+                targetLang = target,
+                providerId = "huggingface"
+            )
+        }
     }
 
     private suspend fun <T> safeCall(call: suspend () -> T): T {
@@ -121,11 +167,4 @@ class OnlineTranslationRepository @Inject constructor(
         "hi" -> "hi_IN"
         else -> "en_XX"
     }
-
-    private fun convertToTranslationResponse(translatedText: String?, originalText: String): TranslationResponse =
-        TranslationResponse(
-            sentences = listOf(
-                Sentence(orig = originalText, trans = translatedText ?: "", translit = null)
-            )
-        )
 }
