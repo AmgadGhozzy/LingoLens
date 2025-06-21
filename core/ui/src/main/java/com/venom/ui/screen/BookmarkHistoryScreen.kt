@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.data.model.OcrEntry
-import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationEntity
 import com.venom.domain.model.ViewResources
 import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
@@ -31,7 +31,7 @@ fun BookmarkHistoryScreen(
     translationViewModel: BookmarkViewModel = hiltViewModel(),
     ocrViewModel: BookmarkOcrViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onTranslationItemClick: (TranslationEntry) -> Unit = {},
+    onTranslationItemClick: (TranslationEntity) -> Unit = {},
     onOcrItemClick: (OcrEntry) -> Unit = {}
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }

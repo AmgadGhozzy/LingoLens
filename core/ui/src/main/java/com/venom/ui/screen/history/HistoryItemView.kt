@@ -21,9 +21,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.TranslationEntry
 import com.venom.domain.model.IHistoryEntry
 
 @Composable
@@ -103,31 +101,6 @@ fun HistoryItemView(
                     }
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HistoryItemViewPreview() {
-    MaterialTheme {
-        HistoryItemView(entry = TranslationEntry(
-            sourceText = "Hello, world!",
-            translatedText = "Привет, мир!",
-            sourceLangName = "English",
-            targetLangName = "Russian",
-            sourceLangCode = "en",
-            targetLangCode = "ru",
-        ),
-            onEntryRemove = {},
-            onToggleBookmark = {},
-            onShareClick = {},
-            onCopyClick = {},
-            onItemClick = {}) { isExpanded, onToggle ->
-            Text(
-                text = if (isExpanded) "Click to collapse" else "Click to expand",
-                modifier = Modifier.padding(16.dp)
-            )
         }
     }
 }

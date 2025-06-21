@@ -30,18 +30,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationEntity
 import com.venom.resources.R
 import com.venom.ui.components.buttons.ExpandIndicator
 
 @Composable
 fun TransHistoryItemView(
-    entry: TranslationEntry,
-    onEntryRemove: (TranslationEntry) -> Unit,
-    onToggleBookmark: (TranslationEntry) -> Unit,
-    onShareClick: (TranslationEntry) -> Unit,
-    onCopyClick: (TranslationEntry) -> Unit,
-    onItemClick: (TranslationEntry) -> Unit,
+    entry: TranslationEntity,
+    onEntryRemove: (TranslationEntity) -> Unit,
+    onToggleBookmark: (TranslationEntity) -> Unit,
+    onShareClick: (TranslationEntity) -> Unit,
+    onCopyClick: (TranslationEntity) -> Unit,
+    onItemClick: (TranslationEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     HistoryItemView(
@@ -63,15 +63,15 @@ fun TransHistoryItemView(
 
 @Composable
 private fun TranslationContent(
-    entry: TranslationEntry,
+    entry: TranslationEntity,
     onExpandClick: () -> Unit,
     isExpanded: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         LangHistorySection(
-            languageName = entry.sourceLangName,
-            languageCode = entry.sourceLangCode,
+            languageName = entry.sourceLang,
+            languageCode = entry.sourceLang,
             text = entry.sourceText,
             isExpanded = isExpanded,
             style = MaterialTheme.typography.bodyMedium
@@ -84,8 +84,8 @@ private fun TranslationContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         LangHistorySection(
-            languageName = entry.targetLangName,
-            languageCode = entry.targetLangCode,
+            languageName = entry.targetLang,
+            languageCode = entry.targetLang,
             text = entry.translatedText,
             isExpanded = isExpanded,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
