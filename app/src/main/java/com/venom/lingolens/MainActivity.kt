@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.google.firebase.remoteconfig.ConfigUpdate
@@ -42,7 +43,9 @@ import com.venom.ui.viewmodel.SettingsViewModel
 import com.venom.ui.viewmodel.UpdateViewModel
 import com.venom.utils.Extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -232,8 +235,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun runtimeEnableAutoInit() {
-        Firebase.messaging.isAutoInitEnabled = true
+    private fun runtimeEnableAutoInit() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                Firebase.messaging.isAutoInitEnabled = true
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to enable Firebase auto-init", e)
+            }
+        }
     }
 
     private fun askNotificationPermission() {
