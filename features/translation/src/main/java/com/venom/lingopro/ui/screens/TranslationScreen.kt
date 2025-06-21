@@ -33,40 +33,46 @@ fun TranslationScreen(
     ttsViewModel: TTSViewModel = hiltViewModel(),
     sttViewModel: STTViewModel = hiltViewModel(),
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(),
-    onNavigateToOcr: () -> Unit,
+    onNavigateToOcr: () -> Unit = {},
     onNavigateToSentence: (String) -> Unit = {},
     initialText: String? = null,
     isDialog: Boolean = false,
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val state by viewModel.uiState.collectAsState()
+
+    // Collect states
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val langSelectorState by langSelectorViewModel.state.collectAsStateWithLifecycle()
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
     val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-    var sourceTextFieldValue by remember {
-        mutableStateOf(
-            TextFieldValue(
-                initialText ?: state.sourceText
-            )
-        )
-    }
+    // Local UI state
+    var sourceTextFieldValue by remember { mutableStateOf(TextFieldValue()) }
+    val translatedTextFieldValue by remember { derivedStateOf { TextFieldValue(state.translatedText) } }
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
-    // Handle initial text only once
-    LaunchedEffect(initialText) {
-        initialText?.let { text ->
-            if (text.isNotBlank() && sourceTextFieldValue.text != text) {
-                sourceTextFieldValue = TextFieldValue(text)
-                viewModel.onSourceTextChanged(text)
-            }
+    // Initialize with initial text or restored state
+    LaunchedEffect(Unit) {
+        val textToSet = initialText?.takeIf { it.isNotBlank() } ?: state.sourceText
+        if (textToSet.isNotBlank() && sourceTextFieldValue.text != textToSet) {
+            sourceTextFieldValue = TextFieldValue(textToSet)
+            // Always trigger translation for initial text
+            viewModel.onSourceTextChanged(textToSet)
         }
     }
 
-    // Update source text field when state changes (e.g., from moveUp)
+    // Sync languages when they change
+    LaunchedEffect(langSelectorState.sourceLang, langSelectorState.targetLang) {
+        viewModel.updateLanguages(
+            langSelectorState.sourceLang,
+            langSelectorState.targetLang
+        )
+    }
+
+    // Update text field when ViewModel state changes (e.g., from swap operation)
     LaunchedEffect(state.sourceText) {
         if (state.sourceText != sourceTextFieldValue.text) {
             sourceTextFieldValue = TextFieldValue(
@@ -76,22 +82,26 @@ fun TranslationScreen(
         }
     }
 
-    // Handle language changes - only update if languages actually changed
-    LaunchedEffect(langSelectorState.sourceLang, langSelectorState.targetLang) {
-        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
+    // Handle speech-to-text result
+    LaunchedEffect(transcription) {
+        if (transcription.isNotBlank() && !showSpeechToTextDialog) {
+            sourceTextFieldValue = TextFieldValue(transcription)
+            viewModel.onSourceTextChanged(transcription)
+            sttViewModel.stopRecognition()
+        }
     }
 
-    val actions = remember(context) {
+    // Debug: Log state changes (remove in production)
+    LaunchedEffect(state.sourceText, state.translatedText, state.isLoading, state.error) {
+        println("TranslationScreen - Source: '${state.sourceText}', Translated: '${state.translatedText}', Loading: ${state.isLoading}, Error: ${state.error}")
+    }
+
+    // Create actions
+    val actions = remember(context, viewModel, ttsViewModel) {
         TranslationActions(
             onTextChange = { newValue ->
-                // Only update if text actually changed
-                if (newValue.text != sourceTextFieldValue.text) {
-                    sourceTextFieldValue = newValue
-                    viewModel.onSourceTextChanged(newValue.text)
-                } else {
-                    // Update only selection/composition without triggering translation
-                    sourceTextFieldValue = newValue
-                }
+                sourceTextFieldValue = newValue
+                viewModel.onSourceTextChanged(newValue.text)
             },
             onClearText = {
                 sourceTextFieldValue = TextFieldValue("")
@@ -104,7 +114,7 @@ fun TranslationScreen(
             onSpeechToText = { showSpeechToTextDialog = true },
             onPaste = {
                 context.pasteFromClipboard()?.let { text ->
-                    if (text != sourceTextFieldValue.text) {
+                    if (text.isNotBlank() && text != sourceTextFieldValue.text) {
                         sourceTextFieldValue = TextFieldValue(text)
                         viewModel.onSourceTextChanged(text)
                     }
@@ -119,74 +129,89 @@ fun TranslationScreen(
 
     @Composable
     fun TranslationContent(modifier: Modifier = Modifier) {
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             TranslationSection(
                 viewModel = langSelectorViewModel,
                 sourceTextValue = sourceTextFieldValue,
-                translatedTextValue = TextFieldValue(state.translatedText),
+                translatedTextValue = translatedTextFieldValue,
                 actions = actions,
                 isLoading = state.isLoading,
                 isSpeaking = ttsState.isSpeaking,
                 isBookmarked = state.isBookmarked
             )
 
-            if (!isDialog && state.synonyms.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                state.translationResult.dict?.let { translations ->
-                    TranslationsCard(
-                        translations = translations,
-                        onWordClick = { selectedWord ->
-                            if (selectedWord != sourceTextFieldValue.text) {
-                                sourceTextFieldValue = TextFieldValue(selectedWord)
-                                viewModel.onSourceTextChanged(selectedWord)
-                            }
-                        },
-                        onExpand = { showDictionaryDialog = true },
-                        onSpeak = ttsViewModel::speak,
-                        modifier = Modifier.verticalScroll(rememberScrollState())
-                    )
-                }
+            // Dictionary results
+            if (state.dict.isNotEmpty()) {
+                TranslationsCard(
+                    translations = state.dict,
+                    onWordClick = { selectedWord ->
+                        if (selectedWord.isNotBlank() && selectedWord != sourceTextFieldValue.text) {
+                            sourceTextFieldValue = TextFieldValue(selectedWord)
+                            viewModel.onSourceTextChanged(selectedWord)
+                        }
+                    },
+                    onExpand = { showDictionaryDialog = true },
+                    onSpeak = ttsViewModel::speak,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                )
             }
         }
     }
 
-    if (isDialog) DraggableDialog(onDismissRequest = onDismiss) { TranslationContent() }
-    else TranslationContent(modifier = Modifier
-        .padding(8.dp)
-        .fillMaxSize())
-
-    if (showDictionaryDialog) Dialog(
-        onDismissRequest = { showDictionaryDialog = false },
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false,
-            dismissOnBackPress = true
-        )
-    ) {
-        DictionaryScreen(
-            translationResponse = state.translationResult,
-            onWordClick = { selectedWord ->
-//                sourceTextFieldValue = TextFieldValue(selectedWord)
-//                viewModel.onSourceTextChanged(selectedWord)
-            },
-            onSpeak = ttsViewModel::speak,
-            onCopy = actions.onCopy,
-            onDismiss = { showDictionaryDialog = false }
+    // Main content
+    if (isDialog) {
+        DraggableDialog(onDismissRequest = onDismiss) {
+            TranslationContent()
+        }
+    } else {
+        TranslationContent(
+            modifier = Modifier.padding(8.dp)
         )
     }
 
-    if (showSpeechToTextDialog) SpeechToTextDialog(
-        sttViewModel = sttViewModel,
-        onDismiss = {
-            showSpeechToTextDialog = false
-            transcription.let {
-                sourceTextFieldValue = TextFieldValue(it)
-                viewModel.onSourceTextChanged(it)
+    // Dictionary dialog
+    if (showDictionaryDialog && state.translationResult != null) {
+        Dialog(
+            onDismissRequest = { showDictionaryDialog = false },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false,
+                dismissOnBackPress = true
+            )
+        ) {
+            DictionaryScreen(
+                translationResponse = state.translationResult!!,
+                onWordClick = { selectedWord ->
+                    if (selectedWord.isNotBlank()) {
+                        sourceTextFieldValue = TextFieldValue(selectedWord)
+                        viewModel.onSourceTextChanged(selectedWord)
+                        showDictionaryDialog = false
+                    }
+                },
+                onSpeak = ttsViewModel::speak,
+                onCopy = actions.onCopy,
+                onDismiss = { showDictionaryDialog = false }
+            )
+        }
+    }
+
+    // Speech-to-text dialog
+    if (showSpeechToTextDialog) {
+        SpeechToTextDialog(
+            sttViewModel = sttViewModel,
+            onDismiss = {
+                showSpeechToTextDialog = false
                 sttViewModel.stopRecognition()
             }
-        }
-    )
+        )
+    }
 
+    // Fullscreen text dialog
     fullscreenState?.let { text ->
         FullscreenTextDialog(
             textValue = TextFieldValue(text),
