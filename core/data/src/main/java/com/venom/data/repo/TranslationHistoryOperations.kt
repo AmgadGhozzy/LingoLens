@@ -1,15 +1,19 @@
 package com.venom.data.repo
 
-import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationEntity
 import kotlinx.coroutines.flow.Flow
 
 interface TranslationHistoryOperations {
-    suspend fun saveTranslationEntry(entry: TranslationEntry)
-    suspend fun getTranslationEntry(sourceText: String, sourceLang: String, targetLang: String): TranslationEntry?
-    fun getTranslationHistory(): Flow<List<TranslationEntry>>
-    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>>
-    suspend fun updateTranslationEntry(entry: TranslationEntry)
-    suspend fun deleteTranslationEntry(entry: TranslationEntry)
+    suspend fun saveTranslationEntity(entry: TranslationEntity): Long
+    suspend fun getTranslationEntity(sourceText: String, sourceLang: String, targetLang: String): TranslationEntity?
+    suspend fun getTranslationEntityById(id: Long): TranslationEntity?
+    fun getTranslationHistory(): Flow<List<TranslationEntity>>
+    fun getBookmarkedTranslations(): Flow<List<TranslationEntity>>
+    fun getTranslationsByProvider(providerId: String): Flow<List<TranslationEntity>>
+    suspend fun updateTranslationEntity(entry: TranslationEntity)
+    suspend fun deleteTranslationEntity(entry: TranslationEntity)
+    suspend fun updateBookmarkStatus(id: Long, isBookmarked: Boolean)
     suspend fun clearBookmarks()
     suspend fun deleteNonBookmarkedEntries()
+    suspend fun clearAllHistory()
 }
