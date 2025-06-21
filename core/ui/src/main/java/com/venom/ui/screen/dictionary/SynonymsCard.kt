@@ -19,7 +19,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.Synset
+import com.venom.domain.model.Synset
 import com.venom.resources.R
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.items.WordChip
@@ -27,34 +27,39 @@ import com.venom.ui.components.items.WordChip
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SynonymsCard(
-    synsets: List<Synset>, onWordClick: (String) -> Unit, modifier: Modifier = Modifier
+    synsets: List<Synset>,
+    onWordClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
     var showAll by remember { mutableStateOf(false) }
 
     CustomCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader(title = stringResource(id = R.string.synonyms), icon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            })
+            SectionHeader(
+                title = stringResource(id = R.string.synonyms),
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
 
             synsets.forEach { synset ->
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(text = synset.pos.replaceFirstChar { it.uppercase() },
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = synset.pos.replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.semantics {
                             contentDescription = "${synset.pos} Synonyms"
-                        })
+                        }
+                    )
 
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -66,9 +71,9 @@ fun SynonymsCard(
                             WordChip(word = synonym, onClick = { onWordClick(synonym) })
                         }
 
-                        if (synonyms.size > 20) WordChip(
-                            word = "...",
-                            onClick = { showAll = !showAll })
+                        if (synonyms.size > 20) {
+                            WordChip(word = "...", onClick = { showAll = !showAll })
+                        }
                     }
                 }
             }

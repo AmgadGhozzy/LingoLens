@@ -8,17 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.gson.Gson
-import com.venom.data.mock.TRANSLATION_RESPONSE
-import com.venom.data.model.TranslationResponse
+import com.venom.domain.model.TranslationResult
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
 
 @Composable
 fun DictionaryScreen(
-    translationResponse: TranslationResponse,
+    translationResponse: TranslationResult,
     modifier: Modifier = Modifier,
     onWordClick: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {},
@@ -27,7 +24,6 @@ fun DictionaryScreen(
     isSpeaking: Boolean = false,
     onDismiss: () -> Unit = {}
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -37,7 +33,6 @@ fun DictionaryScreen(
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -50,7 +45,6 @@ fun DictionaryScreen(
             )
         }
 
-        // Card displaying translation details
         TranslationCard(
             translationResponse = translationResponse,
             onSpeak = onSpeak,
@@ -58,10 +52,9 @@ fun DictionaryScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Display definitions if available
-        translationResponse.definitions?.let { definitions ->
+        if (translationResponse.definitionEntries.isNotEmpty()) {
             DefinitionsCard(
-                definitions = definitions,
+                definitions = translationResponse.definitionEntries,
                 onTextClick = onWordClick,
                 onSpeak = onSpeak,
                 onCopy = onCopy,
@@ -71,30 +64,21 @@ fun DictionaryScreen(
             )
         }
 
-        // Display translations if available
-        translationResponse.dict?.let { translations ->
+        if (translationResponse.dict.isNotEmpty()) {
             TranslationsCard(
-                translations = translations,
+                translations = translationResponse.dict,
                 onWordClick = onWordClick,
                 onSpeak = onSpeak,
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        // Display synonyms if available
-        translationResponse.synsets?.let { synsets ->
+        if (translationResponse.synsets.isNotEmpty()) {
             SynonymsCard(
-                synsets = synsets,
+                synsets = translationResponse.synsets,
                 onWordClick = onWordClick,
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewDictionaryScreen() {
-    val translationResponse = Gson().fromJson(TRANSLATION_RESPONSE, TranslationResponse::class.java)
-    DictionaryScreen(translationResponse = translationResponse)
 }

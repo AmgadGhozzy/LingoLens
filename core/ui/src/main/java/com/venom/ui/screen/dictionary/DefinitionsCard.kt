@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.*
+import com.venom.domain.model.Definition
 import com.venom.resources.R
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.items.WordChip
@@ -27,15 +27,19 @@ fun DefinitionsCard(
 
     CustomCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader(title = stringResource(id = R.string.definitions), icon = {
-                Icon(
-                    imageVector = Icons.Rounded.Book,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            })
+            SectionHeader(
+                title = stringResource(id = R.string.definitions),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Book,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            )
 
             val visibleDefinitions = if (showAll) definitions else definitions.take(5)
             visibleDefinitions.forEach { definition ->
@@ -50,10 +54,12 @@ fun DefinitionsCard(
             }
 
             if (definitions.size > 5) {
-                WordChip(word = if (showAll) stringResource(id = R.string.show_less)
-                else stringResource(id = R.string.show_more), onClick = { showAll = !showAll })
+                WordChip(
+                    word = if (showAll) stringResource(id = R.string.show_less)
+                    else stringResource(id = R.string.show_more),
+                    onClick = { showAll = !showAll }
+                )
             }
         }
     }
 }
-

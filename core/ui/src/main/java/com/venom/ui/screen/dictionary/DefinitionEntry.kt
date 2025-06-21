@@ -7,7 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.DefinitionEntry
+import com.venom.domain.model.DefinitionEntry
 
 @Composable
 fun DefinitionEntry(
@@ -31,7 +31,6 @@ fun DefinitionEntry(
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Main Gloss Row
             GlossRow(
                 text = entry.gloss,
                 onTextClick = onTextClick,
@@ -41,7 +40,6 @@ fun DefinitionEntry(
                 isSpeaking = isSpeaking,
             )
 
-            // Example Row (if available)
             entry.example?.let { example ->
                 ExampleRow(
                     text = example,

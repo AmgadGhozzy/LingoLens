@@ -12,12 +12,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.DictionaryEntry
+import com.venom.domain.model.DictionaryEntry
 import com.venom.ui.components.items.WordChip
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TranslationEntry(
+fun TranslationEntryComponent(
     entry: DictionaryEntry,
     showAll: Boolean,
     onWordClick: (String) -> Unit,
@@ -26,16 +26,16 @@ fun TranslationEntry(
     isAlpha: Boolean
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Display part of speech
         Text(
             text = entry.pos.replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.semantics { contentDescription = "${entry.pos} Translation" }
+            modifier = Modifier.semantics {
+                contentDescription = "${entry.pos} Translation"
+            }
         )
 
-        // Display terms as chips, with a toggle for showing all or a subset
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -45,13 +45,13 @@ fun TranslationEntry(
                 WordChip(
                     word = term,
                     onClick = { onWordClick(term) },
-                    onLongClick = { onSpeak(term) },
                     isAlpha = isAlpha
                 )
             }
 
-            // Add "..." chip if there are more terms to show
-            if (entry.terms.size > 10) WordChip(word = "...", onClick = toggleShowAll)
+            if (entry.terms.size > 10) {
+                WordChip(word = "...", onClick = toggleShowAll)
+            }
         }
     }
 }

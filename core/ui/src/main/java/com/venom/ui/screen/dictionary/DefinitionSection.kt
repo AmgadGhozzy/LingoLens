@@ -10,7 +10,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.*
+import com.venom.domain.model.Definition
 import com.venom.resources.R
 import com.venom.ui.components.items.WordChip
 
@@ -27,18 +27,23 @@ fun DefinitionSection(
     var showAll by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = definition.pos.replaceFirstChar { it.uppercase() },
+            Text(
+                text = definition.pos.replaceFirstChar { it.uppercase() },
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.semantics { contentDescription = "${definition.pos} Definition" })
+                modifier = Modifier.semantics {
+                    contentDescription = "${definition.pos} Definition"
+                }
+            )
         }
 
         val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
@@ -54,8 +59,11 @@ fun DefinitionSection(
         }
 
         if (definition.entry.size > 5) {
-            WordChip(word = if (showAll) stringResource(id = R.string.show_less)
-            else stringResource(id = R.string.show_all), onClick = { showAll = !showAll })
+            WordChip(
+                word = if (showAll) stringResource(id = R.string.show_less)
+                else stringResource(id = R.string.show_all),
+                onClick = { showAll = !showAll }
+            )
         }
     }
 }
