@@ -1,52 +1,122 @@
 package com.venom.data.repo
 
-import com.venom.data.model.TranslationEntry
-import com.venom.data.model.TranslationProvider
-import com.venom.data.model.TranslationResponse
-import kotlinx.coroutines.Dispatchers
+import com.venom.data.local.dao.TranslationDao
+import com.venom.data.mapper.TranslateMapper
+import com.venom.data.model.*
+import com.venom.domain.model.TranslationResult
+import com.venom.domain.repo.ITranslationRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class TranslationRepository @Inject constructor(
+    private val dao: TranslationDao,
     private val onlineTranslationOperations: OnlineTranslationOperations,
     private val offlineTranslationOperations: OfflineTranslationOperations,
     private val translationHistoryOperations: TranslationHistoryOperations
-) {
+) : ITranslationRepository {
 
-    suspend fun getTranslation(
-        sourceLanguage: String = "au",
-        targetLanguage: String = "ar",
-        query: String,
-        provider: TranslationProvider = TranslationProvider.GOOGLE
-    ): Result<TranslationResponse> = withContext(Dispatchers.IO) {
-        return@withContext runCatching {
-            when (provider.id) {
-                TranslationProvider.GOOGLE.id -> onlineTranslationOperations.getGoogleTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.OFFLINE.id -> offlineTranslationOperations.getOfflineTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.CHATGPT.id -> onlineTranslationOperations.getChatGPTTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.GEMINI.id -> onlineTranslationOperations.getGeminiTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.GROQ.id -> onlineTranslationOperations.getGroqTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.DEEPSEEK.id -> onlineTranslationOperations.getDeepSeekTranslation(sourceLanguage, targetLanguage, query)
-                TranslationProvider.HUGGINGFACE.id -> onlineTranslationOperations.getHuggingFaceTranslation(sourceLanguage, targetLanguage, query)
-                else -> throw Exception("Unknown provider: ${provider.id}")
+    override suspend fun translate(
+        sourceText: String,
+        sourceLang: String,
+        targetLang: String,
+        providerId: String,
+        forceRefresh: Boolean
+    ): Result<TranslationResult> {
+        return try {
+            // Check cache first if not forcing refresh
+            if (!forceRefresh) {
+                val cached = dao.getCachedTranslation(sourceText, sourceLang, targetLang, providerId)
+                if (cached != null) {
+                    return Result.success(
+                        TranslateMapper.fromEntity(cached).copy(isFromCache = true)
+                    )
+                }
             }
+
+            // Get translation from appropriate provider
+            val response = when (providerId) {
+                TranslationProvider.GOOGLE.id -> onlineTranslationOperations.getGoogleTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.OFFLINE.id -> offlineTranslationOperations.getOfflineTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.CHATGPT.id -> onlineTranslationOperations.getChatGPTTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.GEMINI.id -> onlineTranslationOperations.getGeminiTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.GROQ.id -> onlineTranslationOperations.getGroqTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.DEEPSEEK.id -> onlineTranslationOperations.getDeepSeekTranslation(sourceLang, targetLang, sourceText)
+                TranslationProvider.HUGGINGFACE.id -> onlineTranslationOperations.getHuggingFaceTranslation(sourceLang, targetLang, sourceText)
+                else -> throw Exception("Unknown provider: $providerId")
+            }
+
+            // Create translation result
+            val translationResult = TranslateMapper.mapToTranslationResult(
+                sourceText = sourceText,
+                translatedText = response.translatedText,
+                sourceLang = sourceLang,
+                targetLang = targetLang,
+                providerId = providerId,
+            )
+
+            // Save to database
+            val entity = TranslateMapper.toEntity(translationResult)
+            dao.insert(entity)
+
+            Result.success(TranslateMapper.fromEntity(entity))
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
-    suspend fun saveTranslationEntry(entry: TranslationEntry) = translationHistoryOperations.saveTranslationEntry(entry)
 
-    suspend fun getTranslationEntry(sourceText: String, sourceLang: String, targetLang: String): TranslationEntry? =
-        translationHistoryOperations.getTranslationEntry(sourceText, sourceLang, targetLang)
+    override suspend fun bookmarkTranslation(id: Long, isBookmarked: Boolean) {
+        translationHistoryOperations.updateBookmarkStatus(id, isBookmarked)
+    }
 
-    fun getTranslationHistory(): Flow<List<TranslationEntry>> = translationHistoryOperations.getTranslationHistory()
+    override fun getTranslationHistory(): Flow<List<TranslationResult>> {
+        return translationHistoryOperations.getTranslationHistory().map { entities ->
+            entities.map { TranslateMapper.fromEntity(it) }
+        }
+    }
 
-    fun getBookmarkedTranslations(): Flow<List<TranslationEntry>> = translationHistoryOperations.getBookmarkedTranslations()
+    override suspend fun clearHistory() {
+        translationHistoryOperations.clearAllHistory()
+    }
 
-    suspend fun updateTranslationEntry(entry: TranslationEntry) = translationHistoryOperations.updateTranslationEntry(entry)
+    // Additional utility methods
+    suspend fun getTranslationById(id: Long): TranslationResult? {
+        return translationHistoryOperations.getTranslationEntityById(id)?.let {
+            TranslateMapper.fromEntity(it)
+        }
+    }
 
-    suspend fun deleteTranslationEntry(entry: TranslationEntry) = translationHistoryOperations.deleteTranslationEntry(entry)
+    fun getBookmarkedTranslations(): Flow<List<TranslationResult>> {
+        return translationHistoryOperations.getBookmarkedTranslations().map { entities ->
+            entities.map { TranslateMapper.fromEntity(it) }
+        }
+    }
 
-    suspend fun clearBookmarks() = translationHistoryOperations.clearBookmarks()
+    fun getTranslationsByProvider(providerId: String): Flow<List<TranslationResult>> {
+        return translationHistoryOperations.getTranslationsByProvider(providerId).map { entities ->
+            entities.map { TranslateMapper.fromEntity(it) }
+        }
+    }
 
-    suspend fun deleteNonBookmarkedEntries() = translationHistoryOperations.deleteNonBookmarkedEntries()
+    suspend fun toggleBookmark(translation: TranslationResult) {
+        val entity = dao.getCachedTranslation(
+            translation.sourceText,
+            translation.sourceLang,
+            translation.targetLang,
+            translation.providerId
+        )
+        entity?.let {
+            translationHistoryOperations.updateBookmarkStatus(it.id, !it.isBookmarked)
+        }
+    }
+
+    suspend fun clearBookmarks() {
+        translationHistoryOperations.clearBookmarks()
+    }
+
+    suspend fun deleteNonBookmarkedEntries() {
+        translationHistoryOperations.deleteNonBookmarkedEntries()
+    }
 }
