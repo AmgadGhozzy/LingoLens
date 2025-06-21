@@ -76,7 +76,9 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
-    implementation(libs.datastore.preferences)
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preferences)
+
 
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
