@@ -164,13 +164,15 @@ class OcrViewModel @Inject constructor(
             val combinedText = paragraphs.joinToString(separator) { it.text }
 
             // Single translation request for all text
-            translationRepository.getTranslation(
-                targetLanguage = targetLang, query = combinedText
+            translationRepository.translate(
+                sourceText = combinedText,
+                targetLang = targetLang,
+                providerId = "google",
+                forceRefresh = false
             ).onSuccess { response ->
                 // Split translated text back into paragraphs
                 val translatedTexts =
-                    response.sentences?.firstOrNull()?.trans?.toString()?.split(separator)
-                        ?: return@onSuccess
+                    response.translatedText.split(separator)
 
                 // Map translated texts back to ParagraphBoxes
                 val translatedBoxes = paragraphs.zip(translatedTexts) { box, translatedText ->
