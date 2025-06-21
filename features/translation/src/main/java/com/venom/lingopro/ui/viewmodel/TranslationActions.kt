@@ -1,8 +1,10 @@
 package com.venom.lingopro.ui.viewmodel
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.input.TextFieldValue
 import com.venom.data.model.TranslationProvider
 
+@Immutable
 data class TranslationActions(
     val onTextChange: (TextFieldValue) -> Unit,
     val onClearText: () -> Unit,
