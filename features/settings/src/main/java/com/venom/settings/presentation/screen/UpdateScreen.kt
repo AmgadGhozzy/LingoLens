@@ -114,7 +114,7 @@ fun UpdateButtons(state: UpdateState, onDismiss: () -> Unit) {
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f)
             ) {
-                Text(text = stringResource(R.string.close))
+                Text(text = stringResource(R.string.action_close))
             }
         }
 
