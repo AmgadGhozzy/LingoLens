@@ -8,22 +8,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.TranslationEntry
+import com.venom.data.model.TranslationEntity
 import com.venom.ui.screen.history.TransHistoryItemView
 
 @Composable
 fun TransBookmarkList(
-    items: List<TranslationEntry>,
+    items: List<TranslationEntity>,
     searchQuery: String,
-    onItemRemove: (TranslationEntry) -> Unit,
-    onToggleBookmark: (TranslationEntry) -> Unit,
-    onShareClick: (TranslationEntry) -> Unit,
-    onCopyClick: (TranslationEntry) -> Unit,
-    onItemClick: ((TranslationEntry) -> Unit)
+    onItemRemove: (TranslationEntity) -> Unit,
+    onToggleBookmark: (TranslationEntity) -> Unit,
+    onShareClick: (TranslationEntity) -> Unit,
+    onCopyClick: (TranslationEntity) -> Unit,
+    onItemClick: ((TranslationEntity) -> Unit)
 ) {
     val filteredItems = items.filter { item ->
         searchQuery.isEmpty() || listOf(
-            item.sourceText, item.translatedText, item.sourceLangCode, item.targetLangCode
+            item.sourceText, item.translatedText, item.sourceLang, item.targetLang
         ).any { it.contains(searchQuery, ignoreCase = true) }
     }
 
