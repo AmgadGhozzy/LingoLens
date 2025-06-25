@@ -21,11 +21,12 @@ sealed class Screen(val route: String) {
         fun createRoute(word: String) = "sentence/$word"
     }
     object Dictionary : Screen("dictionary")
-    object History : Screen("history")
+    object History : Screen("history/{contentType}") {
+        fun createRoute(contentType: String) = "history/$contentType"
+    }
     object Bookmarks : Screen("bookmarks")
     object Onboarding : Screen("onboarding")
 
-    // Quiz screens
     sealed class Quiz(route: String) : Screen(route) {
         object MainLevel : Quiz("quiz/main")
         object LevelTest : Quiz("quiz/test/{level}")
@@ -46,7 +47,7 @@ sealed class Screen(val route: String) {
                 route.startsWith("quiz/test") -> Quiz.LevelTest
                 route == "phrases" -> Phrases
                 route == "dictionary" -> Dictionary
-                route == "history" -> History
+                route.startsWith("history") -> History
                 route == "bookmarks" -> Bookmarks
                 route == "onboarding" -> Onboarding
                 else -> Translation
