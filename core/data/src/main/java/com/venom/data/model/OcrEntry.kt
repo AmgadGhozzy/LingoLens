@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.venom.data.local.typeconverter.OcrResponseConverter
+import com.venom.data.local.converters.OcrResponseConverter
 import com.venom.domain.model.IHistoryEntry
 
 @Entity(tableName = "ocr_history")
