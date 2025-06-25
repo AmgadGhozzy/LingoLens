@@ -3,7 +3,14 @@ package com.venom.di
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.venom.data.BuildConfig
-import com.venom.data.api.*
+import com.venom.data.api.ChatGPTService
+import com.venom.data.api.DeepSeekService
+import com.venom.data.api.GeminiService
+import com.venom.data.api.GithubApi
+import com.venom.data.api.GoogleTranslateService
+import com.venom.data.api.GroqService
+import com.venom.data.api.HuggingFaceService
+import com.venom.data.api.OcrService
 import com.venom.data.repo.UpdateChecker
 import dagger.Module
 import dagger.Provides
@@ -87,13 +94,13 @@ object NetworkModule {
     @Singleton
     @Named("TranslationRetrofit")
     fun provideTranslationRetrofit(@Named("RegularOkHttpClient") client: OkHttpClient): Retrofit {
-        return createRetrofit(TranslationService.BASE_URL, client)
+        return createRetrofit(GoogleTranslateService.BASE_URL, client)
     }
 
     @Provides
     @Singleton
-    fun provideTranslationService(@Named("TranslationRetrofit") retrofit: Retrofit): TranslationService {
-        return retrofit.create(TranslationService::class.java)
+    fun provideTranslationService(@Named("TranslationRetrofit") retrofit: Retrofit): GoogleTranslateService {
+        return retrofit.create(GoogleTranslateService::class.java)
     }
 
     // AI services
