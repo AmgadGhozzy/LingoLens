@@ -16,6 +16,8 @@ import com.venom.stackcard.ui.screen.quiz.QuizScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
+import com.venom.ui.screen.BookmarkHistoryScreen
+import com.venom.ui.screen.ContentType
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.screen.SentenceScreen
 import com.venom.ui.viewmodel.TranslateViewModel
@@ -30,9 +32,9 @@ fun NavigationGraph(
     fileSelector: () -> Unit,
 ) {
     AnimatedNavHost(
-        navController = navController, startDestination = Screen.Translation.route
+        navController = navController,
+        startDestination = Screen.Translation.route
     ) {
-        // Translation Screen with optional text parameter
         composable(
             route = "${Screen.Translation.route}?${Screen.Translation.ARG_TEXT}={${Screen.Translation.ARG_TEXT}}",
             arguments = listOf(
@@ -59,23 +61,25 @@ fun NavigationGraph(
             )
         }
 
-        // Stack Card Screen with optional level parameter
-        composable(route = Screen.StackCard.route, arguments = listOf(navArgument("level") {
-            type = NavType.StringType
-            nullable = true
-            defaultValue = null
-        })) { backStackEntry ->
+        composable(
+            route = Screen.StackCard.route,
+            arguments = listOf(navArgument("level") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
             val level = backStackEntry.arguments?.getString("level")?.let { levelId ->
                 WordLevels.values().find { it.id == levelId }
             }
-            CardScreen(initialLevel = level,
+            CardScreen(
+                initialLevel = level,
                 onNavigateToSentence = { text ->
                     navController.navigate(Screen.Sentence.createRoute(text))
                 }
             )
         }
 
-        // OCR Screen
         composable(Screen.Ocr.route) {
             OcrScreen(
                 viewModel = ocrViewModel,
@@ -89,10 +93,13 @@ fun NavigationGraph(
         }
 
         composable(Screen.Onboarding.route) {
-            OnboardingScreens(onGetStarted = { navController.navigate(Screen.Translation.createRoute()) })
+            OnboardingScreens(
+                onGetStarted = {
+                    navController.navigate(Screen.Translation.createRoute())
+                }
+            )
         }
 
-        // Phrasebook Screen
         composable(Screen.Phrases.route) {
             PhrasebookScreen()
         }
@@ -102,39 +109,57 @@ fun NavigationGraph(
             arguments = listOf(navArgument("word") {
                 type = NavType.StringType
                 nullable = true
-            }
-            )
+            })
         ) { backStackEntry ->
             val word = backStackEntry.arguments?.getString("word")
             SentenceScreen(
                 word = word,
-                onNavigateBack = { navController.popBackStack() })
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
-        // Dialog Screen
         composable(Screen.Dialog.route) {
             DialogScreen()
         }
 
-        // Quiz screens
-        composable(Screen.Quiz.MainLevel.route) {
-            MainLevelScreen(onNavigateToTest = { level ->
-                navController.navigate(Screen.Quiz.createRoute(level))
-            }, onNavigateToLearn = { level ->
-                navController.navigate(Screen.StackCard.createRoute(level))
+        composable(
+            route = Screen.History.route,
+            arguments = listOf(navArgument("contentType") {
+                type = NavType.StringType
             })
+        ) { backStackEntry ->
+            val contentTypeString = backStackEntry.arguments?.getString("contentType") ?: "TRANSLATION"
+            val contentType = ContentType.valueOf(contentTypeString)
+            BookmarkHistoryScreen(
+                contentType = contentType,
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
-        // Quiz level test
-        composable(route = Screen.Quiz.LevelTest.route, arguments = listOf(navArgument("level") {
-            type = NavType.StringType
-        })) { backStackEntry ->
+        composable(Screen.Quiz.MainLevel.route) {
+            MainLevelScreen(
+                onNavigateToTest = { level ->
+                    navController.navigate(Screen.Quiz.createRoute(level))
+                },
+                onNavigateToLearn = { level ->
+                    navController.navigate(Screen.StackCard.createRoute(level))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.Quiz.LevelTest.route,
+            arguments = listOf(navArgument("level") {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
             val level = WordLevels.values().find {
                 it.id == backStackEntry.arguments?.getString("level")
             } ?: WordLevels.Beginner
 
             QuizScreen(
-                level = level, onComplete = { passed, nextLevel ->
+                level = level,
+                onComplete = { passed, nextLevel ->
                     if (passed && nextLevel != null) {
                         navController.navigate(Screen.StackCard.createRoute(level)) {
                             popUpTo(Screen.Quiz.MainLevel.route)
