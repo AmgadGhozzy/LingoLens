@@ -9,8 +9,7 @@ enum class NavigationItems(
     val titleRes: Int,
     val showInBottomBar: Boolean = true
 ) {
-    ONBOARDING(Screen.Onboarding, R.drawable.icon_dialogs_activated, R.string
-        .onboarding_page1_title, true),
+    ONBOARDING(Screen.Onboarding, R.drawable.icon_dialogs_activated, R.string.onboarding_page1_title, true),
     DIALOG(Screen.Dialog, R.drawable.icon_dialogs_activated, R.string.dialog_title, false),
     PHRASE(Screen.Phrases, R.drawable.icon_dialog, R.string.phrase_title),
     QUIZ(Screen.Quiz.MainLevel, R.drawable.quiz_logo, R.string.quiz_title),
