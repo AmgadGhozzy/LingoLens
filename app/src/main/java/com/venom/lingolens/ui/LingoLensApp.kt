@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,13 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import com.venom.data.model.TranslationProvider
 import com.venom.lingolens.navigation.AppState
 import com.venom.lingolens.navigation.NavigationGraph
-import com.venom.phrase.ui.screen.PhrasesDialog
 import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.settings.presentation.screen.SettingsBottomSheet
-import com.venom.stackcard.ui.screen.WordBookmarksDialog
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
-import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.ui.screen.ContentType
 import com.venom.ui.viewmodel.TranslateViewModel
 
@@ -59,24 +58,13 @@ private fun LingoLensAppContent(
     imageSelector: () -> Unit,
     fileSelector: () -> Unit,
 ) {
-    BackHandler(enabled = appState.showBookmarkHistory || appState.showSettings) {
+    BackHandler(enabled = appState.showSettings || appState.showAbout) {
         appState.handleBackPress()
     }
 
     val translationUiState by translateViewModel.uiState.collectAsStateWithLifecycle()
 
     when {
-        appState.showBookmarkHistory -> {
-            BookmarkHistoryDialog(
-                currentScreen = appState.currentScreen,
-                onDismiss = {
-                    appState.showBookmarkHistory = false
-                    appState.navigateToScreen(appState.currentScreen)
-                }
-            )
-            return
-        }
-
         appState.showSettings -> {
             SettingsBottomSheet(
                 onDismiss = { appState.showSettings = false }
@@ -90,38 +78,50 @@ private fun LingoLensAppContent(
         }
     }
 
-    Scaffold(
-        topBar = {
-            if (appState.shouldShowTopBar) {
+    if (appState.shouldShowTopBar) {
+        Scaffold(
+            topBar = {
                 LingoLensTopBar(
                     currentScreen = appState.currentScreen,
                     onNavigateBack = { appState.navController.popBackStack() },
-                    onBookmarkClick = { appState.showBookmarkHistory = true },
+                    onBookmarkClick = {
+                        appState.navigateToHistory(appState.currentScreen.toContentType().name)
+                    },
                     onSettingsClick = { appState.showSettings = true },
                     onAboutClick = { appState.showAbout = true },
-
                     showProviderSelector = appState.currentScreen == Screen.Translation,
                     selectedProvider = translationUiState.selectedProvider,
                     availableProviders = if (appState.currentScreen == Screen.Translation) TranslationProvider.ALL else emptyList(),
                     onProviderSelected = translateViewModel::updateProvider
                 )
+            },
+            bottomBar = {
+                if (appState.shouldShowBottomBar) {
+                    LingoLensBottomBar(
+                        navController = appState.navController,
+                        currentScreen = appState.currentScreen,
+                        onScreenSelected = appState::navigateToScreen
+                    )
+                }
             }
-        },
-        bottomBar = {
-            if (appState.shouldShowBottomBar) {
-                LingoLensBottomBar(
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                NavigationGraph(
                     navController = appState.navController,
-                    currentScreen = appState.currentScreen,
-                    onScreenSelected = appState::navigateToScreen
+                    ocrViewModel = ocrViewModel,
+                    translateViewModel = translateViewModel,
+                    startCamera = startCamera,
+                    imageSelector = imageSelector,
+                    fileSelector = fileSelector
                 )
             }
         }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
             NavigationGraph(
                 navController = appState.navController,
                 ocrViewModel = ocrViewModel,
@@ -131,32 +131,6 @@ private fun LingoLensAppContent(
                 fileSelector = fileSelector
             )
         }
-    }
-}
-
-@Composable
-private fun BookmarkHistoryDialog(
-    currentScreen: Screen,
-    onDismiss: () -> Unit
-) {
-    when (currentScreen) {
-        Screen.Translation, Screen.Ocr -> {
-            BookmarkHistoryScreen(
-                onBackClick = onDismiss,
-                contentType = currentScreen.toContentType()
-            )
-        }
-
-        Screen.Phrases -> PhrasesDialog(
-            categoryId = -1,
-            onDismiss = onDismiss
-        )
-
-        Screen.StackCard -> WordBookmarksDialog(
-            onDismiss = onDismiss
-        )
-
-        else -> {}
     }
 }
 
