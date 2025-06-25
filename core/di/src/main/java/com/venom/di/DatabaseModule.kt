@@ -2,10 +2,10 @@ package com.venom.di
 
 import android.content.Context
 import androidx.room.Room
-import com.venom.data.local.OcrDatabase
-import com.venom.data.local.TranslationDatabase
 import com.venom.data.local.dao.OcrDao
 import com.venom.data.local.dao.TranslationDao
+import com.venom.data.local.database.OcrDatabase
+import com.venom.data.local.database.TranslationDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
