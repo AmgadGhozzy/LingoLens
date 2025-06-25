@@ -5,12 +5,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-<!--    <style name="SplashTheme" parent="Theme.SplashScreen">-->
-<!--        <item name="windowSplashScreenBackground">@color/white</item>-->
-<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>-->
-<!--        <item name="windowSplashScreenAnimationDuration">1000</item>-->
-<!--        <item name="postSplashScreenTheme">@style/Theme.LingoLens</item>-->
-<!--    </style>-->
+    <style name="SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@android:color/transparent</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.LingoLens</item>
+    </style>
 
     <style name="Theme.QuickTr" parent="Theme.LingoLens">
         <item name="android:backgroundDimEnabled">true</item><!-- background dimming -->

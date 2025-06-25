@@ -19,6 +19,7 @@
     <string name="action_speak_source">Speak Source Text</string>
     <string name="action_search">Search</string>
     <string name="action_expand">Expand</string>
+    <string name="action_dismiss">Dismiss</string>
     <string name="action_collapse">Collapse</string>
     <string name="action_clear_search">Clear Search</string>
     <string name="action_translate">Translate</string>
@@ -37,6 +38,11 @@
     <string name="action_clear_bookmarks">Clear All Bookmarks</string>
     <string name="copied_message">Copied!</string>
 
+    <!-- Snackbar Messages -->
+    <string name="failed_to_copy">Failed to copy text</string>
+    <string name="failed_to_share">Failed to share text</string>
+    <string name="text_pasted">Text pasted</string>
+    <string name="failed_to_paste">Failed to paste text</string>
 
     <!-- Navigation -->
     <string name="nav_back">Back</string> <!-- Duplicated entry, kept to avoid breaking code, consider removing one -->
@@ -166,7 +172,6 @@
     <string name="speech">Speech</string>
     <string name="about">About</string>
     <string name="open">Open</string>
-    <string name="close">Close</string>
     <string name="next">NEXT</string>
     <string name="continu">Continue</string>
     <string name="skip">Skip</string>
