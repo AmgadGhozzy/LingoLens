@@ -8,7 +8,6 @@ import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationProvider
 import com.venom.data.repo.SettingsRepository
 import com.venom.data.repo.TranslationRepository
-import com.venom.utils.Extensions.postprocessText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +54,8 @@ class SentenceCardViewModel @Inject constructor(
     fun translate(sentence: String) {
         // Skip if already translated this sentence or currently loading it
         if (lastTranslatedSentence == sentence ||
-            (_uiState.value.isLoading && lastTranslatedSentence == sentence)) {
+            (_uiState.value.isLoading && lastTranslatedSentence == sentence)
+        ) {
             return
         }
 
@@ -64,15 +64,17 @@ class SentenceCardViewModel @Inject constructor(
 
         translationJob?.cancel()
         translationJob = viewModelScope.launch {
-            repository.getTranslation(
-                query = sentence,
-                targetLanguage = _uiState.value.targetLanguage.code,
-                provider = _uiState.value.selectedProvider
+            repository.translate(
+                sourceText = sentence,
+                sourceLang = _uiState.value.sourceLanguage.code,
+                targetLang = _uiState.value.targetLanguage.code,
+                providerId = _uiState.value.selectedProvider.id,
+                forceRefresh = false
             )
                 .onSuccess { response ->
                     _uiState.update {
                         it.copy(
-                            translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText().orEmpty(),
+                            translatedText = response.translatedText,
                             isLoading = false
                         )
                     }
