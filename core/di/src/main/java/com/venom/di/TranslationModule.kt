@@ -3,9 +3,9 @@ package com.venom.di
 import com.venom.data.api.ChatGPTService
 import com.venom.data.api.DeepSeekService
 import com.venom.data.api.GeminiService
+import com.venom.data.api.GoogleTranslateService
 import com.venom.data.api.GroqService
 import com.venom.data.api.HuggingFaceService
-import com.venom.data.api.TranslationService
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.repo.OfflineTranslationOperations
 import com.venom.data.repo.OfflineTranslationRepository
@@ -27,7 +27,7 @@ object TranslationModule {
     @Provides
     @Singleton
     fun provideOnlineTranslationOperations(
-        translationService: TranslationService,
+        translationService: GoogleTranslateService,
         chatGPTService: ChatGPTService,
         geminiService: GeminiService,
         groqService: GroqService,
@@ -54,10 +54,12 @@ object TranslationModule {
     @Provides
     @Singleton
     fun provideTranslationRepository(
+        dao: TranslationDao,
         onlineTranslationOperations: OnlineTranslationOperations,
         offlineTranslationOperations: OfflineTranslationOperations,
         translationHistoryOperations: TranslationHistoryOperations
     ): TranslationRepository = TranslationRepository(
+        dao = dao,
         onlineTranslationOperations,
         offlineTranslationOperations,
         translationHistoryOperations
