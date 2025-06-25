@@ -1,11 +1,24 @@
 package com.venom.lingopro.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -14,8 +27,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslationActions
+import com.venom.resources.R
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
+import com.venom.ui.components.other.SnackbarHost
+import com.venom.ui.components.other.rememberContextAwareSnackbarController
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.screen.dictionary.DictionaryScreen
 import com.venom.ui.screen.dictionary.TranslationsCard
@@ -40,64 +56,76 @@ fun TranslationScreen(
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val snackbarController =
+        rememberContextAwareSnackbarController() // Updated to context-aware version
 
-    // Collect states
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val langSelectorState by langSelectorViewModel.state.collectAsStateWithLifecycle()
     val ttsState by ttsViewModel.uiState.collectAsStateWithLifecycle()
     val transcription by sttViewModel.transcription.collectAsStateWithLifecycle()
 
-    // Local UI state
     var sourceTextFieldValue by remember { mutableStateOf(TextFieldValue()) }
     val translatedTextFieldValue by remember { derivedStateOf { TextFieldValue(state.translatedText) } }
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
     var fullscreenState by remember { mutableStateOf<String?>(null) }
+    var initialTextHandled by remember { mutableStateOf(false) }
 
-    // Initialize with initial text or restored state
-    LaunchedEffect(Unit) {
-        val textToSet = initialText?.takeIf { it.isNotBlank() } ?: state.sourceText
-        if (textToSet.isNotBlank() && sourceTextFieldValue.text != textToSet) {
-            sourceTextFieldValue = TextFieldValue(textToSet)
-            // Always trigger translation for initial text
-            viewModel.onSourceTextChanged(textToSet)
+    LaunchedEffect(initialText, state.sourceText) {
+        if (initialText?.isNotBlank() == true && !initialTextHandled) {
+            sourceTextFieldValue = TextFieldValue(initialText)
+            viewModel.onSourceTextChanged(initialText)
+            initialTextHandled = true
+        } else if (initialText.isNullOrBlank() && !initialTextHandled) {
+            val savedText = state.sourceText
+            if (savedText.isNotBlank() && sourceTextFieldValue.text != savedText) {
+                sourceTextFieldValue = TextFieldValue(savedText)
+            }
+            initialTextHandled = true
         }
     }
 
-    // Sync languages when they change
     LaunchedEffect(langSelectorState.sourceLang, langSelectorState.targetLang) {
-        viewModel.updateLanguages(
-            langSelectorState.sourceLang,
-            langSelectorState.targetLang
-        )
+        viewModel.updateLanguages(langSelectorState.sourceLang, langSelectorState.targetLang)
     }
 
-    // Update text field when ViewModel state changes (e.g., from swap operation)
     LaunchedEffect(state.sourceText) {
         if (state.sourceText != sourceTextFieldValue.text) {
-            sourceTextFieldValue = TextFieldValue(
-                text = state.sourceText,
-                selection = sourceTextFieldValue.selection
-            )
+            val newSelection =
+                if (state.sourceText.length >= sourceTextFieldValue.selection.start) {
+                    sourceTextFieldValue.selection
+                } else {
+                    TextRange(state.sourceText.length)
+                }
+            sourceTextFieldValue = TextFieldValue(state.sourceText, newSelection)
         }
     }
 
-    // Handle speech-to-text result
     LaunchedEffect(transcription) {
-        if (transcription.isNotBlank() && !showSpeechToTextDialog) {
+        if (transcription.isNotBlank()) {
             sourceTextFieldValue = TextFieldValue(transcription)
             viewModel.onSourceTextChanged(transcription)
-            sttViewModel.stopRecognition()
+            if (showSpeechToTextDialog) {
+                showSpeechToTextDialog = false
+                sttViewModel.stopRecognition()
+            }
         }
     }
 
-    // Debug: Log state changes (remove in production)
-    LaunchedEffect(state.sourceText, state.translatedText, state.isLoading, state.error) {
-        println("TranslationScreen - Source: '${state.sourceText}', Translated: '${state.translatedText}', Loading: ${state.isLoading}, Error: ${state.error}")
+    LaunchedEffect(state.error) {
+        state.error?.let { error ->
+            snackbarController.error(
+                error,
+                R.string.action_retry
+            ) { // Now accepts R.string resource
+                viewModel.retryTranslation()
+                viewModel.clearError()
+            }
+            viewModel.clearError()
+        }
     }
 
-    // Create actions
-    val actions = remember(context, viewModel, ttsViewModel) {
+    val actions = remember(context, viewModel, ttsViewModel, snackbarController) {
         TranslationActions(
             onTextChange = { newValue ->
                 sourceTextFieldValue = newValue
@@ -107,18 +135,28 @@ fun TranslationScreen(
                 sourceTextFieldValue = TextFieldValue("")
                 viewModel.clearAll()
             },
-            onCopy = { text -> context.copyToClipboard(text) },
-            onShare = { text -> context.shareText(text) },
+            onCopy = { text ->
+                runCatching { context.copyToClipboard(text) }
+                    .onSuccess { snackbarController.success(R.string.action_copy) } // Now accepts R.string
+                    .onFailure { snackbarController.error(R.string.failed_to_copy) } // Now accepts R.string
+            },
+            onShare = { text ->
+                runCatching { context.shareText(text) }
+                    .onFailure { snackbarController.error(R.string.failed_to_share) } // Now accepts R.string
+            },
             onSpeak = ttsViewModel::speak,
             onBookmark = viewModel::toggleBookmark,
             onSpeechToText = { showSpeechToTextDialog = true },
             onPaste = {
-                context.pasteFromClipboard()?.let { text ->
-                    if (text.isNotBlank() && text != sourceTextFieldValue.text) {
-                        sourceTextFieldValue = TextFieldValue(text)
-                        viewModel.onSourceTextChanged(text)
+                runCatching {
+                    context.pasteFromClipboard()?.let { text ->
+                        if (text.isNotBlank()) {
+                            sourceTextFieldValue = TextFieldValue(text)
+                            viewModel.onSourceTextChanged(text)
+                            snackbarController.success(R.string.text_pasted) // Now accepts R.string
+                        }
                     }
-                }
+                }.onFailure { snackbarController.error(R.string.failed_to_paste) } // Now accepts R.string
             },
             onMoveUp = viewModel::moveUp,
             onOcr = onNavigateToOcr,
@@ -143,7 +181,6 @@ fun TranslationScreen(
                 isBookmarked = state.isBookmarked
             )
 
-            // Dictionary results
             if (state.dict.isNotEmpty()) {
                 TranslationsCard(
                     translations = state.dict,
@@ -163,18 +200,24 @@ fun TranslationScreen(
         }
     }
 
-    // Main content
-    if (isDialog) {
-        DraggableDialog(onDismissRequest = onDismiss) {
-            TranslationContent()
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (isDialog) {
+            DraggableDialog(
+                onDismissRequest = {
+                    sttViewModel.stopRecognition()
+                    ttsViewModel.stopSpeaking()
+                    onDismiss()
+                }
+            ) {
+                TranslationContent()
+            }
+        } else {
+            TranslationContent(modifier = Modifier.padding(8.dp))
         }
-    } else {
-        TranslationContent(
-            modifier = Modifier.padding(8.dp)
-        )
+
+        SnackbarHost(snackbarController) // Updated to work with context-aware controller
     }
 
-    // Dictionary dialog
     if (showDictionaryDialog && state.translationResult != null) {
         Dialog(
             onDismissRequest = { showDictionaryDialog = false },
@@ -200,7 +243,6 @@ fun TranslationScreen(
         }
     }
 
-    // Speech-to-text dialog
     if (showSpeechToTextDialog) {
         SpeechToTextDialog(
             sttViewModel = sttViewModel,
@@ -211,7 +253,6 @@ fun TranslationScreen(
         )
     }
 
-    // Fullscreen text dialog
     fullscreenState?.let { text ->
         FullscreenTextDialog(
             textValue = TextFieldValue(text),
@@ -220,5 +261,12 @@ fun TranslationScreen(
             onShare = actions.onShare,
             onSpeak = actions.onSpeak
         )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            sttViewModel.stopRecognition()
+            ttsViewModel.stopSpeaking()
+        }
     }
 }
