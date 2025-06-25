@@ -1,6 +1,7 @@
 package com.venom.ui.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.OcrEntry
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Immutable
 data class OcrBookmarkState(
     val items: List<OcrEntry> = emptyList(),
     val isLoading: Boolean = false,

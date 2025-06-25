@@ -1,5 +1,6 @@
 package com.venom.ui.viewmodel
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.LANGUAGES_LIST
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Immutable
 data class SettingsUiState(
     val themePrefs: ThemePreference = ThemePreference(),
     val appLanguage: LanguageItem = LANGUAGES_LIST[0],

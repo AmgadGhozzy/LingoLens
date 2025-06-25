@@ -1,15 +1,19 @@
 package com.venom.ui.viewmodel
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.NetworkResult
 import com.venom.data.model.SentenceResponse
 import com.venom.data.repo.SentenceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Immutable
 data class SentenceUiState(
     val isLoading: Boolean = false,
     val sentenceResponse: SentenceResponse? = null,

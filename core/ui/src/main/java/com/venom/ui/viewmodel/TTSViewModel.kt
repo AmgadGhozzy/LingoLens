@@ -3,6 +3,7 @@ package com.venom.ui.viewmodel
 import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.repo.SettingsRepository
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
+@Immutable
 data class TTSUiState(
     val isInitializing: Boolean = false,
     val isSpeaking: Boolean = false,
