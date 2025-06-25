@@ -11,7 +11,6 @@ class AppState(
     val navController: NavHostController
 ) {
     var currentBackStackEntry: NavBackStackEntry? by mutableStateOf(null)
-    var showBookmarkHistory by mutableStateOf(false)
     var showSettings by mutableStateOf(false)
     var showAbout by mutableStateOf(false)
 
@@ -24,34 +23,35 @@ class AppState(
     val shouldShowTopBar: Boolean
         get() = currentRoute != Screen.Quiz.LevelTest.route &&
                 currentRoute != Screen.Onboarding.route &&
-                currentRoute != Screen.Sentence.route
+                currentRoute != Screen.Sentence.route &&
+                currentRoute?.startsWith("history") != true
 
     val shouldShowBottomBar: Boolean
         get() = currentRoute != Screen.Ocr.route &&
                 currentRoute != Screen.Quiz.LevelTest.route &&
                 currentRoute != Screen.Onboarding.route &&
-                currentRoute != Screen.Sentence.route
+                currentRoute != Screen.Sentence.route &&
+                currentRoute?.startsWith("history") != true
 
     fun navigateToScreen(screen: Screen) {
         when (screen) {
             is Screen.Translation -> navController.navigate(screen.route) {
                 popUpTo(Screen.Translation.route) { inclusive = true }
             }
-
             else -> navController.navigate(screen.route) {
                 popUpTo(Screen.Translation.route)
             }
         }
     }
 
+    fun navigateToHistory(contentType: String) {
+        navController.navigate(Screen.History.createRoute(contentType))
+    }
+
     fun handleBackPress() {
         when {
             showSettings -> showSettings = false
-            showBookmarkHistory -> {
-                showBookmarkHistory = false
-                navigateToScreen(currentScreen)
-            }
-
+            showAbout -> showAbout = false
             else -> navController.popBackStack()
         }
     }
