@@ -1,19 +1,25 @@
 package com.venom.stackcard.ui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.venom.data.model.TranslationResponse
+import com.venom.domain.model.TranslationResult
 import com.venom.stackcard.data.model.WordEntity
 import com.venom.ui.components.common.DynamicStyledText
 import com.venom.ui.components.common.ExpandableCard
-import com.venom.ui.screen.dictionary.TranslationEntry
+import com.venom.ui.screen.dictionary.TranslationEntryComponent
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
@@ -31,12 +37,12 @@ fun BookmarkWordItem(
     val state by translateViewModel.uiState.collectAsStateWithLifecycle()
 
     val translations = remember(word.englishEn) {
-        mutableStateOf<TranslationResponse?>(null)
+        mutableStateOf<TranslationResult?>(null)
     }
 
     // Update the item translation state when the global state changes and this item is expanded
     LaunchedEffect(state.translationResult, expanded) {
-        if (expanded && state.translationResult != null && word.englishEn == state.sourceText) {
+        if (expanded && word.englishEn == state.sourceText) {
             translations.value = state.translationResult
         }
     }
@@ -76,7 +82,7 @@ fun BookmarkWordItem(
                 )
             } else {
                 translations.value?.dict?.forEach { entry ->
-                    TranslationEntry(
+                    TranslationEntryComponent(
                         entry = entry,
                         showAll = showAll,
                         onWordClick = {},

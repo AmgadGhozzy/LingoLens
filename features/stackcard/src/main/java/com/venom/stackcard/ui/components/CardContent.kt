@@ -26,7 +26,7 @@ fun CardContent(
 
     val translationText by remember(state.translationResult) {
         derivedStateOf {
-            state.translationResult.dict?.flatMap { it.terms }?.joinToString(", ")
+            state.translationResult?.dict?.flatMap { it.terms }?.joinToString(", ") ?: ""
         }
     }
 
