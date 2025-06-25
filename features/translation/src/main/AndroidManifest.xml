@@ -9,16 +9,21 @@
         <activity
             android:name=".QuickTrActivity"
             android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.QuickTr">
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.QuickTr"
+            android:taskAffinity=""
+            android:documentLaunchMode="always">
+
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
-                <category android:name="android.intent.category.Rounded" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.Rounded" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
