@@ -35,7 +35,6 @@ import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.venom.lingolens.ui.LingoLensApp
 import com.venom.resources.R
 import com.venom.settings.presentation.screen.UpdateScreen
-import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
@@ -53,25 +52,59 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    // ViewModels
     private val ocrViewModel: OcrViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val updateViewModel: UpdateViewModel by viewModels()
 
-    // UI State
     private val showUpdateDialog = mutableStateOf(false)
     private val showOnboarding = mutableStateOf(false)
 
-    // Camera and file handling
     private var currentPhotoUri: Uri? = null
+    private var pendingUriCallback: ((Uri?) -> Unit)? = null
     private lateinit var remoteConfig: FirebaseRemoteConfig
+
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        pendingUriCallback?.invoke(uri)
+        pendingUriCallback = null
+    }
+
+    private val documentLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            contentResolver.takePersistableUriPermission(
+                uri,
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }
+        pendingUriCallback?.invoke(uri)
+        pendingUriCallback = null
+    }
+
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        val resultUri = if (success) currentPhotoUri else null
+        pendingUriCallback?.invoke(resultUri)
+        pendingUriCallback = null
+        currentPhotoUri = null
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (!isGranted) {
+            showToast("Notification permission denied. Your app will not show notifications.")
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Check if we should show onboarding
         showOnboarding.value = intent.getBooleanExtra("show_onboarding", false)
 
         setupPermissions()
@@ -95,19 +128,15 @@ class MainActivity : ComponentActivity() {
             ) {
                 if (shouldShowOnboarding.value) {
                     OnboardingScreens(
-                        onGetStarted = {
-                            shouldShowOnboarding.value = false
-                        },
-                        onSkip = {
-                            shouldShowOnboarding.value = false
-                        }
+                        onGetStarted = { shouldShowOnboarding.value = false },
+                        onSkip = { shouldShowOnboarding.value = false }
                     )
                 } else {
                     LingoLensApp(
                         ocrViewModel = ocrViewModel,
-                        startCamera = { startCamera() },
-                        imageSelector = { selectImageFromGallery() },
-                        fileSelector = { selectDocumentFromFileManager() }
+                        startCamera = ::startCamera,
+                        imageSelector = ::selectImageFromGallery,
+                        fileSelector = ::selectDocumentFromFileManager
                     )
                 }
 
@@ -146,6 +175,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun selectImageFromGallery(callback: (Uri?) -> Unit) {
+        pendingUriCallback = callback
+        galleryLauncher.launch("image/*")
+    }
+
+    private fun selectDocumentFromFileManager(callback: (Uri?) -> Unit) {
+        pendingUriCallback = callback
+        documentLauncher.launch(arrayOf("image/*", "application/pdf"))
+    }
+
+    private fun startCamera(callback: (Uri?) -> Unit) {
+        pendingUriCallback = callback
+        val photoFile = createImageCacheFile()
+        val photoUri = FileProvider.getUriForFile(
+            this, "${packageName}.provider", photoFile
+        )
+        currentPhotoUri = photoUri
+        cameraLauncher.launch(photoUri)
+    }
+
+    private fun createImageCacheFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("PHOTO_${timeStamp}_", ".jpg", storageDir).apply {
+            deleteOnExit()
+        }
+    }
+
     private fun setupPermissions() {
         askNotificationPermission()
     }
@@ -168,73 +225,6 @@ class MainActivity : ComponentActivity() {
         addConfigUpdateListener()
     }
 
-    // Image selection from gallery
-    private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
-        }
-    }
-
-    // Document selection from file manager
-    private val documentLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            // Request persistent permission to access the file
-            contentResolver.takePersistableUriPermission(
-                uri,
-                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-            ocrViewModel.processImage(FromUri(uri), processOcrAfter = true)
-        }
-    }
-
-    // Camera capture
-    private val cameraLauncher = registerForActivityResult(
-        ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            currentPhotoUri?.let { uri ->
-                ocrViewModel.processImage(FromUri(uri), processOcrAfter = false)
-            }
-        }
-    }
-
-    private fun selectImageFromGallery() {
-        galleryLauncher.launch("image/*")
-    }
-
-    private fun selectDocumentFromFileManager() {
-        documentLauncher.launch(arrayOf("image/*", "application/pdf"))
-    }
-
-    private fun startCamera() {
-        val photoFile = createImageCacheFile()
-        val photoUri = FileProvider.getUriForFile(
-            this, "${packageName}.provider", photoFile
-        )
-        currentPhotoUri = photoUri
-        cameraLauncher.launch(photoUri)
-    }
-
-    private fun createImageCacheFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile("PHOTO_${timeStamp}_", ".jpg", storageDir).apply {
-            deleteOnExit()
-        }
-    }
-
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (!isGranted) {
-            showToast("Notification permission denied. Your app will not show notifications.")
-        }
-    }
-
     private fun runtimeEnableAutoInit() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -252,7 +242,6 @@ class MainActivity : ComponentActivity() {
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    // Permission already granted
                 }
 
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
