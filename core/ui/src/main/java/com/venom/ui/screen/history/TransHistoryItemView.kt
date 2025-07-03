@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.TranslationEntity
 import com.venom.resources.R
 import com.venom.ui.components.buttons.ExpandIndicator
@@ -68,9 +69,13 @@ private fun TranslationContent(
     isExpanded: Boolean,
     modifier: Modifier = Modifier
 ) {
+
+    val sourceLanguage = LANGUAGES_LIST.find { it.code == entry.sourceLang }
+    val targetLanguage = LANGUAGES_LIST.find { it.code == entry.targetLang }
+
     Column(modifier = modifier) {
         LangHistorySection(
-            languageName = entry.sourceLang,
+            languageName = sourceLanguage?.englishName ?: entry.sourceLang,
             languageCode = entry.sourceLang,
             text = entry.sourceText,
             isExpanded = isExpanded,
@@ -84,14 +89,14 @@ private fun TranslationContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         LangHistorySection(
-            languageName = entry.targetLang,
+            languageName = targetLanguage?.englishName ?: entry.targetLang,
             languageCode = entry.targetLang,
             text = entry.translatedText,
             isExpanded = isExpanded,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
         )
 
-        if (!entry.synonyms.isNullOrEmpty()) {
+        if (entry.synonyms.isNotEmpty()) {
             ExpandIndicator(
                 expanded = isExpanded,
                 onClick = onExpandClick,
@@ -102,7 +107,7 @@ private fun TranslationContent(
                 enter = fadeIn(tween(400)) + expandVertically(tween(400)),
                 exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
             ) {
-                SynonymsSection(synonyms = entry.synonyms!!)
+                SynonymsSection(synonyms = entry.synonyms)
             }
 
         }
