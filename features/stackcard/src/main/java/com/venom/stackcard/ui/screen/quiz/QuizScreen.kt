@@ -1,18 +1,16 @@
 package com.venom.stackcard.ui.screen.quiz
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.domain.model.QuizTestState
 import com.venom.domain.model.WordLevels
 import com.venom.stackcard.ui.viewmodel.QuizViewModel
+import com.venom.utils.SoundManager
 
 @Composable
 fun QuizScreen(
@@ -27,32 +25,42 @@ fun QuizScreen(
         viewModel.startQuiz(level)
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
-                        MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    ),
-                    center = Offset(0.5f, 0.2f),
-                    radius = 1200f
-                )
-            )
-    ) {
-        when {
-            state.isLoading -> LoadingContent()
-            state.error != null -> ErrorContent(onRetry = { viewModel.startQuiz(level) })
-            else -> QuizContent(
-                state = state,
-                onOptionSelected = viewModel::selectOption,
-                onNext = viewModel::onNextQuestion,
-                onComplete = onComplete,
-                onNavigateToLearn = onNavigateToLearn,
-                onRetry = { viewModel.startQuiz(level) }
-            )
-        }
+    // Initialize sound manager
+    val context = LocalContext.current
+    val soundManager = remember { SoundManager(context) }
+
+    // Define local onRetry function
+    val onRetry: (WordLevels) -> Unit = { levelToRetry ->
+        viewModel.startQuiz(levelToRetry)
+    }
+
+    // Use state machine pattern for navigation between different quiz states
+    when (val testState = state.testState) {
+        is QuizTestState.InProgress -> QuizInProgress(
+            state = state,
+            testState = testState,
+            onOptionSelected = { option ->
+                viewModel.selectOption(option)
+                // Play sound based on correctness
+                if (option == state.currentWord?.arabicAr) {
+                    soundManager.playSound("right_answer")
+                } else {
+                    soundManager.playSound("wrong_answer")
+                }
+            },
+            onNext = {
+                viewModel.onNextQuestion()
+            },
+            onComplete = onComplete
+        )
+
+        is QuizTestState.Completed -> QuizCompleted(
+            testState = testState,
+            onComplete = onComplete,
+            onRetry = { onRetry(state.currentLevel) },
+            onLearnClick = { onNavigateToLearn(state.currentLevel) }
+        )
+
+        else -> Unit
     }
 }
