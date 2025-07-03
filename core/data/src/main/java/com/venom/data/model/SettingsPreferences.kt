@@ -28,7 +28,7 @@ data class ThemePreference(
     val isAmoledBlack: Boolean = false,
     val colorStyle: PaletteStyle = PaletteStyle.Neutral,
     val fontFamily: FontStyles = FontStyles.Default,
-    val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF00B8FF)
+    val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF76D1FF)
 )
 
 @Serializable
