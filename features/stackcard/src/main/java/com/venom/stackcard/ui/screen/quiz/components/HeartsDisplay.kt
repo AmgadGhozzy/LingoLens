@@ -1,8 +1,8 @@
 package com.venom.stackcard.ui.screen.quiz.components
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -10,48 +10,70 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.venom.resources.R
+import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
+import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors.HeartBackground
+import kotlinx.coroutines.delay
 
 @Composable
-fun HeartsDisplay(hearts: Int, showAnimation: Boolean) {
-    val scale by animateFloatAsState(
-        targetValue = if (showAnimation) 1.4f else 1f,
-        animationSpec = spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessHigh)
-    )
-
+fun HeartsDisplay(
+    hearts: Int
+) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFFE91E63).copy(alpha = 0.1f))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(HeartBackground.copy(alpha = 0.2f))
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val scale = remember { Animatable(1f) }
+        LaunchedEffect(key1 = true) {
+            scale.animateTo(
+                targetValue = 1.5f,
+                animationSpec = tween(200, easing = FastOutSlowInEasing)
+            )
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(200, easing = FastOutSlowInEasing)
+            )
+            delay(200)
+            scale.animateTo(
+                targetValue = 1.2f,
+                animationSpec = tween(200, easing = FastOutSlowInEasing)
+            )
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(200, easing = FastOutSlowInEasing)
+            )
+        }
+
         Icon(
-            imageVector = Icons.Rounded.Favorite,
-            contentDescription = "Hearts",
-            tint = Color(0xFFE91E63),
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = stringResource(R.string.hearts_description),
+            tint = ThemeColors.HeartIcon,
             modifier = Modifier
-                .size(20.dp)
-                .scale(scale)
+                .size(16.dp)
+                .scale(scale.value)
         )
+
         Text(
             text = hearts.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFE91E63)
+            color = ThemeColors.HeartIcon,
+            fontWeight = FontWeight.Medium
         )
     }
 }
