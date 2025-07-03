@@ -1,5 +1,6 @@
 package com.venom.lingolens.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -21,15 +22,16 @@ import com.venom.ui.screen.ContentType
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.screen.SentenceScreen
 import com.venom.ui.viewmodel.TranslateViewModel
+import com.venom.wordcraftai.presentation.ui.screens.WordCraftScreen
 
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
     translateViewModel: TranslateViewModel,
     ocrViewModel: OcrViewModel,
-    startCamera: () -> Unit,
-    imageSelector: () -> Unit,
-    fileSelector: () -> Unit,
+    startCamera: ((Uri?) -> Unit) -> Unit,
+    imageSelector: ((Uri?) -> Unit) -> Unit,
+    fileSelector: ((Uri?) -> Unit) -> Unit,
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -171,6 +173,12 @@ fun NavigationGraph(
                 onNavigateToLearn = { level ->
                     navController.navigate(Screen.StackCard.createRoute(level))
                 }
+            )
+        }
+
+        composable(Screen.WordCraft.route) {
+            WordCraftScreen(
+                onImageSelect = imageSelector
             )
         }
     }
