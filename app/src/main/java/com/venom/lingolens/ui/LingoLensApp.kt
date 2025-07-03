@@ -1,14 +1,20 @@
 package com.venom.lingolens.ui
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -26,9 +32,9 @@ import com.venom.ui.viewmodel.TranslateViewModel
 @Composable
 fun LingoLensApp(
     ocrViewModel: OcrViewModel,
-    startCamera: () -> Unit,
-    imageSelector: () -> Unit,
-    fileSelector: () -> Unit,
+    startCamera: ((Uri?) -> Unit) -> Unit,
+    imageSelector: ((Uri?) -> Unit) -> Unit,
+    fileSelector: ((Uri?) -> Unit) -> Unit,
 ) {
     val navController = rememberNavController()
     val appState = remember(navController) {
@@ -54,9 +60,9 @@ private fun LingoLensAppContent(
     appState: AppState,
     ocrViewModel: OcrViewModel,
     translateViewModel: TranslateViewModel,
-    startCamera: () -> Unit,
-    imageSelector: () -> Unit,
-    fileSelector: () -> Unit,
+    startCamera: ((Uri?) -> Unit) -> Unit,
+    imageSelector: ((Uri?) -> Unit) -> Unit,
+    fileSelector: ((Uri?) -> Unit) -> Unit,
 ) {
     BackHandler(enabled = appState.showSettings || appState.showAbout) {
         appState.handleBackPress()
@@ -78,50 +84,14 @@ private fun LingoLensAppContent(
         }
     }
 
-    if (appState.shouldShowTopBar) {
-        Scaffold(
-            topBar = {
-                LingoLensTopBar(
-                    currentScreen = appState.currentScreen,
-                    onNavigateBack = { appState.navController.popBackStack() },
-                    onBookmarkClick = {
-                        appState.navigateToHistory(appState.currentScreen.toContentType().name)
-                    },
-                    onSettingsClick = { appState.showSettings = true },
-                    onAboutClick = { appState.showAbout = true },
-                    showProviderSelector = appState.currentScreen == Screen.Translation,
-                    selectedProvider = translationUiState.selectedProvider,
-                    availableProviders = if (appState.currentScreen == Screen.Translation) TranslationProvider.ALL else emptyList(),
-                    onProviderSelected = translateViewModel::updateProvider
-                )
-            },
-            bottomBar = {
-                if (appState.shouldShowBottomBar) {
-                    LingoLensBottomBar(
-                        navController = appState.navController,
-                        currentScreen = appState.currentScreen,
-                        onScreenSelected = appState::navigateToScreen
-                    )
-                }
-            }
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                NavigationGraph(
-                    navController = appState.navController,
-                    ocrViewModel = ocrViewModel,
-                    translateViewModel = translateViewModel,
-                    startCamera = startCamera,
-                    imageSelector = imageSelector,
-                    fileSelector = fileSelector
-                )
-            }
-        }
-    } else {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(vertical = if (appState.shouldShowTopBar) 72.dp else 0.dp)
+        ) {
             NavigationGraph(
                 navController = appState.navController,
                 ocrViewModel = ocrViewModel,
@@ -129,6 +99,34 @@ private fun LingoLensAppContent(
                 startCamera = startCamera,
                 imageSelector = imageSelector,
                 fileSelector = fileSelector
+            )
+        }
+
+        if (appState.shouldShowTopBar) {
+            LingoLensTopBar(
+                currentScreen = appState.currentScreen,
+                onNavigateBack = { appState.navController.popBackStack() },
+                onBookmarkClick = { appState.navigateToHistory(appState.currentScreen.toContentType().name) },
+                onSettingsClick = { appState.showSettings = true },
+                onAboutClick = { appState.showAbout = true },
+                showProviderSelector = appState.currentScreen == Screen.Translation,
+                selectedProvider = translationUiState.selectedProvider,
+                availableProviders = if (appState.currentScreen == Screen.Translation) TranslationProvider.ALL else emptyList(),
+                onProviderSelected = translateViewModel::updateProvider,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+            )
+        }
+
+        if (appState.shouldShowBottomBar) {
+            LingoLensBottomBar(
+                navController = appState.navController,
+                currentScreen = appState.currentScreen,
+                onScreenSelected = appState::navigateToScreen,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
             )
         }
     }
