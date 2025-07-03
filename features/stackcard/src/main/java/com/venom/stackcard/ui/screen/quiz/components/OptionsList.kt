@@ -3,7 +3,9 @@ package com.venom.stackcard.ui.screen.quiz.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.venom.resources.R
 
 @Composable
 fun OptionsList(
@@ -13,11 +15,18 @@ fun OptionsList(
     correctAnswer: String?,
     onOptionSelected: (String) -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        val optionLabels = arrayOf(
+            R.string.option_a,
+            R.string.option_b,
+            R.string.option_c,
+            R.string.option_d
+        )
+
         options.forEachIndexed { index, option ->
             OptionItem(
                 option = option,
-                label = ('A' + index).toString(),
+                label = stringResource(optionLabels[index.coerceIn(0, optionLabels.size - 1)]),
                 isSelected = option == selectedOption,
                 isCorrect = option == correctAnswer,
                 isAnswered = isAnswered,
