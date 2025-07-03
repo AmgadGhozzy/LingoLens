@@ -1,17 +1,28 @@
 package com.venom.textsnap.ui.screens
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.textsnap.ui.viewmodel.ImageInput.FromUri
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.common.CustomDragHandle
 import com.venom.ui.viewmodel.TTSViewModel
@@ -25,9 +36,9 @@ fun OcrScreen(
     viewModel: OcrViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel(),
     onNavigateToTranslation: (String) -> Unit,
-    onFileClick: () -> Unit,
-    onCameraClick: () -> Unit,
-    onGalleryClick: () -> Unit,
+    onFileClick: ((Uri?) -> Unit) -> Unit,
+    onCameraClick: ((Uri?) -> Unit) -> Unit,
+    onGalleryClick: ((Uri?) -> Unit) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -64,9 +75,21 @@ fun OcrScreen(
             OcrScreenContent(
                 viewModel = viewModel,
                 modifier = Modifier.padding(paddingValues),
-                onFileClick = onFileClick,
-                onCameraClick = onCameraClick,
-                onGalleryClick = onGalleryClick,
+                onFileClick = {
+                    onFileClick { uri ->
+                        uri?.let { viewModel.processImage(FromUri(it), processOcrAfter = true) }
+                    }
+                },
+                onCameraClick = {
+                    onCameraClick { uri ->
+                        uri?.let { viewModel.processImage(FromUri(it), processOcrAfter = false) }
+                    }
+                },
+                onGalleryClick = {
+                    onGalleryClick { uri ->
+                        uri?.let { viewModel.processImage(FromUri(it), processOcrAfter = true) }
+                    }
+                },
                 onRetry = viewModel::processOcr,
                 onToggleSelected = viewModel::toggleSelection,
                 onToggleLabels = viewModel::toggleLabels,
