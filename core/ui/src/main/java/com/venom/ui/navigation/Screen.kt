@@ -26,6 +26,8 @@ sealed class Screen(val route: String) {
     }
     object Bookmarks : Screen("bookmarks")
     object Onboarding : Screen("onboarding")
+    
+    object WordCraft : Screen("wordcraft")
 
     sealed class Quiz(route: String) : Screen(route) {
         object MainLevel : Quiz("quiz/main")
