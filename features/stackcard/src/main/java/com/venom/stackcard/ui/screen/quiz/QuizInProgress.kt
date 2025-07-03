@@ -7,6 +7,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +32,8 @@ import com.venom.stackcard.ui.screen.quiz.components.OptionsList
 import com.venom.stackcard.ui.screen.quiz.components.QuestionCard
 import com.venom.stackcard.ui.screen.quiz.components.QuizHeader
 import com.venom.stackcard.ui.screen.quiz.components.QuizHeaderData
+import com.venom.stackcard.ui.screen.quiz.components.StreakNotification
+import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
 import com.venom.stackcard.ui.viewmodel.QuizUiState
 import com.venom.utils.SoundManager
 import kotlinx.coroutines.delay
@@ -68,8 +71,9 @@ fun QuizInProgress(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(brush = ThemeColors.backgroundGradient)
                 .systemBarsPadding(),
-            contentPadding = PaddingValues(bottom = 100.dp, top = 48.dp),
+            contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
@@ -119,7 +123,7 @@ fun QuizInProgress(
             exit = slideOutVertically { it } + fadeOut(),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(16.dp)
+                .padding(32.dp)
         ) {
             NextButton(onClick = onNext)
         }
