@@ -27,6 +27,7 @@ include(":features:translation")
 include(":features:phrase")
 include(":features:dialog")
 include(":features:stackcard")
+include(":features:wordcraftai")
 include(":features:settings")
 include(":features:ocr")
 

@@ -45,10 +45,10 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:ui"))
     implementation(project(":core:resources"))
+    implementation(project(":core:di"))
 
     // Hilt
     api(libs.hilt.android)
-    implementation(project(":core:di"))
     kapt(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 

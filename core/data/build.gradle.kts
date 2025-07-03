@@ -12,12 +12,10 @@ plugins {
 }
 
 val versionFile = rootProject.file("version.properties")
-val localPropertiesFile = rootProject.file("local.properties")
 
 val localProperties = Properties()
 val versionProperties = Properties()
-
-localProperties.load(FileInputStream(localPropertiesFile))
+localProperties.load(FileInputStream(rootProject.file("local.properties")))
 versionProperties.load(FileInputStream(versionFile))
 
 
