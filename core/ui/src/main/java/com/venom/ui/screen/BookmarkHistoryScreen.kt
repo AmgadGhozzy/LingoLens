@@ -1,10 +1,22 @@
 package com.venom.ui.screen
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -18,9 +30,12 @@ import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.CustomSearchBar
-import com.venom.ui.components.lists.*
-import com.venom.ui.components.sections.*
-import com.venom.ui.viewmodel.*
+import com.venom.ui.components.lists.OcrBookmarkList
+import com.venom.ui.components.lists.TransBookmarkList
+import com.venom.ui.components.sections.CustomTabs
+import com.venom.ui.components.sections.TabItem
+import com.venom.ui.viewmodel.BookmarkOcrViewModel
+import com.venom.ui.viewmodel.BookmarkViewModel
 import com.venom.utils.Extensions.copyToClipboard
 import com.venom.utils.Extensions.shareText
 
@@ -64,22 +79,6 @@ fun BookmarkHistoryScreen(
             ContentType.OCR -> ocrViewModel.fetchItems(viewType)
             else -> {}
         }
-    }
-
-    if (showClearDialog) {
-        ConfirmationDialog(
-            title = stringResource(R.string.dialog_clear_all_title),
-            message = stringResource(R.string.dialog_clear_all_message),
-            onConfirm = {
-                when (contentType) {
-                    ContentType.TRANSLATION -> translationViewModel.clearAllItems()
-                    ContentType.OCR -> ocrViewModel.clearAllItems()
-                    else -> {}
-                }
-                showClearDialog = false
-            },
-            onDismiss = { showClearDialog = false }
-        )
     }
 
     Column(
@@ -152,6 +151,22 @@ fun BookmarkHistoryScreen(
 
             else -> {}
         }
+    }
+
+    if (showClearDialog) {
+        ConfirmationDialog(
+            title = stringResource(R.string.dialog_clear_all_title),
+            message = stringResource(R.string.dialog_clear_all_message),
+            onConfirm = {
+                when (contentType) {
+                    ContentType.TRANSLATION -> translationViewModel.clearAllItems()
+                    ContentType.OCR -> ocrViewModel.clearAllItems()
+                    else -> {}
+                }
+                showClearDialog = false
+            },
+            onDismiss = { showClearDialog = false }
+        )
     }
 }
 
