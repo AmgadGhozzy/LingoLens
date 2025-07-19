@@ -1,12 +1,16 @@
-
 package com.venom.data.model
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.venom.data.local.converters.StringListConverter
+import com.venom.data.local.converters.Converters
+import com.venom.domain.model.Definition
+import com.venom.domain.model.DictionaryEntry
+import com.venom.domain.model.DictionaryTerm
 import com.venom.domain.model.IHistoryEntry
+import com.venom.domain.model.Synset
+import com.venom.domain.model.TranslationSentence
 
 @Entity(
     tableName = "translations",
@@ -17,7 +21,7 @@ import com.venom.domain.model.IHistoryEntry
         Index("providerId")
     ]
 )
-@TypeConverters(StringListConverter::class)
+@TypeConverters(Converters::class)
 data class TranslationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
@@ -30,6 +34,14 @@ data class TranslationEntity(
     val synonyms: List<String> = emptyList(),
     val definitions: List<String> = emptyList(),
     val examples: List<String> = emptyList(),
+    val sentences: List<TranslationSentence> = emptyList(),
+    val dict: List<DictionaryEntry> = emptyList(),
+    val synsets: List<Synset> = emptyList(),
+    val definitionEntries: List<Definition> = emptyList(),
+    val terms: List<DictionaryTerm> = emptyList(),
+    val transliteration: String? = null,
+    val allExamples: List<String> = emptyList(),
+    val posTerms: Map<String, List<String>> = emptyMap(),
     val confidence: Double = 1.0,
     override val timestamp: Long = System.currentTimeMillis(),
     override val isBookmarked: Boolean = false
