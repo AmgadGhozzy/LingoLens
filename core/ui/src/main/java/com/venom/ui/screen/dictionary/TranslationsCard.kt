@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -31,10 +33,9 @@ fun TranslationsCard(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    CustomCard {
+    CustomCard(modifier = modifier) {
         Box(modifier = Modifier.padding(12.dp)) {
             Column(
-                modifier = modifier,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SectionHeader(
@@ -48,7 +49,8 @@ fun TranslationsCard(
                     }
                 )
 
-                translations.forEach { entry ->
+                val visibleTranslations = if (showAll) translations else translations.take(3)
+                visibleTranslations.forEach { entry ->
                     TranslationEntryComponent(
                         entry = entry,
                         showAll = showAll,
