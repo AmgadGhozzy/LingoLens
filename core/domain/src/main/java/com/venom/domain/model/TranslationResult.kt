@@ -2,11 +2,11 @@ package com.venom.domain.model
 
 data class TranslationResult(
     val id: Long = 0,
-    val sourceText: String,
-    val translatedText: String,
-    val sourceLang: String,
-    val targetLang: String,
-    val providerId: String,
+    val sourceText: String = "",
+    val translatedText: String = "",
+    val sourceLang: String = "",
+    val targetLang: String = "",
+    val providerId: String = "",
     val alternatives: List<String> = emptyList(),
     val synonyms: List<String> = emptyList(),
     val definitions: List<String> = emptyList(),
@@ -18,7 +18,11 @@ data class TranslationResult(
     val sentences: List<TranslationSentence> = emptyList(),
     val dict: List<DictionaryEntry> = emptyList(),
     val synsets: List<Synset> = emptyList(),
-    val definitionEntries: List<Definition> = emptyList()
+    val definitionEntries: List<Definition> = emptyList(),
+    val terms: List<DictionaryTerm> = emptyList(),
+    val transliteration: String? = null,
+    val allExamples: List<String> = emptyList(),
+    val posTerms: Map<String, List<String>> = emptyMap()
 )
 
 data class TranslationSentence(
