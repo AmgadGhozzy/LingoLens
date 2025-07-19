@@ -8,11 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DictionaryEntry
+import com.venom.resources.R
 import com.venom.ui.components.items.WordChip
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -40,7 +42,7 @@ fun TranslationEntryComponent(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val visibleTerms = if (showAll) entry.terms else entry.terms.take(10)
+            val visibleTerms = if (showAll) entry.terms else entry.terms.take(8)
             visibleTerms.forEach { term ->
                 WordChip(
                     word = term,
@@ -49,8 +51,12 @@ fun TranslationEntryComponent(
                 )
             }
 
-            if (entry.terms.size > 10) {
-                WordChip(word = "...", onClick = toggleShowAll)
+            if (entry.terms.size > 8) {
+                WordChip(
+                    word = if (showAll) stringResource(id = R.string.show_less)
+                    else stringResource(id = R.string.show_more),
+                    onClick = toggleShowAll
+                )
             }
         }
     }
