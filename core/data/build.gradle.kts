@@ -19,8 +19,8 @@ localProperties.load(FileInputStream(rootProject.file("local.properties")))
 versionProperties.load(FileInputStream(versionFile))
 
 
-val localVersionName = versionProperties.getProperty("VERSION_NAME")
-val localVersionCode = versionProperties.getProperty("VERSION_CODE")
+val localVersionName = versionProperties.getProperty("APP_VERSION_NAME")
+val localVersionCode = versionProperties.getProperty("APP_VERSION_CODE")
 
 android {
     namespace = "com.venom.data"
@@ -30,7 +30,7 @@ android {
         minSdk = 24
 
         buildConfigField("String", "APP_VERSION_NAME", "\"${localVersionName}\"")
-        buildConfigField("String", "VERSION_CODE", "\"${localVersionCode}\"")
+        buildConfigField("String", "APP_VERSION_CODE", "\"${localVersionCode}\"")
         buildConfigField("String", "OCR_API_KEY", localProperties.getProperty("OCR_API_KEY"))
         buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
         buildConfigField("String", "GEMINI_API_KEY", localProperties.getProperty("GEMINI_API_KEY"))

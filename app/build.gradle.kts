@@ -21,7 +21,7 @@ val versionProperties = Properties()
 localProperties.load(FileInputStream(rootProject.file("local.properties")))
 versionProperties.load(FileInputStream(versionFile))
 
-val localVersionCode = versionProperties.getProperty("VERSION_CODE").toInt()
+val localVersionCode = versionProperties.getProperty("APP_VERSION_CODE").toInt()
 
 android {
     namespace = "com.venom.lingolens"
@@ -62,7 +62,7 @@ android {
     gradle.startParameter.taskNames.forEach {
         if (it.contains(":app:assembleRelease")) {
             versionFile.bufferedWriter().use { file ->
-                file.write("VERSION_CODE=${(localVersionCode + 1)}")
+                file.write("APP_VERSION_CODE=${(localVersionCode + 1)}")
             }
         }
     }
