@@ -10,9 +10,11 @@ import androidx.compose.material.icons.automirrored.rounded.CompareArrows
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -66,13 +68,20 @@ fun SynonymsCard(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val synonyms = synset.entry.flatMap { it.synonym }.distinct()
-                        val visibleEntries = if (showAll) synonyms else synonyms.take(20)
-                        visibleEntries.forEach { synonym ->
-                            WordChip(word = synonym, onClick = { onWordClick(synonym) })
+                        val visibleSynonyms = if (showAll) synonyms else synonyms.take(15)
+                        visibleSynonyms.forEach { synonym ->
+                            WordChip(
+                                word = synonym,
+                                onClick = { onWordClick(synonym) }
+                            )
                         }
 
-                        if (synonyms.size > 20) {
-                            WordChip(word = "...", onClick = { showAll = !showAll })
+                        if (synonyms.size > 15) {
+                            WordChip(
+                                word = if (showAll) stringResource(id = R.string.show_less)
+                                else stringResource(id = R.string.show_more),
+                                onClick = { showAll = !showAll }
+                            )
                         }
                     }
                 }
