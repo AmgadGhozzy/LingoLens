@@ -1,8 +1,9 @@
 package com.venom.data.repo
 
+import android.util.Log
 import com.venom.data.local.dao.TranslationDao
 import com.venom.data.mapper.TranslateMapper
-import com.venom.data.model.*
+import com.venom.data.model.TranslationProvider
 import com.venom.domain.model.TranslationResult
 import com.venom.domain.repo.ITranslationRepository
 import kotlinx.coroutines.flow.Flow
@@ -47,21 +48,13 @@ class TranslationRepository @Inject constructor(
                 TranslationProvider.HUGGINGFACE.id -> onlineTranslationOperations.getHuggingFaceTranslation(sourceLang, targetLang, sourceText)
                 else -> throw Exception("Unknown provider: $providerId")
             }
-
-            // Create translation result
-            val translationResult = TranslateMapper.mapToTranslationResult(
-                sourceText = sourceText,
-                translatedText = response.translatedText,
-                sourceLang = sourceLang,
-                targetLang = targetLang,
-                providerId = providerId,
-            )
+            Log.d("TranslationRepository", "Translation result: $response")
 
             // Save to database
-            val entity = TranslateMapper.toEntity(translationResult)
+            val entity = TranslateMapper.toEntity(response)
             dao.insert(entity)
 
-            Result.success(TranslateMapper.fromEntity(entity))
+            Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
         }
