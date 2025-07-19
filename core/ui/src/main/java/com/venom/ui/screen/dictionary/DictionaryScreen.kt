@@ -1,11 +1,17 @@
 package com.venom.ui.screen.dictionary
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -15,7 +21,7 @@ import com.venom.ui.components.buttons.CustomButton
 
 @Composable
 fun DictionaryScreen(
-    translationResponse: TranslationResult,
+    translationResult: TranslationResult,
     modifier: Modifier = Modifier,
     onWordClick: (String) -> Unit = {},
     onSpeak: (String) -> Unit = {},
@@ -45,16 +51,19 @@ fun DictionaryScreen(
             )
         }
 
-        TranslationCard(
-            translationResponse = translationResponse,
-            onSpeak = onSpeak,
-            onCopy = onCopy,
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Translation Card - always shown if sentences exist
+        if (translationResult.sentences.isNotEmpty()) {
+            TranslationCard(
+                translationResponse = translationResult,
+                onSpeak = onSpeak,
+                onCopy = onCopy,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-        if (translationResponse.definitionEntries.isNotEmpty()) {
+        if (translationResult.definitionEntries.isNotEmpty()) {
             DefinitionsCard(
-                definitions = translationResponse.definitionEntries,
+                definitions = translationResult.definitionEntries,
                 onTextClick = onWordClick,
                 onSpeak = onSpeak,
                 onCopy = onCopy,
@@ -64,18 +73,18 @@ fun DictionaryScreen(
             )
         }
 
-        if (translationResponse.dict.isNotEmpty()) {
+        if (translationResult.dict.isNotEmpty()) {
             TranslationsCard(
-                translations = translationResponse.dict,
+                translations = translationResult.dict,
                 onWordClick = onWordClick,
                 onSpeak = onSpeak,
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        if (translationResponse.synsets.isNotEmpty()) {
+        if (translationResult.synsets.isNotEmpty()) {
             SynonymsCard(
-                synsets = translationResponse.synsets,
+                synsets = translationResult.synsets,
                 onWordClick = onWordClick,
                 modifier = Modifier.fillMaxWidth()
             )
