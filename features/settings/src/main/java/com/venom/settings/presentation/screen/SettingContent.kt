@@ -1,25 +1,45 @@
 package com.venom.settings.presentation.screen
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.DocumentScanner
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.venom.data.BuildConfig
 import com.venom.domain.model.SettingsDialog
 import com.venom.resources.R
-import com.venom.settings.presentation.components.*
+import com.venom.settings.presentation.components.ColorPreviewIcon
+import com.venom.settings.presentation.components.SettingsCard
+import com.venom.settings.presentation.components.SettingsIcon
+import com.venom.settings.presentation.components.SettingsItem
+import com.venom.settings.presentation.components.SettingsSliderItem
+import com.venom.settings.presentation.components.SettingsSwitchItem
+import com.venom.settings.presentation.components.UpdateBadge
 import com.venom.settings.presentation.components.dialogs.SettingsDialogController
 import com.venom.ui.components.common.SettingsScaffold
-import com.venom.ui.viewmodel.*
+import com.venom.ui.navigation.Screen
+import com.venom.ui.viewmodel.SettingsUiState
+import com.venom.ui.viewmodel.SettingsViewModel
 import com.venom.utils.PLAY_STORE
 import com.venom.utils.openUrl
 
 @Composable
 fun SettingsContent(
     viewModel: SettingsViewModel = hiltViewModel(),
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var dialogType by remember { mutableStateOf(SettingsDialog.None) }
@@ -28,7 +48,7 @@ fun SettingsContent(
         item { DisplaySettings(viewModel, uiState, onDialogTypeChange = { dialogType = it }) }
         item { LanguageSettings(uiState, onDialogTypeChange = { dialogType = it }) }
         item { SpeechSettings(uiState, viewModel) }
-        item { AboutSettings(onDialogTypeChange = { dialogType = it }) }
+        item { AboutSettings({ dialogType = it }, navController, onDismiss) }
     }
 
     SettingsDialogController(
@@ -74,7 +94,7 @@ private fun DisplaySettings(
             subtitle = uiState.themePrefs.fontFamily.name,
             leadingContent = { SettingsIcon(Icons.Rounded.DocumentScanner) },
             onClick = { onDialogTypeChange(SettingsDialog.SelectFont) },
-            badgeText = "New"
+            badgeText = stringResource(R.string.badge_new)
         )
         SettingsSwitchItem(
             title = R.string.amoled_black,
@@ -136,7 +156,9 @@ private fun SpeechSettings(
 
 @Composable
 private fun AboutSettings(
-    onDialogTypeChange: (SettingsDialog) -> Unit
+    onDialogTypeChange: (SettingsDialog) -> Unit,
+    navController: NavHostController,
+    onDismiss : () -> Unit
 ) {
     val context = LocalContext.current
     SettingsCard(title = R.string.about) {
@@ -151,8 +173,13 @@ private fun AboutSettings(
             onClick = { context.openUrl(PLAY_STORE) }
         )
         SettingsItem(
+            title = R.string.onboarding,
+            leadingContent = { SettingsIcon(Icons.AutoMirrored.Rounded.MenuBook) },
+            onClick = { navController.navigate(Screen.Onboarding.route); onDismiss() }
+        )
+        SettingsItem(
             title = R.string.app_version,
-            subtitle = BuildConfig.VERSION_CODE,
+            subtitle = BuildConfig.APP_VERSION_NAME+BuildConfig.APP_VERSION_CODE,
             leadingContent = { SettingsIcon(Icons.Rounded.Info) },
             trailingContent = { UpdateBadge(hasUpdate = true) },
             onClick = {}
