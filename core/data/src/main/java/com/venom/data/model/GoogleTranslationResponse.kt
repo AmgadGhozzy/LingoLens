@@ -15,8 +15,8 @@ data class GoogleTranslationResponse(
 )
 
 data class Sentence(
-    val trans: String,
-    val orig: String,
+    val trans: String? = null,
+    val orig: String? = null,
     val translit: String? = null,
     @SerializedName("src_translit")
     val srcTranslit: String? = null
