@@ -22,13 +22,14 @@ object TranslateMapper {
         val safeSourceText = sourceText?.takeIf { it.isNotBlank() } ?: ""
         val sentences = response.sentences?.map { sentence ->
             TranslationSentence(
-                original = sentence.orig.takeIf { it.isNotBlank() } ?: safeSourceText,
-                translated = sentence.trans,
+                original = sentence.orig?.takeIf { it.isNotBlank() } ?: safeSourceText,
+                translated = sentence.trans ?: "",
                 transliteration = sentence.translit
             )
         } ?: emptyList()
 
         val translatedText = response.sentences?.firstOrNull()?.trans ?: ""
+        val mainTransliteration = response.sentences?.firstOrNull()?.translit
 
         return TranslationResult(
             sourceText = safeSourceText,
@@ -45,31 +46,11 @@ object TranslateMapper {
             dict = mapDictionaryEntries(response.dict ?: emptyList()),
             synsets = mapSynsets(response.synsets ?: emptyList()),
             definitionEntries = mapDefinitions(response.definitions ?: emptyList()),
-        )
-    }
-
-    fun mapToTranslationResult(
-        sourceText: String,
-        translatedText: String,
-        sourceLang: String,
-        targetLang: String,
-        providerId: String,
-        confidence: Double = 1.0
-    ): TranslationResult {
-        return TranslationResult(
-            sourceText = sourceText,
-            translatedText = translatedText,
-            sourceLang = sourceLang,
-            targetLang = targetLang,
-            providerId = providerId,
-            confidence = confidence,
-            sentences = listOf(
-                TranslationSentence(
-                    original = sourceText,
-                    translated = translatedText,
-                    transliteration = null
-                )
-            )
+            // Extract new fields
+            terms = extractAllTerms(response.dict),
+            transliteration = mainTransliteration,
+            allExamples = extractAllExamples(response.examples),
+            posTerms = extractPosTerms(response.dict)
         )
     }
 
@@ -173,6 +154,35 @@ object TranslateMapper {
         } ?: emptyList()
     }
 
+    // New extraction methods
+
+    private fun extractAllTerms(dict: List<com.venom.data.model.DictionaryEntry>?): List<DictionaryTerm> {
+        return dict?.flatMap { entry ->
+            entry.entry.map { term ->
+                DictionaryTerm(
+                    word = term.word,
+                    reverseTranslation = term.reverseTranslation,
+                    score = term.score
+                )
+            }
+        } ?: emptyList()
+    }
+
+    private fun extractAllExamples(examples: Examples?): List<String> {
+        return examples?.example?.mapNotNull { example ->
+            example.text.takeIf { it.isNotBlank() }
+        } ?: emptyList()
+    }
+
+    private fun extractPosTerms(dict: List<com.venom.data.model.DictionaryEntry>?): Map<String, List<String>> {
+        return dict?.associate { entry ->
+            val pos = entry.pos
+            val terms = entry.terms
+            pos to terms
+        } ?: emptyMap()
+    }
+
+    // Updated entity mapping methods with all fields
     fun toEntity(result: TranslationResult): TranslationEntity {
         return TranslationEntity(
             id = result.id,
@@ -187,7 +197,15 @@ object TranslateMapper {
             examples = result.examples,
             confidence = result.confidence,
             timestamp = result.timestamp,
-            isBookmarked = result.isBookmarked
+            isBookmarked = result.isBookmarked,
+            sentences = result.sentences,
+            dict = result.dict,
+            synsets = result.synsets,
+            definitionEntries = result.definitionEntries,
+            terms = result.terms,
+            transliteration = result.transliteration,
+            allExamples = result.allExamples,
+            posTerms = result.posTerms
         )
     }
 
@@ -206,7 +224,15 @@ object TranslateMapper {
             confidence = entity.confidence,
             timestamp = entity.timestamp,
             isBookmarked = entity.isBookmarked,
-            isFromCache = true
+            isFromCache = true,
+            sentences = entity.sentences,
+            dict = entity.dict,
+            synsets = entity.synsets,
+            definitionEntries = entity.definitionEntries,
+            terms = entity.terms,
+            transliteration = entity.transliteration,
+            allExamples = entity.allExamples,
+            posTerms = entity.posTerms
         )
     }
 }
