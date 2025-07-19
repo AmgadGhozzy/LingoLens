@@ -9,7 +9,6 @@ import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationProvider
 import com.venom.data.repo.SettingsRepository
 import com.venom.data.repo.TranslationRepository
-import com.venom.domain.model.DictionaryEntry
 import com.venom.domain.model.TranslationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -32,11 +31,10 @@ data class TranslationUiState(
     val isLoading: Boolean = false,
     val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE,
     val error: String? = null,
-    val translationResult: TranslationResult? = null
+    val translationResult: TranslationResult = TranslationResult(),
 ) {
-    val translatedText: String get() = translationResult?.translatedText ?: ""
-    val isBookmarked: Boolean get() = translationResult?.isBookmarked == true
-    val dict: List<DictionaryEntry> get() = translationResult?.dict ?: emptyList()
+    val translatedText: String get() = translationResult.translatedText
+    val isBookmarked: Boolean get() = translationResult.isBookmarked
 }
 
 @OptIn(FlowPreview::class)
@@ -141,7 +139,8 @@ class TranslateViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 sourceText = trimmedText,
-                translationResult = if (trimmedText.isBlank()) null else state.translationResult,
+                translationResult = if (trimmedText.isBlank()) TranslationResult() else state
+                    .translationResult,
                 error = null
             )
         }
@@ -167,7 +166,7 @@ class TranslateViewModel @Inject constructor(
             state.copy(
                 sourceLanguage = source,
                 targetLanguage = target,
-                translationResult = null,
+                translationResult = TranslationResult(),
                 error = null
             )
         }
@@ -185,7 +184,7 @@ class TranslateViewModel @Inject constructor(
                 sourceLanguage = currentState.targetLanguage,
                 targetLanguage = currentState.sourceLanguage,
                 sourceText = currentState.translatedText,
-                translationResult = null,
+                translationResult = TranslationResult(),
                 error = null
             )
         }
@@ -202,7 +201,7 @@ class TranslateViewModel @Inject constructor(
             _uiState.update { state ->
                 state.copy(
                     sourceText = currentState.translatedText,
-                    translationResult = null,
+                    translationResult = TranslationResult(),
                     error = null
                 )
             }
@@ -211,7 +210,7 @@ class TranslateViewModel @Inject constructor(
     }
 
     fun toggleBookmark() {
-        val result = _uiState.value.translationResult ?: return
+        val result = _uiState.value.translationResult
         if (result.id == 0L) return
 
         val newBookmarkState = !result.isBookmarked
@@ -251,7 +250,7 @@ class TranslateViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 sourceText = "",
-                translationResult = null,
+                translationResult = TranslationResult(),
                 error = null
             )
         }
