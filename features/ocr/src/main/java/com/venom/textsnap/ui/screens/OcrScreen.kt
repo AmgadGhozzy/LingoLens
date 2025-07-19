@@ -98,7 +98,7 @@ fun OcrScreen(
             )
         },
         sheetContent = {
-            OcrBottomSheetContent(
+            OcrBottomSheet(
                 uiState = uiState,
                 maxHeight = maxHeight.dp,
                 peekHeight = peekHeight,
