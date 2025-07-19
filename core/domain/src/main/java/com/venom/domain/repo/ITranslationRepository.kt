@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ITranslationRepository {
     suspend fun translate(
-        text: String,
+        sourceText: String,
         sourceLang: String = "auto",
         targetLang: String = "ar",
         providerId: String,
