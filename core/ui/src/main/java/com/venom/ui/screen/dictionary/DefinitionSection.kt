@@ -1,8 +1,16 @@
 package com.venom.ui.screen.dictionary
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -46,7 +54,7 @@ fun DefinitionSection(
             )
         }
 
-        val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(5)
+        val visibleDefinitions = if (showAll) definition.entry else definition.entry.take(3)
         visibleDefinitions.forEach { entry ->
             DefinitionEntry(
                 entry = entry,
@@ -58,10 +66,10 @@ fun DefinitionSection(
             )
         }
 
-        if (definition.entry.size > 5) {
+        if (definition.entry.size > 3) {
             WordChip(
                 word = if (showAll) stringResource(id = R.string.show_less)
-                else stringResource(id = R.string.show_all),
+                else stringResource(id = R.string.show_more),
                 onClick = { showAll = !showAll }
             )
         }
