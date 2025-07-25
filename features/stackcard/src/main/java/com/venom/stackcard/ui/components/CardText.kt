@@ -8,14 +8,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.venom.ui.components.common.DynamicStyledText
 import com.venom.ui.components.common.PulseAnimation
+import com.venom.ui.components.other.TextChange
 
 @Composable
 fun CardText(
     text: String, translationText: String?, isLoading: Boolean, isFlipped: Boolean
 ) {
     Spacer(modifier = Modifier.height(32.dp))
-
-    DynamicStyledText(text = text, textAlign = TextAlign.Center, maxFontSize = 42, lineHeight = 48)
+    TextChange(text)
     if (isFlipped) {
         when {
             isLoading -> PulseAnimation(size = 32f)
