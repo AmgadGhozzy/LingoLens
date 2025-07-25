@@ -1,25 +1,65 @@
-package com.venom.stackcard.ui.components
+package com.venom.stackcard.ui.screen.quiz
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOutSine
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Cancel
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Stars
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -502,15 +542,14 @@ private fun NextLevelBadge(delay: Int) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier
-                .graphicsLayer(
-                    scaleX = pulseScale,
-                    scaleY = pulseScale,
+                .wrapContentWidth()
+                .graphicsLayer {
+                    scaleX = pulseScale
+                    scaleY = pulseScale
                     transformOrigin = TransformOrigin.Center
-                )
+                }
                 .clip(RoundedCornerShape(20.dp))
-                .background(
-                    Color(0xFF10B981).copy(alpha = 0.1f)
-                )
+                .background(Color(0xFF10B981).copy(alpha = 0.1f))
                 .drawBehind {
                     val shimmerWidth = size.width * 0.3f
                     val shimmerX = (shimmerOffset + 1f) * (size.width + shimmerWidth) - shimmerWidth
@@ -524,8 +563,7 @@ private fun NextLevelBadge(delay: Int) {
                             ),
                             startX = shimmerX,
                             endX = shimmerX + shimmerWidth
-                        ),
-                        size = size
+                        )
                     )
                 }
                 .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -534,16 +572,15 @@ private fun NextLevelBadge(delay: Int) {
                 imageVector = Icons.Rounded.LockOpen,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
-                tint = Color(0xFF10B981)
+                tint = Color(0xFF10B981 )
             )
+
             Text(
                 text = stringResource(R.string.next_level_unlocked),
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp
-                ),
+                style = MaterialTheme.typography.titleSmall,
                 color = Color(0xFF10B981)
             )
+
             Icon(
                 imageVector = Icons.Rounded.Stars,
                 contentDescription = null,
@@ -553,6 +590,7 @@ private fun NextLevelBadge(delay: Int) {
         }
     }
 }
+
 
 @Preview(showBackground = true, heightDp = 900)
 @Composable
