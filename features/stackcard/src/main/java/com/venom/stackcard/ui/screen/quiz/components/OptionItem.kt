@@ -21,11 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
 
 @Composable
 fun OptionItem(
@@ -44,45 +44,45 @@ fun OptionItem(
     val backgroundColor = when {
         isAnswered && isSelected && isCorrect -> Brush.horizontalGradient(
             colors = listOf(
-                Color(0xFF22C55E).copy(alpha = 0.3f),  // green-500
-                Color(0xFF10B981).copy(alpha = 0.3f)   // emerald-500
+                ThemeColors.OptionCorrectGradientStart,
+                ThemeColors.OptionCorrectGradientEnd
             )
         )
 
         isAnswered && isSelected && !isCorrect -> Brush.horizontalGradient(
             colors = listOf(
-                Color(0xFFEF4444).copy(alpha = 0.3f),  // red-500
-                Color(0xFFEC4899).copy(alpha = 0.3f)   // pink-500
+                ThemeColors.OptionIncorrectGradientStart,
+                ThemeColors.OptionIncorrectGradientEnd
             )
         )
 
         isSelected -> Brush.horizontalGradient(
             colors = listOf(
-                Color(0xFF3B82F6).copy(alpha = 0.3f),  // blue-500
-                Color(0xFF06B6D4).copy(alpha = 0.3f)   // cyan-500
+                ThemeColors.OptionSelectedGradientStart,
+                ThemeColors.OptionSelectedGradientEnd
             )
         )
 
         else -> Brush.horizontalGradient(
             colors = listOf(
-                Color.White.copy(alpha = 0.1f),
-                Color.White.copy(alpha = 0.1f)
+                ThemeColors.OptionDefaultGradient,
+                ThemeColors.OptionDefaultGradient
             )
         )
     }
 
     val borderColor = when {
-        isAnswered && isSelected && isCorrect -> Color(0xFF22C55E)  // green-500
-        isAnswered && isSelected && !isCorrect -> Color(0xFFEF4444)  // red-500
-        isSelected -> Color(0xFF3B82F6)  // blue-500
-        else -> Color.White.copy(alpha = 0.2f)
+        isAnswered && isSelected && isCorrect -> ThemeColors.OptionCorrectBorder
+        isAnswered && isSelected && !isCorrect -> ThemeColors.OptionIncorrectBorder
+        isSelected -> ThemeColors.OptionSelectedBorder
+        else -> ThemeColors.OptionDefaultBorder
     }
 
     val labelBackgroundColor = when {
-        isAnswered && isSelected && isCorrect -> Color(0xFF22C55E)  // green-500
-        isAnswered && isSelected && !isCorrect -> Color(0xFFEF4444)  // red-500
-        isSelected -> Color(0xFF3B82F6)  // blue-500
-        else -> Color.White.copy(alpha = 0.2f)
+        isAnswered && isSelected && isCorrect -> ThemeColors.OptionCorrectBorder
+        isAnswered && isSelected && !isCorrect -> ThemeColors.OptionIncorrectBorder
+        isSelected -> ThemeColors.OptionSelectedBorder
+        else -> ThemeColors.OptionDefaultBorder
     }
 
     val labelContent = when {
@@ -120,7 +120,7 @@ fun OptionItem(
             ) {
                 Text(
                     text = labelContent,
-                    color = Color.White,
+                    color = ThemeColors.OptionText,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -128,7 +128,7 @@ fun OptionItem(
             // Option Text
             Text(
                 text = option,
-                color = Color.White,
+                color = ThemeColors.OptionText,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )
