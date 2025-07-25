@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,14 +57,14 @@ fun QuizHeader(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.1f))
+                    .background(ThemeColors.BackButtonBackground)
                     .clickable { onBackClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = stringResource(R.string.back_button),
-                    tint = Color.White,
+                    tint = ThemeColors.BackButtonIcon,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -105,7 +104,7 @@ fun QuizHeader(
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(Color.White.copy(alpha = 0.1f))
+                    .background(ThemeColors.ProgressBarBackground)
             ) {
                 Box(
                     modifier = Modifier

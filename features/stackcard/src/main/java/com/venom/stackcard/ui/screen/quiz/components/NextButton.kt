@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,14 +72,14 @@ fun NextButton(
         ) {
             Text(
                 text = text,
-                color = Color.White,
+                color = ThemeColors.NextButtonText,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = text,
-                tint = Color.White,
+                tint = ThemeColors.NextButtonText,
                 modifier = Modifier.size(20.dp)
             )
         }

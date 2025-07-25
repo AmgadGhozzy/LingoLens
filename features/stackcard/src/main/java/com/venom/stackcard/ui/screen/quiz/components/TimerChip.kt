@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,7 +31,7 @@ import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
 @Composable
 fun TimerChip(timeRemaining: Int) {
     val isWarning = timeRemaining <= 10
-    val backgroundColor = if (isWarning) ThemeColors.TimerWarning else Color.White.copy(alpha = 0.1f)
+    val backgroundColor = if (isWarning) ThemeColors.TimerWarning else ThemeColors.TimerBackground
     val contentColor = if (isWarning) ThemeColors.OnTimerWarning else ThemeColors.TimerNormal
 
     // Pulsing animation for warning state
