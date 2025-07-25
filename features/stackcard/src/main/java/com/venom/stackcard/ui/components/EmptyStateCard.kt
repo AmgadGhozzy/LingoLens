@@ -20,16 +20,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.venom.resources.R
 import com.venom.ui.components.other.TextShimmer
 
 @Preview
 @Composable
 fun EmptyStateCard(
-    onRefresh: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRefresh: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -46,16 +47,19 @@ fun EmptyStateCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "📚", style = MaterialTheme.typography.displayLarge)
+            Text(
+                text = stringResource(id = R.string.empty_state_emoji),
+                style = MaterialTheme.typography.displayLarge
+            )
 
             Text(
-                text = "Great job! 🎉",
+                text = stringResource(id = R.string.empty_state_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = "You've completed all available cards. Ready for more?",
+                text = stringResource(id = R.string.empty_state_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
@@ -67,7 +71,7 @@ fun EmptyStateCard(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text("Load More Cards")
+                Text(stringResource(id = R.string.empty_state_button_text))
             }
         }
     }
@@ -76,12 +80,12 @@ fun EmptyStateCard(
 @Preview
 @Composable
 fun OnboardingOverlay(
-    onDismiss: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
-            .background(Color.Black.copy(alpha = 0.7f))
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
             .clickable { onDismiss() },
         contentAlignment = Alignment.Center
     ) {
@@ -98,33 +102,33 @@ fun OnboardingOverlay(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "How to Use",
+                    text = stringResource(id = R.string.onboarding_title),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
                 OnboardingStep(
-                    icon = "👆",
-                    title = "Tap to Flip",
-                    description = "Tap the card to see the translation"
+                    icon = stringResource(id = R.string.onboarding_step_1_icon),
+                    title = stringResource(id = R.string.onboarding_step_1_title),
+                    description = stringResource(id = R.string.onboarding_step_1_description)
                 )
 
                 OnboardingStep(
-                    icon = "←",
-                    title = "Swipe Left",
-                    description = "Swipe left if you forgot this word"
+                    icon = stringResource(id = R.string.onboarding_step_2_icon),
+                    title = stringResource(id = R.string.onboarding_step_2_title),
+                    description = stringResource(id = R.string.onboarding_step_2_description)
                 )
 
                 OnboardingStep(
-                    icon = "→",
-                    title = "Swipe Right",
-                    description = "Swipe right if you remember this word"
+                    icon = stringResource(id = R.string.onboarding_step_3_icon),
+                    title = stringResource(id = R.string.onboarding_step_3_title),
+                    description = stringResource(id = R.string.onboarding_step_3_description)
                 )
 
                 Button(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Got it!")
+                    Text(stringResource(id = R.string.onboarding_button_text))
                 }
             }
         }
