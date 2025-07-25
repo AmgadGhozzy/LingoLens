@@ -2,7 +2,6 @@ package com.venom.stackcard.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,14 +18,17 @@ import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
 fun CardContent(
-    card: CardItem, translateViewModel: TranslateViewModel = hiltViewModel(), isFlipped: Boolean
+    card: CardItem,
+    isFlipped: Boolean,
+    modifier: Modifier = Modifier,
+    translateViewModel: TranslateViewModel = hiltViewModel()
 ) {
     val state by translateViewModel.uiState.collectAsStateWithLifecycle()
     val rememberedCard = remember(card.englishEn) { card }
 
     val translationText by remember(state.translationResult) {
         derivedStateOf {
-            state.translationResult?.dict?.flatMap { it.terms }?.joinToString(", ") ?: ""
+            state.translationResult.dict.flatMap { it.terms }.joinToString(", ")
         }
     }
 
@@ -37,8 +39,7 @@ fun CardContent(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .padding(top = if (isFlipped) 24.dp else 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
