@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -163,11 +165,13 @@ private fun LevelIcon(
     isUnlocked: Boolean
 ) {
     Box(
-        modifier = Modifier.size(64.dp)
+        modifier = Modifier
+            .size(64.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(color = if (isUnlocked) level.color else Color.White.copy(alpha = 0.1f))
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(16.dp),
             color = if (isUnlocked) level.color else Color.White.copy(alpha = 0.1f)
         ) {
             Box(contentAlignment = Alignment.Center) {
