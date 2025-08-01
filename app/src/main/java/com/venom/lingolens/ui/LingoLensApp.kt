@@ -73,7 +73,8 @@ private fun LingoLensAppContent(
     when {
         appState.showSettings -> {
             SettingsBottomSheet(
-                onDismiss = { appState.showSettings = false }
+                onDismiss = { appState.showSettings = false },
+                navController = appState.navController
             )
         }
 

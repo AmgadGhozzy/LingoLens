@@ -25,6 +25,7 @@ class AppState(
                 currentRoute != Screen.Onboarding.route &&
                 currentRoute != Screen.Sentence.route &&
                 currentRoute != Screen.WordCraft.route &&
+                currentRoute != Screen.Quiz.MainLevel.route &&
                 currentRoute?.startsWith("history") != true
 
     val shouldShowBottomBar: Boolean
