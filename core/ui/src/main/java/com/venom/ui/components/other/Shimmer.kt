@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.dp
 fun TextShimmer(
     modifier: Modifier = Modifier,
     lines: Int = 2,
-    lineHeights: List<Float> = listOf(0.9f, 0.8f),
+    lineWidths: List<Float> = listOf(0.9f, 0.8f),
+    lineHeight: Int = 20,
     spacing: Int = 12
 ) {
     Column(
@@ -41,9 +42,9 @@ fun TextShimmer(
         repeat(lines) { index ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(lineHeights.getOrElse(index) { 0.75f })
-                    .height(20.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .fillMaxWidth(lineWidths.getOrElse(index) { 0.75f })
+                    .height(lineHeight.dp)
+                    .clip(RoundedCornerShape((lineHeight * 0.3).dp))
                     .animatedShimmer()
             )
         }
