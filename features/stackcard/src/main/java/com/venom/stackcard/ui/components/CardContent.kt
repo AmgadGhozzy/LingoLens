@@ -20,33 +20,46 @@ import com.venom.ui.viewmodel.TranslateViewModel
 fun CardContent(
     card: CardItem,
     isFlipped: Boolean,
+    onDragEnd: () -> Unit,
     modifier: Modifier = Modifier,
     translateViewModel: TranslateViewModel = hiltViewModel()
 ) {
     val state by translateViewModel.uiState.collectAsStateWithLifecycle()
     val rememberedCard = remember(card.englishEn) { card }
 
-    val translationText by remember(state.translationResult) {
+    // Clear translation terms when card changes or when loading starts
+    val wordTerms by remember(state.translationResult, state.isLoading, rememberedCard.englishEn) {
         derivedStateOf {
-            state.translationResult.dict.flatMap { it.terms }.joinToString(", ")
+            // Only show terms if not loading and we have translation results for the current card
+            if (state.isLoading || state.translationResult.dict.isEmpty()) {
+                ""
+            } else {
+                state.translationResult.dict.flatMap { it.terms }.take(5).joinToString(", ")
+            }
         }
     }
 
     LaunchedEffect(isFlipped, rememberedCard.englishEn) {
         if (isFlipped) {
+            // Clear old translation when starting new translation
+            translateViewModel.clearAll() // You'll need to add this method to your ViewModel
             translateViewModel.onSourceTextChanged(rememberedCard.englishEn)
         }
     }
 
+    // Clear translation when card changes (can be triggered by onDrag)
+    LaunchedEffect(rememberedCard.englishEn) {
+        translateViewModel.clearAll()
+    }
+
     Column(
-        modifier = modifier
-            .padding(top = if (isFlipped) 24.dp else 0.dp),
+        modifier = modifier.padding(top = 42.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         CardText(
             text = if (isFlipped) rememberedCard.arabicAr else rememberedCard.englishEn,
-            translationText = translationText,
+            wordTerms = wordTerms,
             isLoading = state.isLoading,
             isFlipped = isFlipped
         )
