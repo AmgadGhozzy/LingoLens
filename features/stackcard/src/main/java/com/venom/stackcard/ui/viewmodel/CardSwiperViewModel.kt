@@ -56,6 +56,7 @@ data class CardSwiperState(
     val removedCards: List<CardItem> = emptyList(),
     val isFlipped: Boolean = false,
     val currentCardIndex: Int = 0,
+    val processedCardsCount: Int = 0,
     val error: String? = null,
     val isLoading: Boolean = true,
     val cardType: CardType = CardType.WORD
@@ -150,12 +151,13 @@ class CardSwiperViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(
                 removedCards = currentState.removedCards + card,
-                visibleCards = currentState.visibleCards - card
+                visibleCards = currentState.visibleCards - card,
+                processedCardsCount = currentState.processedCardsCount + 1
             )
         }
 
         if (state.value.visibleCards.isEmpty()) {
-            loadCards()
+            //loadCards()
         }
     }
 
@@ -214,6 +216,7 @@ class CardSwiperViewModel @Inject constructor(
                     it.copy(
                         visibleCards = listOf(lastCard) + it.visibleCards,
                         removedCards = it.removedCards.dropLast(1),
+                        processedCardsCount = (it.processedCardsCount - 1).coerceAtLeast(0)
                     )
                 }
             }
@@ -237,7 +240,10 @@ class CardSwiperViewModel @Inject constructor(
     private fun setCardType(type: CardType) {
         _state.update {
             it.copy(
-                cardType = type, visibleCards = emptyList(), removedCards = emptyList()
+                cardType = type,
+                visibleCards = emptyList(),
+                removedCards = emptyList(),
+                processedCardsCount = 0
             )
         }
         loadCards()
