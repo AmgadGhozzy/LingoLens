@@ -32,10 +32,10 @@ import com.venom.stackcard.ui.components.EnhancedCardAnimations.SWIPE_THRESHOLD
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.ScaleAnimationSpec
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.SwipeAnimationSpec
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.calculateRotation
-import com.venom.stackcard.ui.components.EnhancedSwipeableCard
 import com.venom.stackcard.ui.components.LoadingShimmer
 import com.venom.stackcard.ui.components.StackProgressIndicator
 import com.venom.stackcard.ui.components.SwipeIndicators
+import com.venom.stackcard.ui.components.SwipeableCard
 import com.venom.stackcard.ui.components.UndoButton
 import com.venom.stackcard.ui.components.rememberCardAnimationState
 import com.venom.stackcard.ui.components.resetAnimationState
@@ -172,7 +172,7 @@ fun CardSwiperStack(
 
                 val blurRadius = if (stackPosition > 0) (stackPosition * 0.5f).dp else 0.dp
 
-                EnhancedSwipeableCard(
+                SwipeableCard(
                     card = card,
                     offsetX = if (isTopCard) cardAnimState.offsetX.value else 0f,
                     offsetY = if (isTopCard) cardAnimState.offsetY.value else 0f,
@@ -251,7 +251,7 @@ fun CardSwiperStack(
         // Stack progress indicator
         if (state.visibleCards.isNotEmpty()) {
             StackProgressIndicator(
-                current = state.currentCardIndex,
+                current = state.processedCardsCount,
                 total = state.visibleCards.size + state.removedCards.size,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
