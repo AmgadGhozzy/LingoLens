@@ -1,5 +1,6 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +34,7 @@ import com.venom.stackcard.ui.viewmodel.CardSwiperEvent
 import com.venom.stackcard.ui.viewmodel.CardSwiperEvent.SetCardType
 import com.venom.stackcard.ui.viewmodel.CardSwiperViewModel
 import com.venom.stackcard.ui.viewmodel.CardType
+import com.venom.ui.components.onboarding.FloatingOrbs
 import com.venom.ui.components.other.FloatingCircleMenu
 import com.venom.ui.components.other.FloatingMenuItem
 import com.venom.ui.components.sections.CustomTabs
@@ -67,6 +70,8 @@ fun CardScreen(
 
     val state by currentViewModel.state.collectAsState()
 
+    // Get the current top card safely - always the first card in visibleCards
+    val currentCard = state.visibleCards.firstOrNull()
 
     // Actions for card events using the current view model
     val onBookmarkWord: (CardItem) -> Unit =
@@ -82,13 +87,17 @@ fun CardScreen(
         else wordViewModel.onEvent(SetCardType(CardType.PHRASE))
     }
 
-    // Main content of the screen
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 32.dp),
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
         contentAlignment = Alignment.Center
     ) {
+        FloatingOrbs(
+            primaryColor = MaterialTheme.colorScheme.primary,
+            secondaryColor = MaterialTheme.colorScheme.primaryContainer,
+            enableAlphaAnimation = false
+        )
 
         // Tabs for switching between card types
         CustomTabs(
@@ -105,6 +114,7 @@ fun CardScreen(
         )
 
         CardSwiperStack(
+            modifier = Modifier.padding(bottom = 64.dp),
             viewModel = currentViewModel,
             onRememberCard = onRememberWord,
             onForgotCard = onForgotWord,
@@ -113,31 +123,34 @@ fun CardScreen(
             onCopy = copyAction,
         )
 
-        FloatingCircleMenu(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            items = listOf(
-                FloatingMenuItem(
-                    icon = Icons.Rounded.Bookmark,
-                    color = USDTColor,
-                    onClick = { onBookmarkWord(state.visibleCards[state.currentCardIndex]) },
-                ),
-                FloatingMenuItem(
-                    icon = Icons.AutoMirrored.Rounded.MenuBook,
-                    color = PurplePrimary,
-                    onClick = { onNavigateToSentence(state.visibleCards[state.currentCardIndex].englishEn) },
-                ),
-                FloatingMenuItem(
-                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
-                    color = BitcoinColor,
-                    onClick = { speakAction(state.visibleCards[state.currentCardIndex].englishEn) },
-                ),
-                FloatingMenuItem(
-                    icon = Icons.Rounded.Share,
-                    color = TONColor,
-                    onClick = { shareAction(state.visibleCards[state.currentCardIndex].englishEn) },
+        // Only show FloatingCircleMenu if there's a current card
+        currentCard?.let { card ->
+            FloatingCircleMenu(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(124.dp),
+                items = listOf(
+                    FloatingMenuItem(
+                        icon = Icons.Rounded.Bookmark,
+                        color = USDTColor,
+                        onClick = { onBookmarkWord(card) },
+                    ),
+                    FloatingMenuItem(
+                        icon = Icons.AutoMirrored.Rounded.MenuBook,
+                        color = PurplePrimary,
+                        onClick = { onNavigateToSentence(card.englishEn) },
+                    ),
+                    FloatingMenuItem(
+                        icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                        color = BitcoinColor,
+                        onClick = { speakAction(card.englishEn) },
+                    ),
+                    FloatingMenuItem(
+                        icon = Icons.Rounded.Share,
+                        color = TONColor,
+                        onClick = { shareAction(card.englishEn) },
+                    )
                 )
             )
-        )
+        }
 
         if (state.visibleCards.isEmpty() && !state.isLoading) {
             EmptyStateCard(
@@ -147,6 +160,7 @@ fun CardScreen(
                 modifier = Modifier.align(Alignment.Center)
             )
         }
+
         var showOnboarding by remember { mutableStateOf(false) }
         // First-time user onboarding
         if (showOnboarding) {
