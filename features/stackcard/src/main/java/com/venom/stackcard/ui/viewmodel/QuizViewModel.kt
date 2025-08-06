@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -92,18 +93,21 @@ class QuizViewModel @Inject constructor(
 
     private fun loadUnlockedLevels() {
         viewModelScope.launch {
-            try {
-                dataStore.data
-                    .map { preferences ->
-                        // Always ensure Beginner level is included
-                        val storedLevels = preferences[PreferencesKeys.UNLOCKED_LEVELS] ?: emptySet()
-                        storedLevels + WordLevels.Beginner.id
-                    }
-                    .collect { unlockedLevels ->
-                        _state.update { it.copy(unlockedLevels = unlockedLevels) }
-                    }
-            } catch (e: Exception) {
-                _state.update { it.copy(unlockedLevels = setOf(WordLevels.Beginner.id)) }
+            val storedLevels = runCatching { dataStore.data.first()[PreferencesKeys.UNLOCKED_LEVELS] }
+                .getOrDefault(emptySet())
+                ?.plus(WordLevels.Beginner.id) ?: setOf(WordLevels.Beginner.id)
+
+            val currentLevel = if (storedLevels.isNotEmpty()) {
+                WordLevels.values().find { level -> level.id == storedLevels.last() } ?: WordLevels.Beginner
+            } else {
+                WordLevels.Beginner
+            }
+
+            _state.update {
+                it.copy(
+                    unlockedLevels = storedLevels,
+                    currentLevel = currentLevel
+                )
             }
         }
     }
