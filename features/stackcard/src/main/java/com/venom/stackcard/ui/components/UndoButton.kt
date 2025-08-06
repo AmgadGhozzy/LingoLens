@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 fun UndoButton(
     removedCardsCount: Int, onUndo: () -> Unit, modifier: Modifier = Modifier
 ) {
-    FloatingActionButton(onClick = onUndo, modifier = modifier.padding(end = 16.dp).semantics {
+    FloatingActionButton(onClick = onUndo, modifier = modifier.padding(end = 16.dp, bottom = 42.dp).semantics {
         contentDescription = "Undo last action. $removedCardsCount cards available"
     }) {
         BadgedBox(badge = {
