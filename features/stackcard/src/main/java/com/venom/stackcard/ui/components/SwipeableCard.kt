@@ -34,7 +34,7 @@ import com.venom.stackcard.ui.viewmodel.CardItem
 import kotlin.math.abs
 
 @Composable
-fun EnhancedSwipeableCard(
+fun SwipeableCard(
     card: CardItem,
     offsetX: Float,
     offsetY: Float,
@@ -56,6 +56,7 @@ fun EnhancedSwipeableCard(
     onBookmark: () -> Unit,
     onSpeak: () -> Unit,
     onCopy: () -> Unit,
+    onClearTranslation: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -135,7 +136,10 @@ fun EnhancedSwipeableCard(
             .pointerInput(isTopCard) {
                 if (isTopCard) {
                     detectDragGestures(
-                        onDragEnd = { onDragEnd() }
+                        onDragEnd = {
+                            onDragEnd()
+                            if (isTopCard) onClearTranslation()
+                        }
                     ) { change, dragAmount ->
                         change.consume()
                         onDrag(dragAmount)
@@ -154,6 +158,7 @@ fun EnhancedSwipeableCard(
             CardContent(
                 card = card,
                 isFlipped = isFlipped,
+                onDragEnd = onDragEnd,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
