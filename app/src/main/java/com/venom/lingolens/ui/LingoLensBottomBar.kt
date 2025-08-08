@@ -3,15 +3,10 @@ package com.venom.lingolens.ui
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -28,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.venom.lingolens.navigation.NavigationItems
 import com.venom.lingolens.navigation.navigateToStart
+import com.venom.ui.components.other.GlassCard
 import com.venom.ui.navigation.Screen
 
 @Composable
@@ -37,27 +33,19 @@ fun LingoLensBottomBar(
     onScreenSelected: (Screen) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.Transparent)
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-    ) {
-        Card(
-            modifier = Modifier
+        GlassCard(
+            padding = 0.dp,
+            modifier = modifier
                 .fillMaxWidth()
-                .background(Color.Transparent),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+                .scale(0.95f)
+                .offset(y = (-8).dp),
+            solidBackgroundAlpha = 0.8f,
+            solidBackground = MaterialTheme.colorScheme.surface
         ) {
             NavigationBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(72.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                    .height(76.dp),
                 containerColor = Color.Transparent,
                 tonalElevation = 0.dp
             ) {
@@ -104,5 +92,4 @@ fun LingoLensBottomBar(
                 }
             }
         }
-    }
 }
