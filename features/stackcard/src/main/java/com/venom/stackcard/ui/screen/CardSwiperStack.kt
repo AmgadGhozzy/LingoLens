@@ -255,7 +255,7 @@ fun CardSwiperStack(
                 total = state.visibleCards.size + state.removedCards.size,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 56.dp)
+                    .padding(top = 64.dp)
             )
         }
 

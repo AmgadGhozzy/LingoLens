@@ -1,6 +1,5 @@
 package com.venom.stackcard.ui.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +10,6 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,9 +32,9 @@ import com.venom.stackcard.ui.viewmodel.CardSwiperEvent
 import com.venom.stackcard.ui.viewmodel.CardSwiperEvent.SetCardType
 import com.venom.stackcard.ui.viewmodel.CardSwiperViewModel
 import com.venom.stackcard.ui.viewmodel.CardType
-import com.venom.ui.components.onboarding.FloatingOrbs
 import com.venom.ui.components.other.FloatingCircleMenu
 import com.venom.ui.components.other.FloatingMenuItem
+import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.components.sections.CustomTabs
 import com.venom.ui.components.sections.TabItem
 import com.venom.ui.theme.ThemeColors.BitcoinColor
@@ -88,16 +86,10 @@ fun CardScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        FloatingOrbs(
-            primaryColor = MaterialTheme.colorScheme.primary,
-            secondaryColor = MaterialTheme.colorScheme.primaryContainer,
-            enableAlphaAnimation = false
-        )
+        FloatingOrbs()
 
         // Tabs for switching between card types
         CustomTabs(
@@ -126,7 +118,9 @@ fun CardScreen(
         // Only show FloatingCircleMenu if there's a current card
         currentCard?.let { card ->
             FloatingCircleMenu(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(124.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(124.dp),
                 items = listOf(
                     FloatingMenuItem(
                         icon = Icons.Rounded.Bookmark,
