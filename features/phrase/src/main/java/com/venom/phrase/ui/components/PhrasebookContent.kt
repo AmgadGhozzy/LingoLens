@@ -1,18 +1,20 @@
 package com.venom.phrase.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.ui.viewmodel.PhraseUiState
+import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.screen.langselector.LangSelectorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,21 +26,31 @@ fun PhrasebookContent(
     onBookmarkClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) {
-    Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+    ) {
         PhrasebookTopBar(
             viewModel = langSelectorViewModel,
             totalPhrases = state.categories.sumOf { it.phraseCount },
             onBookmarkClick = onBookmarkClick,
             scrollBehavior = scrollBehavior
         )
-    }) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(8.dp)
+
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            CategoryList(state = state, onCategoryClick = onNavigateToCategory)
+             FloatingOrbs()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CategoryList(state = state, onCategoryClick = onNavigateToCategory)
+            }
         }
     }
 }
