@@ -1,17 +1,24 @@
 package com.venom.lingopro.ui.components.sections
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
-import com.venom.ui.components.bars.*
-import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.components.bars.SourceTextActionBar
+import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.ui.components.other.GlassCard
 import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.screen.langselector.LanguageBar
 import com.venom.ui.theme.LingoLensTheme
@@ -31,6 +38,7 @@ fun TranslationSection(
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false
 ) {
+
     val context = LocalContext.current
     val validateAndExecute: (() -> Unit) -> Unit = {
         if (sourceTextValue.text.isBlank()) context.showToast("No translation")
@@ -40,16 +48,28 @@ fun TranslationSection(
     val sourceText = sourceTextValue.getSelectedOrFullText()
     val translatedText = translatedTextValue.getSelectedOrFullText()
 
-    CustomCard {
+    GlassCard(
+        padding = 12.dp
+    ) {
         LanguageBar(
             viewModel = viewModel,
             showNativeNameHint = showNativeNameHint,
             showFlag = showFlag
         )
 
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-            thickness = 1.dp
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                            Color.Transparent
+                        )
+                    )
+                )
         )
 
         SourceTextSection(
