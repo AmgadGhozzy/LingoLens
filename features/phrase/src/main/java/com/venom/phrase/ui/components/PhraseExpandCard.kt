@@ -6,10 +6,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.model.Phrase
 import com.venom.ui.components.buttons.ExpandIndicator
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun PhraseExpandCard(
@@ -37,17 +34,12 @@ fun PhraseExpandCard(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Card(
+    GlassCard(
+        onClick = { expanded = !expanded },
         modifier = modifier
             .fillMaxWidth()
             .semantics { contentDescription = "Phrase card for ${phrase.englishEn}" }
-            .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)),
-        shape = RoundedCornerShape(16.dp),
-        onClick = { expanded = !expanded },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        )
+            .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
