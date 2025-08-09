@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Stars
@@ -40,6 +41,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -74,6 +76,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.QuizTestState
 import com.venom.domain.model.WordLevels
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.other.ConfettiView
 import kotlinx.coroutines.delay
 import kotlin.math.PI
@@ -116,6 +119,21 @@ fun QuizCompleted(
                 )
             )
     ) {
+        // Close button in top left
+        CustomFilledIconButton(
+            icon = Icons.Rounded.Close,
+            onClick = { onComplete(false, null) },
+            contentDescription = "Close",
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            size = 40.dp,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(12.dp)
+        )
+
         if (showConfetti && testState.passed) {
             ConfettiView(modifier = Modifier.fillMaxSize())
         }
