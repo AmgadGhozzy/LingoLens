@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.other.GlassCard
 
 /**
  * Data class representing a tab item with a title and an icon resource.
@@ -39,21 +39,19 @@ fun CustomTabs(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    GlassCard(
         modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-        tonalElevation = 2.dp
+        shape = RoundedCornerShape(20.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier.padding(vertical = 3.dp, horizontal = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             tabs.forEachIndexed { index, tabItem ->
                 val isSelected = selectedTab == index
                 val alpha by animateFloatAsState(targetValue = if (isSelected) 1f else 0.6f)
 
-                TabItemContent(
+                TabItem(
                     title = stringResource(tabItem.titleRes),
                     icon = tabItem.iconRes,
                     isSelected = isSelected,

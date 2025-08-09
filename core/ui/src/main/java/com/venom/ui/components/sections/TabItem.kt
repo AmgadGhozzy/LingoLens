@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TabItemContent(
+fun TabItem(
     title: String,
     icon: Int,
     isSelected: Boolean,
@@ -29,16 +29,16 @@ fun TabItemContent(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val animationSpec = tween<Float>(durationMillis = 200)
+
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0.95f,
-        animationSpec = animationSpec
+        animationSpec = tween(300)
     )
 
     Surface(
         onClick = onClick,
         modifier = modifier.scale(scale),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(
             alpha = 0.6f
         ) else MaterialTheme.colorScheme.surface.copy(
