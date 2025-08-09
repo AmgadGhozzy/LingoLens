@@ -31,6 +31,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.stackcard.ui.viewmodel.CardItem
+import com.venom.ui.theme.ThemeColors.GlassPrimary
+import com.venom.ui.theme.ThemeColors.GlassSecondary
+import com.venom.ui.theme.ThemeColors.GlassTertiary
 import kotlin.math.abs
 
 @Composable
@@ -64,8 +67,8 @@ fun SwipeableCard(
     // Dynamic card colors based on swipe direction and restoration state
     val cardBackgroundColor by animateColorAsState(
         targetValue = when {
-            isRestoringCard -> MaterialTheme.colorScheme.surface
-            abs(swipeProgress) < 0.3f -> MaterialTheme.colorScheme.surface
+            isRestoringCard -> MaterialTheme.colorScheme.surfaceContainerLowest
+            abs(swipeProgress) < 0.3f -> MaterialTheme.colorScheme.surfaceContainerLowest
             swipeProgress > 0 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
             else -> MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
         },
@@ -128,6 +131,15 @@ fun SwipeableCard(
             .clip(RoundedCornerShape(24.dp))
             .background(cardBackgroundColor)
             .background(glassMorphismBrush)
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        GlassPrimary.copy(alpha = 0.1f),
+                        GlassSecondary.copy(alpha = 0.1f),
+                        GlassTertiary.copy(alpha = 0.1f)
+                    )
+                )
+            )
             .border(
                 width = borderWidth.dp,
                 color = borderColor,
