@@ -13,7 +13,12 @@ fun CategoryList(
     state: PhraseUiState, onCategoryClick: (Int) -> Unit
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            end = 16.dp,
+            top = 16.dp,
+            bottom = 100.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(state.categories) { category ->
             CategoryItemCard(state = state,
