@@ -1,19 +1,64 @@
 package com.venom.ui.screen
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -21,6 +66,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,10 +78,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.data.model.SentenceResponse
+import com.venom.resources.R
 import com.venom.ui.components.bars.ActionButtons
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.DynamicStyledText
-import com.venom.ui.components.onboarding.FloatingOrbs
+import com.venom.ui.components.other.FloatingOrbs
+import com.venom.ui.components.other.GlassCard
 import com.venom.ui.components.other.TextShimmer
 import com.venom.ui.viewmodel.SentenceCardViewModel
 import com.venom.ui.viewmodel.SentenceViewModel
@@ -62,11 +110,7 @@ fun SentenceScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
-        FloatingOrbs(
-            primaryColor = MaterialTheme.colorScheme.primary,
-            secondaryColor = MaterialTheme.colorScheme.primaryContainer,
-            enableAlphaAnimation = false
-        )
+        FloatingOrbs()
 
         Column(modifier = Modifier.fillMaxSize()) {
             TopBar(onNavigateBack = onNavigateBack)
@@ -140,16 +184,11 @@ private fun SearchSection(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
-    Card(
+    GlassCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp)
-            .scale(scale),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            .scale(scale)
     ) {
         Row(
             modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically
@@ -157,7 +196,7 @@ private fun SearchSection(
             OutlinedTextField(
                 value = searchText,
                 onValueChange = onSearchTextChange,
-                placeholder = { Text("Search for words...") },
+                placeholder = { Text(stringResource(R.string.search_for_words)) },
                 leadingIcon = {
                     Icon(
                         Icons.Default.Search,
@@ -182,8 +221,10 @@ private fun SearchSection(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f)
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                    unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(
+                        alpha = 0.3f
+                    )
                 )
             )
 
@@ -197,7 +238,7 @@ private fun SearchSection(
             ) {
                 Icon(
                     Icons.AutoMirrored.Rounded.Send,
-                    contentDescription = null,
+                    contentDescription = "Search",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
@@ -221,16 +262,17 @@ private fun WelcomeContent() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(modifier = Modifier
-            .size(120.dp)
-            .graphicsLayer { rotationZ = bookRotation }
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), Color.Transparent
-                    )
-                ), CircleShape
-            ), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .graphicsLayer { rotationZ = bookRotation }
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), Color.Transparent
+                        )
+                    ), CircleShape
+                ), contentAlignment = Alignment.Center) {
             Icon(
                 Icons.AutoMirrored.Rounded.MenuBook,
                 contentDescription = null,
@@ -274,10 +316,11 @@ private fun SentenceContent(
 
         item {
             Text(
-                "Example Sentences",
+                stringResource(R.string.example_sentences, response.totalSentences),
                 style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.SemiBold
-                ), modifier = Modifier.padding(vertical = 8.dp)
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                ), modifier = Modifier.padding(vertical = 6.dp)
             )
         }
 
@@ -291,15 +334,14 @@ private fun SentenceContent(
 
 @Composable
 private fun WordCard(response: SentenceResponse) {
-    Card(
+    GlassCard(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(20.dp)
+        solidBackgroundAlpha = 0.9f,
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f))
                 .padding(24.dp)
         ) {
             Text(
@@ -314,7 +356,7 @@ private fun WordCard(response: SentenceResponse) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                "${response.totalSentences} sentences found",
+                stringResource(R.string.sentences_found, response.totalSentences),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
             )
@@ -358,16 +400,13 @@ private fun SentenceCard(
         }
     }
 
-    Card(
+    GlassCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)),
         shape = RoundedCornerShape(16.dp),
         onClick = { viewModel.updateExpanded(!cardState.isExpanded) },
-        colors = CardDefaults.cardColors(
-            containerColor = if (index % 2 == 0) MaterialTheme.colorScheme.surfaceContainer
-            else MaterialTheme.colorScheme.surface
-        )
+        solidBackground = if (index % 2 == 0) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surface
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
@@ -446,7 +485,7 @@ private fun SentenceBadge(number: Int) {
 
 @Preview
 @Composable
-private fun SentenceCardShimmer() {
+fun SentenceCardShimmer() {
     Column(
         modifier = Modifier
             .background(Color.Transparent)
