@@ -10,7 +10,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.School
@@ -48,14 +48,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.domain.model.WordLevels
+import com.venom.resources.R
 import com.venom.stackcard.ui.screen.quiz.components.LevelCard
 import com.venom.stackcard.ui.viewmodel.QuizViewModel
-import com.venom.ui.components.onboarding.FloatingOrbs
+import com.venom.ui.components.other.FloatingOrbs
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,21 +70,28 @@ fun MainLevelScreen(
     val state by viewModel.state.collectAsState()
     var contentVisible by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val listState = rememberLazyListState()
 
-    // Theme-aware colors
-    val isDarkTheme = isSystemInDarkTheme()
     val topBarContentColor = MaterialTheme.colorScheme.onSurface
     val topBarSecondaryColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-    val surfaceColor = MaterialTheme.colorScheme.surface
-    val scrolledContainerColor = if (isDarkTheme) {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-    } else {
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
-    }
 
     LaunchedEffect(Unit) {
         viewModel.refreshProgress()
         contentVisible = true
+    }
+
+    LaunchedEffect(contentVisible, state.currentLevel) {
+        val targetIndex = WordLevels.values().indexOfFirst { it.id == state.currentLevel.id }
+        if (contentVisible && targetIndex !in 0..3) {
+
+            delay(300)
+
+            // Close the top bar
+            scrollBehavior.state.heightOffset = scrollBehavior.state.heightOffsetLimit
+
+            // Scroll to current level
+            listState.animateScrollToItem(index = targetIndex, scrollOffset = 100)
+        }
     }
 
     Box(
@@ -90,12 +99,7 @@ fun MainLevelScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
-        FloatingOrbs(
-            primaryColor = MaterialTheme.colorScheme.primary,
-            secondaryColor = MaterialTheme.colorScheme.primaryContainer,
-            enableAlphaAnimation = false
-        )
-
+        FloatingOrbs()
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,7 +131,7 @@ fun MainLevelScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
 
                                 Text(
-                                    text = "تعلم اللغة",
+                                    text = stringResource(R.string.learning_language),
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = topBarContentColor,
                                     fontWeight = FontWeight.Bold,
@@ -139,14 +143,14 @@ fun MainLevelScreen(
                             // Animate subtitle visibility based on collapse fraction
                             AnimatedVisibility(
                                 visible = scrollBehavior.state.collapsedFraction < 0.5f,
-                                enter = fadeIn() + expandVertically(),
-                                exit = fadeOut() + shrinkVertically()
+                                enter = fadeIn(tween(300)) + expandVertically(tween(300)),
+                                exit = fadeOut(tween(200)) + shrinkVertically(tween(200))
                             ) {
                                 Column {
                                     Spacer(modifier = Modifier.height(8.dp))
 
                                     Text(
-                                        text = "أتقن المفردات عبر مستويات المهارة المختلفة",
+                                        text = stringResource(R.string.level_progress),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = topBarSecondaryColor,
                                         fontWeight = FontWeight.Normal,
@@ -162,7 +166,7 @@ fun MainLevelScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Words learned stat
+                            // Study time stat
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
                                 color = Color(0xFF3B82F6).copy(alpha = 0.2f),
@@ -193,7 +197,7 @@ fun MainLevelScreen(
                                 }
                             }
 
-                            // Study time stat
+                            // Words learned stat
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
                                 color = Color(0xFF10B981).copy(alpha = 0.2f),
@@ -209,7 +213,7 @@ fun MainLevelScreen(
                                     Icon(
                                         imageVector = Icons.Rounded.Star,
                                         contentDescription = null,
-                                        tint = Color(0xFF3B82F6),
+                                        tint = Color(0xFF10B981),
                                         modifier = Modifier.size(16.dp)
                                     )
 
@@ -237,35 +241,37 @@ fun MainLevelScreen(
         ) { paddingValues ->
             AnimatedVisibility(
                 visible = contentVisible,
-                enter = fadeIn(tween(800))
+                enter = fadeIn(tween(600))
             ) {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(horizontal = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    contentPadding = PaddingValues(bottom = 32.dp, top = 16.dp)
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(
+                        top = 16.dp,
+                        bottom = 100.dp
+                    )
                 ) {
                     itemsIndexed(WordLevels.values()) { index, level ->
-                        var cardVisible by remember { mutableStateOf(false) }
-
-                        LaunchedEffect(key1 = Unit) {
-                            delay(100L * index)
-                            cardVisible = true
-                        }
+                        var cardVisible by remember { mutableStateOf(true) }
+                        val isCurrentLevel = state.currentLevel.id == level.id
 
                         AnimatedVisibility(
                             visible = cardVisible,
-                            enter = fadeIn(tween(600)) + slideInVertically(
-                                initialOffsetY = { it / 3 },
-                                animationSpec = tween(600, easing = EaseOutQuart)
+                            enter = fadeIn(
+                                tween(500, delayMillis = 0)
+                            ) + slideInVertically(
+                                initialOffsetY = { it / 4 },
+                                animationSpec = tween(500, easing = EaseOutQuart)
                             )
                         ) {
                             LevelCard(
                                 level = level,
                                 isUnlocked = state.unlockedLevels.contains(level.id),
-                                isCurrentLevel = state.currentLevel.id == level.id,
+                                isCurrentLevel = isCurrentLevel,
                                 progress = state.levelProgress[level.id] ?: 0f,
                                 onTestClick = { onNavigateToTest(level) },
                                 onLearnClick = { onNavigateToLearn(level) }
