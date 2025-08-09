@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +30,6 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Quiz
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.domain.model.WordLevels
 import com.venom.resources.R
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun LevelCard(
@@ -71,88 +69,87 @@ fun LevelCard(
     var expanded by remember { mutableStateOf(isCurrentLevel) }
 
     val scale by animateFloatAsState(
-        targetValue = if (expanded) 1.05f else 1f,
-        animationSpec = spring(dampingRatio = 0.7f)
+        targetValue = if (expanded) 1.03f else 1f,
+        animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f)
     )
 
-    Card(
+    val contentColor = MaterialTheme.colorScheme.onSurface
+    val secondaryContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+
+    GlassCard(
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale)
-            .clickable { expanded = !expanded },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(Color.Transparent),
-        elevation = CardDefaults.cardElevation(0.dp)
+            .scale(scale),
+        onClick = { if (isUnlocked) expanded = !expanded },
+        solidBackground = getGlassBackground(level, isUnlocked),
     ) {
-        Box {
-            Surface(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                color = getGlassBackground(level, isUnlocked),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            LevelIcon(level = level, isUnlocked = isUnlocked)
-                            Spacer(modifier = Modifier.width(16.dp))
-                            LevelInfo(level = level)
-                        }
-
-                        if (isUnlocked) {
-                            ProgressIndicator(progress, level)
-                        } else {
-                            Surface(
-                                modifier = Modifier.size(64.dp),
-                                shape = CircleShape,
-                                color = Color.White.copy(alpha = 0.1f)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Lock,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = stringResource(level.descRes),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f),
-                        lineHeight = 20.sp
+                    LevelIcon(level = level, isUnlocked = isUnlocked)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    LevelInfo(
+                        level = level,
+                        contentColor = contentColor,
+                        secondaryContentColor = secondaryContentColor
                     )
+                }
 
-                    AnimatedVisibility(
-                        visible = expanded && isUnlocked,
-                        enter = fadeIn(tween(400)) + expandVertically(),
-                        exit = fadeOut(tween(200)) + shrinkVertically()
+                if (isUnlocked) {
+                    ProgressIndicator(progress, level, contentColor)
+                } else {
+                    Surface(
+                        modifier = Modifier.size(60.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                     ) {
-                        Column {
-                            Spacer(modifier = Modifier.height(24.dp))
-                            LevelActions(
-                                onLearnClick = onLearnClick,
-                                onTestClick = onTestClick,
-                                level = level
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Rounded.Lock,
+                                contentDescription = stringResource(R.string.locked),
+                                tint = secondaryContentColor,
+                                modifier = Modifier.size(22.dp)
                             )
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(level.descRes),
+                style = MaterialTheme.typography.bodyMedium,
+                color = secondaryContentColor,
+                lineHeight = 22.sp,
+                fontWeight = FontWeight.Normal
+            )
+
+            AnimatedVisibility(
+                visible = expanded && isUnlocked,
+                enter = fadeIn(tween(400)) + expandVertically(tween(400)),
+                exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
+            ) {
+                Column {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    LevelActions(
+                        onLearnClick = onLearnClick,
+                        onTestClick = onTestClick,
+                        level = level,
+                        borderColor = borderColor
+                    )
                 }
             }
         }
@@ -167,51 +164,58 @@ private fun LevelIcon(
     Box(
         modifier = Modifier
             .size(64.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(color = if (isUnlocked) level.color else Color.White.copy(alpha = 0.1f))
+            .clip(RoundedCornerShape(18.dp))
+            .background(
+                color = if (isUnlocked)
+                    level.color.copy(alpha = 0.9f)
+                else
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            )
     ) {
-        Surface(
+        Box(
             modifier = Modifier.fillMaxSize(),
-            color = if (isUnlocked) level.color else Color.White.copy(alpha = 0.1f)
+            contentAlignment = Alignment.Center
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    painter = painterResource(level.iconRes),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+            Icon(
+                painter = painterResource(level.iconRes),
+                contentDescription = null,
+                tint = if (isUnlocked) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(30.dp)
+            )
         }
 
         if (isUnlocked) {
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = level.color.copy(alpha = 0.5f)
+                    .blur(20.dp),
+                shape = RoundedCornerShape(18.dp),
+                color = level.color.copy(alpha = 0.3f)
             ) {}
         }
     }
 }
 
 @Composable
-private fun LevelInfo(level: WordLevels) {
+private fun LevelInfo(
+    level: WordLevels,
+    contentColor: Color,
+    secondaryContentColor: Color
+) {
     Column {
         Text(
             text = stringResource(level.titleRes),
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.White,
+            color = contentColor,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = "${level.range.end - level.range.start + 1} ${stringResource(R.string.words)}",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.White.copy(alpha = 0.7f),
+            color = secondaryContentColor,
             fontWeight = FontWeight.Medium
         )
     }
@@ -221,7 +225,8 @@ private fun LevelInfo(level: WordLevels) {
 private fun LevelActions(
     onLearnClick: () -> Unit,
     onTestClick: () -> Unit,
-    level: WordLevels
+    level: WordLevels,
+    borderColor: Color
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -232,9 +237,14 @@ private fun LevelActions(
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = level.color
+                containerColor = level.color,
+                contentColor = Color.White
             ),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(16.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 2.dp,
+                pressedElevation = 6.dp
+            )
         ) {
             Icon(
                 imageVector = Icons.Rounded.PlayArrow,
@@ -253,10 +263,10 @@ private fun LevelActions(
             onClick = onTestClick,
             modifier = Modifier.weight(1f),
             shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+            border = BorderStroke(1.5.dp, borderColor),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color.White.copy(alpha = 0.1f),
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                contentColor = MaterialTheme.colorScheme.onSurface
             ),
             contentPadding = PaddingValues(16.dp)
         ) {
@@ -275,12 +285,15 @@ private fun LevelActions(
     }
 }
 
-
 @Composable
-private fun ProgressIndicator(progress: Float, level: WordLevels) {
+private fun ProgressIndicator(
+    progress: Float,
+    level: WordLevels,
+    contentColor: Color
+) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(1200)
+        animationSpec = tween(1000)
     )
 
     Box(
@@ -288,18 +301,18 @@ private fun ProgressIndicator(progress: Float, level: WordLevels) {
     ) {
         CircularProgressIndicator(
             progress = { animatedProgress },
-            modifier = Modifier.size(64.dp),
-            strokeWidth = 4.dp,
+            modifier = Modifier.size(60.dp),
+            strokeWidth = 5.dp,
             strokeCap = StrokeCap.Round,
             color = level.color,
-            trackColor = Color.White.copy(alpha = 0.2f)
+            trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
         )
         Text(
             text = "${(animatedProgress * 100).toInt()}%",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            color = contentColor,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -310,7 +323,7 @@ private fun getGlassBackground(
     isUnlocked: Boolean
 ): Color {
     return when {
-        !isUnlocked -> Color(0xFF1F2937).copy(alpha = 0.3f)
-        else -> level.color.copy(alpha = 0.2f)
+        !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        else -> level.color.copy(alpha = 0.15f)
     }
 }
