@@ -22,15 +22,14 @@ fun PhrasebookTitle(
     Column(modifier = Modifier.padding(end = 16.dp)) {
         Text(
             text = stringResource(R.string.phrase_title),
-            style = MaterialTheme.typography.headlineMedium.copy(
+            style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.Bold
             )
         )
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 4.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
             Badge(
@@ -40,7 +39,7 @@ fun PhrasebookTitle(
 
             Text(
                 text = stringResource(R.string.phrases),
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.Medium
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
