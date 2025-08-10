@@ -101,7 +101,7 @@ private fun SwipeIndicator(
             .blur(if (alpha < 0.3f) 2.dp else 0.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor.copy(alpha = 0.9f)
+            containerColor = backgroundColor.copy(0.9f)
         )
     ) {
         Row(

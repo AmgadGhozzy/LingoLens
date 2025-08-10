@@ -70,7 +70,7 @@ fun BookmarkWordItem(
             DynamicStyledText(
                 text = word.arabicAr,
                 maxFontSize = 18,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.8f)
             )
 
             if (word.synonyms.isNotEmpty()) {

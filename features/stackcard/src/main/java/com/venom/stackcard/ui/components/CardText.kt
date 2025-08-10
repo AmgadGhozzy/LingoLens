@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.venom.ui.components.common.PulseAnimation
 import com.venom.ui.components.other.TextChange
+import com.venom.ui.components.other.TextShimmer
 
 @Composable
 fun CardText(
@@ -41,7 +41,7 @@ fun CardText(
         ) {
             if (isFlipped) {
                 when {
-                    isLoading -> PulseAnimation(size = 32f)
+                    isLoading -> TextShimmer()
                     wordTerms != null && wordTerms.isNotEmpty() -> {
                         TextChange(
                             text = wordTerms,

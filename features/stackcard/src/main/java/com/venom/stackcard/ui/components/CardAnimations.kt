@@ -15,7 +15,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 object EnhancedCardAnimations {
-    const val SWIPE_THRESHOLD = 200f
+    const val SWIPE_THRESHOLD = 300f
     const val MAX_ROTATION_DEGREES = 15f
 
     val SwipeAnimationSpec = tween<Float>(

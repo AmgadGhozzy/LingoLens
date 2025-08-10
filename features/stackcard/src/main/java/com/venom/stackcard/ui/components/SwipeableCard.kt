@@ -69,18 +69,18 @@ fun SwipeableCard(
         targetValue = when {
             isRestoringCard -> MaterialTheme.colorScheme.surfaceContainerLowest
             abs(swipeProgress) < 0.3f -> MaterialTheme.colorScheme.surfaceContainerLowest
-            swipeProgress > 0 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            else -> MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+            swipeProgress > 0 -> MaterialTheme.colorScheme.primary.copy(0.1f)
+            else -> MaterialTheme.colorScheme.error.copy(0.1f)
         },
         animationSpec = tween(200)
     )
 
     val borderColor by animateColorAsState(
         targetValue = when {
-            isRestoringCard -> MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
-            abs(swipeProgress) < 0.3f -> MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-            swipeProgress > 0 -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-            else -> MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+            isRestoringCard -> MaterialTheme.colorScheme.outline.copy(0.1f)
+            abs(swipeProgress) < 0.3f -> MaterialTheme.colorScheme.outline.copy(0.2f)
+            swipeProgress > 0 -> MaterialTheme.colorScheme.primary.copy(0.6f)
+            else -> MaterialTheme.colorScheme.error.copy(0.6f)
         },
         animationSpec = tween(200)
     )
@@ -95,8 +95,8 @@ fun SwipeableCard(
     val glassMorphismBrush = remember(onSurfaceColor) {
         Brush.verticalGradient(
             colors = listOf(
-                onSurfaceColor.copy(alpha = 0.1f),
-                onSurfaceColor.copy(alpha = 0.06f),
+                onSurfaceColor.copy(0.1f),
+                onSurfaceColor.copy(0.06f),
                 Color.Transparent
             ),
             startY = 0f,
@@ -122,8 +122,8 @@ fun SwipeableCard(
             .shadow(
                 elevation = shadowElevation,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                ambientColor = MaterialTheme.colorScheme.primary.copy(0.1f),
+                spotColor = MaterialTheme.colorScheme.primary.copy(0.2f)
             )
             .then(
                 if (blurRadius > 0.dp) Modifier.blur(blurRadius) else Modifier
@@ -134,9 +134,9 @@ fun SwipeableCard(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        GlassPrimary.copy(alpha = 0.1f),
-                        GlassSecondary.copy(alpha = 0.1f),
-                        GlassTertiary.copy(alpha = 0.1f)
+                        GlassPrimary.copy(0.1f),
+                        GlassSecondary.copy(0.1f),
+                        GlassTertiary.copy(0.1f)
                     )
                 )
             )

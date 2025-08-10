@@ -38,7 +38,7 @@ fun EmptyStateCard(
             .fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.surface.copy(0.9f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
@@ -61,7 +61,7 @@ fun EmptyStateCard(
             Text(
                 text = stringResource(id = R.string.empty_state_message),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurface.copy(0.7f)
             )
 
             Button(
@@ -85,7 +85,7 @@ fun OnboardingOverlay(
 ) {
     Box(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            .background(MaterialTheme.colorScheme.onSurface.copy(0.7f))
             .clickable { onDismiss() },
         contentAlignment = Alignment.Center
     ) {
@@ -161,7 +161,7 @@ private fun OnboardingStep(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                color = MaterialTheme.colorScheme.onSurface.copy(0.7f)
             )
         }
     }
@@ -176,7 +176,7 @@ fun LoadingShimmer(
         modifier = modifier.size(280.dp, 400.dp),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.2f)
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(0.2f)
         )
     ) {
         Box(

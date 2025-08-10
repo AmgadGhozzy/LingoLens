@@ -42,13 +42,13 @@ fun StackProgressIndicator(
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                trackColor = MaterialTheme.colorScheme.primary.copy(0.2f)
             )
 
             Text(
                 text = "$current / $total",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onSurface.copy(0.8f)
             )
         }
     }
