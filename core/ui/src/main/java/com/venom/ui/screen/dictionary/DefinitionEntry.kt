@@ -1,10 +1,14 @@
 package com.venom.ui.screen.dictionary
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DefinitionEntry
@@ -21,7 +25,7 @@ fun DefinitionEntry(
 ) {
     val customTextSelectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colorScheme.primary,
-        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+        backgroundColor = MaterialTheme.colorScheme.primary.copy(0.4f)
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {

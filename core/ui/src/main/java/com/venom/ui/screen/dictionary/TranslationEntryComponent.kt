@@ -46,8 +46,7 @@ fun TranslationEntryComponent(
             visibleTerms.forEach { term ->
                 WordChip(
                     word = term,
-                    onClick = { onWordClick(term) },
-                    isAlpha = isAlpha
+                    onClick = { onWordClick(term) }
                 )
             }
 

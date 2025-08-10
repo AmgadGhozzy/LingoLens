@@ -17,8 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.venom.domain.model.Definition
 import com.venom.resources.R
-import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.items.WordChip
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun DefinitionsCard(
@@ -32,7 +32,7 @@ fun DefinitionsCard(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    CustomCard(modifier = modifier) {
+    GlassCard(modifier = modifier, padding = 16.dp) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

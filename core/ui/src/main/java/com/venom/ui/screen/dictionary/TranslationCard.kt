@@ -1,7 +1,8 @@
 package com.venom.ui.screen.dictionary
 
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.venom.domain.model.TranslationResult
 import com.venom.ui.components.common.DynamicStyledText
@@ -32,7 +33,7 @@ fun TranslationCard(
             DynamicStyledText(
                 text = sentence.original,
                 maxFontSize = 18,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.8f)
             )
         }
     )

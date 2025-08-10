@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DictionaryEntry
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
-import com.venom.ui.components.dialogs.CustomCard
+import com.venom.ui.components.other.GlassCard
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -33,7 +33,7 @@ fun TranslationsCard(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    CustomCard(modifier = modifier) {
+    GlassCard(modifier = modifier, padding = 12.dp) {
         Box(modifier = Modifier.padding(12.dp)) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
