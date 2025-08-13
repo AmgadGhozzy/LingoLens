@@ -29,7 +29,7 @@ fun ActionButtons(
             icon = R.drawable.icon_share,
             onClick = onShareClick,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
                 contentColor = MaterialTheme.colorScheme.primary
             ),
             contentDescription = stringResource(R.string.action_share)

@@ -15,7 +15,7 @@ import com.venom.phrase.data.mapper.getCategoryIcon
 fun CategoryIcon(icon: String) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+        color = MaterialTheme.colorScheme.primary.copy(0.1f),
         modifier = Modifier.size(52.dp)
     ) {
         Icon(

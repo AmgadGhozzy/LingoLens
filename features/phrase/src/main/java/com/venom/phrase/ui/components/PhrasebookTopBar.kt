@@ -47,7 +47,7 @@ fun PhrasebookTopBar(
                     .clip(RoundedCornerShape(28.dp))
                     .border(
                         width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(0.6f),
                         shape = RoundedCornerShape(28.dp)
                     )
             )

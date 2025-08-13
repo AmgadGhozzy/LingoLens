@@ -39,7 +39,7 @@ fun ExpandedContent(
         ) {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 16.dp),
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f)
+                color = MaterialTheme.colorScheme.outlineVariant.copy(0.8f)
             )
 
             // Translation

@@ -66,7 +66,7 @@ fun CategoryItemCard(
                 contentDescription = "View ${category.getTranslation(state.targetLang.code)} phrases",
                 onClick = onClick,
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.09f),
+                    containerColor = MaterialTheme.colorScheme.primary.copy(0.09f),
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             )
