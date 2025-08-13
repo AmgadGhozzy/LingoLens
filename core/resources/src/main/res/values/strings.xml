@@ -1,402 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- App & General -->
     <string name="app_name">LingoLens</string>
+    <string name="app_version">App Version</string>
+    <string name="badge_new">New</string>
+    <string name="category">Category</string>
+    <string name="copied_message">Copied!</string>
     <string name="default_notification_channel_id">lingo_lens_channel</string>
+    <string name="dictionary">Dictionary</string>
+    <string name="error_message">Please try again.</string>
+    <string name="get_started">Get Started</string>
+    <string name="hearts">Hearts</string>
+    <string name="native_language">Native language</string>
+    <string name="next">NEXT</string>
+    <string name="open">Open</string>
+    <string name="phrase">Phrase</string>
+    <string name="phrases">Phrases</string>
+    <string name="settings">Settings</string>
+    <string name="skip">Skip</string>
+    <string name="synonyms">Synonyms</string>
+    <string name="translations">Translations</string>
+    <string name="type_something">Type something…</string>
+    <string name="words">Words</string>
 
     <!-- Actions -->
     <string name="action_back">Back</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_check_settings">Check Settings</string>
     <string name="action_clear">Clear</string>
+    <string name="action_clear_bookmarks">Clear All Bookmarks</string>
+    <string name="action_clear_history">Clear All History</string>
+    <string name="action_clear_search">Clear Search</string>
+    <string name="action_close">Close</string>
+    <string name="action_collapse">Collapse</string>
+    <string name="action_continue">Continue</string>
     <string name="action_copy">Copy</string>
     <string name="action_copy_source">Copy Source Text</string>
-    <string name="action_paste">Paste</string>
-    <string name="action_save">Save</string>
-    <string name="action_share">Share</string>
     <string name="action_delete">Delete</string>
+    <string name="action_deselect_all">Deselect All</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_expand">Expand</string>
+    <string name="action_files">Files</string>
+    <string name="action_fullscreen">Full Screen</string>
+    <string name="action_fullscreen_source">Full Screen Source Text</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="action_hide_labels">Hide Labels</string>
+    <string name="action_hide_paragraphs">Hide Paragraphs</string>
+    <string name="action_menu">Main Menu</string>
     <string name="action_move_up">Move Up</string>
-    <string name="action_close">Close</string>
+    <string name="action_more_options">More Options</string>
+    <string name="action_ocr">Ocr Image to Text</string>
+    <string name="action_paste">Paste</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_save">Save</string>
+    <string name="action_search">Search</string>
+    <string name="action_select">Select</string>
+    <string name="action_select_all">Select All</string>
+    <string name="action_share">Share</string>
+    <string name="action_show_labels">Show Labels</string>
+    <string name="action_show_paragraphs">Show Paragraphs</string>
     <string name="action_speak">Speak</string>
     <string name="action_speaking">Speaking</string>
     <string name="action_speak_source">Speak Source Text</string>
-    <string name="action_search">Search</string>
-    <string name="action_expand">Expand</string>
-    <string name="action_dismiss">Dismiss</string>
-    <string name="action_collapse">Collapse</string>
-    <string name="action_clear_search">Clear Search</string>
-    <string name="action_translate">Translate</string>
     <string name="action_speech_to_text">Speech to Text</string>
-    <string name="action_fullscreen">Full Screen</string>
-    <string name="action_fullscreen_source">Full Screen Source Text</string>
-    <string name="action_more_options">More Options</string>
-    <string name="action_select_all">Select All</string>
-    <string name="action_deselect_all">Deselect All</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
     <string name="action_swap_languages">Swap Languages</string>
-    <string name="action_show_labels">Show Labels</string>
-    <string name="action_hide_labels">Hide Labels</string>
-    <string name="action_show_paragraphs">Show Paragraphs</string>
-    <string name="action_hide_paragraphs">Hide Paragraphs</string>
-    <string name="action_clear_history">Clear All History</string>
-    <string name="action_clear_bookmarks">Clear All Bookmarks</string>
-    <string name="copied_message">Copied!</string>
+    <string name="action_translate">Translate</string>
+    <string name="action_try_another_provider">Try Another Provider</string>
+    <string name="retry">Retry</string>
 
-    <!-- Snackbar Messages -->
-    <string name="failed_to_copy">Failed to copy text</string>
-    <string name="failed_to_share">Failed to share text</string>
-    <string name="text_pasted">Text pasted</string>
-    <string name="failed_to_paste">Failed to paste text</string>
-
-    <!-- Navigation -->
-    <string name="nav_back">Back</string> <!-- Duplicated entry, kept to avoid breaking code, consider removing one -->
-    <string name="nav_search">Search</string>
-
-    <!-- Bookmarks -->
+    <!-- Navigation & Screen Titles -->
     <string name="bookmarks_title">Bookmarks</string>
-    <string name="bookmark_add">Save</string>
-    <string name="bookmark_remove">Remove</string>
-    <string name="bookmarks_search_hint">Search Saved Translations</string>
-
-
-    <string name="bookmarks_empty_title">No Bookmarks</string>
-    <string name="bookmarks_empty_subtitle">Save translations to view them later.</string>
-    <string name="words_bookmarks">Bookmarked Words</string>
-
-    <string name="ocr_empty_state_title">Scan an Image</string>
-    <string name="ocr_empty_state_description">Scan an image or select one from gallery</string>
-
-    <string name="words_bookmarks_empty_state_title">No words bookmarked</string>
-    <string name="words_bookmarks_empty_state_subtitle">Bookmark words to practice them later.</string>
-
-    <string name="phrase_empty_state_title">No phrases found</string>
-    <string name="phrase_empty_state_subtitle">No matching phrases were found. Try searching for something else.</string>
-
-    <!-- History -->
     <string name="history_title">History</string>
-    <string name="history_empty_title">No History</string>
-    <string name="history_empty_subtitle">Your recent translations will appear here.</string>
+    <string name="nav_back">Back</string>
+    <string name="nav_search">Search</string>
+    <string name="ocr_title">OCR</string>
+    <string name="onboarding">Onboarding</string>
+    <string name="phrase_title">PhraseBook</string>
+    <string name="quiz_title">Quiz</string>
+    <string name="settings_title">Settings</string>
+    <string name="stackcard_title">StackCard</string>
+    <string name="translate_title">Translate</string>
+    <string name="words_title">Words</string>
 
-    <!-- Search -->
-    <string name="search_no_results_title">No Results Found</string>
-    <string name="search_no_results_subtitle">Try searching with different keywords.</string>
+    <!-- Onboarding -->
+    <string name="onboarding_feature1">100+ Languages</string>
+    <string name="onboarding_feature10">Speech Recognition</string>
+    <string name="onboarding_feature11">Text-to-Speech</string>
+    <string name="onboarding_feature12">Voice-to-Text</string>
+    <string name="onboarding_feature13">User-Friendly Interface</string>
+    <string name="onboarding_feature14">Progress Tracking</string>
+    <string name="onboarding_feature15">Adaptive Learning</string>
+    <string name="onboarding_feature2">AI-Powered Translation</string>
+    <string name="onboarding_feature3">Context Awareness</string>
+    <string name="onboarding_feature4">Image to Text</string>
+    <string name="onboarding_feature5">Document Scanning</string>
+    <string name="onboarding_feature6">Handwriting Support</string>
+    <string name="onboarding_feature7">Interactive Lessons</string>
+    <string name="onboarding_feature8">Real Conversations</string>
+    <string name="onboarding_feature9">Daily Challenges</string>
+    <string name="onboarding_page1_description">LingoLens is your trusted companion for language learning. Our advanced language translation and text-to-speech capabilities will help you communicate effortlessly with anyone, anywhere.</string>
+    <string name="onboarding_page1_subtitle">Your AI Language Partner</string>
+    <string name="onboarding_page1_title">Welcome to LingoLens</string>
+    <string name="onboarding_page2_description">Real-time translation across 100+ languages with advanced AI and context awareness.</string>
+    <string name="onboarding_page2_subtitle">Real-time Translation</string>
+    <string name="onboarding_page2_title">Smart Translation</string>
+    <string name="onboarding_page3_description">Instantly extract and translate text from images, documents, and real-world objects with our advanced OCR technology.</string>
+    <string name="onboarding_page3_subtitle">Text in a Snap</string>
+    <string name="onboarding_page3_title">AI-Powered OCR</string>
+    <string name="onboarding_page4_description">Engage with interactive lessons and real-world scenarios that make learning natural and effective.</string>
+    <string name="onboarding_page4_subtitle">Learn by Doing</string>
+    <string name="onboarding_page4_title">Immersive Learning</string>
+    <string name="onboarding_page5_description">Unleash your creativity with our voice recognition feature, perfect for writing, speaking, and more.</string>
+    <string name="onboarding_page5_subtitle">Unleash Your Voice</string>
+    <string name="onboarding_page5_title">Voice Recognition</string>
+    <string name="onboarding_page6_description">Join millions of users mastering new languages with our comprehensive learning platform.</string>
+    <string name="onboarding_page6_subtitle">Fluency Awaits</string>
+    <string name="onboarding_page6_title">Start Your Journey</string>
+
+    <!-- Translation Screen -->
+    <string name="collapse_translation">Show less</string>
+    <string name="expand_translation">Show full translation</string>
+    <string name="more_lines_count">+%d more lines</string>
+    <string name="start_conversation">Use the microphone buttons below to begin translating.</string>
+    <string name="synonyms_label">Synonyms</string>
+    <string name="translate_result_placeholder">Translation will appear here.</string>
+    <string name="translate_type_text">Type text to translate</string>
 
     <!-- Language Selection -->
-    <string name="select_language">Select Language</string>
-    <string name="language_selected">Language Selected</string>
-    <string name="language_no_results">Sorry, no languages found</string>
     <string name="language_native_name_hint">Native Name</string>
+    <string name="language_no_results">Sorry, no languages found</string>
+    <string name="language_selected">Language Selected</string>
+    <string name="select_language">Select Language</string>
 
-    <!-- Translation -->
-    <string name="translate_type_text">Type text to translate</string>
-    <string name="translate_result_placeholder">Translation will appear here.</string>
+    <!-- History & Bookmarks -->
+    <string name="bookmark_add">Save</string>
+    <string name="bookmark_remove">Remove</string>
+    <string name="bookmarks_empty_subtitle">Save translations to view them later.</string>
+    <string name="bookmarks_empty_title">No Bookmarks</string>
+    <string name="bookmarks_search_hint">Search Saved Translations</string>
+    <string name="history_empty_subtitle">Your recent translations will appear here.</string>
+    <string name="history_empty_title">No History</string>
+    <string name="words_bookmarks">Bookmarked Words</string>
+    <string name="words_bookmarks_empty_state_subtitle">Bookmark words to practice them later.</string>
+    <string name="words_bookmarks_empty_state_title">No words bookmarked</string>
 
-    <string name="more_lines_count">+%d more lines</string>
-    <string name="expand_translation">Show full translation</string>
-    <string name="collapse_translation">Show less</string>
-    <string name="synonyms_label">Synonyms</string>
-
-    <!-- Confirmation Dialog -->
-    <string name="dialog_clear_all_title">Clear All Items</string>
-    <string name="dialog_clear_all_message">Are you sure you want to clear all items? This action cannot be undone.</string>
-    <string name="dialog_confirm">Confirm</string>
-    <string name="dialog_cancel">Cancel</string>
-
-
-    <!-- Speech State Messages -->
-    <string name="speech_state_listening">Listening…</string>
-    <string name="speech_state_partial">I heard…</string>
-    <string name="speech_state_result">I got it!</string>
-    <string name="speech_state_error">Oops!</string>
-    <string name="speech_state_ready">Ready to listen</string>
-
-    <!-- Speech Error Messages -->
-    <string name="speech_error_no_permission">Microphone permission needed</string>
-    <string name="speech_error_not_available">Speech recognition unavailable on this device.</string>
-    <string name="speech_error_audio">Audio recording error</string>
-    <string name="speech_error_network">Network error</string>
-    <string name="speech_error_timeout">Network timeout</string>
-    <string name="speech_error_no_match">Couldn\'t understand that</string>
-    <string name="speech_error_busy">Speech service busy</string>
-    <string name="speech_error_server">Server error</string>
-    <string name="speech_error_no_input">No speech detected</string>
-    <string name="speech_error_unknown">Something went wrong</string>
-
-
-    <string name="ocr_title">OCR</string>
-    <string name="translate_title">Translate</string>
-    <string name="quiz_title">Quiz</string>
-
-
-    <string name="retry">Retry</string>
-    <string name="error_message">Please try again.</string>
-    <string name="recognized_text_placeholder">Recognized text will appear here.</string>
-    <string name="ocr_image_content_description">OCR Image</string>
+    <!-- OCR -->
+    <string name="ocr_empty_state_description">Scan an image or select one from gallery</string>
+    <string name="ocr_empty_state_title">Scan an Image</string>
     <string name="ocr_entry_description">OCR text from %1$s: %2$s</string>
-    <string name="settings_title">Settings</string>
-    <string name="action_start">Start</string>
-    <string name="action_continue">Continue</string>
-    <string name="action_stop">Stop</string>
-    <string name="action_pause">Pause</string>
-    <string name="action_resume">Resume</string>
-    <string name="transcript_label">Transcript</string>
-    <string name="action_menu">Main Menu</string>
-    <string name="category">Category</string>
-    <string name="phrase">Phrase</string>
-    <string name="phrase_title">PhraseBook</string>
-    <string name="phrases">Phrases</string>
+    <string name="ocr_image_content_description">OCR Image</string>
+    <string name="recognized_text_placeholder">Recognized text will appear here.</string>
+
+    <!-- Learning, Phrases & Vocab Levels -->
+    <string name="card_sentence_practice">Practice sentences using cards.</string>
+    <string name="card_swiper_stack">Card stack for learning words.</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="correct_answers">Correct</string>
+    <string name="delete_language_model">Delete Language Model</string>
+    <string name="desc_advanced">Professional and academic vocabulary</string>
+    <string name="desc_beginner">Most common words in daily use</string>
+    <string name="desc_elementary">Basic vocabulary for everyday communication</string>
+    <string name="desc_intermediate">Expanded vocabulary for fluent conversation</string>
+    <string name="desc_mastery">Expert level vocabulary</string>
+    <string name="desc_upper_intermediate">Advanced communication skills</string>
+    <string name="description_master_vocab">Master vocabulary across different proficiency levels</string>
+    <string name="download_language_model">Download Language Model</string>
+    <string name="example_sentences">Example Sentences</string>
     <string name="forgot">Forgot</string>
     <string name="i_remember">I Remember</string>
+    <string name="learn">Learn</string>
+    <string name="learning_language">Learning Language</string>
+    <string name="level_advanced">Advanced</string>
+    <string name="level_beginner">Beginner</string>
+    <string name="level_completed">Level Complete</string>
+    <string name="level_elementary">Elementary</string>
+    <string name="level_intermediate">Intermediate</string>
+    <string name="level_mastery">Mastery</string>
+    <string name="level_progress">Master vocabulary across different skill levels</string>
+    <string name="level_upper_intermediate">Upper Intermediate</string>
+    <string name="locked">Locked</string>
+    <string name="next_level">Next Level</string>
+    <string name="next_level_unlocked">Next Level Unlocked!</string>
+    <string name="percentage">%</string>
+    <string name="phrase_empty_state_subtitle">No matching phrases were found. Try searching for something else.</string>
+    <string name="phrase_empty_state_title">No phrases found</string>
+    <string name="score">Your Score</string>
+    <string name="search_for_words">Search for words...</string>
+    <string name="sentence_explorer">Sentence Explorer</string>
+    <string name="sentences_found">(%1$d) sentence found</string>
+    <string name="start_learning">Start Learning</string>
+    <string name="test">Test</string>
+    <string name="title_language_learning">Language Learning</string>
+    <string name="try_again">Try Again</string>
+
+    <!-- Quiz UI -->
+    <string name="back_button">Back</string>
+    <string name="bookmark_question">Bookmark %1$s</string>
+    <string name="copy_question">Copy %1$s</string>
+    <string name="correct_answer">Correct</string>
+    <string name="correct_symbol">✓</string>
+    <string name="examples">Examples</string>
+    <string name="hearts_description">Hearts</string>
+    <string name="incorrect_answer">Incorrect</string>
+    <string name="incorrect_symbol">✗</string>
+    <string name="lock_in_dictionary">Lock in dictionary for %1$s</string>
+    <string name="next_button">Next</string>
+    <string name="option_a">A</string>
+    <string name="option_b">B</string>
+    <string name="option_c">C</string>
+    <string name="option_d">D</string>
+    <string name="parts_of_speech">Part of speech</string>
+    <string name="question_progress">Question %1$d of %2$d</string>
+    <string name="question_progress_percentage">%1$d%%</string>
+    <string name="share_question">Share %1$s and its answer</string>
+    <string name="speech_to_text">Speech-to-text for %1$s</string>
+    <string name="streak_milestone">🔥 %1$dx Streak!</string>
+    <string name="streak_notification">%1$d day streak! 🔥</string>
+    <string name="time_remaining">%1$ds</string>
+    <string name="timer_description">Timer</string>
+
+    <!-- Flashcards -->
+    <string name="empty_state_button_text">Load More Cards</string>
+    <string name="empty_state_emoji">📚</string>
+    <string name="empty_state_message">You have completed all available cards. Ready for more?</string>
+    <string name="empty_state_title">Great job! 🎉</string>
+    <string name="onboarding_button_text">Got it!</string>
+    <string name="onboarding_step_1_description">Tap the card to see the translation</string>
+    <string name="onboarding_step_1_icon">👆</string>
+    <string name="onboarding_step_1_title">Tap to Flip</string>
+    <string name="onboarding_step_2_description">Swipe left if you forgot this word</string>
+    <string name="onboarding_step_2_icon">←</string>
+    <string name="onboarding_step_2_title">Swipe Left</string>
+    <string name="onboarding_step_3_description">Swipe right if you remember this word</string>
+    <string name="onboarding_step_3_icon">→</string>
+    <string name="onboarding_step_3_title">Swipe Right</string>
+    <string name="onboarding_title">How to Use</string>
+
+    <!-- Speech & Voice -->
+    <string name="speech_error_audio">Audio recording error</string>
+    <string name="speech_error_busy">Speech service busy</string>
+    <string name="speech_error_network">Network error</string>
+    <string name="speech_error_no_input">No speech detected</string>
+    <string name="speech_error_no_match">Couldn\'t understand that</string>
+    <string name="speech_error_no_permission">Microphone permission needed</string>
+    <string name="speech_error_not_available">Speech recognition unavailable on this device.</string>
+    <string name="speech_error_server">Server error</string>
+    <string name="speech_error_timeout">Network timeout</string>
+    <string name="speech_error_unknown">Something went wrong</string>
+    <string name="speech_state_error">Oops!</string>
+    <string name="speech_state_listening">Listening…</string>
+    <string name="speech_state_partial">I heard…</string>
+    <string name="speech_state_ready">Ready to listen</string>
+    <string name="speech_state_result">I got it!</string>
+    <string name="transcript_label">Transcript</string>
+
+    <!-- Dialogs & Messages -->
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_clear_all_message">Are you sure you want to clear all items? This action cannot be undone.</string>
+    <string name="dialog_clear_all_title">Clear All Items</string>
+    <string name="dialog_confirm">Confirm</string>
     <string name="dialog_title">Dialog</string>
-    <string name="stackcard_title">StackCard</string>
-    <string name="words_title">Words</string>
-    <string name="card_swiper_stack">Card stack for learning words.</string>
-    <string name="card_sentence_practice">Practice sentences using cards.</string>
-    <string name="start_conversation">Use the microphone buttons below to begin translating.</string>
     <string name="no_messages_found">No Messages, Start a Conversation</string>
+    <string name="premium_feature_description">Premium feature requires subscription</string>
+    <string name="search_no_results_subtitle">Try searching with different keywords.</string>
+    <string name="search_no_results_title">No Results Found</string>
 
-    <string name="action_camera">Camera</string>
-    <string name="action_gallery">Gallery</string>
-    <string name="action_files">Files</string>
-    <string name="synonyms">Synonyms</string>
+    <!-- Update Dialog -->
+    <string name="destination_update_available_desc">A new version of the app is available. Update now to enjoy the latest features and improvements.</string>
+    <string name="force_update_description">This update is required to continue using the app. Please update to the latest version.</string>
+    <string name="update">Update</string>
+    <string name="update_available">Update Available</string>
+    <string name="update_required">Update Required</string>
+    <string name="whats_new">Whats New</string>
+
+    <!-- Status Messages (Success, Loading, Error) -->
+    <string name="failed_to_copy">Failed to copy text</string>
+    <string name="failed_to_paste">Failed to paste text</string>
+    <string name="failed_to_share">Failed to share text</string>
+    <string name="text_pasted">Text pasted</string>
+    <string name="translation_bookmarked">Translation bookmarked</string>
+    <string name="translation_loading">Translating…</string>
+    <string name="translation_loading_provider">Translating with %s…</string>
+    <string name="translation_saved">Translation saved to history</string>
+    <string name="translation_success">Translation completed successfully</string>
+
+    <!-- Error Messages -->
+    <string name="error_authentication">Authentication failed. Please check your API configuration.</string>
+    <string name="error_chatgpt_quota">ChatGPT quota exceeded. Please try another provider.</string>
+    <string name="error_database">Database error occurred. Please try again.</string>
+    <string name="error_deepseek_api">DeepSeek API error. Please check your configuration.</string>
+    <string name="error_gemini_safety">Content blocked by Gemini safety filters.</string>
+    <string name="error_generic">An unexpected error occurred. Please try again.</string>
+    <string name="error_generic_translation">Translation failed. Please try again.</string>
+    <string name="error_groq_model">Groq model unavailable. Please try again later.</string>
+    <string name="error_huggingface_model">HuggingFace model loading. Please wait and try again.</string>
+    <string name="error_invalid_response">Invalid response from translation service.</string>
+    <string name="error_network">No internet connection. Please check your network and try again.</string>
+    <string name="error_rate_limit">Too many requests. Please wait a moment before trying again.</string>
+    <string name="error_server">Server temporarily unavailable. Please try again later.</string>
+    <string name="error_timeout">Request timed out. Please try again.</string>
+    <string name="error_unsupported_provider">This translation provider is not supported.</string>
+    <string name="error_validation">Invalid input provided. Please check your text.</string>
+
+    <!-- Settings Screen -->
+    <string name="about">About</string>
+    <string name="continu">Continue</string>
     <string name="definitions">Definitions</string>
-    <string name="translations">Translations</string>
-    <string name="dictionary">Dictionary</string>
-    <string name="show_less">Show Less</string>
-    <string name="show_all">Show All</string>
-    <string name="show_more">Show More</string>
-    <string name="action_ocr">Ocr Image to Text</string>
-    <string name="type_something">Type something…</string>
-    <string name="settings">Settings</string>
-
-
-    <!-- General -->
     <string name="display">Display</string>
     <string name="language">Language</string>
+    <string name="show_all">Show All</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_more">Show More</string>
     <string name="speech">Speech</string>
-    <string name="about">About</string>
-    <string name="open">Open</string>
-    <string name="next">NEXT</string>
-    <string name="continu">Continue</string>
-    <string name="skip">Skip</string>
-    <string name="get_started">Get Started</string>
 
-    <!-- Theme and Colors -->
-    <string name="theme">THEME</string>
-    <string name="app_theme">App theme</string>
-    <string name="dark_mode">Dark</string>
-    <string name="light_mode">Light</string>
-    <string name="follow_system">Follow system</string>
+    <!-- Settings: Theme & Display -->
     <string name="amoled_black">Pure black</string>
     <string name="amoled_black_desc">Use black color on background in dark mode</string>
+    <string name="app_theme">App theme</string>
+    <string name="colors">COLORS</string>
+    <string name="dark_mode">Dark</string>
+    <string name="follow_system">Follow system</string>
+    <string name="font_type">Font type</string>
+    <string name="light_mode">Light</string>
     <string name="monochrome">Monochrome</string>
     <string name="monochrome_desc">Use monochrome colors</string>
-    <string name="colors">COLORS</string>
+    <string name="palette_style">Palette style</string>
     <string name="primary_color">Primary color</string>
     <string name="primary_color_desc">The theme primary color</string>
-    <string name="palette_style">Palette style</string>
-    <string name="wallpaper_color">Material you</string>
-    <string name="wallpaper_color_desc">Use wallpapers color</string>
     <string name="random_color">Random color</string>
     <string name="random_color_desc">Use random color that updates every time you open the app</string>
-    <string name="font_type">Font type</string>
+    <string name="select_color">Select Color</string>
+    <string name="theme">THEME</string>
     <string name="theme_and_colors">Theme and colors</string>
+    <string name="wallpaper_color">Material you</string>
+    <string name="wallpaper_color_desc">Use wallpapers color</string>
+    <string name="wallpaper_colors">Use Wallpaper Color</string>
+    <string name="wallpaper_colors_desc">Use wallpaper colors as primary color</string>
 
-    <!-- Language -->
+    <!-- Settings: Language -->
     <string name="app_language">App language</string>
-    <string name="native_language">Native language</string>
-
     <string name="lang_follow_system">Follow System</string>
 
-
-    <!-- Speech -->
+    <!-- Settings: Speech -->
     <string name="auto_pronunciation">Auto Pronunciation</string>
     <string name="auto_pronunciation_desc">Pronounce words after translation</string>
     <string name="speech_rate">Speech Rate</string>
 
-    <!-- About & Info -->
-    <string name="info">Info</string>
-    <string name="credits">Credits</string>
+    <!-- Settings: About & Info -->
     <string name="about_credits">Designed and developed by Amgad Ghozzy in Egypt</string>
     <string name="connect_with_us">Connect With Us</string>
+    <string name="credits">Credits</string>
+    <string name="help_translate">Help Translate</string>
+    <string name="info">Info</string>
     <string name="legal">Legal Information</string>
+    <string name="licenses">Open Source Licenses</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="open_source_licenses_desc">View licenses for open source libraries used in this app</string>
-    <string name="licenses">Open Source Licenses</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="terms">Terms of Service</string>
     <string name="rate_app">Rate App</string>
+    <string name="rate_app_desc">Rate us on Play Store</string>
     <string name="report_issue">Report Issue</string>
-    <string name="help_translate">Help Translate</string>
+    <string name="report_issue_desc">Send us feedback</string>
     <string name="share_app">Share App</string>
+    <string name="share_app_desc">Share app link</string>
+    <string name="terms">Terms of Service</string>
 
-    <!-- Social/Contact -->
-    <string name="github">Github</string>
+    <!-- Settings: Social & Contact -->
+    <string name="donate">Donate</string>
     <string name="email">Email</string>
-    <string name="twitter">Twitter</string>
+    <string name="github">Github</string>
     <string name="linkedin">Linkedin</string>
     <string name="report_bugs">Report bugs</string>
-    <string name="donate">Donate</string>
     <string name="share">Share</string>
+    <string name="twitter">Twitter</string>
 
-    <!-- Update Dialog -->
-    <string name="force_update_description">This update is required to continue using the app. Please update to the latest version.</string>
-    <string name="destination_update_available_desc">A new version of the app is available. Update now to enjoy the latest features and improvements.</string>
-    <string name="update_required">Update Required</string>
-    <string name="update_available">Update Available</string>
-    <string name="whats_new">Whats New</string>
-    <string name="update">Update</string>
-    <string name="app_version">App Version</string>
-    <string name="share_app_desc">Share app link</string>
-    <string name="report_issue_desc">Send us feedback</string>
-    <string name="rate_app_desc">Rate us on Play Store</string>
-    <string name="hearts">Hearts</string>
-    <string name="select_color">Select Color</string>
-    <string name="action_select">Select</string>
-    <string name="wallpaper_colors">Use Wallpaper Color</string>
-    <string name="wallpaper_colors_desc">Use wallpaper colors as primary color</string>
-
-
-    <string name="level_beginner">Beginner</string>
-    <string name="desc_beginner">Most common words in daily use</string>
-
-    <string name="level_elementary">Elementary</string>
-    <string name="desc_elementary">Basic vocabulary for everyday communication</string>
-
-    <string name="level_intermediate">Intermediate</string>
-    <string name="desc_intermediate">Expanded vocabulary for fluent conversation</string>
-
-    <string name="level_upper_intermediate">Upper Intermediate</string>
-    <string name="desc_upper_intermediate">Advanced communication skills</string>
-
-    <string name="level_advanced">Advanced</string>
-    <string name="desc_advanced">Professional and academic vocabulary</string>
-
-    <string name="level_mastery">Mastery</string>
-    <string name="desc_mastery">Expert level vocabulary</string>
-
-    <string name="title_language_learning">Language Learning</string>
-    <string name="description_master_vocab">Master vocabulary across different proficiency levels</string>
-
-
-    <!-- Translation Error Messages -->
-    <string name="error_generic_translation">Translation failed. Please try again.</string>
-    <string name="error_network">No internet connection. Please check your network and try again.</string>
-    <string name="error_timeout">Request timed out. Please try again.</string>
-    <string name="error_authentication">Authentication failed. Please check your API configuration.</string>
-    <string name="error_rate_limit">Too many requests. Please wait a moment before trying again.</string>
-    <string name="error_server">Server temporarily unavailable. Please try again later.</string>
-    <string name="error_unsupported_provider">This translation provider is not supported.</string>
-    <string name="error_invalid_response">Invalid response from translation service.</string>
-    <string name="error_database">Database error occurred. Please try again.</string>
-    <string name="error_validation">Invalid input provided. Please check your text.</string>
-    <string name="error_generic">An unexpected error occurred. Please try again.</string>
-
-    <!-- Provider Specific Errors -->
-    <string name="error_chatgpt_quota">ChatGPT quota exceeded. Please try another provider.</string>
-    <string name="error_gemini_safety">Content blocked by Gemini safety filters.</string>
-    <string name="error_groq_model">Groq model unavailable. Please try again later.</string>
-    <string name="error_deepseek_api">DeepSeek API error. Please check your configuration.</string>
-    <string name="error_huggingface_model">HuggingFace model loading. Please wait and try again.</string>
-
-    <!-- Success Messages -->
-    <string name="translation_success">Translation completed successfully</string>
-    <string name="translation_saved">Translation saved to history</string>
-    <string name="translation_bookmarked">Translation bookmarked</string>
-
-    <!-- Loading Messages -->
-    <string name="translation_loading">Translating…</string>
-    <string name="translation_loading_provider">Translating with %s…</string>
-
-    <!-- Retry Actions -->
-    <string name="action_retry">Retry</string>
-    <string name="action_try_another_provider">Try Another Provider</string>
-    <string name="action_check_settings">Check Settings</string>
-
-    <!-- Provider Names -->
-    <string name="provider_google">Google Translate</string>
-    <string name="provider_offline">Offline</string>
-    <string name="provider_chatgpt">ChatGPT</string>
-    <string name="provider_gemini">Gemini</string>
-    <string name="provider_groq">Groq</string>
-    <string name="provider_deepseek">DeepSeek</string>
-    <string name="provider_huggingface">HuggingFace</string>
-
-    <!-- Provider Descriptions -->
+    <!-- Translation Providers -->
     <string name="change_translation_provider_cd">Change translation provider, current is %s</string>
-    <string name="selected_indicator_cd">Selected</string>
-    <string name="provider_google_description">Fast and reliable translation service</string>
-    <string name="provider_offline_description">Offline translation</string>
+    <string name="collapse_providers_list">Tap to hide provider list</string>
+    <string name="current_provider">Currently using %1$s as translation provider</string>
+    <string name="dropdown_role">Translation provider dropdown</string>
+    <string name="expand_providers_list">Tap to show all providers</string>
+    <string name="provider_chatgpt">ChatGPT</string>
     <string name="provider_chatgpt_description">AI-powered translations with context understanding</string>
-    <string name="provider_gemini_description">AI-powered translations with context understanding</string>
-    <string name="provider_groq_description">AI-powered translations with context understanding</string>
+    <string name="provider_deepseek">DeepSeek</string>
     <string name="provider_deepseek_description">AI-powered translations with context understanding</string>
+    <string name="provider_gemini">Gemini</string>
+    <string name="provider_gemini_description">AI-powered translations with context understanding</string>
+    <string name="provider_google">Google Translate</string>
+    <string name="provider_google_description">Fast and reliable translation service</string>
+    <string name="provider_groq">Groq</string>
+    <string name="provider_groq_description">AI-powered translations with context understanding</string>
+    <string name="provider_huggingface">HuggingFace</string>
     <string name="provider_huggingface_description">AI-powered translations with context understanding</string>
-
-    <!-- Provider Selection UI -->
+    <string name="provider_icon">%1$s icon</string>
+    <string name="provider_offline">Offline</string>
+    <string name="provider_offline_description">Offline translation</string>
     <string name="provider_premium_badge">PRO</string>
+    <string name="provider_selected">Selected</string>
+    <string name="select_provider">Select %1$s as translation provider</string>
+    <string name="selected_indicator_cd">Selected</string>
     <string name="translation_provider_selector">Translation provider selector</string>
     <string name="translation_provider_selector_with_current">Translation provider: %1$s. Tap to change</string>
-    <string name="select_provider">Select %1$s as translation provider</string>
-    <string name="current_provider">Currently using %1$s as translation provider</string>
-    <string name="expand_providers_list">Tap to show all providers</string>
-    <string name="collapse_providers_list">Tap to hide provider list</string>
-    <string name="dropdown_role">Translation provider dropdown</string>
-    <string name="provider_selected">Selected</string>
-    <string name="provider_icon">%1$s icon</string>
-    <string name="premium_feature_description">Premium feature requires subscription</string>
-
-    <!-- Onboarding Pages -->
-    <string name="onboarding_page1_title">Welcome to LingoLens</string>
-    <string name="onboarding_page1_subtitle">Your AI Language Partner</string>
-    <string name="onboarding_page1_description">LingoLens is your trusted companion for language learning. Our advanced language translation and text-to-speech capabilities will help you communicate effortlessly with anyone, anywhere.</string>
-
-    <string name="onboarding_page2_title">Smart Translation</string>
-    <string name="onboarding_page2_subtitle">Real-time Translation</string>
-    <string name="onboarding_page2_description">Real-time translation across 100+ languages with advanced AI and context awareness.</string>
-    <string name="onboarding_feature1">100+ Languages</string>
-    <string name="onboarding_feature2">AI-Powered Translation</string>
-    <string name="onboarding_feature3">Context Awareness</string>
-
-    <string name="onboarding_page3_title">AI-Powered OCR</string>
-    <string name="onboarding_page3_subtitle">Text in a Snap</string>
-    <string name="onboarding_page3_description">Instantly extract and translate text from images, documents, and real-world objects with our advanced OCR technology.</string>
-    <string name="onboarding_feature4">Image to Text</string>
-    <string name="onboarding_feature5">Document Scanning</string>
-    <string name="onboarding_feature6">Handwriting Support</string>
-
-    <string name="onboarding_page4_title">Immersive Learning</string>
-    <string name="onboarding_page4_subtitle">Learn by Doing</string>
-    <string name="onboarding_page4_description">Engage with interactive lessons and real-world scenarios that make learning natural and effective.</string>
-    <string name="onboarding_feature7">Interactive Lessons</string>
-    <string name="onboarding_feature8">Real Conversations</string>
-    <string name="onboarding_feature9">Daily Challenges</string>
-
-    <string name="onboarding_page5_title">Voice Recognition</string>
-    <string name="onboarding_page5_subtitle">Unleash Your Voice</string>
-    <string name="onboarding_page5_description">Unleash your creativity with our voice recognition feature, perfect for writing, speaking, and more.</string>
-    <string name="onboarding_feature10">Speech Recognition</string>
-    <string name="onboarding_feature11">Text-to-Speech</string>
-    <string name="onboarding_feature12">Voice-to-Text</string>
-
-    <string name="onboarding_page6_title">Start Your Journey</string>
-    <string name="onboarding_page6_subtitle">Fluency Awaits</string>
-    <string name="onboarding_page6_description">Join millions of users mastering new languages with our comprehensive learning platform.</string>
-    <string name="onboarding_feature13">User-Friendly Interface</string>
-    <string name="onboarding_feature14">Progress Tracking</string>
-    <string name="onboarding_feature15">Adaptive Learning</string>
-
-    <!-- Learning UI -->
-    <string name="start_learning">Start Learning</string>
-    <string name="learn">Learn</string>
-    <string name="test">Test</string>
-    <string name="next_level">Next Level</string>
-    <string name="congratulations">Congratulations</string>
-    <string name="try_again">Try Again</string>
-    <string name="words">Words</string>
-    <string name="next_level_unlocked">Next Level Unlocked!</string>
-    <string name="correct_answers">Correct</string>
-    <string name="percentage">%</string>
-    <string name="score">Your Score</string>
-    <string name="level_completed">Level Complete</string>
-    <string name="delete_language_model">Delete Language Model</string>
-    <string name="download_language_model">Download Language Model</string>
-    <string name="sentence_explorer">Sentence Explorer</string>
 
 </resources>

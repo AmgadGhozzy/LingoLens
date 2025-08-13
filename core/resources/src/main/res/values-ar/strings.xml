@@ -4,11 +4,13 @@
     <!-- App & General -->
     <string name="app_name">LingoLens</string>
     <string name="app_version">إصدار التطبيق</string>
+    <string name="badge_new">جديد</string>
     <string name="category">الفئة</string>
     <string name="copied_message">تم النسخ!</string>
     <string name="default_notification_channel_id">lingo_lens_channel</string>
     <string name="dictionary">قاموس</string>
     <string name="error_message">يرجى المحاولة مرة أخرى.</string>
+    <string name="get_started">ابدأ</string>
     <string name="hearts">القلوب</string>
     <string name="native_language">اللغة الأم</string>
     <string name="next">التالي</string>
@@ -25,6 +27,7 @@
     <!-- Actions -->
     <string name="action_back">رجوع</string>
     <string name="action_camera">الكاميرا</string>
+    <string name="action_check_settings">التحقق من الإعدادات</string>
     <string name="action_clear">مسح</string>
     <string name="action_clear_bookmarks">مسح جميع الإشارات المرجعية</string>
     <string name="action_clear_history">مسح السجل بالكامل</string>
@@ -36,7 +39,7 @@
     <string name="action_copy_source">نسخ النص الأصلي</string>
     <string name="action_delete">حذف</string>
     <string name="action_deselect_all">إلغاء تحديد الكل</string>
-    <string name="retry">إعادة المحاولة</string>
+    <string name="action_dismiss">تجاهل</string>
     <string name="action_expand">توسيع</string>
     <string name="action_files">الملفات</string>
     <string name="action_fullscreen">شاشة كاملة</string>
@@ -45,12 +48,13 @@
     <string name="action_hide_labels">إخفاء التصنيفات</string>
     <string name="action_hide_paragraphs">إخفاء الفقرات</string>
     <string name="action_menu">القائمة الرئيسية</string>
-    <string name="action_more_options">خيارات إضافية</string>
     <string name="action_move_up">نقل لأعلى</string>
+    <string name="action_more_options">خيارات إضافية</string>
     <string name="action_ocr">تحويل الصورة إلى نص</string>
-    <string name="action_pause">إيقاف مؤقت</string>
     <string name="action_paste">لصق</string>
+    <string name="action_pause">إيقاف مؤقت</string>
     <string name="action_resume">استئناف</string>
+    <string name="action_retry">إعادة المحاولة</string>
     <string name="action_save">حفظ</string>
     <string name="action_search">بحث</string>
     <string name="action_select">اختيار</string>
@@ -59,20 +63,15 @@
     <string name="action_show_labels">إظهار التصنيفات</string>
     <string name="action_show_paragraphs">إظهار الفقرات</string>
     <string name="action_speak">تحدث</string>
-    <string name="action_speak_source">تحدث بالنص الأصلي</string>
     <string name="action_speaking">يتم التحدث</string>
+    <string name="action_speak_source">تحدث بالنص الأصلي</string>
     <string name="action_speech_to_text">تحويل الكلام إلى نص</string>
     <string name="action_start">ابدأ</string>
     <string name="action_stop">إيقاف</string>
     <string name="action_swap_languages">تبديل اللغات</string>
     <string name="action_translate">ترجمة</string>
     <string name="action_try_another_provider">جرّب موفر خدمة آخر</string>
-    <string name="action_check_settings">التحقق من الإعدادات</string>
-
-    <string name="failed_to_copy">فشل في نسخ النص</string>
-    <string name="failed_to_share">فشل في مشاركة النص</string>
-    <string name="text_pasted">تم لصق النص</string>
-    <string name="failed_to_paste">فشل في لصق النص</string>
+    <string name="retry">إعادة المحاولة</string>
 
     <!-- Navigation & Screen Titles -->
     <string name="bookmarks_title">الإشارات المرجعية</string>
@@ -80,6 +79,7 @@
     <string name="nav_back">رجوع</string>
     <string name="nav_search">بحث</string>
     <string name="ocr_title">التعرف على النص</string>
+    <string name="onboarding">الإعداد الأولي</string>
     <string name="phrase_title">كتاب العبارات</string>
     <string name="quiz_title">اختبار</string>
     <string name="settings_title">الإعدادات</string>
@@ -88,8 +88,13 @@
     <string name="words_title">كلمات</string>
 
     <!-- Onboarding -->
-    <string name="get_started">ابدأ</string>
     <string name="onboarding_feature1">100+ لغة</string>
+    <string name="onboarding_feature10">التعرف على الكلام</string>
+    <string name="onboarding_feature11">تحويل النص إلى كلام</string>
+    <string name="onboarding_feature12">تحويل الصوت إلى نص</string>
+    <string name="onboarding_feature13">واجهة سهلة الاستخدام</string>
+    <string name="onboarding_feature14">تتبع التقدم</string>
+    <string name="onboarding_feature15">تعلم تكيفي</string>
     <string name="onboarding_feature2">ترجمة مدعومة بالذكاء الاصطناعي</string>
     <string name="onboarding_feature3">وعي بالسياق</string>
     <string name="onboarding_feature4">صورة إلى نص</string>
@@ -98,12 +103,6 @@
     <string name="onboarding_feature7">دروس تفاعلية</string>
     <string name="onboarding_feature8">محادثات حقيقية</string>
     <string name="onboarding_feature9">تحديات يومية</string>
-    <string name="onboarding_feature10">التعرف على الكلام</string>
-    <string name="onboarding_feature11">تحويل النص إلى كلام</string>
-    <string name="onboarding_feature12">تحويل الصوت إلى نص</string>
-    <string name="onboarding_feature13">واجهة سهلة الاستخدام</string>
-    <string name="onboarding_feature14">تتبع التقدم</string>
-    <string name="onboarding_feature15">تعلم تكيفي</string>
     <string name="onboarding_page1_description">LingoLens هو رفيقك الموثوق لتعلم اللغات. ستساعدك قدراتنا المتقدمة في ترجمة اللغات وتحويل النص إلى كلام على التواصل بسهولة مع أي شخص في أي مكان.</string>
     <string name="onboarding_page1_subtitle">شريكك اللغوي المدعوم بالذكاء الاصطناعي</string>
     <string name="onboarding_page1_title">مرحبًا بك في LingoLens</string>
@@ -131,8 +130,6 @@
     <string name="synonyms_label">مرادفات</string>
     <string name="translate_result_placeholder">ستظهر الترجمة هنا.</string>
     <string name="translate_type_text">اكتب نصًا للترجمة</string>
-    <string name="translation_loading">جاري الترجمة…</string>
-    <string name="translation_loading_provider">جاري الترجمة باستخدام %s…</string>
 
     <!-- Language Selection -->
     <string name="language_native_name_hint">الاسم الأصلي</string>
@@ -159,7 +156,7 @@
     <string name="ocr_image_content_description">صورة التعرف الضوئي على الحروف</string>
     <string name="recognized_text_placeholder">سيظهر النص الذي تم التعرف عليه هنا.</string>
 
-    <!-- Learning, Quiz & Phrases -->
+    <!-- Learning, Phrases & Vocab Levels -->
     <string name="card_sentence_practice">تدرب على الجمل باستخدام البطاقات.</string>
     <string name="card_swiper_stack">مجموعة بطاقات لتعلم الكلمات.</string>
     <string name="congratulations">تهانينا</string>
@@ -173,27 +170,76 @@
     <string name="desc_upper_intermediate">مهارات تواصل متقدمة</string>
     <string name="description_master_vocab">أتقن المفردات عبر مستويات المهارة المختلفة</string>
     <string name="download_language_model">تنزيل نموذج اللغة</string>
+    <string name="example_sentences">جمل أمثلة</string>
     <string name="forgot">نسيت</string>
     <string name="i_remember">أتذكر</string>
     <string name="learn">تعلم</string>
+    <string name="learning_language">لغة التعلم</string>
     <string name="level_advanced">متقدم</string>
     <string name="level_beginner">مبتدئ</string>
     <string name="level_completed">اكتمل المستوى</string>
     <string name="level_elementary">أساسي</string>
     <string name="level_intermediate">متوسط</string>
     <string name="level_mastery">إتقان</string>
+    <string name="level_progress">أتقن المفردات عبر مستويات المهارة المختلفة</string>
     <string name="level_upper_intermediate">فوق المتوسط</string>
+    <string name="locked">مغلق</string>
     <string name="next_level">المستوى التالي</string>
-    <string name="next_level_unlocked">تم فتح المستوى التالي!</string>
+    <string name="next_level_unlocked">تم فتح المستوى التالي</string>
     <string name="percentage">%</string>
     <string name="phrase_empty_state_subtitle">لم يتم العثور على عبارات مطابقة. حاول البحث عن شيء آخر.</string>
     <string name="phrase_empty_state_title">لم يتم العثور على عبارات</string>
     <string name="score">نتيجتك</string>
+    <string name="search_for_words">ابحث عن كلمات...</string>
     <string name="sentence_explorer">مستكشف الجمل</string>
+    <string name="sentences_found">تم العثور على (%1$d) جملة</string>
     <string name="start_learning">ابدأ التعلم</string>
     <string name="test">اختبار</string>
     <string name="title_language_learning">تعلم اللغة</string>
     <string name="try_again">حاول مرة أخرى</string>
+
+    <!-- Quiz UI -->
+    <string name="back_button">رجوع</string>
+    <string name="bookmark_question">حفظ %1$s في الإشارات المرجعية</string>
+    <string name="copy_question">نسخ %1$s</string>
+    <string name="correct_answer">إجابة صحيحة</string>
+    <string name="correct_symbol">✓</string>
+    <string name="examples">أمثلة</string>
+    <string name="hearts_description">القلوب</string>
+    <string name="incorrect_answer">إجابة خاطئة</string>
+    <string name="incorrect_symbol">✗</string>
+    <string name="lock_in_dictionary">البحث في القاموس عن %1$s</string>
+    <string name="next_button">التالي</string>
+    <string name="option_a">أ</string>
+    <string name="option_b">ب</string>
+    <string name="option_c">ج</string>
+    <string name="option_d">د</string>
+    <string name="parts_of_speech">أقسام الكلام</string>
+    <string name="question_progress">السؤال %1$d من %2$d</string>
+    <string name="question_progress_percentage">%1$d%%</string>
+    <string name="share_question">مشاركة %1$s وإجابته</string>
+    <string name="speech_to_text">تحويل الكلام إلى نص لـ %1$s</string>
+    <string name="streak_milestone">🔥 سلسلة %1$dx!</string>
+    <string name="streak_notification">سلسلة %1$d يوم! 🔥</string>
+    <string name="time_remaining">الوقت المتبقي %1$ds</string>
+    <string name="timer_description">مؤقت</string>
+
+    <!-- Flashcards -->
+    <string name="empty_state_button_text">تحميل المزيد من البطاقات</string>
+    <string name="empty_state_emoji">📚</string>
+    <string name="empty_state_message">لقد أكملت جميع البطاقات المتاحة. هل أنت مستعد للمزيد؟</string>
+    <string name="empty_state_title">عمل رائع! 🎉</string>
+    <string name="onboarding_button_text">فهمت!</string>
+    <string name="onboarding_step_1_description">انقر على البطاقة لرؤية الترجمة</string>
+    <string name="onboarding_step_1_icon">👆</string>
+    <string name="onboarding_step_1_title">انقر للقلب</string>
+    <string name="onboarding_step_2_description">اسحب لليسار إذا نسيت هذه الكلمة</string>
+    <string name="onboarding_step_2_icon">←</string>
+    <string name="onboarding_step_2_title">اسحب لليسار</string>
+    <string name="onboarding_step_3_description">اسحب لليمين إذا تذكرت هذه الكلمة</string>
+    <string name="onboarding_step_3_icon">→</string>
+    <string name="onboarding_step_3_title">اسحب لليمين</string>
+    <string name="onboarding_title">كيفية الاستخدام</string>
 
     <!-- Speech & Voice -->
     <string name="speech_error_audio">خطأ في تسجيل الصوت</string>
@@ -232,8 +278,14 @@
     <string name="update_required">التحديث مطلوب</string>
     <string name="whats_new">ما الجديد</string>
 
-    <!-- Success & Loading Messages -->
+    <!-- Status Messages (Success, Loading, Error) -->
+    <string name="failed_to_copy">فشل في نسخ النص</string>
+    <string name="failed_to_paste">فشل في لصق النص</string>
+    <string name="failed_to_share">فشل في مشاركة النص</string>
+    <string name="text_pasted">تم لصق النص</string>
     <string name="translation_bookmarked">تم حفظ الترجمة في الإشارات المرجعية</string>
+    <string name="translation_loading">جاري الترجمة…</string>
+    <string name="translation_loading_provider">جاري الترجمة باستخدام %s…</string>
     <string name="translation_saved">تم حفظ الترجمة في السجل</string>
     <string name="translation_success">اكتملت الترجمة بنجاح</string>
 
