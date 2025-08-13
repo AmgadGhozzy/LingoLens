@@ -77,7 +77,7 @@ fun CardSwiperStack(
             when {
                 offset > 50f && !isRestoringCard -> Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF4CAF50).copy(alpha = intensity),
+                        Color(0xFF4CAF50).copy(intensity),
                         Color.Transparent
                     ),
                     radius = 800f
@@ -85,7 +85,7 @@ fun CardSwiperStack(
 
                 offset < -50f && !isRestoringCard -> Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFFE53E3E).copy(alpha = intensity),
+                        Color(0xFFE53E3E).copy(intensity),
                         Color.Transparent
                     ),
                     radius = 800f

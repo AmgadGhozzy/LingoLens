@@ -107,12 +107,12 @@ fun QuizCompleted(
                 brush = Brush.verticalGradient(
                     colors = if (testState.passed) {
                         listOf(
-                            Color(0xFF10B981).copy(alpha = 0.1f),
+                            Color(0xFF10B981).copy(0.1f),
                             MaterialTheme.colorScheme.surface
                         )
                     } else {
                         listOf(
-                            Color(0xFFEF4444).copy(alpha = 0.1f),
+                            Color(0xFFEF4444).copy(0.1f),
                             MaterialTheme.colorScheme.surface
                         )
                     }
@@ -125,7 +125,7 @@ fun QuizCompleted(
             onClick = { onComplete(false, null) },
             contentDescription = "Close",
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.3f),
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             size = 40.dp,
@@ -274,12 +274,12 @@ private fun IconSection(isPassed: Boolean) {
                 brush = Brush.radialGradient(
                     colors = if (isPassed) {
                         listOf(
-                            Color(0xFF10B981).copy(alpha = glow * 0.2f),
+                            Color(0xFF10B981).copy(glow * 0.2f),
                             Color.Transparent
                         )
                     } else {
                         listOf(
-                            Color(0xFFEF4444).copy(alpha = glow * 0.2f),
+                            Color(0xFFEF4444).copy(glow * 0.2f),
                             Color.Transparent
                         )
                     },
@@ -351,7 +351,7 @@ private fun ScoreCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(
             1.dp,
-            if (isPassed) Color(0xFF10B981).copy(alpha = 0.2f) else Color(0xFFEF4444).copy(alpha = 0.2f)
+            if (isPassed) Color(0xFF10B981).copy(0.2f) else Color(0xFFEF4444).copy(0.2f)
         )
     ) {
         Column(
@@ -406,7 +406,7 @@ private fun ScoreCard(
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 color = if (isPassed) Color(0xFF10B981) else Color(0xFFEF4444),
-                trackColor = if (isPassed) Color(0xFF10B981).copy(alpha = 0.15f) else Color(0xFFEF4444).copy(alpha = 0.15f)
+                trackColor = if (isPassed) Color(0xFF10B981).copy(0.15f) else Color(0xFFEF4444).copy(0.15f)
             )
         }
     }
@@ -506,7 +506,7 @@ private fun SecondaryButton(
         ),
         border = BorderStroke(
             1.5.dp,
-            if (isPassed) Color(0xFF10B981).copy(alpha = 0.6f) else Color(0xFFEF4444).copy(alpha = 0.6f)
+            if (isPassed) Color(0xFF10B981).copy(0.6f) else Color(0xFFEF4444).copy(0.6f)
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -567,7 +567,7 @@ private fun NextLevelBadge(delay: Int) {
                     transformOrigin = TransformOrigin.Center
                 }
                 .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFF10B981).copy(alpha = 0.1f))
+                .background(Color(0xFF10B981).copy(0.1f))
                 .drawBehind {
                     val shimmerWidth = size.width * 0.3f
                     val shimmerX = (shimmerOffset + 1f) * (size.width + shimmerWidth) - shimmerWidth
@@ -576,7 +576,7 @@ private fun NextLevelBadge(delay: Int) {
                         brush = Brush.horizontalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                Color(0xFF10B981).copy(alpha = 0.2f),
+                                Color(0xFF10B981).copy(0.2f),
                                 Color.Transparent
                             ),
                             startX = shimmerX,
