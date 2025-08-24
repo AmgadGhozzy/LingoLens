@@ -27,6 +27,7 @@ include(":features:translation")
 include(":features:phrase")
 include(":features:dialog")
 include(":features:stackcard")
+include(":features:quiz")
 include(":features:wordcraftai")
 include(":features:settings")
 include(":features:ocr")
@@ -38,5 +39,3 @@ include(":core:di")
 include(":core:resources")
 include(":core:utils")
 include(":core:domain")
-
-
