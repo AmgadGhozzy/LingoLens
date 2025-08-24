@@ -2,18 +2,27 @@ package com.venom.ui.screen.history
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.*
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,10 +41,11 @@ fun HistoryItemView(
     onShareClick: () -> Unit,
     onCopyClick: () -> Unit,
     onItemClick: () -> Unit,
+    isExpanded: Boolean,
+    onExpandChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable (Boolean, () -> Unit) -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
     val expandedScale by animateFloatAsState(
         targetValue = if (isExpanded) 1.02f else 1f,
         animationSpec = spring(stiffness = Spring.StiffnessMedium)
@@ -51,19 +61,24 @@ fun HistoryItemView(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .scale(expandedScale)
             .clip(RoundedCornerShape(24.dp))
-            .clickable { isExpanded = !isExpanded }
+            .clickable {
+                onExpandChange(!isExpanded)
+            }
             .semantics {
                 contentDescription =
                     "${if (entry.isBookmarked) "Bookmarked" else "Not bookmarked"} history item"
-                onClick(label = "Toggle expanded state") { isExpanded = !isExpanded; true }
+                onClick(label = "Toggle expanded state") {
+                    onExpandChange(!isExpanded)
+                    true
+                }
             },
         shape = RoundedCornerShape(24.dp),
         tonalElevation = if (isExpanded) 12.dp else 6.dp,
         shadowElevation = if (isExpanded) 16.dp else 8.dp,
-        color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.95f)
+        color = MaterialTheme.colorScheme.surfaceContainer.copy(0.95f)
     ) {
         Box(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.6f))
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(0.6f))
         ) {
             Column(
                 modifier = Modifier
@@ -84,7 +99,9 @@ fun HistoryItemView(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                content(isExpanded) { isExpanded = !isExpanded }
+                content(isExpanded) {
+                    onExpandChange(!isExpanded)
+                }
 
                 AnimatedVisibility(
                     visible = isExpanded,

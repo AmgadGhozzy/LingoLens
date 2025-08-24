@@ -65,7 +65,7 @@ fun LangHistorySection(
 
             if (showLanguageCode) {
                 Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(0.6f),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
@@ -88,7 +88,7 @@ fun LangHistorySection(
                 .fillMaxWidth()
                 .semantics { contentDescription = "$languageName text: $text" }
                 .then(if (onTextClick != null) Modifier.clickable(onClick = onTextClick) else Modifier),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(0.7f),
             shape = RoundedCornerShape(16.dp),
             tonalElevation = 2.dp
         ) {
@@ -108,7 +108,7 @@ fun LangHistorySection(
 
         if (!isExpanded && text.lines().size > maxCollapsedLines) {
             Surface(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                color = MaterialTheme.colorScheme.primary.copy(0.1f),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
                     .padding(top = 8.dp)

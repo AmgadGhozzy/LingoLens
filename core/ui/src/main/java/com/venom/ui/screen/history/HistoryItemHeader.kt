@@ -29,7 +29,7 @@ fun HistoryItemHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            color = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(

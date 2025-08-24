@@ -29,6 +29,8 @@ fun OcrHistoryItemView(
     onShareClick: (OcrEntry) -> Unit,
     onCopyClick: (OcrEntry) -> Unit,
     onItemClick: (OcrEntry) -> Unit,
+    isExpanded: Boolean,
+    onExpandChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     HistoryItemView(
@@ -38,11 +40,13 @@ fun OcrHistoryItemView(
         onShareClick = { onShareClick(entry) },
         onCopyClick = { onCopyClick(entry) },
         onItemClick = { onItemClick(entry) },
+        isExpanded = isExpanded,
+        onExpandChange = onExpandChange,
         modifier = modifier
-    ) { isExpanded, _ ->
+    ) { itemExpanded, _ ->
         OcrContent(
             entry = entry,
-            isExpanded = isExpanded
+            isExpanded = itemExpanded
         )
     }
 }
@@ -55,7 +59,7 @@ private fun OcrContent(
 ) {
     Column(modifier = modifier) {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(0.6f),
             shape = RoundedCornerShape(16.dp),
             tonalElevation = 2.dp
         ) {

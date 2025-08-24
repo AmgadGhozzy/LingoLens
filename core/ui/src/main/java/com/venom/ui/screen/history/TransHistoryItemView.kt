@@ -43,6 +43,8 @@ fun TransHistoryItemView(
     onShareClick: (TranslationEntity) -> Unit,
     onCopyClick: (TranslationEntity) -> Unit,
     onItemClick: (TranslationEntity) -> Unit,
+    isExpanded: Boolean, // New parameter: whether this item is expanded
+    onExpandChange: (Boolean) -> Unit, // New parameter: callback when expansion changes
     modifier: Modifier = Modifier
 ) {
     HistoryItemView(
@@ -52,11 +54,13 @@ fun TransHistoryItemView(
         onShareClick = { onShareClick(entry) },
         onCopyClick = { onCopyClick(entry) },
         onItemClick = { onItemClick(entry) },
+        isExpanded = isExpanded,
+        onExpandChange = onExpandChange,
         modifier = modifier
-    ) { isExpanded, onExpandClick ->
+    ) { itemExpanded, onExpandClick ->
         TranslationContent(
             entry = entry,
-            isExpanded = isExpanded,
+            isExpanded = itemExpanded,
             onExpandClick = onExpandClick
         )
     }
@@ -121,7 +125,7 @@ private fun TranslationArrow() {
         horizontalArrangement = Arrangement.Center
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+            color = MaterialTheme.colorScheme.primaryContainer.copy(0.4f),
             shape = CircleShape,
             tonalElevation = 4.dp
         ) {
@@ -146,7 +150,7 @@ private fun TranslationArrow() {
 @Composable
 private fun SynonymsSection(synonyms: List<String>) {
     Surface(
-        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+        color = MaterialTheme.colorScheme.tertiaryContainer.copy(0.3f),
         shape = RoundedCornerShape(16.dp),
         tonalElevation = 2.dp
     ) {

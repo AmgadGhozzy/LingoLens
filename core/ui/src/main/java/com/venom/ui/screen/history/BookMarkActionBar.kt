@@ -33,7 +33,7 @@ fun BookMarkActionBar(
             icon = R.drawable.icon_share,
             onClick = onShareClick,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
                 contentColor = MaterialTheme.colorScheme.primary
             ),
             contentDescription = stringResource(R.string.action_share)
@@ -43,7 +43,7 @@ fun BookMarkActionBar(
             icon = R.drawable.icon_delete_bin,
             onClick = onDeleteClick,
             colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.errorContainer.copy(0.3f),
                 contentColor = MaterialTheme.colorScheme.error
             ),
             contentDescription = stringResource(R.string.action_delete)
