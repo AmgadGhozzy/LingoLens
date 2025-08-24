@@ -11,9 +11,10 @@ import com.venom.dialog.ui.screen.DialogScreen
 import com.venom.domain.model.WordLevels
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
+import com.venom.quiz.ui.screen.MainLevelScreen
+import com.venom.quiz.ui.screen.QuizScreen
+import com.venom.stackcard.ui.screen.BookmarksScreen
 import com.venom.stackcard.ui.screen.CardScreen
-import com.venom.stackcard.ui.screen.quiz.MainLevelScreen
-import com.venom.stackcard.ui.screen.quiz.QuizScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
@@ -130,12 +131,18 @@ fun NavigationGraph(
                 type = NavType.StringType
             })
         ) { backStackEntry ->
-            val contentTypeString = backStackEntry.arguments?.getString("contentType") ?: "TRANSLATION"
+            val contentTypeString =
+                backStackEntry.arguments?.getString("contentType") ?: "TRANSLATION"
             val contentType = ContentType.valueOf(contentTypeString)
-            BookmarkHistoryScreen(
-                contentType = contentType,
-                onBackClick = { navController.popBackStack() }
-            )
+            if (contentType == ContentType.STACKCARD)
+                BookmarksScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
+            else
+                BookmarkHistoryScreen(
+                    contentType = contentType,
+                    onBackClick = { navController.popBackStack() }
+                )
         }
 
         composable(Screen.Quiz.MainLevel.route) {

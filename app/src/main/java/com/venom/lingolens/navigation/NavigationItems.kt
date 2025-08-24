@@ -9,7 +9,6 @@ enum class NavigationItems(
     val titleRes: Int,
     val showInBottomBar: Boolean = true
 ) {
-    ONBOARDING(Screen.WordCraft, R.drawable.ic_paragraph_on, R.string.onboarding_page1_title ),
     DIALOG(Screen.Dialog, R.drawable.icon_dialogs_activated, R.string.dialog_title, false),
     PHRASE(Screen.Phrases, R.drawable.icon_dialog, R.string.phrase_title),
     QUIZ(Screen.Quiz.MainLevel, R.drawable.quiz_logo, R.string.quiz_title),

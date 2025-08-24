@@ -24,6 +24,7 @@ class AppState(
         get() = currentRoute != Screen.Quiz.LevelTest.route &&
                 currentRoute != Screen.Onboarding.route &&
                 currentRoute != Screen.Sentence.route &&
+                currentRoute != Screen.Phrases.route &&
                 currentRoute != Screen.WordCraft.route &&
                 currentRoute != Screen.Quiz.MainLevel.route &&
                 currentRoute?.startsWith("history") != true
