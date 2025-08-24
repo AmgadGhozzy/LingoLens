@@ -59,7 +59,7 @@ fun LingoLensBottomBar(
                         targetValue = if (isSelected)
                             MaterialTheme.colorScheme.primary
                         else
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f),
                         animationSpec = tween(300)
                     )
 

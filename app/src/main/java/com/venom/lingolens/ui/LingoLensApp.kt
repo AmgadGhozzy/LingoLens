@@ -88,10 +88,11 @@ private fun LingoLensAppContent(
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                 .fillMaxSize()
                 .statusBarsPadding()
-                .padding(vertical = if (appState.shouldShowTopBar) 72.dp else 0.dp)
+                .navigationBarsPadding()
+                .padding(top = if (appState.shouldShowTopBar) 64.dp else 0.dp)
         ) {
             NavigationGraph(
                 navController = appState.navController,
