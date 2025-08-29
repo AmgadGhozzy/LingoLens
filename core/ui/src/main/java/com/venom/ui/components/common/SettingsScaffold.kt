@@ -79,7 +79,7 @@ fun SettingsScaffold(
                     onClick = onDismiss,
                     contentDescription = stringResource(R.string.action_close),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.3f),
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     size = 38.dp

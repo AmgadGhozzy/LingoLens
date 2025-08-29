@@ -2,8 +2,12 @@ package com.venom.ui.components.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,7 +77,7 @@ fun BaseActionBar(
     showOverflowMenu: Boolean = false,
     overflowOptions: List<ActionItem.Action> = emptyList(),
     useCard: Boolean = false,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
+    containerColor: Color = Color.Unspecified,
     elevation: Dp = 2.dp,
     useTextButtons: Boolean = false,
     modifier: Modifier = Modifier

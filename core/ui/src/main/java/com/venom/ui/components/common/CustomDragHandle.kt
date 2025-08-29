@@ -27,7 +27,7 @@ fun CustomDragHandle(
                 .height(height)
                 .semantics { contentDescription = "Drag Handle" }
                 .background(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.4f),
                     shape = RoundedCornerShape(2.dp)
                 )
         )
