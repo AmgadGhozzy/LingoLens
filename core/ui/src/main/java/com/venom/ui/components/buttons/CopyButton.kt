@@ -48,7 +48,7 @@ fun CopyButton(
             enabled = enabled,
             shape = RoundedCornerShape(24.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.4f),
                 contentColor = MaterialTheme.colorScheme.primary
             ),
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),

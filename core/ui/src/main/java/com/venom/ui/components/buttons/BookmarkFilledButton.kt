@@ -3,8 +3,12 @@ package com.venom.ui.components.buttons
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Shape
@@ -26,8 +30,8 @@ fun BookmarkFilledButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val colors = IconButtonDefaults.filledIconButtonColors(
-        containerColor = if (isBookmarked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        containerColor = if (isBookmarked) MaterialTheme.colorScheme.primaryContainer.copy(0.5f)
+        else MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
         contentColor = if (isBookmarked) MaterialTheme.colorScheme.onPrimaryContainer
         else MaterialTheme.colorScheme.primary
     )

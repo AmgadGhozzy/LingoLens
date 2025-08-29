@@ -1,10 +1,18 @@
 package com.venom.ui.components.buttons
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,13 +68,13 @@ fun CustomTextButton(
                 is ImageVector -> Icon(
                     imageVector = icon,
                     contentDescription = text,
-                    tint = if (enabled) iconTint else iconTint.copy(alpha = 0.38f),
+                    tint = if (enabled) iconTint else iconTint.copy(0.38f),
                     modifier = Modifier.size(iconSize)
                 )
                 is Int -> Icon(
                     painter = painterResource(id = icon),
                     contentDescription = text,
-                    tint = if (enabled) iconTint else iconTint.copy(alpha = 0.38f),
+                    tint = if (enabled) iconTint else iconTint.copy(0.38f),
                     modifier = Modifier.size(iconSize)
                 )
             }
@@ -74,7 +82,7 @@ fun CustomTextButton(
                 Text(
                     text = text,
                     style = textStyle,
-                    color = if (enabled) textColor else textColor.copy(alpha = 0.38f),
+                    color = if (enabled) textColor else textColor.copy(0.38f),
                     maxLines = 1,
                 )
             }
