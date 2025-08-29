@@ -1,4 +1,4 @@
-package com.venom.data.model
+package com.venom.data.remote.respnod
 
 import com.google.gson.annotations.SerializedName
 

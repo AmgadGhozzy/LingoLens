@@ -1,18 +1,18 @@
-package com.venom.data.model
+package com.venom.data.remote.respnod
 
 import com.google.gson.annotations.SerializedName
 
-data class DeepSeekResponse(
+data class ChatGPTResponse(
     val id: String? = null,
     @SerializedName("object")
     val objectName: String? = null,
     val created: Long? = null,
     val model: String? = null,
-    val usage: DeepSeekUsage? = null,
-    val choices: List<DeepSeekChoice>? = null
+    val usage: ChatGPTUsage? = null,
+    val choices: List<ChatGPTChoice>? = null
 )
 
-data class DeepSeekUsage(
+data class ChatGPTUsage(
     @SerializedName("prompt_tokens")
     val promptTokens: Int? = null,
     @SerializedName("completion_tokens")
@@ -21,14 +21,14 @@ data class DeepSeekUsage(
     val totalTokens: Int? = null
 )
 
-data class DeepSeekChoice(
-    val message: DeepSeekMessage? = null,
+data class ChatGPTChoice(
+    val message: ChatGPTMessage? = null,
     @SerializedName("finish_reason")
     val finishReason: String? = null,
     val index: Int? = null
 )
 
-data class DeepSeekMessage(
+data class ChatGPTMessage(
     val role: String? = null,
     val content: String? = null
 )
