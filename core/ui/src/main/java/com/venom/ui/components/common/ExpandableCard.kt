@@ -1,11 +1,21 @@
 package com.venom.ui.components.common
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -13,20 +23,23 @@ import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.buttons.ExpandIndicator
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun ExpandableCard(
     title: String,
+    expanded: Boolean? = null,
+    onExpandChange: ((Boolean) -> Unit)? = null,
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
     onBookmark: (() -> Unit)? = null,
     expandedContent: @Composable ColumnScope.() -> Unit,
-    onExpandChange: ((Boolean) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
-    ElevatedCard(
+    var internalExpanded by remember { mutableStateOf(false) }
+    val isExpanded = expanded ?: internalExpanded
+    GlassCard(
         modifier = modifier.animateContentSize(
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -34,12 +47,13 @@ fun ExpandableCard(
             )
         ),
         onClick = {
-            expanded = !expanded
-            onExpandChange?.invoke(expanded)
+            val newExpanded = !isExpanded
+            if (expanded == null) {
+                internalExpanded = newExpanded
+            }
+            onExpandChange?.invoke(newExpanded)
         },
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        solidBackgroundAlpha = 0.3f
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -54,7 +68,6 @@ fun ExpandableCard(
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Default actions
                     CustomFilledIconButton(
                         icon = R.drawable.icon_sound,
                         shape = MaterialTheme.shapes.small,
@@ -81,7 +94,7 @@ fun ExpandableCard(
                 }
             }
 
-            AnimatedVisibility(visible = expanded) {
+            AnimatedVisibility(visible = isExpanded) {
                 Column(
                     modifier = Modifier.padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -91,10 +104,13 @@ fun ExpandableCard(
             }
 
             ExpandIndicator(
-                expanded = expanded,
+                expanded = isExpanded,
                 onClick = {
-                    expanded = !expanded
-                    onExpandChange?.invoke(expanded)
+                    val newExpanded = !isExpanded
+                    if (expanded == null) {
+                        internalExpanded = newExpanded
+                    }
+                    onExpandChange?.invoke(newExpanded)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
