@@ -1,6 +1,6 @@
 package com.venom.data.api
 
-import com.venom.data.model.OcrResponse
+import com.venom.data.remote.respnod.OcrResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response

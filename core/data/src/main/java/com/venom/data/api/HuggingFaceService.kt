@@ -1,7 +1,7 @@
 package com.venom.data.api
 
 import com.google.gson.annotations.SerializedName
-import com.venom.data.model.HuggingFaceTranslationResult
+import com.venom.data.remote.respnod.HuggingFaceTranslationResult
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST

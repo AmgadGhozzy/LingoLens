@@ -1,7 +1,7 @@
 package com.venom.data.api
 
 import com.google.gson.annotations.SerializedName
-import com.venom.data.model.GeminiResponse
+import com.venom.data.remote.respnod.GeminiResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Path

@@ -1,6 +1,6 @@
 package com.venom.data.api
 
-import com.venom.data.model.GoogleTranslationResponse
+import com.venom.data.remote.respnod.GoogleTranslationResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
