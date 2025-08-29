@@ -1,19 +1,35 @@
 package com.venom.ui.components.buttons
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -22,6 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.theme.ThemeColors.GlassPrimary
+import com.venom.ui.theme.ThemeColors.GlassSecondary
+import com.venom.ui.theme.ThemeColors.GlassTertiary
 
 /**
  * A modern, animated, and customizable action bar icon component
@@ -36,6 +55,7 @@ import com.venom.resources.R
  * @param iconPadding Padding around the icon (default 8.dp)
  * @param selectedTint Custom color when selected
  * @param disabledTint Custom color when disabled
+ * @param showBorder Whether to show the border around the button (default true)
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,28 +67,36 @@ fun CustomButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean = false,
-    iconSize: Dp = 24.dp,
-    iconPadding: Dp = 6.dp,
+    iconSize: Dp = 26.dp,
+    iconPadding: Dp = 4.dp,
     selectedTint: Color? = null,
-    disabledTint: Color? = null
+    disabledTint: Color? = null,
+    showBorder: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.9f else if (selected) 1.1f else 1f,
-        label = "button_scale"
+        targetValue = when {
+            !enabled -> 0.95f
+            isPressed -> 0.92f
+            selected -> 1.05f
+            else -> 1f
+        },
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
     )
 
     val iconColor by animateColorAsState(
         targetValue = when {
             !enabled -> disabledTint
-                ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(0.38f)
 
             selected -> selectedTint ?: MaterialTheme.colorScheme.onSecondary
             else -> MaterialTheme.colorScheme.primary
-        },
-        label = "icon_color"
+        }
     )
 
     Box(
@@ -79,7 +107,12 @@ fun CustomButton(
             modifier = modifier,
             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
             tooltip = {
-                PlainTooltip(caretSize = TooltipDefaults.caretSize) {
+                PlainTooltip(
+                    caretSize = TooltipDefaults.caretSize,
+                    containerColor =
+                        MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground
+                ) {
                     Text(contentDescription)
                 }
             },
@@ -87,7 +120,28 @@ fun CustomButton(
         ) {
             IconButton(
                 onClick = onClick,
-                modifier = Modifier.scale(scale),
+                modifier = Modifier
+                    .padding(4.dp)
+                    .scale(scale)
+                    .then(
+                        if (showBorder) Modifier
+                            .border(
+                                0.8.dp,
+                                iconColor.copy(0.1f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        GlassPrimary.copy(0.05f),
+                                        GlassSecondary.copy(0.05f),
+                                        GlassTertiary.copy(0.05f)
+                                    )
+                                ),
+                                RoundedCornerShape(12.dp)
+                            )
+                        else Modifier
+                    ),
                 enabled = enabled,
                 interactionSource = interactionSource
             ) {
