@@ -1,16 +1,29 @@
 package com.venom.ui.components.dialogs
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,6 +36,7 @@ import com.venom.resources.R
 import com.venom.ui.components.bars.TranslatedTextActionBar
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.inputs.CustomTextField
+import com.venom.ui.components.other.GlassCard
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.utils.Extensions.getSelectedOrFullText
 
@@ -53,77 +67,74 @@ fun FullscreenTextDialog(
             dismissOnBackPress = true, usePlatformDefaultWidth = false
         )
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(12.dp)
-
-        ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                CustomFilledIconButton(
-                    icon = Icons.Rounded.Close,
-                    onClick = onDismiss,
-                    contentDescription = stringResource(R.string.action_close),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    size = 38.dp
-                )
-            }
-
-            Surface(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                tonalElevation = 2.dp
+        GlassCard(solidBackgroundAlpha = 1f) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp, vertical = 18.dp)
             ) {
-                CustomTextField(
-                    textValue = textValue,
-                    minFontSize = (fontSize * 0.8f).toInt(),
-                    maxFontSize = (fontSize * 1.2f).toInt(),
-                    maxLines = Int.MAX_VALUE,
-                    minHeight = 200.dp,
-                    maxHeight = 600.dp,
-                    isReadOnly = true,
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                    CustomFilledIconButton(
+                        icon = Icons.Rounded.Close,
+                        onClick = onDismiss,
+                        contentDescription = stringResource(R.string.action_close),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f),
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        size = 38.dp
+                    )
+                }
+
+                Surface(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
-                        .verticalScroll(rememberScrollState())
-                )
-            }
-
-            Slider(
-                value = fontSize,
-                onValueChange = { fontSize = it },
-                valueRange = 16f..56f,
-                steps = 8,
-                thumb = {
-                    SliderDefaults.Thumb(
-                        interactionSource = interactionSource, modifier = modifier.height(24.dp)
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(0.1f),
+                    tonalElevation = 2.dp
+                ) {
+                    CustomTextField(
+                        textValue = textValue,
+                        minFontSize = (fontSize * 0.8f).toInt(),
+                        maxFontSize = (fontSize * 1.2f).toInt(),
+                        maxLines = Int.MAX_VALUE,
+                        minHeight = 200.dp,
+                        maxHeight = 600.dp,
+                        isReadOnly = true,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp)
+                            .verticalScroll(rememberScrollState())
                     )
-                },
-                track = {
-                    SliderDefaults.Track(
-                        sliderState = it, modifier = modifier.height(8.dp)
-                    )
-                },
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+                }
 
-            Card(modifier = Modifier.padding(bottom = 24.dp),shape = RoundedCornerShape(18.dp)) {
-                TranslatedTextActionBar(
-                    onCopy = { onCopy(textValue.getSelectedOrFullText()) },
-                    onShare = { onShare(textValue.getSelectedOrFullText()) },
-                    onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
-                    isSaved = false,
-                    isSpeaking = false
+                Slider(
+                    value = fontSize,
+                    onValueChange = { fontSize = it },
+                    valueRange = 16f..56f,
+                    steps = 8,
+                    thumb = {
+                        SliderDefaults.Thumb(
+                            interactionSource = interactionSource, modifier = modifier.height(24.dp)
+                        )
+                    },
+                    track = {
+                        SliderDefaults.Track(
+                            sliderState = it, modifier = modifier.height(8.dp)
+                        )
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+                    TranslatedTextActionBar(
+                        onCopy = { onCopy(textValue.getSelectedOrFullText()) },
+                        onShare = { onShare(textValue.getSelectedOrFullText()) },
+                        onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
+                        isSaved = false,
+                        isSpeaking = false
+                    )
             }
         }
     }
