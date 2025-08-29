@@ -1,8 +1,8 @@
-package com.venom.stackcard.data.repo
+package com.venom.data.repo
 
+import com.venom.data.local.Entity.WordEntity
+import com.venom.data.local.dao.WordDao
 import com.venom.domain.model.WordLevels
-import com.venom.stackcard.data.local.dao.WordDao
-import com.venom.stackcard.data.model.WordEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -21,15 +21,13 @@ class WordRepository @Inject constructor(
         level: WordLevels = WordLevels.Beginner,
         includeRemembered: Boolean = false,
         includeForgotten: Boolean = false,
-        orderBy: String = "RANKING",
         pageSize: Int = 10
     ): List<WordEntity> = withContext(Dispatchers.IO) {
-        wordDao.getWordsFromLevel(
+        wordDao.getRandomWordsFromLevel(
             minRank = level.range.start,
             maxRank = level.range.end,
             includeRemembered = includeRemembered,
             includeForgotten = includeForgotten,
-            orderBy = orderBy,
             pageSize = pageSize
         )
     }
@@ -43,7 +41,7 @@ class WordRepository @Inject constructor(
     }
 
     suspend fun getLevelsProgress(): Map<String, Float> = withContext(Dispatchers.IO) {
-        WordLevels.values().associate { level ->
+        WordLevels.Companion.values().associate { level ->
             level.id to getLevelProgress(level)
         }
     }
