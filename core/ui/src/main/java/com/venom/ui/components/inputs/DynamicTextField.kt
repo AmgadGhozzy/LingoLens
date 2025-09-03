@@ -1,24 +1,20 @@
 package com.venom.ui.components.inputs
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -56,9 +52,22 @@ fun DynamicTextField(
     val scrollState = remember { ScrollState(0) }
     val dynamicFontSize = (maxFontSize - (value.length / 40)).coerceAtLeast(minFontSize).sp
 
-    val textAlpha by animateFloatAsState(
-        targetValue = if (value.isEmpty()) 0.7f else 1f,
-        animationSpec = spring()
+    LaunchedEffect(value) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
+
+    val baseTextStyle = MaterialTheme.typography.bodyLarge
+    val customTextStyle = baseTextStyle.copy(
+        fontSize = dynamicFontSize,
+        textDirection = getTextDirection(value),
+        fontWeight = FontWeight.Medium,
+        lineHeight = (dynamicFontSize.value * 1.4).sp
+    )
+
+    val basePlaceholderStyle = MaterialTheme.typography.bodyLarge
+    val placeholderTextStyle = basePlaceholderStyle.copy(
+        textDirection = getTextDirection(placeHolderText),
+        fontSize = 20.sp
     )
 
     TextField(
@@ -70,18 +79,12 @@ fun DynamicTextField(
         readOnly = readOnly,
         maxLines = maxLines,
         minLines = minLines,
-        textStyle = TextStyle(
-            fontSize = dynamicFontSize,
-            textDirection = getTextDirection(value),
-            fontWeight = FontWeight.Medium,
-            lineHeight = (dynamicFontSize.value * 1.4).sp
-        ).copy(color = LocalContentColor.current.copy(alpha = textAlpha)),
+        textStyle = customTextStyle,
         placeholder = {
             Text(
                 text = placeHolderText,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                fontSize = 20.sp,
-                style = TextStyle(textDirection = getTextDirection(placeHolderText)),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f),
+                style = placeholderTextStyle,
                 modifier = Modifier.fillMaxSize()
             )
         },
