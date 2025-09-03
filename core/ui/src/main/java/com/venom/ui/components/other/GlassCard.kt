@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -31,10 +30,11 @@ fun GlassCard(
     glassTertiary: Color = GlassTertiary,
     glassAlpha: Float = 0.15f,
     solidBackgroundAlpha: Float = 0.1f,
-    solidBackground: Color = MaterialTheme.colorScheme.background.copy(alpha = solidBackgroundAlpha),
+    solidBackground: Color = MaterialTheme.colorScheme.background.copy(solidBackgroundAlpha),
     borderAlpha: Float = 0.1f,
     shape: Shape = RoundedCornerShape(24.dp),
     padding: Dp = 0.dp,
+    contentPadding: Dp = 0.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = MaterialTheme.colorScheme.outline,
     content: @Composable () -> Unit = {}
@@ -42,27 +42,27 @@ fun GlassCard(
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .padding(padding)
             .clip(shape)
             .background(solidBackground)
             .background(
                 brush = Brush.linearGradient(
                     listOf(
-                        glassPrimary.copy(alpha = glassAlpha),
-                        glassSecondary.copy(alpha = glassAlpha * 0.8f),
-                        glassTertiary.copy(alpha = glassAlpha * 0.6f)
+                        glassPrimary.copy(glassAlpha),
+                        glassSecondary.copy(glassAlpha * 0.8f),
+                        glassTertiary.copy(glassAlpha * 0.6f)
                     )
                 )
             )
             .border(
                 width = borderWidth,
-                color = borderColor.copy(alpha = borderAlpha),
+                color = borderColor.copy(borderAlpha),
                 shape = shape
             )
             .clickable(enabled = onClick != null) { onClick?.invoke() }
     ) {
         Box(
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(contentPadding)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
