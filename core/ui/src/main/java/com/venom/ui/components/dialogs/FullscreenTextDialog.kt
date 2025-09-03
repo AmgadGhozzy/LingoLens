@@ -2,8 +2,8 @@ package com.venom.ui.components.dialogs
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,6 +63,7 @@ fun FullscreenTextDialog(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     var fontSize by remember { mutableFloatStateOf(24f) }
+    var isEditable by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = onDismiss, properties = DialogProperties(
@@ -75,7 +78,21 @@ fun FullscreenTextDialog(
                     .fillMaxSize()
                     .padding(horizontal = 12.dp, vertical = 18.dp)
             ) {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CustomFilledIconButton(
+                        icon = Icons.Rounded.Edit,
+                        onClick = { isEditable = !isEditable },
+                        contentDescription = stringResource(R.string.action_edit),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f),
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        size = 38.dp
+                    )
                     CustomFilledIconButton(
                         icon = Icons.Rounded.Close,
                         onClick = onDismiss,
@@ -87,7 +104,6 @@ fun FullscreenTextDialog(
                         size = 38.dp
                     )
                 }
-
                 Surface(
                     modifier = Modifier
                         .weight(1f)
@@ -98,12 +114,12 @@ fun FullscreenTextDialog(
                 ) {
                     CustomTextField(
                         textValue = textValue,
+                        isReadOnly = !isEditable,
                         minFontSize = (fontSize * 0.8f).toInt(),
                         maxFontSize = (fontSize * 1.2f).toInt(),
                         maxLines = Int.MAX_VALUE,
                         minHeight = 200.dp,
                         maxHeight = 600.dp,
-                        isReadOnly = true,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(24.dp)
@@ -128,13 +144,13 @@ fun FullscreenTextDialog(
                     },
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-                    TranslatedTextActionBar(
-                        onCopy = { onCopy(textValue.getSelectedOrFullText()) },
-                        onShare = { onShare(textValue.getSelectedOrFullText()) },
-                        onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
-                        isSaved = false,
-                        isSpeaking = false
-                    )
+                TranslatedTextActionBar(
+                    onCopy = { onCopy(textValue.getSelectedOrFullText()) },
+                    onShare = { onShare(textValue.getSelectedOrFullText()) },
+                    onSpeak = { onSpeak(textValue.getSelectedOrFullText()) },
+                    isSaved = false,
+                    isSpeaking = false
+                )
             }
         }
     }
