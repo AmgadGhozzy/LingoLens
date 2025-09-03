@@ -26,7 +26,14 @@ import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -93,7 +100,7 @@ fun FloatingCircleMenu(
                 .shadow(
                     elevation = 16.dp,
                     shape = CircleShape,
-                    ambientColor = Color.Black.copy(alpha = 0.15f)
+                    ambientColor = Color.Black.copy(0.15f)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
                 .clickable { if (clickedIndex < 0) isExpanded = !isExpanded },
@@ -153,7 +160,7 @@ private fun FloatingMenuItemComponent(
                     val waveRadius = (60 + wave * 40).dp.toPx() * waveProgress
                     val alpha = (1f - waveProgress) * (0.4f - wave * 0.1f)
                     drawCircle(
-                        color = item.color.copy(alpha = alpha),
+                        color = item.color.copy(alpha),
                         radius = waveRadius,
                         style = Stroke(width = (4 - wave).dp.toPx())
                     )
@@ -170,7 +177,7 @@ private fun FloatingMenuItemComponent(
                     val y = center.y + sin(sparkleAngle).toFloat() * distance
 
                     drawCircle(
-                        color = item.color.copy(alpha = (1f - waveProgress) * 0.6f),
+                        color = item.color.copy((1f - waveProgress) * 0.6f),
                         radius = 3.dp.toPx(),
                         center = Offset(x, y)
                     )
@@ -192,8 +199,8 @@ private fun FloatingMenuItemComponent(
                     .shadow(
                         elevation = 12.dp,
                         shape = CircleShape,
-                        spotColor = Color.Black.copy(alpha = 0.3f),
-                        ambientColor = Color.Black.copy(alpha = 0.2f)
+                        spotColor = Color.Black.copy(0.3f),
+                        ambientColor = Color.Black.copy(0.2f)
                     )
                     .background(MaterialTheme.colorScheme.surfaceContainerLowest, CircleShape)
                     .clickable { onItemClick() },

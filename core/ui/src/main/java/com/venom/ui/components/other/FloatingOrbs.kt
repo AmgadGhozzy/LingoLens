@@ -1,10 +1,20 @@
-package com.venom.ui.components.onboarding
+package com.venom.ui.components.other
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -12,8 +22,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.venom.ui.theme.ThemeColors.Indigo
-import com.venom.ui.theme.ThemeColors.Purple
 
 data class OrbConfig(
     val size: Dp,
@@ -28,15 +36,15 @@ data class OrbConfig(
 @Composable
 fun FloatingOrbs(
     modifier: Modifier = Modifier,
-    primaryColor: Color = Indigo,
-    secondaryColor: Color = Purple,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    secondaryColor: Color = MaterialTheme.colorScheme.primaryContainer,
     customOrbs: List<OrbConfig>? = null,
-    animationDuration: Int = 6000,
+    animationDuration: Int = 10000,
     enableFloatingAnimation: Boolean = true,
-    enableScaleAnimation: Boolean = true,
-    enableAlphaAnimation: Boolean = true
+    enableScaleAnimation: Boolean = false,
+    enableAlphaAnimation: Boolean = false
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "floating_orbs_transition")
+    val infiniteTransition = rememberInfiniteTransition()
 
     // Scale animations
     val scale1 by infiniteTransition.animateFloat(
@@ -71,7 +79,7 @@ fun FloatingOrbs(
         initialValue = if (enableAlphaAnimation) 0.2f else 0.4f,
         targetValue = if (enableAlphaAnimation) 0.6f else 0.4f,
         animationSpec = infiniteRepeatable(
-            tween((animationDuration * 0.83f).toInt(), easing = EaseInOutCubic),
+            tween((animationDuration * 0.1f).toInt(), easing = EaseInOutCubic),
             RepeatMode.Reverse
         )
     )
@@ -114,8 +122,8 @@ fun FloatingOrbs(
                     .background(
                         Brush.radialGradient(
                             listOf(
-                                orb.color.copy(alpha = alpha * orb.alphaMultiplier),
-                                orb.color.copy(alpha = alpha * orb.alphaMultiplier * 0.3f),
+                                orb.color.copy(alpha * orb.alphaMultiplier),
+                                orb.color.copy(alpha * orb.alphaMultiplier * 0.3f),
                                 Color.Transparent
                             ),
                             radius = orb.size.value * 1.5f
@@ -133,10 +141,10 @@ private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<Orb
             size = 320.dp,
             color = primaryColor,
             alignment = Alignment.TopStart,
-            offsetX = (-100).dp,
-            offsetY = (-80).dp,
+            offsetX = (-120).dp,
+            offsetY = (-100).dp,
             scaleMultiplier = 1f,
-            alphaMultiplier = 0.8f
+            alphaMultiplier = 0.5f
         ),
         OrbConfig(
             size = 280.dp,
@@ -145,7 +153,7 @@ private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<Orb
             offsetX = 60.dp,
             offsetY = 0.dp,
             scaleMultiplier = 1f,
-            alphaMultiplier = 0.6f
+            alphaMultiplier = 0.4f
         ),
         OrbConfig(
             size = 240.dp,
@@ -154,7 +162,7 @@ private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<Orb
             offsetX = (-60).dp,
             offsetY = 100.dp,
             scaleMultiplier = 1f,
-            alphaMultiplier = 0.4f
+            alphaMultiplier = 0.2f
         ),
         OrbConfig(
             size = 160.dp,
@@ -163,7 +171,7 @@ private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<Orb
             offsetX = 40.dp,
             offsetY = 120.dp,
             scaleMultiplier = 0.6f,
-            alphaMultiplier = 0.3f
+            alphaMultiplier = 0.1f
         )
     )
 }
