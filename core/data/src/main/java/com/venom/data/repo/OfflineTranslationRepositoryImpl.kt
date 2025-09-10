@@ -8,12 +8,13 @@ import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import com.venom.data.mapper.TranslateMapper
 import com.venom.domain.model.TranslationResult
+import com.venom.domain.repo.IOfflineTranslation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class OfflineTranslationRepository @Inject constructor() : OfflineTranslationOperations {
+class OfflineTranslationRepositoryImpl @Inject constructor() : IOfflineTranslation {
 
     override suspend fun getOfflineTranslation(sourceLang: String, targetLang: String, query: String): TranslationResult = withContext(Dispatchers.IO) {
         val options = TranslatorOptions.Builder()
