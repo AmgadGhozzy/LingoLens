@@ -1,10 +1,10 @@
-package com.venom.stackcard.di
+package com.venom.di
 
 import android.content.Context
 import androidx.room.Room
-import com.venom.stackcard.data.local.WordDatabase
-import com.venom.stackcard.data.local.dao.WordDao
-import com.venom.stackcard.data.repo.WordRepository
+import com.venom.data.local.dao.WordDao
+import com.venom.data.local.database.WordDatabase
+import com.venom.data.repo.WordRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,5 +30,5 @@ object WordCardModule {
 
     @Provides
     @Singleton
-    fun provideWordRepository(wordDao: WordDao) = WordRepository(wordDao)
+    fun provideWordRepositoryImpl(wordDao: WordDao) = WordRepositoryImpl(wordDao)
 }

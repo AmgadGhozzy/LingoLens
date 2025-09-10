@@ -7,13 +7,13 @@ import com.venom.data.api.GoogleTranslateService
 import com.venom.data.api.GroqService
 import com.venom.data.api.HuggingFaceService
 import com.venom.data.local.dao.TranslationDao
-import com.venom.data.repo.OfflineTranslationOperations
-import com.venom.data.repo.OfflineTranslationRepository
-import com.venom.data.repo.OnlineTranslationOperations
-import com.venom.data.repo.OnlineTranslationRepository
-import com.venom.data.repo.TranslationHistoryOperations
-import com.venom.data.repo.TranslationHistoryRepository
-import com.venom.data.repo.TranslationRepository
+import com.venom.data.repo.OfflineTranslationRepositoryImpl
+import com.venom.data.repo.OnlineTranslationRepositoryImpl
+import com.venom.data.repo.TranslationHistoryRepositoryImpl
+import com.venom.data.repo.TranslationRepositoryImpl
+import com.venom.domain.repo.IOfflineTranslation
+import com.venom.domain.repo.IOnlineTranslation
+import com.venom.domain.repo.ITranslationHistory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +33,7 @@ object TranslationModule {
         groqService: GroqService,
         deepSeekService: DeepSeekService,
         huggingFaceService: HuggingFaceService
-    ): OnlineTranslationOperations = OnlineTranslationRepository(
+    ): IOnlineTranslation = OnlineTranslationRepositoryImpl(
         translationService,
         chatGPTService,
         geminiService,
@@ -44,21 +44,21 @@ object TranslationModule {
 
     @Provides
     @Singleton
-    fun provideOfflineTranslationOperations(): OfflineTranslationOperations = OfflineTranslationRepository()
+    fun provideOfflineTranslationOperations(): IOfflineTranslation = OfflineTranslationRepositoryImpl()
 
     @Provides
     @Singleton
-    fun provideTranslationHistoryOperations(translationDao: TranslationDao): TranslationHistoryOperations = 
-        TranslationHistoryRepository(translationDao)
+    fun provideTranslationHistoryOperations(translationDao: TranslationDao): ITranslationHistory =
+        TranslationHistoryRepositoryImpl(translationDao)
 
     @Provides
     @Singleton
     fun provideTranslationRepository(
         dao: TranslationDao,
-        onlineTranslationOperations: OnlineTranslationOperations,
-        offlineTranslationOperations: OfflineTranslationOperations,
-        translationHistoryOperations: TranslationHistoryOperations
-    ): TranslationRepository = TranslationRepository(
+        onlineTranslationOperations: IOnlineTranslation,
+        offlineTranslationOperations: IOfflineTranslation,
+        translationHistoryOperations: ITranslationHistory
+    ): TranslationRepositoryImpl = TranslationRepositoryImpl(
         dao = dao,
         onlineTranslationOperations,
         offlineTranslationOperations,

@@ -1,4 +1,4 @@
-package com.venom.stackcard.di
+package com.venom.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
