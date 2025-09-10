@@ -1,9 +1,9 @@
 package com.venom.data.mapper
 
 import android.util.Log
-import com.venom.data.model.BoundingBlock
-import com.venom.data.model.OriginalResponse
-import com.venom.data.model.ParagraphBox
+import com.venom.data.remote.respnod.BoundingBlock
+import com.venom.data.remote.respnod.OriginalResponse
+import com.venom.data.remote.respnod.ParagraphBox
 import com.venom.utils.Extensions.sanitize
 
 object ParagraphBoxMapper {

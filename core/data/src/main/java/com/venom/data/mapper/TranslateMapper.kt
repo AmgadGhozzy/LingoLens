@@ -1,9 +1,9 @@
 package com.venom.data.mapper
 
-import com.venom.data.model.AlternativeTranslation
-import com.venom.data.model.Examples
-import com.venom.data.model.GoogleTranslationResponse
-import com.venom.data.model.TranslationEntity
+import com.venom.data.local.Entity.TranslationEntity
+import com.venom.data.remote.respnod.AlternativeTranslation
+import com.venom.data.remote.respnod.Examples
+import com.venom.data.remote.respnod.GoogleTranslationResponse
 import com.venom.domain.model.Definition
 import com.venom.domain.model.DefinitionEntry
 import com.venom.domain.model.DictionaryEntry
@@ -12,6 +12,7 @@ import com.venom.domain.model.Synset
 import com.venom.domain.model.SynsetEntry
 import com.venom.domain.model.TranslationResult
 import com.venom.domain.model.TranslationSentence
+import com.venom.utils.Extensions.postprocessText
 
 object TranslateMapper {
 
@@ -23,16 +24,16 @@ object TranslateMapper {
         val sentences = response.sentences?.map { sentence ->
             TranslationSentence(
                 original = sentence.orig?.takeIf { it.isNotBlank() } ?: safeSourceText,
-                translated = sentence.trans ?: "",
+                translated = sentence.trans?.postprocessText() ?: "",
                 transliteration = sentence.translit
             )
         } ?: emptyList()
 
-        val translatedText = response.sentences?.firstOrNull()?.trans ?: ""
+        val translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText() ?: ""
         val mainTransliteration = response.sentences?.firstOrNull()?.translit
 
         return TranslationResult(
-            sourceText = safeSourceText,
+            sourceText = safeSourceText.postprocessText(),
             translatedText = translatedText,
             sourceLang = response.src,
             targetLang = "",
@@ -70,7 +71,7 @@ object TranslateMapper {
         )
     }
 
-    private fun mapDictionaryEntries(dict: List<com.venom.data.model.DictionaryEntry>): List<DictionaryEntry> {
+    private fun mapDictionaryEntries(dict: List<com.venom.data.remote.respnod.DictionaryEntry>): List<DictionaryEntry> {
         return dict.map { entry ->
             DictionaryEntry(
                 pos = entry.pos,
@@ -86,7 +87,7 @@ object TranslateMapper {
         }
     }
 
-    private fun mapSynsets(synsets: List<com.venom.data.model.Synset>): List<Synset> {
+    private fun mapSynsets(synsets: List<com.venom.data.remote.respnod.Synset>): List<Synset> {
         return synsets.map { synset ->
             Synset(
                 pos = synset.pos,
@@ -99,7 +100,7 @@ object TranslateMapper {
         }
     }
 
-    private fun mapDefinitions(definitions: List<com.venom.data.model.Definition>): List<Definition> {
+    private fun mapDefinitions(definitions: List<com.venom.data.remote.respnod.Definition>): List<Definition> {
         return definitions.map { definition ->
             Definition(
                 pos = definition.pos,
@@ -121,7 +122,7 @@ object TranslateMapper {
         }?.distinct() ?: emptyList()
     }
 
-    private fun extractSynonyms(synsets: List<com.venom.data.model.Synset>?): List<String> {
+    private fun extractSynonyms(synsets: List<com.venom.data.remote.respnod.Synset>?): List<String> {
         return synsets?.flatMap { synset ->
             synset.entry.flatMap { entry ->
                 entry.synonym.filter { it.isNotBlank() }
@@ -129,7 +130,7 @@ object TranslateMapper {
         }?.distinct() ?: emptyList()
     }
 
-    private fun extractDefinitions(definitions: List<com.venom.data.model.Definition>?): List<String> {
+    private fun extractDefinitions(definitions: List<com.venom.data.remote.respnod.Definition>?): List<String> {
         return definitions?.flatMap { def ->
             def.entry.mapNotNull { entry ->
                 val gloss = entry.gloss.takeIf { it.isNotBlank() }
@@ -156,7 +157,7 @@ object TranslateMapper {
 
     // New extraction methods
 
-    private fun extractAllTerms(dict: List<com.venom.data.model.DictionaryEntry>?): List<DictionaryTerm> {
+    private fun extractAllTerms(dict: List<com.venom.data.remote.respnod.DictionaryEntry>?): List<DictionaryTerm> {
         return dict?.flatMap { entry ->
             entry.entry.map { term ->
                 DictionaryTerm(
@@ -174,7 +175,7 @@ object TranslateMapper {
         } ?: emptyList()
     }
 
-    private fun extractPosTerms(dict: List<com.venom.data.model.DictionaryEntry>?): Map<String, List<String>> {
+    private fun extractPosTerms(dict: List<com.venom.data.remote.respnod.DictionaryEntry>?): Map<String, List<String>> {
         return dict?.associate { entry ->
             val pos = entry.pos
             val terms = entry.terms
