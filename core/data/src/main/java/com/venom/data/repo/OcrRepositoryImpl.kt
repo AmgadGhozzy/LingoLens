@@ -3,9 +3,9 @@ package com.venom.data.repo
 import android.util.Log
 import com.venom.data.BuildConfig
 import com.venom.data.api.OcrService
+import com.venom.data.local.Entity.OcrEntity
 import com.venom.data.local.dao.OcrDao
-import com.venom.data.model.OcrEntry
-import com.venom.data.model.OcrResponse
+import com.venom.data.remote.respnod.OcrResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -43,7 +43,7 @@ class OcrRepository @Inject constructor(private val ocrService: OcrService,priva
     }
 
     suspend fun saveOcrEntry(
-        ocrEntry: OcrEntry
+        ocrEntry: OcrEntity
     ) = withContext(Dispatchers.IO){
         ocrDao.insert(ocrEntry)
     }
@@ -52,9 +52,9 @@ class OcrRepository @Inject constructor(private val ocrService: OcrService,priva
 
     fun getBookmarkedOcrEntries() = ocrDao.getBookmarkedEntries()
 
-    suspend fun updateOcrEntry(entry: OcrEntry) = ocrDao.update(entry)
+    suspend fun updateOcrEntry(entry: OcrEntity) = ocrDao.update(entry)
 
-    suspend fun deleteOcrEntry(entry: OcrEntry) = ocrDao.delete(entry)
+    suspend fun deleteOcrEntry(entry: OcrEntity) = ocrDao.delete(entry)
 
     suspend fun clearBookmarks() = ocrDao.clearBookmarks()
 
