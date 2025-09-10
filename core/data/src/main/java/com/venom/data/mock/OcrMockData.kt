@@ -1,8 +1,8 @@
 package com.venom.data.mock
 
-import com.venom.data.model.BoundingBlock
-import com.venom.data.model.ParagraphBox
-import com.venom.data.model.Vertex
+import com.venom.data.remote.respnod.BoundingBlock
+import com.venom.data.remote.respnod.ParagraphBox
+import com.venom.data.remote.respnod.Vertex
 
 val ocrJson =
     """{"google":{"text":"ants bark cats desk fins jump lids milk neck pack sing tuck vine wave yawn zips","bounding_boxes":[{"text":"ants","left":0.028333333333333332,"top":0.09333333333333334,"width":0.10833333333333334,"height":0.03666666666666667},{"text":"bark","left":0.29833333333333334,"top":0.08833333333333333,"width":0.10833333333333334,"height":0.041666666666666664},{"text":"cats","left":0.58,"top":0.09166666666666666,"width":0.105,"height":0.04},{"text":"desk","left":0.8616666666666667,"top":0.08833333333333333,"width":0.12,"height":0.041666666666666664},{"text":"fins","left":0.02666666666666667,"top":0.3466666666666667,"width":0.09333333333333334,"height":0.051666666666666666},{"text":"jump","left":0.28833333333333333,"top":0.355,"width":0.13,"height":0.04666666666666667},{"text":"lids","left":0.58,"top":0.3466666666666667,"width":0.085,"height":0.051666666666666666},{"text":"milk","left":0.8583333333333333,"top":0.345,"width":0.09833333333333333,"height":0.051666666666666666},{"text":"neck","left":0.03,"top":0.6183333333333333,"width":0.11833333333333333,"height":0.03833333333333333},{"text":"pack","left":0.29333333333333333,"top":0.6166666666666667,"width":0.12166666666666667,"height":0.051666666666666666},{"text":"sing","left":0.5716666666666667,"top":0.6183333333333333,"width":0.10333333333333333,"height":0.04666666666666667},{"text":"tuck","left":0.8516666666666667,"top":0.6133333333333333,"width":0.10833333333333334,"height":0.05},{"text":"vine","left":0.028333333333333332,"top":0.8816666666666667,"width":0.1,"height":0.045},{"text":"wave","left":0.28833333333333333,"top":0.8883333333333333,"width":0.13166666666666665,"height":0.035},{"text":"yawn","left":0.575,"top":0.8916666666666667,"width":0.12833333333333333,"height":0.03833333333333333},{"text":"zips","left":0.8533333333333334,"top":0.885,"width":0.1,"height":0.04833333333333333}],"status":"success","original_response":{"textAnnotations":[{"locale":"und","description":"ants
