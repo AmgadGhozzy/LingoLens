@@ -1,7 +1,12 @@
 package com.venom.data.local.dao
 
-import androidx.room.*
-import com.venom.data.model.TranslationEntity
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.venom.data.local.Entity.TranslationEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,6 +25,19 @@ interface TranslationDao {
         sourceLang: String,
         targetLang: String,
         providerId: String
+    ): TranslationEntity?
+
+    @Query("""
+        SELECT * FROM translations 
+        WHERE sourceText = :sourceText 
+        AND sourceLang = :sourceLang 
+        AND targetLang = :targetLang
+        LIMIT 1
+    """)
+    suspend fun getTranslationEntity(
+        sourceText: String,
+        sourceLang: String,
+        targetLang: String
     ): TranslationEntity?
 
     @Query("SELECT * FROM translations WHERE id = :id LIMIT 1")
@@ -54,17 +72,4 @@ interface TranslationDao {
 
     @Query("DELETE FROM translations")
     suspend fun clearAll()
-
-    @Query("""
-        SELECT * FROM translations 
-        WHERE sourceText = :sourceText 
-        AND sourceLang = :sourceLang 
-        AND targetLang = :targetLang
-        LIMIT 1
-    """)
-    suspend fun getTranslationEntity(
-        sourceText: String,
-        sourceLang: String,
-        targetLang: String
-    ): TranslationEntity?
 }
