@@ -1,4 +1,5 @@
-package com.venom.stackcard.data.model
+
+package com.venom.data.local.Entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -59,7 +60,7 @@ val wordList = listOf(
         englishEn = "Sun",
         arabicAr = "شمس",
         isBookmarked = true,
-        synonyms = listOf("star","solar")
+        synonyms = listOf("star", "solar")
     ),
     WordEntity(
         ranking = 8,
@@ -71,7 +72,7 @@ val wordList = listOf(
         ranking = 9,
         englishEn = "Car",
         arabicAr = "سيارة",
-        synonyms = listOf("vehicle","automobile")
+        synonyms = listOf("vehicle", "automobile")
     ),
     WordEntity(
         ranking = 10,
