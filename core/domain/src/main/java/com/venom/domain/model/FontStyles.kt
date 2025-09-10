@@ -7,8 +7,16 @@ enum class FontStyles(val title: String) {
     MONOSPACE("Monospace"),
     CURSIVE("Cursive"),
 
+    CAIRO("Cairo"),
+    ALEXANDRIA("Alexandria"),
     CAVEAT("Caveat"),
     ROBOTO("Roboto"),
     QUICKSAND("Quicksand"),
     JOSEFIN_SANS("Josefin Sans")
 }
+
+data class MultilingualFontConfig(
+    val arabicFont: FontStyles = FontStyles.CAIRO,
+    val englishFont: FontStyles = FontStyles.ROBOTO,
+    val fallbackFont: FontStyles = FontStyles.Default
+)

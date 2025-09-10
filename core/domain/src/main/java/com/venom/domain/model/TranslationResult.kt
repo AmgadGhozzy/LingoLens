@@ -12,8 +12,8 @@ data class TranslationResult(
     val definitions: List<String> = emptyList(),
     val examples: List<String> = emptyList(),
     val confidence: Double = 1.0,
-    val timestamp: Long = System.currentTimeMillis(),
-    val isBookmarked: Boolean = false,
+    override val timestamp: Long = System.currentTimeMillis(),
+    override val isBookmarked: Boolean = false,
     val isFromCache: Boolean = false,
     val sentences: List<TranslationSentence> = emptyList(),
     val dict: List<DictionaryEntry> = emptyList(),
@@ -23,7 +23,7 @@ data class TranslationResult(
     val transliteration: String? = null,
     val allExamples: List<String> = emptyList(),
     val posTerms: Map<String, List<String>> = emptyMap()
-)
+) : IHistoryEntry
 
 data class TranslationSentence(
     val original: String,
