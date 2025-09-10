@@ -1,8 +1,8 @@
-package com.venom.data.repo
+package com.venom.domain.repo
 
 import com.venom.domain.model.TranslationResult
 
-interface OnlineTranslationOperations {
+interface IOnlineTranslation {
     suspend fun getGoogleTranslation(source: String, target: String, query: String): TranslationResult
     suspend fun getChatGPTTranslation(source: String, target: String, query: String): TranslationResult
     suspend fun getGeminiTranslation(source: String, target: String, query: String): TranslationResult
