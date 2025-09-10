@@ -1,9 +1,26 @@
 package com.venom.data.repo
 
 import com.venom.data.BuildConfig
-import com.venom.data.api.*
+import com.venom.data.api.ChatGPTMessage
+import com.venom.data.api.ChatGPTRequestBody
+import com.venom.data.api.ChatGPTService
+import com.venom.data.api.DeepSeekMessage
+import com.venom.data.api.DeepSeekRequestBody
+import com.venom.data.api.DeepSeekService
+import com.venom.data.api.GeminiContent
+import com.venom.data.api.GeminiPart
+import com.venom.data.api.GeminiRequest
+import com.venom.data.api.GeminiService
+import com.venom.data.api.GoogleTranslateService
+import com.venom.data.api.GroqMessage
+import com.venom.data.api.GroqRequestBody
+import com.venom.data.api.GroqService
+import com.venom.data.api.HuggingFaceParameters
+import com.venom.data.api.HuggingFaceRequestBody
+import com.venom.data.api.HuggingFaceService
 import com.venom.data.mapper.TranslateMapper
 import com.venom.domain.model.TranslationResult
+import com.venom.domain.repo.IOnlineTranslation
 import com.venom.utils.Extensions.preprocessText
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
@@ -11,14 +28,14 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-class OnlineTranslationRepository @Inject constructor(
+class OnlineTranslationRepositoryImpl @Inject constructor(
     private val translationService: GoogleTranslateService,
     private val chatGPTService: ChatGPTService,
     private val geminiService: GeminiService,
     private val groqService: GroqService,
     private val deepSeekService: DeepSeekService,
     private val huggingFaceService: HuggingFaceService
-) : OnlineTranslationOperations {
+) : IOnlineTranslation {
 
     override suspend fun getGoogleTranslation(source: String, target: String, query: String): TranslationResult {
         return safeCall {
