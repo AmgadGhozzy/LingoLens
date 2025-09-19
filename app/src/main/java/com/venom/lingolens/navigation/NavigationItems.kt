@@ -13,6 +13,7 @@ enum class NavigationItems(
     PHRASE(Screen.Phrases, R.drawable.icon_dialog, R.string.phrase_title),
     QUIZ(Screen.Quiz.MainLevel, R.drawable.quiz_logo, R.string.quiz_title),
     WORDCARD(Screen.StackCard, R.drawable.icon_cards1, R.string.stackcard_title),
+    QUOTE(Screen.Quote, R.drawable.icon_quotes, R.string.quote_title),
     OCR(Screen.Ocr, R.drawable.icon_camera, R.string.ocr_title),
     TRANSLATE(Screen.Translation, R.drawable.icon_translate, R.string.translate_title);
 }

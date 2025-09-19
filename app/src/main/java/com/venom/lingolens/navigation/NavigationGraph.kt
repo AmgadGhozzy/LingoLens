@@ -13,6 +13,7 @@ import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
 import com.venom.quiz.ui.screen.MainLevelScreen
 import com.venom.quiz.ui.screen.QuizScreen
+import com.venom.quote.ui.screen.QuoteScreen
 import com.venom.stackcard.ui.screen.BookmarksScreen
 import com.venom.stackcard.ui.screen.CardScreen
 import com.venom.textsnap.ui.screens.OcrScreen
@@ -140,6 +141,7 @@ fun NavigationGraph(
                 )
             else
                 BookmarkHistoryScreen(
+                    navController = navController,
                     contentType = contentType,
                     onBackClick = { navController.popBackStack() }
                 )
@@ -187,6 +189,10 @@ fun NavigationGraph(
             WordCraftScreen(
                 onImageSelect = imageSelector
             )
+        }
+        
+        composable(Screen.Quote.route) {
+            QuoteScreen()
         }
     }
 }
