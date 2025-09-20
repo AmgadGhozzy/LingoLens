@@ -28,7 +28,7 @@ data class SettingsUiState(
     val nativeLanguage: LanguageItem = LANGUAGES_LIST[1],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
     val speechRate: Float = 1f,
-    val autoPronounciation: Boolean = true,
+    val autoPronunciation: Boolean = true,
     val error: String? = null
 )
 
@@ -53,7 +53,7 @@ class SettingsViewModel @Inject constructor(
         appLanguage = appLanguage,
         nativeLanguage = nativeLanguage,
         targetLanguage = targetLanguage,
-        autoPronounciation = autoPronounciation,
+        autoPronunciation = autoPronunciation,
         themePrefs = themePrefs
     )
 
@@ -83,7 +83,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateAutoPronounciation(enabled: Boolean) = updateSetting {
-        updateSettings { copy(autoPronounciation = enabled) }
+        updateSettings { copy(autoPronunciation = enabled) }
     }
 
     fun updateAppTheme(theme: AppTheme) = updateSetting {
