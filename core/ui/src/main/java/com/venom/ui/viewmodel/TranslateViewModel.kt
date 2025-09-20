@@ -8,7 +8,7 @@ import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationProvider
 import com.venom.data.repo.SettingsRepository
-import com.venom.data.repo.TranslationRepository
+import com.venom.data.repo.TranslationRepositoryImpl
 import com.venom.domain.model.TranslationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -32,6 +32,8 @@ data class TranslationUiState(
     val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE,
     val error: String? = null,
     val translationResult: TranslationResult = TranslationResult(),
+    val canUseOfflineTranslation: Boolean = false,
+    val missingOfflineLanguages: List<String> = emptyList(),
 ) {
     val translatedText: String get() = translationResult.translatedText
     val isBookmarked: Boolean get() = translationResult.isBookmarked
@@ -40,7 +42,7 @@ data class TranslationUiState(
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TranslateViewModel @Inject constructor(
-    private val repository: TranslationRepository,
+    private val repository: TranslationRepositoryImpl,
     private val settingsRepository: SettingsRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -171,8 +173,48 @@ class TranslateViewModel @Inject constructor(
             )
         }
 
+        checkOfflineAvailability(source, target)
+
         if (currentState.sourceText.isNotBlank()) {
             triggerTranslation(currentState.sourceText, forceRefresh = true, immediate = true)
+        }
+    }
+
+    private fun checkOfflineAvailability(source: LanguageItem, target: LanguageItem) {
+        viewModelScope.launch {
+            try {
+                val downloadedModels = repository.getDownloadedModels() // Assume this method exists
+                val allModels = repository.getAllOfflineModels() // Assume this method exists
+
+                val sourceSupported = allModels.contains(source.code)
+                val targetSupported = allModels.contains(target.code)
+                val sourceDownloaded = downloadedModels.contains(source.code)
+                val targetDownloaded = downloadedModels.contains(target.code)
+
+                val canUseOffline = sourceSupported && targetSupported && sourceDownloaded && targetDownloaded
+                val missingLanguages = mutableListOf<String>()
+
+                if (sourceSupported && !sourceDownloaded) {
+                    missingLanguages.add(source.englishName)
+                }
+                if (targetSupported && !targetDownloaded) {
+                    missingLanguages.add(target.englishName)
+                }
+
+                _uiState.update { state ->
+                    state.copy(
+                        canUseOfflineTranslation = canUseOffline,
+                        missingOfflineLanguages = missingLanguages
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { state ->
+                    state.copy(
+                        canUseOfflineTranslation = false,
+                        missingOfflineLanguages = emptyList()
+                    )
+                }
+            }
         }
     }
 
@@ -188,6 +230,8 @@ class TranslateViewModel @Inject constructor(
                 error = null
             )
         }
+
+        checkOfflineAvailability(currentState.targetLanguage, currentState.sourceLanguage)
 
         if (currentState.translatedText.isNotBlank()) {
             triggerTranslation(currentState.translatedText, immediate = true)
@@ -283,6 +327,15 @@ class TranslateViewModel @Inject constructor(
 
         val currentState = _uiState.value
 
+        // Check if using offline provider and models are not available
+        if (currentState.selectedProvider == TranslationProvider.OFFLINE && !currentState.canUseOfflineTranslation) {
+            _uiState.update { state ->
+                state.copy(
+                    error = "Offline models not available for ${currentState.sourceLanguage.englishName} -> ${currentState.targetLanguage.englishName}. Please download the required language models or switch to an online provider."
+                )
+            }
+            return
+        }
 
         cancelCurrentTranslation()
 
@@ -310,10 +363,16 @@ class TranslateViewModel @Inject constructor(
                     },
                     onFailure = { exception ->
                         if (text == _uiState.value.sourceText) {
+                            val errorMessage = if (currentState.selectedProvider == TranslationProvider.OFFLINE) {
+                                "Offline translation failed. ${exception.message ?: ""}\nTry downloading the language models or switch to an online provider."
+                            } else {
+                                exception.message ?: "Translation failed"
+                            }
+
                             _uiState.update { state ->
                                 state.copy(
                                     isLoading = false,
-                                    error = exception.message ?: "Translation failed"
+                                    error = errorMessage
                                 )
                             }
                         }
