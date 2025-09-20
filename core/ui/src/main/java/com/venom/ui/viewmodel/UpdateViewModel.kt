@@ -31,7 +31,7 @@ class UpdateViewModel @Inject constructor(
             val config = updateChecker.checkForUpdates()
             _state.update {
                 it.copy(
-                    isForceUpdate = config.forceUpdateVersion > BuildConfig.VERSION_CODE.toInt(),
+                    isForceUpdate = config.forceUpdateVersion > BuildConfig.APP_VERSION_CODE.toInt(),
                     features = config.features,
                     latestVersionName = config.latestVersionName
                 )

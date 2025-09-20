@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.data.model.OcrEntry
+import com.venom.data.local.Entity.OcrEntity
 import com.venom.data.repo.OcrRepository
 import com.venom.ui.screen.ViewType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @Immutable
 data class OcrBookmarkState(
-    val items: List<OcrEntry> = emptyList(),
+    val items: List<OcrEntity> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val viewType: ViewType = ViewType.BOOKMARKS
@@ -70,7 +70,7 @@ class BookmarkOcrViewModel @Inject constructor(
     }
 
     // Remove a single item
-    fun removeItem(entry: OcrEntry) {
+    fun removeItem(entry: OcrEntity) {
         viewModelScope.launch {
             try {
                 ocrRepository.deleteOcrEntry(entry)
@@ -102,7 +102,7 @@ class BookmarkOcrViewModel @Inject constructor(
     }
 
     // Toggle bookmark status
-    fun toggleBookmark(entry: OcrEntry) {
+    fun toggleBookmark(entry: OcrEntity) {
         viewModelScope.launch {
             try {
                 val updatedEntry = entry.copy(isBookmarked = !entry.isBookmarked)
