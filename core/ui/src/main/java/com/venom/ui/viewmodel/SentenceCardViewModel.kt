@@ -7,7 +7,7 @@ import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationProvider
 import com.venom.data.repo.SettingsRepository
-import com.venom.data.repo.TranslationRepository
+import com.venom.data.repo.TranslationRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,10 +28,13 @@ data class SentenceCardState(
 
 @HiltViewModel
 class SentenceCardViewModel @Inject constructor(
-    private val repository: TranslationRepository,
+    private val repository: TranslationRepositoryImpl,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(SentenceCardState())
+    val uiState = _uiState.asStateFlow()
+    
     init {
         viewModelScope.launch {
             settingsRepository.settings.collect { settings ->
@@ -40,9 +43,6 @@ class SentenceCardViewModel @Inject constructor(
             }
         }
     }
-
-    private val _uiState = MutableStateFlow(SentenceCardState())
-    val uiState = _uiState.asStateFlow()
 
     private var translationJob: Job? = null
     private var lastTranslatedSentence: String? = null
