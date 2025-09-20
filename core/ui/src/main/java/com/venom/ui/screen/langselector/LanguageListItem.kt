@@ -81,12 +81,12 @@ fun LanguageListItem(
                 .fillMaxWidth()
                 .background(
                     if (isSelected) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                        MaterialTheme.colorScheme.primaryContainer.copy(0.8f)
                     } else {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                        MaterialTheme.colorScheme.surfaceVariant.copy(0.6f)
                     }
                 )
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -101,8 +101,8 @@ fun LanguageListItem(
                         .background(
                             brush = Brush.radialGradient(
                                 colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                    MaterialTheme.colorScheme.primary.copy(0.2f),
+                                    MaterialTheme.colorScheme.primary.copy(0.1f)
                                 )
                             )
                         ),
@@ -133,7 +133,7 @@ fun LanguageListItem(
                         text = language.nativeName,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             }

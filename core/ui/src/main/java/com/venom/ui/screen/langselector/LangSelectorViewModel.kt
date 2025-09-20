@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
-import com.venom.data.repo.OfflineTranslationOperations
 import com.venom.data.repo.SettingsRepository
+import com.venom.domain.repo.IOfflineTranslation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,13 +19,15 @@ data class LanguageSelectorState(
     val targetLang: LanguageItem = LANGUAGES_LIST[1],
     val searchQuery: String = "",
     val isSelectingSourceLanguage: Boolean = true,
-    val filteredLanguages: List<LanguageItem> = LANGUAGES_LIST
+    val filteredLanguages: List<LanguageItem> = LANGUAGES_LIST,
+    val availableLanguages: List<LanguageItem> = LANGUAGES_LIST,
+    val offlineModelsStatus: Map<String, Boolean> = emptyMap()
 )
 
 @HiltViewModel
 class LangSelectorViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val offlineTranslationOperations: OfflineTranslationOperations
+    private val offlineTranslationOperations: IOfflineTranslation
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LanguageSelectorState())
@@ -42,8 +44,13 @@ class LangSelectorViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.settings.collectLatest { preferences ->
                 if (!isInternalUpdate) {
-                    val nativeLang = LANGUAGES_LIST.find { it.code == preferences.nativeLanguage.code } ?: LANGUAGES_LIST[0]
-                    val targetLang = LANGUAGES_LIST.find { it.code == preferences.targetLanguage.code } ?: LANGUAGES_LIST[1]
+                    val currentState = _state.value
+                    val availableLanguages = currentState.availableLanguages
+
+                    val nativeLang = availableLanguages.find { it.code == preferences.nativeLanguage.code }
+                        ?: availableLanguages.firstOrNull() ?: LANGUAGES_LIST[0]
+                    val targetLang = availableLanguages.find { it.code == preferences.targetLanguage.code }
+                        ?: availableLanguages.getOrNull(1) ?: LANGUAGES_LIST[1]
 
                     _state.update { current ->
                         current.copy(sourceLang = nativeLang, targetLang = targetLang)
@@ -53,11 +60,50 @@ class LangSelectorViewModel @Inject constructor(
         }
     }
 
+    // New: Set custom languages list
+    fun setCustomLanguagesList(languages: List<LanguageItem>) {
+        _state.update { current ->
+            val updatedLanguages = languages.map { lang ->
+                // Update with offline status if available
+                val isDownloaded = current.offlineModelsStatus[lang.code] ?: false
+                lang.copy(
+                    isDownloaded = isDownloaded,
+                    downloadSizeMb = if (getAllModels().contains(lang.code)) getModelSize(lang.code) else null
+                )
+            }
+
+            current.copy(
+                availableLanguages = updatedLanguages,
+                filteredLanguages = filterLanguages(current.searchQuery, updatedLanguages)
+            )
+        }
+    }
+
+    // New: Check if offline model is downloaded for a language
+    fun isOfflineModelDownloaded(langCode: String): Boolean {
+        return _state.value.offlineModelsStatus[langCode] ?: false
+    }
+
+    // New: Check if both source and target languages have offline models
+    fun areOfflineModelsAvailable(): Boolean {
+        val currentState = _state.value
+        return isOfflineModelDownloaded(currentState.sourceLang.code) &&
+                isOfflineModelDownloaded(currentState.targetLang.code)
+    }
+
+    // New: Get languages that need to be downloaded for offline translation
+    fun getLanguagesNeedingDownload(): List<LanguageItem> {
+        val currentState = _state.value
+        return listOf(currentState.sourceLang, currentState.targetLang).filter { lang ->
+            getAllModels().contains(lang.code) && !isOfflineModelDownloaded(lang.code)
+        }
+    }
+
     fun onSearchQueryChange(query: String) {
         _state.update { current ->
             current.copy(
                 searchQuery = query,
-                filteredLanguages = filterLanguages(query)
+                filteredLanguages = filterLanguages(query, current.availableLanguages)
             )
         }
     }
@@ -136,8 +182,12 @@ class LangSelectorViewModel @Inject constructor(
             val allMlKitLanguages = offlineTranslationOperations.getAllModels().toSet()
             val downloadedMlKitLanguages = offlineTranslationOperations.getDownloadedModels()
 
+            val offlineStatus = allMlKitLanguages.associateWith { langCode ->
+                downloadedMlKitLanguages.contains(langCode)
+            }
+
             _state.update { current ->
-                val updatedLanguages = LANGUAGES_LIST.map { lang ->
+                val updatedLanguages = current.availableLanguages.map { lang ->
                     val isMlKitSupported = allMlKitLanguages.contains(lang.code)
                     if (isMlKitSupported) {
                         lang.copy(
@@ -148,13 +198,21 @@ class LangSelectorViewModel @Inject constructor(
                         lang
                     }
                 }
+
                 current.copy(
+                    offlineModelsStatus = offlineStatus,
+                    availableLanguages = updatedLanguages,
                     filteredLanguages = filterLanguages(current.searchQuery, updatedLanguages),
                     sourceLang = updateLanguageItemDetails(current.sourceLang, updatedLanguages),
                     targetLang = updateLanguageItemDetails(current.targetLang, updatedLanguages)
                 )
             }
         }
+    }
+
+    // New: Refresh offline models status
+    fun refreshOfflineModelsStatus() {
+        loadOfflineLanguageModelsStatus()
     }
 
     private fun getModelSize(langCode: String): Float {
@@ -249,6 +307,12 @@ class LangSelectorViewModel @Inject constructor(
             offlineTranslationOperations.downloadLanguageModel(language.code)
                 .onSuccess {
                     updateLanguageItemState(language.code, isDownloading = false, isDownloaded = true)
+                    // Update offline models status
+                    _state.update { current ->
+                        current.copy(
+                            offlineModelsStatus = current.offlineModelsStatus + (language.code to true)
+                        )
+                    }
                 }
                 .onFailure {
                     updateLanguageItemState(language.code, isDownloading = false)
@@ -261,6 +325,12 @@ class LangSelectorViewModel @Inject constructor(
             offlineTranslationOperations.deleteLanguageModel(language.code)
                 .onSuccess {
                     updateLanguageItemState(language.code, isDownloaded = false)
+                    // Update offline models status
+                    _state.update { current ->
+                        current.copy(
+                            offlineModelsStatus = current.offlineModelsStatus + (language.code to false)
+                        )
+                    }
                 }
         }
     }
@@ -271,7 +341,7 @@ class LangSelectorViewModel @Inject constructor(
         isDownloaded: Boolean? = null
     ) {
         _state.update { current ->
-            val updatedList = current.filteredLanguages.map { lang ->
+            val updatedAvailableList = current.availableLanguages.map { lang ->
                 if (lang.code == langCode) {
                     lang.copy(
                         isDownloading = isDownloading ?: lang.isDownloading,
@@ -279,17 +349,28 @@ class LangSelectorViewModel @Inject constructor(
                     )
                 } else lang
             }
+
+            val updatedFilteredList = current.filteredLanguages.map { lang ->
+                if (lang.code == langCode) {
+                    lang.copy(
+                        isDownloading = isDownloading ?: lang.isDownloading,
+                        isDownloaded = isDownloaded ?: lang.isDownloaded
+                    )
+                } else lang
+            }
+
             current.copy(
-                filteredLanguages = updatedList,
-                sourceLang = updateLanguageItemDetails(current.sourceLang, updatedList),
-                targetLang = updateLanguageItemDetails(current.targetLang, updatedList)
+                availableLanguages = updatedAvailableList,
+                filteredLanguages = updatedFilteredList,
+                sourceLang = updateLanguageItemDetails(current.sourceLang, updatedAvailableList),
+                targetLang = updateLanguageItemDetails(current.targetLang, updatedAvailableList)
             )
         }
     }
 
     private fun filterLanguages(
         query: String,
-        languages: List<LanguageItem> = _state.value.filteredLanguages
+        languages: List<LanguageItem> = _state.value.availableLanguages
     ): List<LanguageItem> {
         return if (query.isEmpty()) {
             languages
@@ -302,4 +383,6 @@ class LangSelectorViewModel @Inject constructor(
             }
         }
     }
+
+    private fun getAllModels(): List<String> = offlineTranslationOperations.getAllModels()
 }

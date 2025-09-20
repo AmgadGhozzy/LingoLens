@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.venom.data.model.LANGUAGES_LIST
+import com.venom.data.model.LanguageItem
 import com.venom.resources.R
 
 /**
@@ -43,23 +46,27 @@ import com.venom.resources.R
 @Composable
 fun LanguageBar(
     viewModel: LangSelectorViewModel,
+    languages: List<LanguageItem> = LANGUAGES_LIST,
     isFromBottomSheet: Boolean = false,
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false,
     modifier: Modifier = Modifier,
     flagSize: Dp = 32.dp,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    containerColor: Color = Color.Unspecified,
+    contentColor: Color = Color.Unspecified
 ) {
     val state by viewModel.state.collectAsState()
     var showLanguageSelector by remember { mutableStateOf(false) }
+
+    LaunchedEffect(languages) {
+        viewModel.setCustomLanguagesList(languages)
+    }
 
     val rotation by animateFloatAsState(
         targetValue = if (isFromBottomSheet) 0f else 180f, animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
         )
     )
-
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
