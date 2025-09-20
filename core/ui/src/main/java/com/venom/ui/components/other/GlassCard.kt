@@ -21,23 +21,42 @@ import com.venom.ui.theme.ThemeColors.GlassPrimary
 import com.venom.ui.theme.ThemeColors.GlassSecondary
 import com.venom.ui.theme.ThemeColors.GlassTertiary
 
+/**
+ * A GlassCard is a special card that supports a glassy effect. It is a flexible and
+ * customizable composable that can be used to enhance the UI of your app.
+ *
+ * @param contentPadding The padding of the content inside the card
+ * @param glassAlpha The alpha value of the glass effect
+ * @param glassPrimary The primary color of the glass effect
+ * @param glassSecondary The secondary color of the glass effect
+ * @param glassTertiary The tertiary color of the glass effect
+ * @param borderAlpha The alpha value of the border
+ * @param borderColor The color of the border
+ * @param borderWidth The width of the border
+ * @param padding The padding of the card
+ * @param shape The shape of the card
+ * @param solidBackground The solid background color of the card
+ * @param solidBackgroundAlpha The alpha value of the solid background
+ * @param onClick Click event handler for the card
+ * @param content The content of the card
+ */
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
+    contentPadding: Dp = 0.dp,
+    glassAlpha: Float = 0.15f,
     glassPrimary: Color = GlassPrimary,
     glassSecondary: Color = GlassSecondary,
     glassTertiary: Color = GlassTertiary,
-    glassAlpha: Float = 0.15f,
-    solidBackgroundAlpha: Float = 0.1f,
-    solidBackground: Color = MaterialTheme.colorScheme.background.copy(solidBackgroundAlpha),
     borderAlpha: Float = 0.1f,
-    shape: Shape = RoundedCornerShape(24.dp),
-    padding: Dp = 0.dp,
-    contentPadding: Dp = 0.dp,
-    borderWidth: Dp = 1.dp,
     borderColor: Color = MaterialTheme.colorScheme.outline,
-    content: @Composable () -> Unit = {}
+    borderWidth: Dp = 1.dp,
+    padding: Dp = 0.dp,
+    shape: Shape = RoundedCornerShape(24.dp),
+    solidBackground: Color = MaterialTheme.colorScheme.background.copy(0.1f),
+    solidBackgroundAlpha: Float = 0.1f,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit = {},
 ) {
 
     Box(
