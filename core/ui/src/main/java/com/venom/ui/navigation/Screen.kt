@@ -28,6 +28,8 @@ sealed class Screen(val route: String) {
     object Onboarding : Screen("onboarding")
     
     object WordCraft : Screen("wordcraft")
+    
+    object Quote : Screen("quote")
 
     sealed class Quiz(route: String) : Screen(route) {
         object MainLevel : Quiz("quiz/main")
@@ -52,6 +54,7 @@ sealed class Screen(val route: String) {
                 route.startsWith("history") -> History
                 route == "bookmarks" -> Bookmarks
                 route == "onboarding" -> Onboarding
+                route == "quote" -> Quote
                 else -> Translation
             }
         }

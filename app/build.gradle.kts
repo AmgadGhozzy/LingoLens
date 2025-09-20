@@ -105,6 +105,7 @@ dependencies {
     implementation(project(":features:dialog"))
     implementation(project(":features:stackcard"))
     implementation(project(":features:quiz"))
+    implementation(project(":features:quote"))
     implementation(project(":features:wordcraftai"))
     implementation(project(":features:ocr"))
     implementation(project(":features:settings"))
