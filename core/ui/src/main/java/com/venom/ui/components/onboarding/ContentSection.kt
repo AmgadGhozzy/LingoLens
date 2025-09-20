@@ -1,6 +1,9 @@
 package com.venom.ui.components.onboarding
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Icon
@@ -26,7 +29,8 @@ fun ContentSection(page: OnboardingPage) {
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                lineHeight = 40.sp
             )
 
             Text(
@@ -40,7 +44,7 @@ fun ContentSection(page: OnboardingPage) {
         Text(
             text = page.description,
             fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
+            color = MaterialTheme.colorScheme.onBackground.copy(0.9f),
             textAlign = TextAlign.Center,
             lineHeight = 24.sp
         )
@@ -60,7 +64,7 @@ fun ContentSection(page: OnboardingPage) {
                         )
                         Text(
                             text = feature,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
+                            color = MaterialTheme.colorScheme.onBackground.copy(0.9f),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
