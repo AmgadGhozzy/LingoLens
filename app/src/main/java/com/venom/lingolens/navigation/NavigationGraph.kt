@@ -23,6 +23,7 @@ import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.ui.screen.ContentType
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.screen.SentenceScreen
+import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.viewmodel.TranslateViewModel
 import com.venom.wordcraftai.presentation.ui.screens.WordCraftScreen
 
@@ -30,6 +31,7 @@ import com.venom.wordcraftai.presentation.ui.screens.WordCraftScreen
 fun NavigationGraph(
     navController: NavHostController,
     translateViewModel: TranslateViewModel,
+    langSelectorViewModel: LangSelectorViewModel,
     ocrViewModel: OcrViewModel,
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
@@ -57,6 +59,7 @@ fun NavigationGraph(
             val text = backStackEntry.arguments?.getString(Screen.Translation.ARG_TEXT)
             TranslationScreen(
                 viewModel = translateViewModel,
+                langSelectorViewModel = langSelectorViewModel,
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
                 onNavigateToSentence = { text ->
                     navController.navigate(Screen.Sentence.createRoute(text))
