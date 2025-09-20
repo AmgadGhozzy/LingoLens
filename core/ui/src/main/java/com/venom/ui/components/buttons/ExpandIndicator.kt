@@ -1,11 +1,17 @@
 package com.venom.ui.components.buttons
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
@@ -19,8 +25,8 @@ fun ExpandIndicator(
     expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current,
-    containerColor: Color = Color.Transparent,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
+    containerColor: Color = MaterialTheme.colorScheme.onSurface.copy(0.1f),
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,

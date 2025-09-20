@@ -39,7 +39,7 @@ fun WordChipItem(
         modifier = Modifier
             .padding(3.dp)
             .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.secondary.copy(0.5f))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = LocalIndication.current,
