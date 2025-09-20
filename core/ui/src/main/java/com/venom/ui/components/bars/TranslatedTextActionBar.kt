@@ -75,7 +75,6 @@ fun TranslatedTextActionBar(
 
     BaseActionBar(
         leftAction = leftAction,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         actions = actions,
         modifier = modifier
     )

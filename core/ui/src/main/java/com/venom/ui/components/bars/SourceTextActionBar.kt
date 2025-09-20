@@ -1,6 +1,6 @@
 package com.venom.ui.components.bars
 
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,7 +76,6 @@ fun SourceTextActionBar(
 
     BaseActionBar(
         leftAction = leftAction,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         actions = actions,
         modifier = modifier
     )
