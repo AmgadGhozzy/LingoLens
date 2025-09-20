@@ -1,4 +1,4 @@
-package com.venom.ui.components.lists
+package com.venom.ui.screen.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,23 +12,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.TranslationEntity
-import com.venom.ui.screen.history.TransHistoryItemView
+import com.venom.data.local.Entity.OcrEntity
 
 @Composable
-fun TransBookmarkList(
-    items: List<TranslationEntity>,
+fun OcrBookmarkList(
+    items: List<OcrEntity>,
     searchQuery: String,
-    onItemRemove: (TranslationEntity) -> Unit,
-    onToggleBookmark: (TranslationEntity) -> Unit,
-    onShareClick: (TranslationEntity) -> Unit,
-    onCopyClick: (TranslationEntity) -> Unit,
-    onItemClick: ((TranslationEntity) -> Unit)
+    onItemRemove: (OcrEntity) -> Unit,
+    onToggleBookmark: (OcrEntity) -> Unit,
+    onShareClick: (OcrEntity) -> Unit,
+    onCopyClick: (OcrEntity) -> Unit,
+    onItemClick: (OcrEntity) -> Unit,
+    onOpenInNew: (OcrEntity) -> Unit
 ) {
     val filteredItems = items.filter { item ->
-        searchQuery.isEmpty() || listOf(
-            item.sourceText, item.translatedText, item.sourceLang, item.targetLang
-        ).any { it.contains(searchQuery, ignoreCase = true) }
+        searchQuery.isEmpty() || item.recognizedText.contains(searchQuery, ignoreCase = true)
     }
 
     var expandedItemId by remember { mutableStateOf<String?>(null) }
@@ -40,13 +38,14 @@ fun TransBookmarkList(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(filteredItems) { entry ->
-            TransHistoryItemView(
+            OcrHistoryItemView(
                 entry = entry,
                 onEntryRemove = onItemRemove,
                 onToggleBookmark = onToggleBookmark,
                 onShareClick = onShareClick,
                 onCopyClick = onCopyClick,
-                onItemClick = onItemClick,
+                onItemClick = { onItemClick(entry) },
+                onOpenInNew = { onOpenInNew(entry) },
                 isExpanded = expandedItemId == entry.id.toString(),
                 onExpandChange = { isExpanding ->
                     expandedItemId = if (isExpanding) entry.id.toString() else null

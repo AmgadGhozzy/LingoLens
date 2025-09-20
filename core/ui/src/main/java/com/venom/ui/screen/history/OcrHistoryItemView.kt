@@ -18,17 +18,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.OcrEntry
+import com.venom.data.local.Entity.OcrEntity
 import com.venom.utils.Extensions.toBitmap
 
 @Composable
 fun OcrHistoryItemView(
-    entry: OcrEntry,
-    onEntryRemove: (OcrEntry) -> Unit,
-    onToggleBookmark: (OcrEntry) -> Unit,
-    onShareClick: (OcrEntry) -> Unit,
-    onCopyClick: (OcrEntry) -> Unit,
-    onItemClick: (OcrEntry) -> Unit,
+    entry: OcrEntity,
+    onEntryRemove: (OcrEntity) -> Unit,
+    onToggleBookmark: (OcrEntity) -> Unit,
+    onShareClick: (OcrEntity) -> Unit,
+    onCopyClick: (OcrEntity) -> Unit,
+    onItemClick: (OcrEntity) -> Unit,
+    onOpenInNew: (OcrEntity) -> Unit,
     isExpanded: Boolean,
     onExpandChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -40,6 +41,7 @@ fun OcrHistoryItemView(
         onShareClick = { onShareClick(entry) },
         onCopyClick = { onCopyClick(entry) },
         onItemClick = { onItemClick(entry) },
+        onOpenInNew = { onOpenInNew(entry) },
         isExpanded = isExpanded,
         onExpandChange = onExpandChange,
         modifier = modifier
@@ -53,7 +55,7 @@ fun OcrHistoryItemView(
 
 @Composable
 private fun OcrContent(
-    entry: OcrEntry,
+    entry: OcrEntity,
     isExpanded: Boolean,
     modifier: Modifier = Modifier
 ) {

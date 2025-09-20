@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,20 +32,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.data.model.LANGUAGES_LIST
-import com.venom.data.model.TranslationEntity
+import com.venom.domain.model.TranslationResult
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.buttons.ExpandIndicator
 
 @Composable
 fun TransHistoryItemView(
-    entry: TranslationEntity,
-    onEntryRemove: (TranslationEntity) -> Unit,
-    onToggleBookmark: (TranslationEntity) -> Unit,
-    onShareClick: (TranslationEntity) -> Unit,
-    onCopyClick: (TranslationEntity) -> Unit,
-    onItemClick: (TranslationEntity) -> Unit,
-    isExpanded: Boolean, // New parameter: whether this item is expanded
-    onExpandChange: (Boolean) -> Unit, // New parameter: callback when expansion changes
+    entry: TranslationResult,
+    onEntryRemove: (TranslationResult) -> Unit,
+    onToggleBookmark: (TranslationResult) -> Unit,
+    onShareClick: (TranslationResult) -> Unit,
+    onCopyClick: (TranslationResult) -> Unit,
+    onItemClick: (TranslationResult) -> Unit,
+    onOpenInNew: (TranslationResult) -> Unit,
+    isExpanded: Boolean,
+    onExpandChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     HistoryItemView(
@@ -54,6 +57,7 @@ fun TransHistoryItemView(
         onShareClick = { onShareClick(entry) },
         onCopyClick = { onCopyClick(entry) },
         onItemClick = { onItemClick(entry) },
+        onOpenInNew = { onOpenInNew(entry) },
         isExpanded = isExpanded,
         onExpandChange = onExpandChange,
         modifier = modifier
@@ -68,7 +72,7 @@ fun TransHistoryItemView(
 
 @Composable
 private fun TranslationContent(
-    entry: TranslationEntity,
+    entry: TranslationResult,
     onExpandClick: () -> Unit,
     isExpanded: Boolean,
     modifier: Modifier = Modifier
@@ -88,7 +92,16 @@ private fun TranslationContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TranslationArrow()
+        CustomFilledIconButton(
+            icon = Icons.Rounded.ArrowDownward,
+            contentDescription = stringResource(R.string.expand_translation),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary.copy(0.1f),
+                contentColor = MaterialTheme.colorScheme.primary
+            ),
+            onClick = onExpandClick,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -100,20 +113,22 @@ private fun TranslationContent(
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold)
         )
 
+        // Always show expand indicator if there are synonyms
         if (entry.synonyms.isNotEmpty()) {
             ExpandIndicator(
                 expanded = isExpanded,
                 onClick = onExpandClick,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = fadeIn(tween(400)) + expandVertically(tween(400)),
-                exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
-            ) {
-                SynonymsSection(synonyms = entry.synonyms)
-            }
+        }
 
+        // Show synonyms when card is expanded
+        AnimatedVisibility(
+            visible = isExpanded && entry.synonyms.isNotEmpty(),
+            enter = fadeIn(tween(400)) + expandVertically(tween(400)),
+            exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
+        ) {
+            SynonymsSection(synonyms = entry.synonyms)
         }
     }
 }
