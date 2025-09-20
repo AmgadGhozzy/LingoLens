@@ -2,6 +2,7 @@ package com.venom.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,18 +23,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.venom.data.model.OcrEntry
-import com.venom.data.model.TranslationEntity
+import androidx.navigation.NavController
+import com.venom.data.local.Entity.OcrEntity
+import com.venom.domain.model.TranslationResult
 import com.venom.domain.model.ViewResources
 import com.venom.resources.R
 import com.venom.ui.components.bars.TopBar
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.dialogs.ConfirmationDialog
 import com.venom.ui.components.inputs.CustomSearchBar
-import com.venom.ui.components.lists.OcrBookmarkList
-import com.venom.ui.components.lists.TransBookmarkList
+import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.components.sections.CustomTabs
 import com.venom.ui.components.sections.TabItem
+import com.venom.ui.navigation.Screen
+import com.venom.ui.screen.history.OcrBookmarkList
+import com.venom.ui.screen.history.TransBookmarkList
 import com.venom.ui.viewmodel.BookmarkOcrViewModel
 import com.venom.ui.viewmodel.BookmarkViewModel
 import com.venom.utils.Extensions.copyToClipboard
@@ -45,9 +49,24 @@ fun BookmarkHistoryScreen(
     contentType: ContentType,
     translationViewModel: BookmarkViewModel = hiltViewModel(),
     ocrViewModel: BookmarkOcrViewModel = hiltViewModel(),
+    navController: NavController,
     onBackClick: () -> Unit,
-    onTranslationItemClick: (TranslationEntity) -> Unit = {},
-    onOcrItemClick: (OcrEntry) -> Unit = {}
+    onTranslationItemClick: (TranslationResult) -> Unit = { result ->
+        navController.navigate(Screen.Translation.createRoute(result.sourceText))
+    },
+    onOcrItemClick: (OcrEntity) -> Unit = { ocrEntry ->
+        try {
+            navController.navigate("ocr") {
+                popUpTo("ocr") {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        } catch (e: Exception) {
+            println("OCR navigation failed: ${e.message}")
+        }
+    }
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
@@ -81,75 +100,83 @@ fun BookmarkHistoryScreen(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
+        FloatingOrbs()
+
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
-            TopBar(
-                title = viewResources.title,
-                onLeadingIconClick = onBackClick,
-                actions = {
-                    CustomFilledIconButton(
-                        icon = R.drawable.icon_delete,
-                        contentDescription = stringResource(R.string.action_clear_history),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
-                            contentColor = MaterialTheme.colorScheme.error
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        onClick = { showClearDialog = true }
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                TopBar(
+                    title = viewResources.title,
+                    onLeadingIconClick = onBackClick,
+                    actions = {
+                        CustomFilledIconButton(
+                            icon = R.drawable.icon_delete,
+                            contentDescription = stringResource(R.string.action_clear_history),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.error.copy(0.1f),
+                                contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            onClick = { showClearDialog = true }
+                        )
+                    }
+                )
+
+                CustomTabs(
+                    tabs = listOf(
+                        TabItem(R.string.history_title, R.drawable.icon_history),
+                        TabItem(R.string.bookmarks_title, R.drawable.icon_bookmark_outline),
+                    ),
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it }
+                )
+
+                CustomSearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChanged = { searchQuery = it }
+                )
+            }
+
+            when (contentType) {
+                ContentType.TRANSLATION -> {
+                    val items by translationViewModel.bookmarkState.collectAsState()
+                    TransBookmarkList(
+                        items = items.items,
+                        searchQuery = searchQuery,
+                        onItemRemove = translationViewModel::removeItem,
+                        onToggleBookmark = translationViewModel::toggleBookmark,
+                        onShareClick = { context.shareText(it.translatedText) },
+                        onCopyClick = { context.copyToClipboard(it.translatedText) },
+                        onItemClick = onTranslationItemClick,
+                        onOpenInNew = onTranslationItemClick
                     )
                 }
-            )
 
-            CustomTabs(
-                tabs = listOf(
-                    TabItem(R.string.history_title, R.drawable.icon_history),
-                    TabItem(R.string.bookmarks_title, R.drawable.icon_bookmark_outline),
-                ),
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
-            )
+                ContentType.OCR -> {
+                    val items by ocrViewModel.ocrBookmarkState.collectAsState()
+                    OcrBookmarkList(
+                        items = items.items,
+                        searchQuery = searchQuery,
+                        onItemRemove = ocrViewModel::removeItem,
+                        onToggleBookmark = ocrViewModel::toggleBookmark,
+                        onShareClick = { context.shareText(it.recognizedText) },
+                        onCopyClick = { context.copyToClipboard(it.recognizedText) },
+                        onItemClick = onOcrItemClick,
+                        onOpenInNew = onOcrItemClick
+                    )
+                }
 
-            CustomSearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChanged = { searchQuery = it }
-            )
-        }
-
-        when (contentType) {
-            ContentType.TRANSLATION -> {
-                val items by translationViewModel.bookmarkState.collectAsState()
-                TransBookmarkList(
-                    items = items.items,
-                    searchQuery = searchQuery,
-                    onItemRemove = translationViewModel::removeItem,
-                    onToggleBookmark = translationViewModel::toggleBookmark,
-                    onShareClick = { context.shareText(it.translatedText) },
-                    onCopyClick = { context.copyToClipboard(it.translatedText) },
-                    onItemClick = onTranslationItemClick
-                )
+                else -> {}
             }
-
-            ContentType.OCR -> {
-                val items by ocrViewModel.ocrBookmarkState.collectAsState()
-                OcrBookmarkList(
-                    items = items.items,
-                    searchQuery = searchQuery,
-                    onItemRemove = ocrViewModel::removeItem,
-                    onToggleBookmark = ocrViewModel::toggleBookmark,
-                    onShareClick = { context.shareText(it.recognizedText) },
-                    onCopyClick = { context.copyToClipboard(it.recognizedText) },
-                    onItemClick = onOcrItemClick
-                )
-            }
-
-            else -> {}
         }
     }
 
