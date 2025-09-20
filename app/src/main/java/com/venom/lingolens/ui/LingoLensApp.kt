@@ -25,8 +25,10 @@ import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.settings.presentation.screen.SettingsBottomSheet
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.ContentType
+import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
@@ -44,11 +46,13 @@ fun LingoLensApp(
     }
 
     val translateViewModel: TranslateViewModel = hiltViewModel()
+    val langSelectorViewModel: LangSelectorViewModel = hiltViewModel()
 
     LingoLensAppContent(
         appState = appState,
         ocrViewModel = ocrViewModel,
         translateViewModel = translateViewModel,
+        langSelectorViewModel = langSelectorViewModel,
         startCamera = startCamera,
         imageSelector = imageSelector,
         fileSelector = fileSelector
@@ -60,6 +64,7 @@ private fun LingoLensAppContent(
     appState: AppState,
     ocrViewModel: OcrViewModel,
     translateViewModel: TranslateViewModel,
+    langSelectorViewModel: LangSelectorViewModel,
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
@@ -85,10 +90,14 @@ private fun LingoLensAppContent(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+    ) {
+        FloatingOrbs()
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
@@ -98,6 +107,7 @@ private fun LingoLensAppContent(
                 navController = appState.navController,
                 ocrViewModel = ocrViewModel,
                 translateViewModel = translateViewModel,
+                langSelectorViewModel = langSelectorViewModel,
                 startCamera = startCamera,
                 imageSelector = imageSelector,
                 fileSelector = fileSelector
