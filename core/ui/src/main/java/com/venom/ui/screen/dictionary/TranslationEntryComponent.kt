@@ -19,13 +19,12 @@ import com.venom.ui.components.items.WordChip
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TranslationEntryComponent(
+fun  TranslationEntryComponent(
     entry: DictionaryEntry,
     showAll: Boolean,
     onWordClick: (String) -> Unit,
     onSpeak: (String) -> Unit,
-    toggleShowAll: () -> Unit,
-    isAlpha: Boolean
+    toggleShowAll: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(

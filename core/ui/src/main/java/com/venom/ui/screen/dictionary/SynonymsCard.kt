@@ -35,7 +35,7 @@ fun SynonymsCard(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    GlassCard(modifier = modifier, padding = 16.dp) {
+    GlassCard(modifier = modifier, contentPadding = 16.dp) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

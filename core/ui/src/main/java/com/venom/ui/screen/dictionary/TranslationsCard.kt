@@ -33,7 +33,7 @@ fun TranslationsCard(
 ) {
     var showAll by remember { mutableStateOf(false) }
 
-    GlassCard(modifier = modifier, padding = 12.dp) {
+    GlassCard(modifier = modifier, contentPadding = 12.dp) {
         Box(modifier = Modifier.padding(12.dp)) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -56,8 +56,7 @@ fun TranslationsCard(
                         showAll = showAll,
                         onWordClick = onWordClick,
                         onSpeak = onSpeak,
-                        toggleShowAll = { showAll = !showAll },
-                        isAlpha = true
+                        toggleShowAll = { showAll = !showAll }
                     )
                 }
             }
