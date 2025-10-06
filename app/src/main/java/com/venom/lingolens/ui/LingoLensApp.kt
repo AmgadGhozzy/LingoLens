@@ -1,7 +1,9 @@
 package com.venom.lingolens.ui
 
 import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,16 +26,13 @@ import com.venom.lingolens.navigation.AppState
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.settings.presentation.screen.SettingsBottomSheet
-import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.ContentType
-import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
 fun LingoLensApp(
-    ocrViewModel: OcrViewModel,
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
@@ -45,14 +44,8 @@ fun LingoLensApp(
         currentBackStackEntry = navController.currentBackStackEntryAsState().value
     }
 
-    val translateViewModel: TranslateViewModel = hiltViewModel()
-    val langSelectorViewModel: LangSelectorViewModel = hiltViewModel()
-
     LingoLensAppContent(
         appState = appState,
-        ocrViewModel = ocrViewModel,
-        translateViewModel = translateViewModel,
-        langSelectorViewModel = langSelectorViewModel,
         startCamera = startCamera,
         imageSelector = imageSelector,
         fileSelector = fileSelector
@@ -62,9 +55,7 @@ fun LingoLensApp(
 @Composable
 private fun LingoLensAppContent(
     appState: AppState,
-    ocrViewModel: OcrViewModel,
-    translateViewModel: TranslateViewModel,
-    langSelectorViewModel: LangSelectorViewModel,
+    translateViewModel: TranslateViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
@@ -105,12 +96,9 @@ private fun LingoLensAppContent(
         ) {
             NavigationGraph(
                 navController = appState.navController,
-                ocrViewModel = ocrViewModel,
-                translateViewModel = translateViewModel,
-                langSelectorViewModel = langSelectorViewModel,
                 startCamera = startCamera,
                 imageSelector = imageSelector,
-                fileSelector = fileSelector
+                fileSelector = fileSelector,
             )
         }
 
