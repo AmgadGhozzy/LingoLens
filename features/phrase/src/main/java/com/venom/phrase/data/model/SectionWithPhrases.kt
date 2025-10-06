@@ -6,5 +6,5 @@ import androidx.room.Relation
 data class SectionWithPhrases(
     @Embedded val section: Section, @Relation(
         parentColumn = "sectionId", entityColumn = "sectionId"
-    ) val phrases: List<Phrase>
+    ) val phrases: List<PhraseEntity>
 )

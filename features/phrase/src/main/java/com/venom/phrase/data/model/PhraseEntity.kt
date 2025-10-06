@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
         childColumns = ["sectionId"],
     )], indices = [Index("sectionId")]
 )
-data class Phrase(
+data class PhraseEntity(
     @PrimaryKey val phraseId: Int,
     val sectionId: Int,
     override val englishEn: String,
