@@ -17,22 +17,16 @@ import com.venom.quote.ui.screen.QuoteScreen
 import com.venom.stackcard.ui.screen.BookmarksScreen
 import com.venom.stackcard.ui.screen.CardScreen
 import com.venom.textsnap.ui.screens.OcrScreen
-import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.BookmarkHistoryScreen
 import com.venom.ui.screen.ContentType
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.screen.SentenceScreen
-import com.venom.ui.screen.langselector.LangSelectorViewModel
-import com.venom.ui.viewmodel.TranslateViewModel
 import com.venom.wordcraftai.presentation.ui.screens.WordCraftScreen
 
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    translateViewModel: TranslateViewModel,
-    langSelectorViewModel: LangSelectorViewModel,
-    ocrViewModel: OcrViewModel,
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
@@ -58,8 +52,6 @@ fun NavigationGraph(
         ) { backStackEntry ->
             val text = backStackEntry.arguments?.getString(Screen.Translation.ARG_TEXT)
             TranslationScreen(
-                viewModel = translateViewModel,
-                langSelectorViewModel = langSelectorViewModel,
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
                 onNavigateToSentence = { text ->
                     navController.navigate(Screen.Sentence.createRoute(text))
@@ -89,7 +81,6 @@ fun NavigationGraph(
 
         composable(Screen.Ocr.route) {
             OcrScreen(
-                viewModel = ocrViewModel,
                 onNavigateToTranslation = { text ->
                     navController.navigate(Screen.Translation.createRoute(text))
                 },
@@ -193,7 +184,7 @@ fun NavigationGraph(
                 onImageSelect = imageSelector
             )
         }
-        
+
         composable(Screen.Quote.route) {
             QuoteScreen()
         }
