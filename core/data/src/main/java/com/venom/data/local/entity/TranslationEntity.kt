@@ -1,4 +1,4 @@
-package com.venom.data.local.Entity
+package com.venom.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.Index
