@@ -1,6 +1,6 @@
 package com.venom.data.mapper
 
-import com.venom.data.local.Entity.TranslationEntity
+import com.venom.data.local.entity.TranslationEntity
 import com.venom.data.remote.respnod.AlternativeTranslation
 import com.venom.data.remote.respnod.Examples
 import com.venom.data.remote.respnod.GoogleTranslationResponse

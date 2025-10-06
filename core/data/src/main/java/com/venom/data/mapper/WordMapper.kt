@@ -1,6 +1,6 @@
 package com.venom.data.mapper
 
-import com.venom.data.local.Entity.WordEntity
+import com.venom.data.local.entity.WordEntity
 import com.venom.domain.model.Word
 
 object WordMapper {
