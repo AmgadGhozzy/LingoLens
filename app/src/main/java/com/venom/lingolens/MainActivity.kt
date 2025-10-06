@@ -20,7 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -35,7 +35,6 @@ import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.venom.lingolens.ui.LingoLensApp
 import com.venom.resources.R
 import com.venom.settings.presentation.screen.UpdateScreen
-import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.SettingsViewModel
@@ -52,7 +51,6 @@ import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val ocrViewModel: OcrViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val updateViewModel: UpdateViewModel by viewModels()
 
@@ -133,7 +131,6 @@ class MainActivity : ComponentActivity() {
                     )
                 } else {
                     LingoLensApp(
-                        ocrViewModel = ocrViewModel,
                         startCamera = ::startCamera,
                         imageSelector = ::selectImageFromGallery,
                         fileSelector = ::selectDocumentFromFileManager
@@ -160,7 +157,7 @@ class MainActivity : ComponentActivity() {
         val locale = if (languageCode.isEmpty()) Locale.getDefault() else Locale(languageCode)
         val config = LocalConfiguration.current
         config.setLocale(locale)
-        val res = LocalContext.current.resources
+        val res = LocalResources.current
         res.updateConfiguration(config, res.displayMetrics)
     }
 
