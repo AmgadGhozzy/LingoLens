@@ -1,20 +1,16 @@
 package com.venom.phrase.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.ui.viewmodel.PhraseUiState
-import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.screen.langselector.LangSelectorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +26,6 @@ fun PhrasebookContent(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
         PhrasebookTopBar(
             viewModel = langSelectorViewModel,
@@ -39,18 +34,13 @@ fun PhrasebookContent(
             scrollBehavior = scrollBehavior
         )
 
-        Box(
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-             FloatingOrbs()
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CategoryList(state = state, onCategoryClick = onNavigateToCategory)
-            }
+            CategoryList(state = state, onCategoryClick = onNavigateToCategory)
         }
     }
 }
