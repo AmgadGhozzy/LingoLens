@@ -3,7 +3,7 @@ package com.venom.data.local.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Update
-import com.venom.data.local.Entity.WordEntity
+import com.venom.data.local.entity.WordEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

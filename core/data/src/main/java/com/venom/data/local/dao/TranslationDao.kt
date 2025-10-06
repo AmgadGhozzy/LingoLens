@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.venom.data.local.Entity.TranslationEntity
+import com.venom.data.local.entity.TranslationEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

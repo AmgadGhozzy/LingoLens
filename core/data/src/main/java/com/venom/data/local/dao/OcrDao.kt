@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.venom.data.local.Entity.OcrEntity
+import com.venom.data.local.entity.OcrEntity
 import kotlinx.coroutines.flow.Flow
 @Dao
 interface OcrDao {
