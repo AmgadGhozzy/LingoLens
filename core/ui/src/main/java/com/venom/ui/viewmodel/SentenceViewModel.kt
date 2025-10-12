@@ -17,7 +17,8 @@ import javax.inject.Inject
 data class SentenceUiState(
     val isLoading: Boolean = false,
     val sentenceResponse: SentenceResponse? = null,
-    val error: String? = null
+    val error: String? = null,
+    val cacheInfo: Int = 0
 )
 
 @HiltViewModel
@@ -50,7 +51,17 @@ class SentenceViewModel @Inject constructor(
         }
     }
 
-    fun getCacheInfo() = viewModelScope.launch { repository.getCacheInfo() }
-    fun clearCache() = viewModelScope.launch { repository.clearCache() }
-    fun clearError() = _uiState.update { it.copy(error = null) }
+    fun getCacheInfo() {
+        viewModelScope.launch {
+            val count = repository.getCacheInfo()
+            _uiState.update { it.copy(cacheInfo = count) }
+        }
+    }
+
+    fun clearCache() {
+        viewModelScope.launch {
+            repository.clearCache()
+            getCacheInfo()
+        }
+    }
 }
