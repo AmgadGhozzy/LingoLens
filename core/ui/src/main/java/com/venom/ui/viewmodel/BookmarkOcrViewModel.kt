@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.data.local.Entity.OcrEntity
+import com.venom.data.local.entity.OcrEntity
 import com.venom.data.repo.OcrRepository
 import com.venom.ui.screen.ViewType
 import dagger.hilt.android.lifecycle.HiltViewModel

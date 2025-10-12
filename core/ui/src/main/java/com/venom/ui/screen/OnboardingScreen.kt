@@ -1,12 +1,26 @@
 package com.venom.ui.screen
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,11 +33,11 @@ import androidx.compose.ui.unit.sp
 import com.venom.resources.R
 import com.venom.ui.components.onboarding.ActionButton
 import com.venom.ui.components.onboarding.ContentSection
-import com.venom.ui.components.onboarding.FloatingOrbs
 import com.venom.ui.components.onboarding.HeroSection
 import com.venom.ui.components.onboarding.OnboardingPage
 import com.venom.ui.components.onboarding.PageIndicators
 import com.venom.ui.components.onboarding.getPages
+import com.venom.ui.components.other.FloatingOrbs
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -102,7 +116,7 @@ private fun TopSection(
                 onClick = onSkip,
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White.copy(alpha = 0.1f))
+                    .background(Color.White.copy(0.1f))
             ) {
                 Text(
                     text = stringResource(id = R.string.skip),
