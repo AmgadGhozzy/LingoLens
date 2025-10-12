@@ -38,6 +38,7 @@ fun LangSelectorBottomSheet(
     val state by viewModel.state.collectAsState()
     CustomBottomSheet(onDismiss) {
         LangSelectorContent(
+            viewModel = viewModel,
             state = state,
             onSearchQueryChange = viewModel::onSearchQueryChange,
             onLanguageSelected = { language ->
@@ -52,6 +53,7 @@ fun LangSelectorBottomSheet(
 
 @Composable
 fun LangSelectorContent(
+    viewModel: LangSelectorViewModel,
     state: LanguageSelectorState,
     onSearchQueryChange: (String) -> Unit,
     onLanguageSelected: (LanguageItem) -> Unit,
@@ -63,7 +65,7 @@ fun LangSelectorContent(
         modifier = modifier.padding(horizontal = 16.dp).background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
         LanguageBar(
-            viewModel = hiltViewModel(),
+            langSelectorViewModel = viewModel,
             isFromBottomSheet = true,
             showNativeNameHint = false,
             showFlag = true

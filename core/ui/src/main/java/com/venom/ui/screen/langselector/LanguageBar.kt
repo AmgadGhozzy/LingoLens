@@ -34,7 +34,9 @@ import com.venom.resources.R
 /**
  * A customizable top bar for language translation.
  *
- * @param viewModel The view model for language selection.
+ * @param langSelectorViewModel The view model for language selection.
+ * @param languages List of available languages.
+ * @param isFromBottomSheet Whether this is being rendered inside a bottom sheet.
  * @param showNativeNameHint Whether to show the native name of languages.
  * @param showFlag Whether to show flags for languages.
  * @param modifier Additional modifier for customization.
@@ -45,7 +47,7 @@ import com.venom.resources.R
 
 @Composable
 fun LanguageBar(
-    viewModel: LangSelectorViewModel,
+    langSelectorViewModel: LangSelectorViewModel,
     languages: List<LanguageItem> = LANGUAGES_LIST,
     isFromBottomSheet: Boolean = false,
     showNativeNameHint: Boolean = false,
@@ -55,11 +57,11 @@ fun LanguageBar(
     containerColor: Color = Color.Unspecified,
     contentColor: Color = Color.Unspecified
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by langSelectorViewModel.state.collectAsState()
     var showLanguageSelector by remember { mutableStateOf(false) }
 
     LaunchedEffect(languages) {
-        viewModel.setCustomLanguagesList(languages)
+        langSelectorViewModel.setCustomLanguagesList(languages)
     }
 
     val rotation by animateFloatAsState(
@@ -67,6 +69,7 @@ fun LanguageBar(
             dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
         )
     )
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
@@ -89,7 +92,7 @@ fun LanguageBar(
                     showNativeNameHint = showNativeNameHint,
                     showArrow = !isFromBottomSheet,
                     onClick = {
-                        viewModel.setSelectingSourceLanguage(true)
+                        langSelectorViewModel.setSelectingSourceLanguage(true)
                         showLanguageSelector = true
                     }
                 )
@@ -97,7 +100,8 @@ fun LanguageBar(
 
             // Swap Button
             IconButton(
-                onClick = { viewModel.swapLanguages() }, modifier = Modifier.rotate(rotation)
+                onClick = { langSelectorViewModel.swapLanguages() },
+                modifier = Modifier.rotate(rotation)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.icon_swap),
@@ -117,7 +121,7 @@ fun LanguageBar(
                     showNativeNameHint = showNativeNameHint,
                     showArrow = !isFromBottomSheet,
                     onClick = {
-                        viewModel.setSelectingSourceLanguage(false)
+                        langSelectorViewModel.setSelectingSourceLanguage(false)
                         showLanguageSelector = true
                     }
                 )
@@ -127,7 +131,7 @@ fun LanguageBar(
 
     if (showLanguageSelector && !isFromBottomSheet) {
         LangSelectorBottomSheet(
-            viewModel = viewModel,
+            viewModel = langSelectorViewModel,
             onDismiss = { showLanguageSelector = false }
         )
     }
