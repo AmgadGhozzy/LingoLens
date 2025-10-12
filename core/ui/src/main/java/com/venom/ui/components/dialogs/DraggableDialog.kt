@@ -33,32 +33,37 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun DraggableDialog(
-    onDismissRequest: () -> Unit, properties: DialogProperties = DialogProperties(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties = DialogProperties(
         usePlatformDefaultWidth = false,
         decorFitsSystemWindows = false,
         dismissOnBackPress = true,
         dismissOnClickOutside = false
-    ), modifier: Modifier = Modifier, content: @Composable () -> Unit
+    ),
+    content: @Composable () -> Unit
 ) {
     var offset by remember { mutableStateOf(Offset.Zero) }
 
     Dialog(
         onDismissRequest = onDismissRequest, properties = properties
     ) {
-        Box(modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 180.dp)
-            .pointerInput(Unit) {
-                detectDragGestures { change, dragAmount ->
-                    change.consume()
-                    offset += dragAmount
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 148.dp)
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offset += dragAmount
+                    }
                 }
-            }
-            .offset {
-                IntOffset(
-                    x = offset.x.roundToInt(), y = offset.y.roundToInt()
-                )
-            }) {
+                .offset {
+                    IntOffset(
+                        x = offset.x.roundToInt(),
+                        y = offset.y.roundToInt()
+                    )
+                }) {
             content()
         }
     }
