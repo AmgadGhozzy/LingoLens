@@ -53,8 +53,8 @@ fun GlassCard(
     borderWidth: Dp = 1.dp,
     padding: Dp = 0.dp,
     shape: Shape = RoundedCornerShape(24.dp),
-    solidBackground: Color = MaterialTheme.colorScheme.background.copy(0.1f),
     solidBackgroundAlpha: Float = 0.1f,
+    solidBackground: Color = MaterialTheme.colorScheme.background.copy(solidBackgroundAlpha),
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit = {},
 ) {
