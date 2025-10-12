@@ -28,7 +28,8 @@ class QuickTrActivity : ComponentActivity() {
                 TranslationScreen(
                     isDialog = true,
                     onDismiss = { finish() },
-                    initialText = selectedText
+                    initialText = selectedText,
+                    onOpenInApp = { openInMainApp() }
                 )
             }
         }
@@ -39,5 +40,18 @@ class QuickTrActivity : ComponentActivity() {
         return intent?.run {
             getStringExtra(Intent.EXTRA_TEXT) ?: getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.trim()
         }?.takeIf { it.isNotBlank() }
+    }
+
+    private fun openInMainApp() {
+        try {
+            val mainActivityIntent = Intent().apply {
+                setClassName(packageName, "com.venom.lingolens.MainActivity")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            startActivity(mainActivityIntent)
+            finish()
+        } catch (e: Exception) {
+            Log.e("QuickTrActivity", "Error opening main app", e)
+        }
     }
 }
