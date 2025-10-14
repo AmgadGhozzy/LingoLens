@@ -3,16 +3,21 @@ package com.venom.ui.components.inputs
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -22,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.other.GlassCard
 
 /**
  * A customizable search bar component with enhanced features.
@@ -37,10 +43,10 @@ import com.venom.ui.components.buttons.CustomButton
  */
 @Composable
 fun CustomSearchBar(
+    modifier: Modifier = Modifier,
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     onSearchTriggered: () -> Unit = {},
-    modifier: Modifier = Modifier,
     searchHint: String = stringResource(R.string.nav_search),
     enabled: Boolean = true,
     searchIconTint: Color = MaterialTheme.colorScheme.primary,
@@ -48,15 +54,9 @@ fun CustomSearchBar(
     shape: RoundedCornerShape = RoundedCornerShape(16.dp),
     contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
 ) {
-    var isFocused by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Surface(
-        modifier = modifier.padding(8.dp).fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        tonalElevation = if (isFocused) 2.dp else 0.dp,
-        shape = shape
-    ) {
+    GlassCard(modifier = modifier, padding = 8.dp, shape = shape) {
         Row(
             modifier = Modifier.padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
@@ -67,14 +67,14 @@ fun CustomSearchBar(
                 selectedTint = searchIconTint,
                 contentDescription = stringResource(R.string.nav_search),
                 onClick = { if (enabled) onSearchTriggered() },
+                showBorder = false
             )
 
             BasicTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChanged,
                 modifier = Modifier
-                    .weight(1f)
-                    .onFocusChanged { isFocused = it.isFocused },
+                    .weight(1f),
                 enabled = enabled,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -115,6 +115,7 @@ fun CustomSearchBar(
                         onSearchQueryChanged("")
                         keyboardController?.hide()
                     },
+                    showBorder = false,
                     modifier = Modifier.size(32.dp)
                 )
             }
