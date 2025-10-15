@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz
+package com.venom.quiz.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,20 +22,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.venom.domain.model.QuizTestState
 import com.venom.domain.model.WordLevels
-import com.venom.stackcard.ui.screen.quiz.components.NextButton
-import com.venom.stackcard.ui.screen.quiz.components.OptionsList
-import com.venom.stackcard.ui.screen.quiz.components.QuestionCard
-import com.venom.stackcard.ui.screen.quiz.components.QuizHeader
-import com.venom.stackcard.ui.screen.quiz.components.QuizHeaderData
-import com.venom.stackcard.ui.screen.quiz.components.StreakNotification
-import com.venom.stackcard.ui.viewmodel.QuizUiState
-import com.venom.ui.components.other.FloatingOrbs
+import com.venom.quiz.ui.components.NextButton
+import com.venom.quiz.ui.components.OptionsList
+import com.venom.quiz.ui.components.QuestionCard
+import com.venom.quiz.ui.components.QuizHeader
+import com.venom.quiz.ui.components.QuizHeaderData
+import com.venom.quiz.ui.components.StreakNotification
+import com.venom.quiz.ui.viewmodel.QuizUiState
 import com.venom.utils.SoundManager
 import kotlinx.coroutines.delay
 
@@ -73,16 +69,10 @@ fun QuizInProgress(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .background(Color(0x1E1E40AF))
     ) {
-        FloatingOrbs()
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(brush = Brush.verticalGradient(
-                    colors = listOf(MaterialTheme.colorScheme.background, Color(0xFF1E40AF), MaterialTheme.colorScheme.background )
-                ))
-                .systemBarsPadding(),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -115,14 +105,7 @@ fun QuizInProgress(
                     selectedOption = state.selectedOption,
                     isAnswered = state.isAnswered,
                     correctAnswer = state.currentWord?.arabicAr,
-                    onOptionSelected = { option ->
-                        onOptionSelected(option)
-                        if (option == state.currentWord?.arabicAr) {
-                            soundManager.playSound("right_answer")
-                        } else {
-                            soundManager.playSound("wrong_answer")
-                        }
-                    }
+                    onOptionSelected = { option -> onOptionSelected(option) }
                 )
             }
         }
