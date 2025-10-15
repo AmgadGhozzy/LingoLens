@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,8 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors.ProgressBarForeground
+import com.venom.ui.theme.QuizColors
+import com.venom.ui.theme.QuizColors.ProgressBarForeground
 
 data class QuizHeaderData(
     val currentQuestion: Int,
@@ -57,14 +57,14 @@ fun QuizHeader(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(ThemeColors.BackButtonBackground)
+                    .background(QuizColors.BackButtonBackground)
                     .clickable { onBackClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = stringResource(R.string.back_button),
-                    tint = ThemeColors.BackButtonIcon,
+                    tint = QuizColors.BackButtonIcon,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -104,7 +104,7 @@ fun QuizHeader(
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(ThemeColors.ProgressBarBackground)
+                    .background(QuizColors.ProgressBarBackground)
             ) {
                 Box(
                     modifier = Modifier
@@ -114,8 +114,8 @@ fun QuizHeader(
                         .background(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(
-                                    ThemeColors.ProgressBarForeground,
-                                    ThemeColors.ProgressBarForegroundEnd
+                                    ProgressBarForeground,
+                                    QuizColors.ProgressBarForegroundEnd
                                 )
                             )
                         )

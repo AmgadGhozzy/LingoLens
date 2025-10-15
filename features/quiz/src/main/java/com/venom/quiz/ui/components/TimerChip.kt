@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -26,13 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
+import com.venom.ui.theme.QuizColors
 
 @Composable
 fun TimerChip(timeRemaining: Int) {
     val isWarning = timeRemaining <= 10
-    val backgroundColor = if (isWarning) ThemeColors.TimerWarning else ThemeColors.TimerBackground
-    val contentColor = if (isWarning) ThemeColors.OnTimerWarning else ThemeColors.TimerNormal
+    val backgroundColor = if (isWarning) QuizColors.TimerWarning else QuizColors.TimerBackground
+    val contentColor = if (isWarning) QuizColors.OnTimerWarning else QuizColors.TimerNormal
 
     // Pulsing animation for warning state
     val infiniteTransition = rememberInfiniteTransition()

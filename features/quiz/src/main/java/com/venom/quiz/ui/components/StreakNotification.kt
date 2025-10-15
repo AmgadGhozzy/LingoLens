@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,13 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
+import com.venom.ui.theme.QuizColors
 
 @Composable
 fun StreakNotification(
     message: String,
-    color: Color = ThemeColors.Secondary,
-    contentColor: Color = ThemeColors.OnSecondary
+    color: Color = QuizColors.Secondary,
+    contentColor: Color = QuizColors.OnSecondary
 ) {
     Surface(
         color = color,
