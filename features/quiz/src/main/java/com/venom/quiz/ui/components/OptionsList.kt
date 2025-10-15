@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

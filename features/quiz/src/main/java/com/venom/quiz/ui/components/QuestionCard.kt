@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -34,10 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.other.FloatingCircleMenu
 import com.venom.ui.components.other.FloatingMenuItem
+import com.venom.ui.theme.QuizColors
 import com.venom.ui.theme.ThemeColors.BitcoinColor
 import com.venom.ui.theme.ThemeColors.PurplePrimary
 import com.venom.ui.theme.ThemeColors.TONColor
@@ -61,14 +61,14 @@ fun QuestionCard(
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            ThemeColors.QuestionCardGradientStart,
-                            ThemeColors.QuestionCardGradientEnd
+                            QuizColors.QuestionCardGradientStart,
+                            QuizColors.QuestionCardGradientEnd
                         )
                     )
                 )
                 .border(
                     width = 1.dp,
-                    color = ThemeColors.QuestionCardBorder,
+                    color = QuizColors.QuestionCardBorder,
                     shape = RoundedCornerShape(28.dp)
                 )
                 .padding(32.dp),
@@ -80,7 +80,7 @@ fun QuestionCard(
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                color = ThemeColors.QuestionText
+                color = QuizColors.QuestionText
             )
 
             AnimatedVisibility(
@@ -92,7 +92,7 @@ fun QuestionCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(20.dp))
-                        .background(ThemeColors.TranslationBackground)
+                        .background(QuizColors.TranslationBackground)
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -101,7 +101,7 @@ fun QuestionCard(
                         style = MaterialTheme.typography.headlineSmall,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Medium,
-                        color = ThemeColors.TranslationText
+                        color = QuizColors.TranslationText
                     )
                 }
             }
