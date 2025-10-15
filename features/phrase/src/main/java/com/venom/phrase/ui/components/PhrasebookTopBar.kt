@@ -40,7 +40,7 @@ fun PhrasebookTopBar(
         scrollBehavior = scrollBehavior,
         actions = {
             LanguageBar(
-                viewModel = viewModel,
+                langSelectorViewModel = viewModel,
                 modifier = Modifier
                     .height(56.dp)
                     .width(256.dp)

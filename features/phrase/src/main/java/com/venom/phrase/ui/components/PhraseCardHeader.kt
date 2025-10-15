@@ -1,16 +1,17 @@
 package com.venom.phrase.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.venom.phrase.data.mapper.getTranslation
-import com.venom.phrase.data.model.Phrase
+import com.venom.phrase.data.model.PhraseEntity
 import com.venom.ui.components.common.DynamicStyledText
 
 @Composable
 fun PhraseCardHeader(
-    phrase: Phrase,
+    phrase: PhraseEntity,
     sourceLang: String,
     isSpeaking: Boolean,
     isBookmarked: Boolean,

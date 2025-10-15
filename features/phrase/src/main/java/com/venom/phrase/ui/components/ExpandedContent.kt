@@ -16,13 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.mapper.getTranslation
-import com.venom.phrase.data.model.Phrase
+import com.venom.phrase.data.model.PhraseEntity
 import com.venom.ui.components.common.DynamicStyledText
 
 @Composable
 fun ExpandedContent(
     visible: Boolean,
-    phrase: Phrase,
+    phrase: PhraseEntity,
     targetLang: String,
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit
