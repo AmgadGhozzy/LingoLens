@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.phrase.data.mapper.getTranslation
-import com.venom.phrase.data.model.Phrase
+import com.venom.phrase.data.model.PhraseEntity
 import com.venom.phrase.data.model.SectionWithPhrases
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
@@ -43,7 +43,7 @@ fun SectionWithPhrasesList(
     sections: List<SectionWithPhrases>,
     sourceLang: String,
     targetLang: String,
-    onBookmarkClick: (Phrase) -> Unit,
+    onBookmarkClick: (PhraseEntity) -> Unit,
     isSpeaking: Boolean,
     onSpeakClick: (String, String) -> Unit,
     onCopy: (String) -> Unit,
@@ -53,6 +53,8 @@ fun SectionWithPhrasesList(
 ) {
 
     var showCardDialog by remember { mutableStateOf(false) }
+    // Track which phrase is expanded (using phrase ID)
+    var expandedPhraseId by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = modifier
@@ -110,7 +112,12 @@ fun SectionWithPhrasesList(
                                 )
                             },
                             onCopy = { onCopy(phrase.getTranslation(sourceLang)) },
-                            onShare = { onShare(phrase.getTranslation(sourceLang)) })
+                            onShare = { onShare(phrase.getTranslation(sourceLang)) },
+                            isExpanded = expandedPhraseId == phrase.phraseId.toString(),
+                            onExpandChange = { isExpanding ->
+                                expandedPhraseId = if (isExpanding) phrase.phraseId.toString() else null
+                            }
+                        )
                     }
                 }
 
