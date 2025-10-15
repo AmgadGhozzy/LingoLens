@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
+import com.venom.ui.theme.QuizColors
 
 @Composable
 fun OptionItem(
@@ -44,45 +44,45 @@ fun OptionItem(
     val backgroundColor = when {
         isAnswered && isSelected && isCorrect -> Brush.horizontalGradient(
             colors = listOf(
-                ThemeColors.OptionCorrectGradientStart,
-                ThemeColors.OptionCorrectGradientEnd
+                QuizColors.OptionCorrectGradientStart,
+                QuizColors.OptionCorrectGradientEnd
             )
         )
 
         isAnswered && isSelected && !isCorrect -> Brush.horizontalGradient(
             colors = listOf(
-                ThemeColors.OptionIncorrectGradientStart,
-                ThemeColors.OptionIncorrectGradientEnd
+                QuizColors.OptionIncorrectGradientStart,
+                QuizColors.OptionIncorrectGradientEnd
             )
         )
 
         isSelected -> Brush.horizontalGradient(
             colors = listOf(
-                ThemeColors.OptionSelectedGradientStart,
-                ThemeColors.OptionSelectedGradientEnd
+                QuizColors.OptionSelectedGradientStart,
+                QuizColors.OptionSelectedGradientEnd
             )
         )
 
         else -> Brush.horizontalGradient(
             colors = listOf(
-                ThemeColors.OptionDefaultGradient,
-                ThemeColors.OptionDefaultGradient
+                QuizColors.OptionDefaultGradient,
+                QuizColors.OptionDefaultGradient
             )
         )
     }
 
     val borderColor = when {
-        isAnswered && isSelected && isCorrect -> ThemeColors.OptionCorrectBorder
-        isAnswered && isSelected && !isCorrect -> ThemeColors.OptionIncorrectBorder
-        isSelected -> ThemeColors.OptionSelectedBorder
-        else -> ThemeColors.OptionDefaultBorder
+        isAnswered && isSelected && isCorrect -> QuizColors.OptionCorrectBorder
+        isAnswered && isSelected && !isCorrect -> QuizColors.OptionIncorrectBorder
+        isSelected -> QuizColors.OptionSelectedBorder
+        else -> QuizColors.OptionDefaultBorder
     }
 
     val labelBackgroundColor = when {
-        isAnswered && isSelected && isCorrect -> ThemeColors.OptionCorrectBorder
-        isAnswered && isSelected && !isCorrect -> ThemeColors.OptionIncorrectBorder
-        isSelected -> ThemeColors.OptionSelectedBorder
-        else -> ThemeColors.OptionDefaultBorder
+        isAnswered && isSelected && isCorrect -> QuizColors.OptionCorrectBorder
+        isAnswered && isSelected && !isCorrect -> QuizColors.OptionIncorrectBorder
+        isSelected -> QuizColors.OptionSelectedBorder
+        else -> QuizColors.OptionDefaultBorder
     }
 
     val labelContent = when {
@@ -120,7 +120,7 @@ fun OptionItem(
             ) {
                 Text(
                     text = labelContent,
-                    color = ThemeColors.OptionText,
+                    color = QuizColors.OptionText,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -128,7 +128,7 @@ fun OptionItem(
             // Option Text
             Text(
                 text = option,
-                color = ThemeColors.OptionText,
+                color = QuizColors.OptionText,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )

@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -24,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors.HeartBackground
+import com.venom.ui.theme.QuizColors
+import com.venom.ui.theme.QuizColors.HeartBackground
 import kotlinx.coroutines.delay
 
 @Composable
@@ -35,7 +35,7 @@ fun HeartsDisplay(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .background(HeartBackground.copy(alpha = 0.2f))
+            .background(HeartBackground.copy(0.2f))
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -64,7 +64,7 @@ fun HeartsDisplay(
         Icon(
             imageVector = Icons.Filled.Favorite,
             contentDescription = stringResource(R.string.hearts_description),
-            tint = ThemeColors.HeartIcon,
+            tint = QuizColors.HeartIcon,
             modifier = Modifier
                 .size(16.dp)
                 .scale(scale.value)
@@ -72,7 +72,7 @@ fun HeartsDisplay(
 
         Text(
             text = hearts.toString(),
-            color = ThemeColors.HeartIcon,
+            color = QuizColors.HeartIcon,
             fontWeight = FontWeight.Medium
         )
     }

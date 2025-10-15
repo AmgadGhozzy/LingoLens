@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.resources.R
-import com.venom.stackcard.ui.screen.quiz.theme.ThemeColors
+import com.venom.ui.theme.QuizColors
 
 @Composable
 fun NextButton(
@@ -57,8 +57,8 @@ fun NextButton(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        ThemeColors.NextButtonStart,
-                        ThemeColors.NextButtonEnd
+                        QuizColors.NextButtonStart,
+                        QuizColors.NextButtonEnd
                     )
                 )
             )
@@ -72,14 +72,14 @@ fun NextButton(
         ) {
             Text(
                 text = text,
-                color = ThemeColors.NextButtonText,
+                color = QuizColors.NextButtonText,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp
             )
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = text,
-                tint = ThemeColors.NextButtonText,
+                tint = QuizColors.NextButtonText,
                 modifier = Modifier.size(20.dp)
             )
         }
