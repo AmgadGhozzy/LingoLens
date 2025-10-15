@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz.components
+package com.venom.quiz.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -9,14 +9,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,14 +36,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -64,25 +62,40 @@ fun LevelCard(
     progress: Float = 0f,
     onTestClick: () -> Unit,
     onLearnClick: () -> Unit,
-    isCurrentLevel: Boolean = false
+    isExpanded: Boolean = false,
+    onExpandToggle: () -> Unit = {}
 ) {
-    var expanded by remember { mutableStateOf(isCurrentLevel) }
+    var internalExpanded by remember { mutableStateOf(false) }
+
+    // Update internal state when external expansion changes
+    LaunchedEffect(isExpanded) {
+        if (isExpanded && !internalExpanded) {
+            internalExpanded = true
+        } else if (!isExpanded && internalExpanded) {
+            internalExpanded = false
+        }
+    }
 
     val scale by animateFloatAsState(
-        targetValue = if (expanded) 1.03f else 1f,
+        targetValue = if (internalExpanded) 1.03f else 1f,
         animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f)
     )
 
     val contentColor = MaterialTheme.colorScheme.onSurface
-    val secondaryContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-    val borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+    val secondaryContentColor = MaterialTheme.colorScheme.onSurface.copy(0.7f)
+    val borderColor = MaterialTheme.colorScheme.outline.copy(0.3f)
 
     GlassCard(
         modifier = Modifier
             .fillMaxWidth()
             .scale(scale),
-        onClick = { if (isUnlocked) expanded = !expanded },
-        solidBackground = getGlassBackground(level, isUnlocked),
+        onClick = {
+            if (isUnlocked) {
+                internalExpanded = !internalExpanded
+                onExpandToggle()
+            }
+        },
+        solidBackground = getGlassBackground(level, isUnlocked).copy(0.1f),
     ) {
         Column(
             modifier = Modifier
@@ -98,7 +111,11 @@ fun LevelCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    LevelIcon(level = level, isUnlocked = isUnlocked)
+                    Image(
+                        painter = painterResource(level.iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(68.dp)
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     LevelInfo(
                         level = level,
@@ -113,7 +130,7 @@ fun LevelCard(
                     Surface(
                         modifier = Modifier.size(60.dp),
                         shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Icon(
@@ -138,8 +155,8 @@ fun LevelCard(
             )
 
             AnimatedVisibility(
-                visible = expanded && isUnlocked,
-                enter = fadeIn(tween(400)) + expandVertically(tween(400)),
+                visible = internalExpanded && isUnlocked,
+                enter = fadeIn(tween(500)) + expandVertically(tween(500)),
                 exit = fadeOut(tween(300)) + shrinkVertically(tween(300))
             ) {
                 Column {
@@ -152,46 +169,6 @@ fun LevelCard(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LevelIcon(
-    level: WordLevels,
-    isUnlocked: Boolean
-) {
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                color = if (isUnlocked)
-                    level.color.copy(alpha = 0.9f)
-                else
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-            )
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(level.iconRes),
-                contentDescription = null,
-                tint = if (isUnlocked) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(30.dp)
-            )
-        }
-
-        if (isUnlocked) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(20.dp),
-                shape = RoundedCornerShape(18.dp),
-                color = level.color.copy(alpha = 0.3f)
-            ) {}
         }
     }
 }
@@ -265,7 +242,7 @@ private fun LevelActions(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.5.dp, borderColor),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.3f),
                 contentColor = MaterialTheme.colorScheme.onSurface
             ),
             contentPadding = PaddingValues(16.dp)
@@ -305,7 +282,7 @@ private fun ProgressIndicator(
             strokeWidth = 5.dp,
             strokeCap = StrokeCap.Round,
             color = level.color,
-            trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            trackColor = MaterialTheme.colorScheme.outline.copy(0.2f)
         )
         Text(
             text = "${(animatedProgress * 100).toInt()}%",
@@ -323,7 +300,7 @@ private fun getGlassBackground(
     isUnlocked: Boolean
 ): Color {
     return when {
-        !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-        else -> level.color.copy(alpha = 0.15f)
+        !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant.copy(0.4f)
+        else -> level.color.copy(0.15f)
     }
 }
