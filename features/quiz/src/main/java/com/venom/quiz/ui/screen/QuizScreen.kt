@@ -1,5 +1,7 @@
-package com.venom.stackcard.ui.screen.quiz
+package com.venom.quiz.ui.screen
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,12 +11,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.domain.model.QuizTestState
 import com.venom.domain.model.WordLevels
-import com.venom.stackcard.ui.viewmodel.QuizViewModel
+import com.venom.quiz.ui.viewmodel.QuizViewModel
 import com.venom.utils.SoundManager
 
 @Composable
 fun QuizScreen(
-    viewModel: QuizViewModel = hiltViewModel(),
+    viewModel: QuizViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     level: WordLevels,
     onNavigateToLearn: (WordLevels) -> Unit,
     onComplete: (Boolean, WordLevels?) -> Unit
