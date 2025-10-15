@@ -9,6 +9,20 @@ import com.venom.resources.R
 
 private val defaultType = Typography()
 
+val Cairo = FontFamily(
+    Font(R.font.cairo_bold, FontWeight.Bold),
+    Font(R.font.cairo_light, FontWeight.Light),
+    Font(R.font.cairo_medium, FontWeight.Medium),
+    Font(R.font.cairo_regular, FontWeight.Normal)
+)
+
+val Alexandria = FontFamily(
+    Font(R.font.alexandria_bold, FontWeight.Bold),
+    Font(R.font.alexandria_light, FontWeight.Light),
+    Font(R.font.alexandria_medium, FontWeight.Medium),
+    Font(R.font.alexandria_regular, FontWeight.Normal)
+)
+
 val Caveat = FontFamily(
     Font(R.font.caveat_medium, FontWeight.Medium),
     Font(R.font.caveat_regular, FontWeight.Normal),
@@ -61,6 +75,8 @@ fun FontStyles.toFontFamily(): FontFamily = when (this) {
     FontStyles.MONOSPACE -> FontFamily.Monospace
     FontStyles.CURSIVE -> FontFamily.Cursive
 
+    FontStyles.CAIRO -> Cairo
+    FontStyles.ALEXANDRIA -> Alexandria
     FontStyles.CAVEAT -> Caveat
     FontStyles.ROBOTO -> Roboto
     FontStyles.QUICKSAND -> Quicksand
