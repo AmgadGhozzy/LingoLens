@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.screen.quiz
+package com.venom.quiz.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutSine
