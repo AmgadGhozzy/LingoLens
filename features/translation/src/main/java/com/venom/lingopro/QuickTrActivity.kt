@@ -29,7 +29,9 @@ class QuickTrActivity : ComponentActivity() {
                     isDialog = true,
                     onDismiss = { finish() },
                     initialText = selectedText,
-                    onOpenInApp = { openInMainApp() }
+                    onOpenInApp = { text ->
+                        openInMainApp(text)
+                    }
                 )
             }
         }
@@ -42,11 +44,14 @@ class QuickTrActivity : ComponentActivity() {
         }?.takeIf { it.isNotBlank() }
     }
 
-    private fun openInMainApp() {
+    private fun openInMainApp(text: String) {
         try {
             val mainActivityIntent = Intent().apply {
                 setClassName(packageName, "com.venom.lingolens.MainActivity")
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("source_text", text)
+                putExtra("open_translation", true)
+                Log.d("QuickTrActivity", "Main app opened successfully with text")
             }
             startActivity(mainActivityIntent)
             finish()
