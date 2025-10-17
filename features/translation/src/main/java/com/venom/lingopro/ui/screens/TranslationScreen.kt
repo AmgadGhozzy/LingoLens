@@ -53,7 +53,7 @@ fun TranslationScreen(
     langSelectorViewModel: LangSelectorViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     onNavigateToOcr: () -> Unit = {},
     onNavigateToSentence: (String) -> Unit = {},
-    onOpenInApp: () -> Unit = {},
+    onOpenInApp: (String) -> Unit = {},
     initialText: String? = null,
     isDialog: Boolean = false,
     onDismiss: () -> Unit = {}
@@ -71,7 +71,7 @@ fun TranslationScreen(
     val translatedTextFieldValue by remember { derivedStateOf { TextFieldValue(state.translatedText) } }
     var showDictionaryDialog by remember { mutableStateOf(false) }
     var showSpeechToTextDialog by remember { mutableStateOf(false) }
-    var fullscreenState by remember { mutableStateOf<String?>(null) }
+    var fullscreenText by remember { mutableStateOf<String?>(null) }
     var initialTextHandled by remember { mutableStateOf(false) }
 
     LaunchedEffect(initialText, state.sourceText) {
@@ -161,7 +161,7 @@ fun TranslationScreen(
             },
             onMoveUp = viewModel::moveUp,
             onOcr = onNavigateToOcr,
-            onFullscreen = { fullscreenState = it },
+            onFullscreen = { fullscreenText = it },
             onSentenceExplorer = { word -> onNavigateToSentence(word) })
     }
 
@@ -201,21 +201,26 @@ fun TranslationScreen(
         }
     }
 
+    val handleDismiss: () -> Unit = remember(sttViewModel, ttsViewModel, onDismiss) {
+        {
+            sttViewModel.stopRecognition()
+            ttsViewModel.stopSpeaking()
+            onDismiss()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (isDialog) {
             DraggableDialog(
-                onDismissRequest = {
-                    sttViewModel.stopRecognition()
-                    ttsViewModel.stopSpeaking()
-                    onDismiss()
-                }) {
-                TranslationContent()
-                FloatingDialogActions(
-                    onDismiss = onDismiss,
-                    onOpenInApp = onOpenInApp,
-                    ttsViewModel = ttsViewModel,
-                    sttViewModel = sttViewModel
-                )
+                onDismissRequest = handleDismiss
+            ) {
+                Box {
+                    TranslationContent()
+                    FloatingDialogActions(
+                        onDismiss = handleDismiss,
+                        onOpenInApp = { onOpenInApp(sourceTextFieldValue.text) }
+                    )
+                }
             }
         } else {
             TranslationContent(modifier = Modifier.padding(8.dp))
@@ -254,10 +259,16 @@ fun TranslationScreen(
             })
     }
 
-    fullscreenState?.let { text ->
+    fullscreenText?.let { text ->
         FullscreenTextDialog(
-            textValue = TextFieldValue(text),
-            onDismiss = { fullscreenState = null },
+            text = text,
+            onDismiss = { modifiedText ->
+                if (modifiedText != text) {
+                    sourceTextFieldValue = TextFieldValue(modifiedText)
+                    viewModel.onSourceTextChanged(modifiedText)
+                }
+                fullscreenText = null
+            },
             onCopy = actions.onCopy,
             onShare = actions.onShare,
             onSpeak = actions.onSpeak
