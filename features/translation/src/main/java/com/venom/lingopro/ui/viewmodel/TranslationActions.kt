@@ -15,7 +15,9 @@ data class TranslationActions(
     val onMoveUp: () -> Unit,
     val onOcr: () -> Unit,
     val onBookmark: () -> Unit,
-    val onSpeechToText: () -> Unit,
+    val onSpeechToTextStart: () -> Unit,
+    val onSpeechToTextEnd: () -> Unit,
+    val isSpeechToTextActive: Boolean,
     val onFullscreen: (String) -> Unit,
     val onSentenceExplorer: ((String) -> Unit)? = null,
     val onProviderChange: (TranslationProvider) -> Unit = {}
@@ -30,7 +32,9 @@ data class TranslationActions(
             onMoveUp = {},
             onOcr = {},
             onBookmark = {},
-            onSpeechToText = {},
+            onSpeechToTextStart = {},
+            onSpeechToTextEnd = {},
+            isSpeechToTextActive = false,
             onFullscreen = {})
     }
 }
