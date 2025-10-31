@@ -5,11 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.resources.R
+import com.venom.ui.components.buttons.STTButton
 import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.common.BaseActionBar
 
 /**
- * Bottom action bar with multiple functional icons.
+ * Bottom action bar with multiple functional icons including WhatsApp-style STT button.
  *
  * @param onSpeak Callback for speak/sound action.
  * @param isSpeaking Whether the text is speaking.
@@ -17,10 +18,11 @@ import com.venom.ui.components.common.BaseActionBar
  * @param onPaste Callback for paste action.
  * @param onCopy Callback for copy action.
  * @param onFullscreen Callback for fullscreen action.
- * @param onSpeechToText Callback for speech-to-text action.
+ * @param onSpeechToTextStart Callback when STT button is pressed (start recording).
+ * @param onSpeechToTextEnd Callback when STT button is released (stop recording).
+ * @param isSpeechToTextActive Whether speech-to-text is currently active.
  * @param modifier Optional modifier for the entire row.
  */
-
 @Composable
 fun SourceTextActionBar(
     onSpeak: () -> Unit,
@@ -29,7 +31,9 @@ fun SourceTextActionBar(
     onPaste: () -> Unit,
     onCopy: () -> Unit,
     onFullscreen: () -> Unit,
-    onSpeechToText: () -> Unit,
+    onSpeechToTextStart: () -> Unit,
+    onSpeechToTextEnd: () -> Unit,
+    isSpeechToTextActive: Boolean = false,
     onSentenceExplorer: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -39,45 +43,61 @@ fun SourceTextActionBar(
         onClick = onSpeak
     )
 
-    val actions = listOfNotNull(
-        ActionItem.Action(
-            icon = R.drawable.icon_fullscreen,
-            description = R.string.action_fullscreen,
-            onClick = onFullscreen
-        ),
-        onSentenceExplorer?.let {
+    val actions = buildList {
+        add(
             ActionItem.Action(
-                icon = R.drawable.icon_quotes,
-                description = R.string.sentence_explorer,
-                onClick = it
+                icon = R.drawable.icon_fullscreen,
+                description = R.string.action_fullscreen,
+                onClick = onFullscreen
             )
-        },
-        ActionItem.Action(
-            icon = R.drawable.icon_copy,
-            description = R.string.action_copy,
-            onClick = onCopy
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_paste,
-            description = R.string.action_paste,
-            onClick = onPaste
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_camera,
-            description = R.string.action_ocr,
-            onClick = onOcr
-        ),
-        ActionItem.Action(
-            icon = R.drawable.icon_mic,
-            description = R.string.action_speech_to_text,
-            onClick = onSpeechToText
         )
-    )
+
+        onSentenceExplorer?.let {
+            add(
+                ActionItem.Action(
+                    icon = R.drawable.icon_quotes,
+                    description = R.string.sentence_explorer,
+                    onClick = it
+                )
+            )
+        }
+
+        add(
+            ActionItem.Action(
+                icon = R.drawable.icon_copy,
+                description = R.string.action_copy,
+                onClick = onCopy
+            )
+        )
+
+        add(
+            ActionItem.Action(
+                icon = R.drawable.icon_paste,
+                description = R.string.action_paste,
+                onClick = onPaste
+            )
+        )
+
+        add(
+            ActionItem.Action(
+                icon = R.drawable.icon_camera,
+                description = R.string.action_ocr,
+                onClick = onOcr
+            )
+        )
+    }
 
     BaseActionBar(
         leftAction = leftAction,
         actions = actions,
-        modifier = modifier
+        modifier = modifier,
+        trailingContent = {
+            STTButton(
+                onPressStart = onSpeechToTextStart,
+                onPressEnd = onSpeechToTextEnd,
+                isActive = isSpeechToTextActive
+            )
+        }
     )
 }
 
@@ -92,7 +112,9 @@ fun SourceActionBarPreview() {
             onCopy = { },
             onPaste = { },
             onOcr = { },
-            onSpeechToText = { },
+            onSpeechToTextStart = { },
+            onSpeechToTextEnd = { },
+            isSpeechToTextActive = false,
             onSentenceExplorer = { }
         )
     }
