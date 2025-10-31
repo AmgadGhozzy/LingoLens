@@ -1,6 +1,7 @@
 package com.venom.lingopro.ui.components.sections
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +29,7 @@ import com.venom.utils.Extensions.showToast
 
 @Composable
 fun TranslationSection(
-    viewModel: LangSelectorViewModel = hiltViewModel(),
+    viewModel: LangSelectorViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
     sourceTextValue: TextFieldValue,
     translatedTextValue: TextFieldValue,
     actions: TranslationActions = TranslationActions.Empty,
@@ -36,7 +37,8 @@ fun TranslationSection(
     isSpeaking: Boolean = false,
     isBookmarked: Boolean = false,
     showNativeNameHint: Boolean = false,
-    showFlag: Boolean = false
+    showFlag: Boolean = false,
+    backgroundAlpha: Float = 0.1f
 ) {
 
     val context = LocalContext.current
@@ -49,10 +51,11 @@ fun TranslationSection(
     val translatedText = translatedTextValue.getSelectedOrFullText()
 
     GlassCard(
-        padding = 12.dp
+        solidBackgroundAlpha = backgroundAlpha,
+        contentPadding = 12.dp
     ) {
         LanguageBar(
-            viewModel = viewModel,
+            langSelectorViewModel = viewModel,
             showNativeNameHint = showNativeNameHint,
             showFlag = showFlag
         )
@@ -65,7 +68,7 @@ fun TranslationSection(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                            MaterialTheme.colorScheme.outline.copy(0.2f),
                             Color.Transparent
                         )
                     )
@@ -80,7 +83,9 @@ fun TranslationSection(
         )
 
         SourceTextActionBar(
-            onSpeechToText = actions.onSpeechToText,
+            onSpeechToTextStart = actions.onSpeechToTextStart,
+            onSpeechToTextEnd = actions.onSpeechToTextEnd,
+            isSpeechToTextActive = actions.isSpeechToTextActive,
             onOcr = actions.onOcr,
             onPaste = actions.onPaste,
             onCopy = { validateAndExecute { actions.onCopy(sourceText) } },
