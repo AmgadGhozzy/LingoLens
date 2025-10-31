@@ -9,16 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.venom.ui.components.buttons.CustomButton
-import com.venom.ui.components.buttons.CustomTextButton
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.menus.ButtonType
 import com.venom.ui.components.menus.OverflowMenu
@@ -42,17 +38,17 @@ private fun ActionItemContent(
     when (action) {
         is ActionItem.Action -> {
             if (useTextButtons) {
-                CustomTextButton(
+                com.venom.ui.components.buttons.CustomTextButton(
                     onClick = action.onClick,
                     icon = action.icon,
-                    text = stringResource(action.description),
+                    text = androidx.compose.ui.res.stringResource(action.description),
                     withText = false,
                     enabled = action.enabled
                 )
             } else {
-                CustomButton(
+                com.venom.ui.components.buttons.CustomButton(
                     icon = action.icon,
-                    contentDescription = stringResource(action.description),
+                    contentDescription = androidx.compose.ui.res.stringResource(action.description),
                     onClick = action.onClick,
                     selected = action.selected,
                     enabled = action.enabled
@@ -61,7 +57,7 @@ private fun ActionItemContent(
         }
 
         is ActionItem.TextAction -> {
-            Text(
+            androidx.compose.material3.Text(
                 text = action.text,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -80,7 +76,8 @@ fun BaseActionBar(
     containerColor: Color = Color.Unspecified,
     elevation: Dp = 2.dp,
     useTextButtons: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trailingContent: @Composable (() -> Unit)? = null
 ) {
     val content = @Composable {
         Row(
@@ -90,6 +87,7 @@ fun BaseActionBar(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Left section (overflow menu or left action)
             if (showOverflowMenu || leftAction != null) {
                 Box(modifier = Modifier.weight(1f)) {
                     if (showOverflowMenu) {
@@ -100,6 +98,7 @@ fun BaseActionBar(
                 }
             }
 
+            // Center section (main actions)
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -107,6 +106,9 @@ fun BaseActionBar(
             ) {
                 actions.forEach { ActionItemContent(it, useTextButtons) }
             }
+
+            // Trailing section (custom content like STT button)
+            trailingContent?.invoke()
         }
     }
 
