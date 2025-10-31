@@ -147,7 +147,14 @@ fun TranslationScreen(
             },
             onSpeak = ttsViewModel::speak,
             onBookmark = viewModel::toggleBookmark,
-            onSpeechToText = { showSpeechToTextDialog = true },
+            onSpeechToTextStart = {
+                sttViewModel.startRecognition()
+            },
+            onSpeechToTextEnd = {
+                sttViewModel.stopRecognition()
+            },
+            isSpeechToTextActive = sttViewModel.isRecognitionActive,
+
             onPaste = {
                 runCatching {
                     context.pasteFromClipboard()?.let { text ->
