@@ -1,5 +1,7 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,7 +36,6 @@ import com.venom.stackcard.ui.viewmodel.CardSwiperViewModel
 import com.venom.stackcard.ui.viewmodel.CardType
 import com.venom.ui.components.other.FloatingCircleMenu
 import com.venom.ui.components.other.FloatingMenuItem
-import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.components.sections.CustomTabs
 import com.venom.ui.components.sections.TabItem
 import com.venom.ui.theme.ThemeColors.BitcoinColor
@@ -48,9 +49,9 @@ import com.venom.utils.Extensions.shareText
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardScreen(
-    wordViewModel: CardSwiperViewModel = hiltViewModel(),
-    phraseViewModel: CardSwiperViewModel = hiltViewModel(),
-    ttsViewModel: TTSViewModel = hiltViewModel(),
+    wordViewModel: CardSwiperViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
+    phraseViewModel: CardSwiperViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
+    ttsViewModel: TTSViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     onNavigateToSentence: (String) -> Unit = {},
     initialLevel: WordLevels? = null
 ) {
@@ -89,8 +90,6 @@ fun CardScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        FloatingOrbs()
-
         // Tabs for switching between card types
         CustomTabs(
             tabs = listOf(
