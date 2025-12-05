@@ -1,8 +1,10 @@
 package com.venom.stackcard.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -49,7 +51,6 @@ fun SwipeableCard(
     shadowElevation: Dp,
     blurRadius: Dp,
     isFlipped: Boolean,
-    rotationY: Float,
     isTopCard: Boolean,
     swipeProgress: Float,
     isRestoringCard: Boolean = false,
@@ -104,6 +105,12 @@ fun SwipeableCard(
         )
     }
 
+    // Flip transition for smooth flip
+    val transition = updateTransition(isFlipped)
+    val animatedRotationY by transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 800) }
+    ) { state -> if (state) 180f else 0f }
+
     Card(
         modifier = modifier
             .size(280.dp, 400.dp)
@@ -113,11 +120,11 @@ fun SwipeableCard(
             )
             .graphicsLayer(
                 rotationZ = rotation,
-                rotationY = rotationY,
+                rotationY = animatedRotationY,
                 scaleX = scale,
                 scaleY = scale,
                 alpha = alpha,
-                cameraDistance = 12f * density.density
+                cameraDistance = 12f
             )
             .shadow(
                 elevation = shadowElevation,
@@ -165,7 +172,7 @@ fun SwipeableCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().graphicsLayer(rotationY = animatedRotationY)
         ) {
             CardContent(
                 card = card,
