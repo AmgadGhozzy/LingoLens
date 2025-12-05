@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.resources.R
-import com.venom.stackcard.ui.components.EnhancedCardAnimations.FlipAnimationSpec
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.ReturnAnimationSpec
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.SWIPE_THRESHOLD
 import com.venom.stackcard.ui.components.EnhancedCardAnimations.ScaleAnimationSpec
@@ -184,18 +183,11 @@ fun CardSwiperStack(
                     shadowElevation = shadowElevation,
                     blurRadius = blurRadius,
                     isFlipped = isTopCard && state.isFlipped,
-                    rotationY = if (isTopCard) cardAnimState.rotationY.value else 0f,
                     isTopCard = isTopCard,
                     swipeProgress = if (isTopCard) cardAnimState.offsetX.value / SWIPE_THRESHOLD else 0f,
                     isRestoringCard = isRestoringCard && isTopCard,
                     onFlip = {
-                        scope.launch {
-                            cardAnimState.rotationY.animateTo(
-                                targetValue = if (!state.isFlipped) 360f else 0f,
-                                animationSpec = FlipAnimationSpec
-                            )
-                            viewModel.onEvent(CardSwiperEvent.FlipCard)
-                        }
+                        viewModel.onEvent(CardSwiperEvent.FlipCard)
                     },
                     onDrag = onDragCallback,
                     onDragEnd = {
