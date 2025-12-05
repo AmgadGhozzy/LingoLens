@@ -6,12 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.data.local.PreferencesKeys
+import com.venom.data.repo.WordRepositoryImpl
+import com.venom.domain.model.Word
 import com.venom.domain.model.WordLevels
-import com.venom.phrase.data.model.Phrase
+import com.venom.phrase.data.model.PhraseEntity
 import com.venom.phrase.data.repo.PhraseRepository
-import com.venom.stackcard.data.local.PreferencesKeys
-import com.venom.stackcard.data.model.WordEntity
-import com.venom.stackcard.data.repo.WordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,22 +32,22 @@ sealed interface CardItem {
     val isForgotten: Boolean
 }
 
-data class WordCard(val word: WordEntity) : CardItem {
-    override val id = word.id
-    override val englishEn = word.englishEn
-    override val arabicAr = word.arabicAr
-    override val isBookmarked = word.isBookmarked
-    override val isRemembered = word.isRemembered
-    override val isForgotten = word.isForgotten
+data class WordCard(val word: Word) : CardItem {
+    override val id: Int = word.id
+    override val englishEn: String = word.englishEn
+    override val arabicAr: String = word.arabicAr
+    override val isBookmarked: Boolean = word.isBookmarked
+    override val isRemembered: Boolean = word.isRemembered
+    override val isForgotten: Boolean = word.isForgotten
 }
 
-data class PhraseCard(val phrase: Phrase) : CardItem {
-    override val id = phrase.phraseId
-    override val englishEn = phrase.englishEn
-    override val arabicAr = phrase.arabicAr
-    override val isBookmarked = phrase.isBookmarked
-    override val isRemembered = phrase.isRemembered
-    override val isForgotten = phrase.isForgotten
+data class PhraseCard(val phrase: PhraseEntity) : CardItem {
+    override val id: Int = phrase.phraseId
+    override val englishEn: String = phrase.englishEn
+    override val arabicAr: String = phrase.arabicAr
+    override val isBookmarked: Boolean = phrase.isBookmarked
+    override val isRemembered: Boolean = phrase.isRemembered
+    override val isForgotten: Boolean = phrase.isForgotten
 }
 
 @Stable
@@ -79,7 +79,7 @@ sealed class CardSwiperEvent {
 
 @HiltViewModel
 class CardSwiperViewModel @Inject constructor(
-    private val wordRepository: WordRepository,
+    private val wordRepository: WordRepositoryImpl,
     private val phraseRepository: PhraseRepository,
     private val dataStore: DataStore<Preferences>,
     savedStateHandle: SavedStateHandle
@@ -124,8 +124,8 @@ class CardSwiperViewModel @Inject constructor(
     }
 
     private suspend fun loadWords() {
-        val level = selectedLevel
-        val words = wordRepository.getWordsFromLevel(level = level.value)
+        val level = selectedLevel.value
+        val words = wordRepository.getWordsFromLevel(level = level)
 
         _state.update { currentState ->
             currentState.copy(
@@ -223,14 +223,14 @@ class CardSwiperViewModel @Inject constructor(
         }
     }
 
-    private suspend fun revertWordCardState(word: WordEntity) {
+    private suspend fun revertWordCardState(word: Word) {
         when {
             word.isRemembered -> wordRepository.toggleRemember(word)
             word.isForgotten -> wordRepository.toggleForgot(word)
         }
     }
 
-    private suspend fun revertPhraseCardState(phrase: Phrase) {
+    private suspend fun revertPhraseCardState(phrase: PhraseEntity) {
         when {
             phrase.isRemembered -> phraseRepository.toggleRemember(phrase)
             phrase.isForgotten -> phraseRepository.toggleForgot(phrase)
