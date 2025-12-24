@@ -22,6 +22,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
@@ -48,21 +52,18 @@ fun OptionItem(
                 QuizColors.OptionCorrectGradientEnd
             )
         )
-
         isAnswered && isSelected && !isCorrect -> Brush.horizontalGradient(
             colors = listOf(
                 QuizColors.OptionIncorrectGradientStart,
                 QuizColors.OptionIncorrectGradientEnd
             )
         )
-
         isSelected -> Brush.horizontalGradient(
             colors = listOf(
                 QuizColors.OptionSelectedGradientStart,
                 QuizColors.OptionSelectedGradientEnd
             )
         )
-
         else -> Brush.horizontalGradient(
             colors = listOf(
                 QuizColors.OptionDefaultGradient,
@@ -76,6 +77,12 @@ fun OptionItem(
         isAnswered && isSelected && !isCorrect -> QuizColors.OptionIncorrectBorder
         isSelected -> QuizColors.OptionSelectedBorder
         else -> QuizColors.OptionDefaultBorder
+    }
+
+    val borderWidth = when {
+        isAnswered && isSelected -> 2.dp
+        isSelected -> 2.dp
+        else -> 1.dp
     }
 
     val labelBackgroundColor = when {
@@ -93,24 +100,27 @@ fun OptionItem(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(0.96f)
             .scale(scale)
             .clip(RoundedCornerShape(20.dp))
             .background(backgroundColor)
             .border(
-                width = 2.dp,
+                width = borderWidth,
                 color = borderColor,
                 shape = RoundedCornerShape(20.dp)
             )
+            .semantics {
+                role = Role.Button
+                contentDescription = "Option $label: $option"
+            }
             .clickable(enabled = !isAnswered) { onClick() }
-            .padding(16.dp)
+            .padding(horizontal = 18.dp, vertical = 16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Option Label
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -125,7 +135,6 @@ fun OptionItem(
                 )
             }
 
-            // Option Text
             Text(
                 text = option,
                 color = QuizColors.OptionText,
