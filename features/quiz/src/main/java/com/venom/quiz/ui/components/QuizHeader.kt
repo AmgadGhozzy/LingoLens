@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.theme.QuizColors
-import com.venom.ui.theme.QuizColors.ProgressBarForeground
 
 data class QuizHeaderData(
     val currentQuestion: Int,
@@ -52,7 +51,7 @@ fun QuizHeader(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Back Button
+            // Back Button with border
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -65,7 +64,7 @@ fun QuizHeader(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = stringResource(R.string.back_button),
                     tint = QuizColors.BackButtonIcon,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -76,7 +75,7 @@ fun QuizHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Progress Bar
+        // Progress Bar Section
         Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -89,16 +88,17 @@ fun QuizHeader(
                         data.currentQuestion,
                         data.totalQuestions
                     ),
-                    color = ProgressBarForeground,
+                    color = QuizColors.ProgressBarForeground,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                // Timer moved to the right
+                // Timer on the right
                 TimerChip(data.timeRemaining)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Progress Bar Track
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,6 +106,7 @@ fun QuizHeader(
                     .clip(RoundedCornerShape(4.dp))
                     .background(QuizColors.ProgressBarBackground)
             ) {
+                // Progress Bar Fill
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(data.currentQuestion.toFloat() / data.totalQuestions)
@@ -114,7 +115,7 @@ fun QuizHeader(
                         .background(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(
-                                    ProgressBarForeground,
+                                    QuizColors.ProgressBarForeground,
                                     QuizColors.ProgressBarForegroundEnd
                                 )
                             )
