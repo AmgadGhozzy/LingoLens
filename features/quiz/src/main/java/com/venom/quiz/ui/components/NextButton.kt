@@ -1,9 +1,5 @@
 package com.venom.quiz.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,12 +14,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,37 +28,26 @@ import com.venom.ui.theme.QuizColors
 @Composable
 fun NextButton(
     onClick: () -> Unit,
+    enabled: Boolean = true,
     text: String = stringResource(R.string.next_button)
 ) {
-    val scale = remember { Animatable(1f) }
 
-    LaunchedEffect(Unit) {
-        scale.animateTo(
-            targetValue = 1.05f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(800),
-                repeatMode = RepeatMode.Reverse
-            )
-        )
-    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .scale(scale.value)
+            .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(
-                brush = Brush.horizontalGradient(
+                Brush.horizontalGradient(
                     colors = listOf(
                         QuizColors.NextButtonStart,
                         QuizColors.NextButtonEnd
                     )
                 )
             )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center,
-
-        ) {
+            .clickable(enabled = enabled) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
