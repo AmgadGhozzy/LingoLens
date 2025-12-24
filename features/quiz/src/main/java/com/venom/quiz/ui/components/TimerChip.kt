@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +24,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.venom.resources.R
 import com.venom.ui.theme.QuizColors
 
@@ -38,7 +38,7 @@ fun TimerChip(timeRemaining: Int) {
     val infiniteTransition = rememberInfiniteTransition()
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (isWarning) 1.1f else 1f,
+        targetValue = if (isWarning) 1.08f else 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(500),
             repeatMode = RepeatMode.Reverse
@@ -63,9 +63,8 @@ fun TimerChip(timeRemaining: Int) {
         Text(
             text = "${timeRemaining}s",
             color = contentColor,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 4.dp)
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
         )
     }
 }
