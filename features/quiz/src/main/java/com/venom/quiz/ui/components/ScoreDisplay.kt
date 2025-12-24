@@ -18,18 +18,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.theme.QuizColors
 import com.venom.ui.theme.QuizColors.OnScoreBackground
-import com.venom.ui.theme.QuizColors.ScoreBackground
 
 @Composable
-fun ScoreDisplay(
-    score: Int
-) {
-
+fun ScoreDisplay(score: Int) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .background(ScoreBackground)
+            .background(QuizColors.ScoreBackground)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)

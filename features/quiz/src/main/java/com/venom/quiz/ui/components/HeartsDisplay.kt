@@ -25,39 +25,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.theme.QuizColors
-import com.venom.ui.theme.QuizColors.HeartBackground
-import kotlinx.coroutines.delay
 
 @Composable
-fun HeartsDisplay(
-    hearts: Int
-) {
+fun HeartsDisplay(hearts: Int) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(24.dp))
-            .background(HeartBackground.copy(0.2f))
+            .background(QuizColors.HeartBackground)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val scale = remember { Animatable(1f) }
-        LaunchedEffect(key1 = true) {
+        LaunchedEffect(hearts) {
             scale.animateTo(
-                targetValue = 1.5f,
-                animationSpec = tween(200, easing = FastOutSlowInEasing)
+                targetValue = 1.4f,
+                animationSpec = tween(150, easing = FastOutSlowInEasing)
             )
             scale.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(200, easing = FastOutSlowInEasing)
-            )
-            delay(200)
-            scale.animateTo(
-                targetValue = 1.2f,
-                animationSpec = tween(200, easing = FastOutSlowInEasing)
-            )
-            scale.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(200, easing = FastOutSlowInEasing)
+                animationSpec = tween(150, easing = FastOutSlowInEasing)
             )
         }
 

@@ -19,9 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.venom.ui.theme.QuizColors
 
 @Composable
-fun StreakDisplay(
-    streak: Int
-) {
+fun StreakDisplay(streak: Int) {
     val backgroundColor = if (streak >= 5) QuizColors.StreakHighlight else QuizColors.StreakNormal
     val contentColor = if (streak >= 5) QuizColors.OnStreakHighlight else QuizColors.OnStreakNormal
 
