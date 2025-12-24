@@ -8,11 +8,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.venom.dialog.ui.screen.DialogScreen
+import com.venom.domain.model.QuizMode
 import com.venom.domain.model.WordLevels
 import com.venom.lingopro.ui.screens.TranslationScreen
 import com.venom.phrase.ui.screen.PhrasebookScreen
-import com.venom.quiz.ui.screen.MainLevelScreen
+import com.venom.quiz.ui.screen.CategoriesScreen
+import com.venom.quiz.ui.screen.LevelScreen
+import com.venom.quiz.ui.screen.QuizMainScreen
 import com.venom.quiz.ui.screen.QuizScreen
+import com.venom.quiz.ui.screen.TestsScreen
 import com.venom.quote.ui.screen.QuoteScreen
 import com.venom.stackcard.ui.screen.BookmarksScreen
 import com.venom.stackcard.ui.screen.CardScreen
@@ -141,10 +145,29 @@ fun NavigationGraph(
                 )
         }
 
-        composable(Screen.Quiz.MainLevel.route) {
-            MainLevelScreen(
+        // Main Quiz Hub - Shows both vocab levels and classes
+        composable(Screen.Quiz.route) {
+            QuizMainScreen(
+                onNavigateToLevels = {
+                    navController.navigate(Screen.Quiz.Levels.route)
+                },
                 onNavigateToTest = { level ->
-                    navController.navigate(Screen.Quiz.createRoute(level))
+                    navController.navigate(Screen.Quiz.LevelTest.createRoute(level))
+                },
+                onNavigateToLearn = { level ->
+                    navController.navigate(Screen.StackCard.createRoute(level))
+                },
+                onNavigateToClass = { classId ->
+                    navController.navigate(Screen.QuizCategories.createRoute(classId))
+                }
+            )
+        }
+
+        // Detailed vocab levels screen with expandable cards
+        composable(Screen.Quiz.Levels.route) {
+            LevelScreen(
+                onNavigateToTest = { level ->
+                    navController.navigate(Screen.Quiz.LevelTest.createRoute(level))
                 },
                 onNavigateToLearn = { level ->
                     navController.navigate(Screen.StackCard.createRoute(level))
@@ -152,6 +175,52 @@ fun NavigationGraph(
             )
         }
 
+        // Categories for a specific class
+        composable(
+            route = Screen.QuizCategories.route,
+            arguments = listOf(navArgument("classId") { type = NavType.IntType })
+        ) {
+            CategoriesScreen(
+                onBackClick = { navController.navigateUp() },
+                onCategoryClick = { categoryId ->
+                    navController.navigate(Screen.QuizTests.createRoute(categoryId))
+                }
+            )
+        }
+
+        // Tests within a category
+        composable(
+            route = Screen.QuizTests.route,
+            arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+        ) {
+            TestsScreen(
+                onBackClick = { navController.navigateUp() },
+                onTestClick = { testId ->
+                    navController.navigate(Screen.QuizExam.createRoute(testId))
+                }
+            )
+        }
+
+        // Actual exam/test taking screen
+        composable(
+            route = Screen.QuizExam.route,
+            arguments = listOf(navArgument("testId") { type = NavType.IntType })
+        ) {
+            QuizScreen(
+                mode = QuizMode.Test(
+                    testId = it.arguments?.getInt("testId") ?: 0
+                ),
+                onBack = { navController.navigateUp() },
+                onComplete = { _, _ ->
+                    navController.popBackStack(
+                        Screen.Quiz.route,
+                        false
+                    )
+                }
+            )
+        }
+
+        // Vocabulary level test
         composable(
             route = Screen.Quiz.LevelTest.route,
             arguments = listOf(navArgument("level") {
@@ -163,19 +232,18 @@ fun NavigationGraph(
             } ?: WordLevels.Beginner
 
             QuizScreen(
-                level = level,
-                onComplete = { passed, nextLevel ->
-                    if (passed && nextLevel != null) {
+                mode = QuizMode.Word(level),
+                onBack = { navController.popBackStack() },
+                onComplete = { passed, _ ->
+                    if (passed) {
                         navController.navigate(Screen.StackCard.createRoute(level)) {
-                            popUpTo(Screen.Quiz.MainLevel.route)
+                            popUpTo(Screen.Quiz.route)
                         }
                     } else {
                         navController.popBackStack()
                     }
                 },
-                onNavigateToLearn = { level ->
-                    navController.navigate(Screen.StackCard.createRoute(level))
-                }
+                onLearnClick = { navController.navigate(Screen.StackCard.createRoute(it)) }
             )
         }
 
