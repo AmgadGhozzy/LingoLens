@@ -11,22 +11,22 @@ interface GeminiService {
     /**
      * Translates text using Google's Gemini API.
      *
-     * @param model The model to use for translation, default is FLASH_MODEL.
+     * @param model The model to use for translation, default is GEMMA_MODEL.
      * @param apiKey The API key for authentication.
      * @param request The request body containing the text to translate.
      * @return The response from the Gemini API containing the translated text.
      */
     @POST("v1beta/models/{model}:generateContent")
     suspend fun translate(
-        @Path("model") model: String = FLASH_MODEL,
+        @Path("model") model: String = GEMMA_MODEL,
         @Query("key") apiKey: String,
         @Body request: GeminiRequest
     ): GeminiResponse
 
     companion object {
         const val BASE_URL = "https://generativelanguage.googleapis.com/"
-        const val FLASH_MODEL = "gemini-2.0-flash-lite"
-        const val PRO_MODEL = "gemini-pro"
+        const val FLASH_MODEL = "gemini-2.5-flash-lite"
+        const val GEMMA_MODEL = "gemma-3-27b"
     }
 }
 
