@@ -1,11 +1,12 @@
 package com.venom.textsnap.ui.components.sections
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -18,6 +19,7 @@ import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.inputs.CustomTextField
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun RecognizedTextSection(
@@ -41,7 +43,7 @@ fun RecognizedTextSection(
 
     fullscreenState?.takeIf { it.isNotEmpty() }?.let { fullscreenText ->
         FullscreenTextDialog(
-            textValue = TextFieldValue(fullscreenText),
+            text = TextFieldValue(fullscreenText).text,
             onDismiss = { fullscreenState = null },
             onCopy = onCopy,
             onShare = onShare,
@@ -50,22 +52,19 @@ fun RecognizedTextSection(
     }
 
     Box {
-        SelectionContainer(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(
-                    shape = MaterialTheme.shapes.medium,
-                    color = MaterialTheme.colorScheme.surfaceContainerLow
-                )
+        GlassCard(
+            solidBackgroundAlpha = 0.1f
         ) {
-            CustomTextField(
-                textValue = TextFieldValue(text),
-                placeHolderText = stringResource(R.string.recognized_text_placeholder),
-                maxLines = maxLines,
-                maxHeight = currentHeight,
-                minHeight = currentHeight,
-                isReadOnly = true
-            )
+            SelectionContainer {
+                CustomTextField(
+                    textValue = TextFieldValue(text),
+                    placeHolderText = stringResource(R.string.recognized_text_placeholder),
+                    maxLines = maxLines,
+                    maxHeight = currentHeight,
+                    minHeight = currentHeight,
+                    isReadOnly = true
+                )
+            }
         }
 
         if (text.isNotEmpty()) {
@@ -73,7 +72,8 @@ fun RecognizedTextSection(
                 icon = R.drawable.icon_fullscreen,
                 contentDescription = stringResource(R.string.action_fullscreen),
                 modifier = Modifier.align(Alignment.TopEnd),
-                onClick = { fullscreenState = text }
+                onClick = { fullscreenState = text },
+                showBorder = false
             )
         }
     }
