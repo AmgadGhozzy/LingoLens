@@ -21,21 +21,42 @@ class AppState(
         get() = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
 
     val shouldShowTopBar: Boolean
-        get() = currentRoute != Screen.Quiz.LevelTest.route &&
-                currentRoute != Screen.Onboarding.route &&
-                currentRoute != Screen.Sentence.route &&
-                currentRoute != Screen.Phrases.route &&
-                currentRoute != Screen.WordCraft.route &&
-                currentRoute != Screen.Quiz.MainLevel.route &&
-                currentRoute != Screen.Quote.route &&
-                currentRoute?.startsWith("history") != true
+        get() = when {
+            // Quiz-related screens - hide top bar (they have custom headers)
+            currentRoute == Screen.Quiz.route -> false
+            currentRoute == Screen.Quiz.Levels.route -> false
+            currentRoute?.startsWith("quiz/test") == true -> false
+            currentRoute?.startsWith("quiz/exam") == true -> false
+            currentRoute?.startsWith("quiz/categories") == true -> false
+            currentRoute?.startsWith("quiz/tests") == true -> false
+
+            // Other screens - hide top bar
+            currentRoute == Screen.Onboarding.route -> false
+            currentRoute == Screen.Sentence.route -> false
+            currentRoute == Screen.Phrases.route -> false
+            currentRoute == Screen.WordCraft.route -> false
+            currentRoute == Screen.Quote.route -> false
+            currentRoute?.startsWith("history") == true -> false
+
+            // Show top bar for all other screens
+            else -> true
+        }
 
     val shouldShowBottomBar: Boolean
-        get() = currentRoute != Screen.Ocr.route &&
-                currentRoute != Screen.Quiz.LevelTest.route &&
-                currentRoute != Screen.Onboarding.route &&
-                currentRoute != Screen.Sentence.route &&
-                currentRoute?.startsWith("history") != true
+        get() = when {
+            // Hide bottom bar for these screens
+            currentRoute == Screen.Ocr.route -> false
+            currentRoute?.startsWith("quiz/test") == true -> false
+            currentRoute?.startsWith("quiz/exam") == true -> false
+            currentRoute?.startsWith("quiz/categories") == true -> false
+            currentRoute?.startsWith("quiz/tests") == true -> false
+            currentRoute == Screen.Onboarding.route -> false
+            currentRoute == Screen.Sentence.route -> false
+            currentRoute?.startsWith("history") == true -> false
+
+            // Show bottom bar for all other screens (including quiz hub and levels)
+            else -> true
+        }
 
     fun navigateToScreen(screen: Screen) {
         when (screen) {
