@@ -1,6 +1,7 @@
 package com.venom.textsnap.ui.screens
 
 import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -33,10 +35,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrScreen(
-    viewModel: OcrViewModel = hiltViewModel(),
-    ttsViewModel: TTSViewModel = hiltViewModel(),
-    onNavigateToTranslation: (String) -> Unit,
-    onFileClick: ((Uri?) -> Unit) -> Unit,
+    viewModel: OcrViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    onNavigateToTranslation: (String) -> Unit, onFileClick: ((Uri?) -> Unit) -> Unit,
     onCameraClick: ((Uri?) -> Unit) -> Unit,
     onGalleryClick: ((Uri?) -> Unit) -> Unit,
 ) {
@@ -67,6 +68,7 @@ fun OcrScreen(
     BottomSheetScaffold(
         scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState),
         modifier = Modifier.navigationBarsPadding(),
+        containerColor = Color.Transparent,
         sheetPeekHeight = peekHeight,
         sheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
         sheetDragHandle = { CustomDragHandle() },
