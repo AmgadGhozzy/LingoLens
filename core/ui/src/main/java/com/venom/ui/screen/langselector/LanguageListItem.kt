@@ -1,15 +1,14 @@
 package com.venom.ui.screen.langselector
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,18 +31,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun LanguageListItem(
@@ -56,37 +54,30 @@ fun LanguageListItem(
     onDownloadClick: (LanguageItem) -> Unit = {},
     onDeleteClick: (LanguageItem) -> Unit = {},
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
+
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1.02f else 1f,
-        animationSpec = tween(300)
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
     )
 
-    Card(
+    GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .scale(scale)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            ),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 8.dp else 2.dp
-        )
+            .scale(scale),
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
+        glassAlpha = if (isSelected) 0.25f else 0.15f,
+        borderWidth = if (isSelected) 2.dp else 1.dp,
+        borderAlpha = if (isSelected) 0.4f else 0.1f,
+        solidBackgroundAlpha = if (isSelected) 0.2f else 0.08f
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    if (isSelected) {
-                        MaterialTheme.colorScheme.primaryContainer.copy(0.8f)
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant.copy(0.6f)
-                    }
-                )
-                .padding(12.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -94,24 +85,34 @@ fun LanguageListItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
+                // Flag Container
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(56.dp)
                         .clip(CircleShape)
                         .background(
                             brush = Brush.radialGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(0.2f),
-                                    MaterialTheme.colorScheme.primary.copy(0.1f)
-                                )
+                                colors = if (isSelected) {
+                                    listOf(
+                                        MaterialTheme.colorScheme.primary.copy(0.25f),
+                                        MaterialTheme.colorScheme.primary.copy(0.1f),
+                                        Color.Transparent
+                                    )
+                                } else {
+                                    listOf(
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(0.4f),
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(0.2f),
+                                        Color.Transparent
+                                    )
+                                }
                             )
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = language.flag,
-                        fontSize = 24.sp,
-                        modifier = Modifier.scale(1.2f)
+                        fontSize = 28.sp,
+                        modifier = Modifier.scale(1.1f)
                     )
                 }
 
@@ -121,33 +122,47 @@ fun LanguageListItem(
                     Text(
                         text = language.englishName,
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                             color = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
+                                MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurface
                             }
                         )
                     )
+
                     Text(
                         text = language.nativeName,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = if (isSelected) {
-                                MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
+                                MaterialTheme.colorScheme.primary.copy(0.7f)
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             }
                         )
                     )
+
+                    // Download size info
                     language.downloadSizeMb?.let { size ->
                         if (!language.isDownloaded) {
-                            Text(
-                                text = "${size}MB",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Medium
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CloudDownload,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = MaterialTheme.colorScheme.secondary
                                 )
-                            )
+                                Text(
+                                    text = "${size}MB",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -155,38 +170,49 @@ fun LanguageListItem(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 AnimatedVisibility(
                     visible = isSelected,
-                    enter = scaleIn(tween(300)) + fadeIn(tween(300)),
-                    exit = scaleOut(tween(300)) + fadeOut(tween(300))
+                    enter = scaleIn(spring(stiffness = Spring.StiffnessHigh)) + fadeIn(),
+                    exit = scaleOut(spring(stiffness = Spring.StiffnessHigh)) + fadeOut()
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.CheckCircle,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(28.dp)
                     )
                 }
 
                 when {
                     language.isDownloading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.5.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(0.3f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 3.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
 
                     language.isDownloaded -> {
                         IconButton(
                             onClick = { onDeleteClick(language) },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.errorContainer.copy(0.3f))
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Delete,
-                                contentDescription = null,
+                                contentDescription = "Delete offline model",
                                 tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -196,12 +222,15 @@ fun LanguageListItem(
                     language.downloadSizeMb != null -> {
                         IconButton(
                             onClick = { onDownloadClick(language) },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.secondaryContainer.copy(0.3f))
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.CloudDownload,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = "Download offline model",
+                                tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
