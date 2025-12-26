@@ -53,18 +53,19 @@ class LangSelectorViewModel @Inject constructor(
                         ?: availableLanguages.getOrNull(1) ?: LANGUAGES_LIST[1]
 
                     _state.update { current ->
-                        current.copy(sourceLang = nativeLang, targetLang = targetLang)
+                        current.copy(
+                            sourceLang = nativeLang,
+                            targetLang = targetLang
+                        )
                     }
                 }
             }
         }
     }
 
-    // New: Set custom languages list
     fun setCustomLanguagesList(languages: List<LanguageItem>) {
         _state.update { current ->
             val updatedLanguages = languages.map { lang ->
-                // Update with offline status if available
                 val isDownloaded = current.offlineModelsStatus[lang.code] ?: false
                 lang.copy(
                     isDownloaded = isDownloaded,
@@ -79,24 +80,22 @@ class LangSelectorViewModel @Inject constructor(
         }
     }
 
-    // New: Check if offline model is downloaded for a language
     fun isOfflineModelDownloaded(langCode: String): Boolean {
         return _state.value.offlineModelsStatus[langCode] ?: false
     }
 
-    // New: Check if both source and target languages have offline models
     fun areOfflineModelsAvailable(): Boolean {
         val currentState = _state.value
         return isOfflineModelDownloaded(currentState.sourceLang.code) &&
                 isOfflineModelDownloaded(currentState.targetLang.code)
     }
 
-    // New: Get languages that need to be downloaded for offline translation
     fun getLanguagesNeedingDownload(): List<LanguageItem> {
         val currentState = _state.value
-        return listOf(currentState.sourceLang, currentState.targetLang).filter { lang ->
-            getAllModels().contains(lang.code) && !isOfflineModelDownloaded(lang.code)
-        }
+        return listOf(currentState.sourceLang, currentState.targetLang)
+            .filter { lang ->
+                getAllModels().contains(lang.code) && !isOfflineModelDownloaded(lang.code)
+            }
     }
 
     fun onSearchQueryChange(query: String) {
@@ -210,104 +209,21 @@ class LangSelectorViewModel @Inject constructor(
         }
     }
 
-    // New: Refresh offline models status
     fun refreshOfflineModelsStatus() {
         loadOfflineLanguageModelsStatus()
-    }
-
-    private fun getModelSize(langCode: String): Float {
-        return when (langCode) {
-            "en" -> 30.2f
-            "es" -> 28.5f
-            "fr" -> 29.1f
-            "de" -> 31.4f
-            "it" -> 27.8f
-            "pt" -> 28.3f
-            "ru" -> 33.7f
-            "ja" -> 42.1f
-            "ko" -> 39.6f
-            "zh" -> 44.8f
-            "ar" -> 35.2f
-            "hi" -> 31.9f
-            "th" -> 36.4f
-            "vi" -> 29.7f
-            "tr" -> 28.9f
-            "pl" -> 30.6f
-            "nl" -> 27.4f
-            "sv" -> 26.8f
-            "no" -> 26.1f
-            "da" -> 25.9f
-            "fi" -> 28.7f
-            "cs" -> 29.3f
-            "hu" -> 30.8f
-            "ro" -> 27.6f
-            "bg" -> 28.4f
-            "hr" -> 27.9f
-            "sk" -> 28.1f
-            "sl" -> 26.5f
-            "et" -> 25.7f
-            "lv" -> 26.3f
-            "lt" -> 27.2f
-            "uk" -> 32.4f
-            "be" -> 29.8f
-            "mk" -> 28.6f
-            "sq" -> 26.9f
-            "sr" -> 28.2f
-            "bs" -> 27.1f
-            "mt" -> 25.4f
-            "ga" -> 26.7f
-            "cy" -> 26.0f
-            "is" -> 25.8f
-            "he" -> 29.4f
-            "fa" -> 33.1f
-            "ur" -> 30.5f
-            "bn" -> 34.6f
-            "ta" -> 35.8f
-            "te" -> 33.9f
-            "ml" -> 32.7f
-            "kn" -> 31.5f
-            "gu" -> 30.9f
-            "pa" -> 29.6f
-            "mr" -> 28.8f
-            "ne" -> 27.5f
-            "si" -> 26.4f
-            "my" -> 37.2f
-            "km" -> 34.3f
-            "lo" -> 31.8f
-            "ka" -> 28.0f
-            "hy" -> 27.3f
-            "az" -> 26.6f
-            "kk" -> 30.3f
-            "ky" -> 28.5f
-            "uz" -> 27.7f
-            "tg" -> 26.8f
-            "mn" -> 29.2f
-            "id" -> 26.9f
-            "ms" -> 26.2f
-            "tl" -> 27.4f
-            "sw" -> 25.6f
-            "am" -> 28.3f
-            "zu" -> 24.8f
-            "xh" -> 24.5f
-            "af" -> 25.1f
-            "eu" -> 26.5f
-            "ca" -> 27.8f
-            "gl" -> 26.7f
-            else -> 28.0f
-        }
-    }
-
-    private fun updateLanguageItemDetails(lang: LanguageItem, allLangs: List<LanguageItem>): LanguageItem {
-        return allLangs.find { it.code == lang.code } ?: lang
     }
 
     fun downloadLanguage(language: LanguageItem) {
         viewModelScope.launch {
             updateLanguageItemState(language.code, isDownloading = true)
+
             offlineTranslationOperations.downloadLanguageModel(language.code)
                 .onSuccess {
-                    updateLanguageItemState(language.code, isDownloading = false, isDownloaded = true)
-                    // Update offline models status
+                    updateLanguageItemState(
+                        language.code,
+                        isDownloading = false,
+                        isDownloaded = true
+                    )
                     _state.update { current ->
                         current.copy(
                             offlineModelsStatus = current.offlineModelsStatus + (language.code to true)
@@ -325,7 +241,6 @@ class LangSelectorViewModel @Inject constructor(
             offlineTranslationOperations.deleteLanguageModel(language.code)
                 .onSuccess {
                     updateLanguageItemState(language.code, isDownloaded = false)
-                    // Update offline models status
                     _state.update { current ->
                         current.copy(
                             offlineModelsStatus = current.offlineModelsStatus + (language.code to false)
@@ -381,6 +296,38 @@ class LangSelectorViewModel @Inject constructor(
                         lang.englishName.contains(lowerQuery, true) ||
                         lang.nativeName.contains(lowerQuery, true)
             }
+        }
+    }
+
+    private fun updateLanguageItemDetails(
+        lang: LanguageItem,
+        allLangs: List<LanguageItem>
+    ): LanguageItem {
+        return allLangs.find { it.code == lang.code } ?: lang
+    }
+
+    private fun getModelSize(langCode: String): Float {
+        return when (langCode) {
+            "en" -> 30.2f; "es" -> 28.5f; "fr" -> 29.1f; "de" -> 31.4f
+            "it" -> 27.8f; "pt" -> 28.3f; "ru" -> 33.7f; "ja" -> 42.1f
+            "ko" -> 39.6f; "zh" -> 44.8f; "ar" -> 35.2f; "hi" -> 31.9f
+            "th" -> 36.4f; "vi" -> 29.7f; "tr" -> 28.9f; "pl" -> 30.6f
+            "nl" -> 27.4f; "sv" -> 26.8f; "no" -> 26.1f; "da" -> 25.9f
+            "fi" -> 28.7f; "cs" -> 29.3f; "hu" -> 30.8f; "ro" -> 27.6f
+            "bg" -> 28.4f; "hr" -> 27.9f; "sk" -> 28.1f; "sl" -> 26.5f
+            "et" -> 25.7f; "lv" -> 26.3f; "lt" -> 27.2f; "uk" -> 32.4f
+            "be" -> 29.8f; "mk" -> 28.6f; "sq" -> 26.9f; "sr" -> 28.2f
+            "bs" -> 27.1f; "mt" -> 25.4f; "ga" -> 26.7f; "cy" -> 26.0f
+            "is" -> 25.8f; "he" -> 29.4f; "fa" -> 33.1f; "ur" -> 30.5f
+            "bn" -> 34.6f; "ta" -> 35.8f; "te" -> 33.9f; "ml" -> 32.7f
+            "kn" -> 31.5f; "gu" -> 30.9f; "pa" -> 29.6f; "mr" -> 28.8f
+            "ne" -> 27.5f; "si" -> 26.4f; "my" -> 37.2f; "km" -> 34.3f
+            "lo" -> 31.8f; "ka" -> 28.0f; "hy" -> 27.3f; "az" -> 26.6f
+            "kk" -> 30.3f; "ky" -> 28.5f; "uz" -> 27.7f; "tg" -> 26.8f
+            "mn" -> 29.2f; "id" -> 26.9f; "ms" -> 26.2f; "tl" -> 27.4f
+            "sw" -> 25.6f; "am" -> 28.3f; "zu" -> 24.8f; "xh" -> 24.5f
+            "af" -> 25.1f; "eu" -> 26.5f; "ca" -> 27.8f; "gl" -> 26.7f
+            else -> 28.0f
         }
     }
 
