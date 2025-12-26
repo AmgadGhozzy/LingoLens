@@ -1,9 +1,7 @@
 package com.venom.ui.components.bars
 
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -16,7 +14,6 @@ import com.venom.ui.components.common.BaseActionBar
  *
  * @param actions List of [ActionItem]s to be displayed in the action bar
  * @param modifier Modifier for the action bar
- * @param containerColor Background color of the action bar
  * @param elevation Elevation of the action bar
  */
 
@@ -24,14 +21,11 @@ import com.venom.ui.components.common.BaseActionBar
 fun TextActionBar(
     actions: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     elevation: Dp = 2.dp
 ) {
     BaseActionBar(
         actions = actions,
         showOverflowMenu = true,
-        useCard = true,
-        containerColor = containerColor,
         elevation = elevation,
         useTextButtons = true,
         modifier = modifier
