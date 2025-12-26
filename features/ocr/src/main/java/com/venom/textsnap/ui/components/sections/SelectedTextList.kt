@@ -1,6 +1,8 @@
 package com.venom.textsnap.ui.components.sections
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -19,10 +21,11 @@ fun SelectedTextList(
     onSpeak: (String) -> Unit,
     onTranslate: (String) -> Unit
 ) {
+    if (texts.isEmpty()) return
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
             .navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
