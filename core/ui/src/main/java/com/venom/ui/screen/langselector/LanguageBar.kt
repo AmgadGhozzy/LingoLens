@@ -4,10 +4,19 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -74,7 +82,7 @@ fun LanguageBar(
         modifier = modifier.fillMaxWidth(),
         color = containerColor,
         contentColor = contentColor,
-        tonalElevation = 1.dp
+        tonalElevation = 0.dp
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -83,7 +91,11 @@ fun LanguageBar(
         ) {
             // Source Language
             AnimatedContent(
-                targetState = state.sourceLang
+                targetState = state.sourceLang,
+                transitionSpec = {
+                    (scaleIn(tween(300)) + fadeIn(tween(300)))
+                        .togetherWith(scaleOut(tween(300)) + fadeOut(tween(300)))
+                }
             ) { language ->
                 LanguageItemView(
                     language = language,
@@ -104,15 +116,20 @@ fun LanguageBar(
                 modifier = Modifier.rotate(rotation)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.icon_swap),
-                    contentDescription = stringResource(R.string.action_swap_languages),
-                    tint = MaterialTheme.colorScheme.primary
+                    imageVector = Icons.Default.SwapHoriz,
+                    contentDescription = stringResource(id = R.string.swap_languages),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
             // Target Language
             AnimatedContent(
-                targetState = state.targetLang
+                targetState = state.targetLang,
+                transitionSpec = {
+                    (scaleIn(tween(300)) + fadeIn(tween(300)))
+                        .togetherWith(scaleOut(tween(300)) + fadeOut(tween(300)))
+                }
             ) { language ->
                 LanguageItemView(
                     language = language,
