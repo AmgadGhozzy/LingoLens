@@ -1,9 +1,17 @@
 package com.venom.ui.screen.langselector
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -45,27 +53,25 @@ fun LanguageItemView(
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     flagSize: Dp = 40.dp
-
 ) {
-    // Interaction source for the ripple effect
     val interactionSource = remember { MutableInteractionSource() }
 
-    // Clickable modifier
     val baseModifier = modifier
         .clip(RoundedCornerShape(12.dp))
-        .then(if (onClick != null) {
-            Modifier.clickable(
-                interactionSource = interactionSource, indication = LocalIndication.current
-            ) { onClick() }
-        } else {
-            Modifier
-        })
+        .then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = interactionSource, indication = LocalIndication.current
+                ) { onClick() }
+            } else {
+                Modifier
+            })
         .padding(6.dp)
 
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = baseModifier
     ) {
-        // Display the flag if enabled
+        // Flag
         if (showFlag) {
 
             Text(
@@ -97,12 +103,16 @@ fun LanguageItemView(
             }
         }
 
-        if (showArrow && onClick != null) {
+        // Arrow indicator
+        AnimatedVisibility(
+            visible = showArrow && onClick != null,
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut()
+        ) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
-                contentDescription = "Expand language selection",
-                modifier = Modifier
-                    .size(20.dp),
+                contentDescription = "Select language",
+                modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
