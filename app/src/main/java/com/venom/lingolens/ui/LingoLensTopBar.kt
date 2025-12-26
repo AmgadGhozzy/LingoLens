@@ -79,7 +79,8 @@ fun LingoLensTopBar(
                 ProviderSelectorAction(
                     selectedProvider = selectedProvider,
                     availableProviders = availableProviders,
-                    onProviderSelected = onProviderSelected
+                    onProviderSelected = onProviderSelected,
+                    excludedProviders = listOf("chatgpt", "DeepSeek")
                 )
             }
 

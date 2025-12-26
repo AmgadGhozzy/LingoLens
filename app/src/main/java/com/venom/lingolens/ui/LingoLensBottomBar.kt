@@ -69,7 +69,7 @@ fun LingoLensBottomBar(
                                 .border(
                                     0.8.dp,
                                     MaterialTheme.colorScheme.primary.copy(0.1f),
-                                    RoundedCornerShape(12.dp)
+                                    RoundedCornerShape(18.dp)
                                 )
                                 .background(
                                     brush = Brush.linearGradient(
@@ -79,7 +79,7 @@ fun LingoLensBottomBar(
                                             GlassTertiary.copy(0.05f)
                                         )
                                     ),
-                                    RoundedCornerShape(12.dp)
+                                    RoundedCornerShape(18.dp)
                                 )
                                 .shadow(
                                     elevation = 24.dp,
