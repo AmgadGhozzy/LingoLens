@@ -16,7 +16,7 @@ fun OcrLoadingOverlay(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)),
+            .background(MaterialTheme.colorScheme.surface.copy(0.3f)),
         contentAlignment = Alignment.Center
     ) {
         PulseAnimation(

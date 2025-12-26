@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.venom.data.model.ParagraphBox
+import com.venom.data.remote.respnod.ParagraphBox
 import com.venom.textsnap.ui.components.sections.sampleTextColors
 
 @Composable
@@ -68,7 +68,7 @@ fun DrawBoundingBox(
             .pointerInput(Unit) { detectTapGestures(onTap = { onSelect() }) }
 
             .background(
-                if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                if (isSelected) MaterialTheme.colorScheme.primary.copy(0.5f)
                 else colors.backgroundColor, RoundedCornerShape(6.dp)
             )) {
 

@@ -7,9 +7,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -26,7 +34,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.data.mapper.getBoxRect
-import com.venom.data.model.ParagraphBox
+import com.venom.data.remote.respnod.ParagraphBox
 import com.venom.resources.R
 import com.venom.textsnap.ui.components.DrawBoundingBox
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
@@ -139,7 +147,7 @@ fun ZoomableImageWithBoundingBoxes(
                     }
                 }
                 drawPath(
-                    path = path, color = Color.White.copy(alpha = 0.5f), style = Stroke(
+                    path = path, color = Color.White.copy(0.5f), style = Stroke(
                         width = 30f / scale, cap = StrokeCap.Round, join = StrokeJoin.Round
                     )
                 )

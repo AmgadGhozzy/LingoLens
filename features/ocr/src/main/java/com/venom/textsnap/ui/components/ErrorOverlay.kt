@@ -31,7 +31,7 @@ fun ErrorOverlay(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
+            .background(MaterialTheme.colorScheme.surface.copy(0.9f))
             .padding(32.dp)
     ) {
         Column(
