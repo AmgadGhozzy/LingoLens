@@ -1,9 +1,16 @@
 package com.venom.textsnap.ui.components.sections
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,6 +27,7 @@ import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.common.EmptyState
 import com.venom.ui.components.dialogs.ImageCropperDialog
 import com.venom.ui.components.menus.ExpandableFAB
+import com.venom.ui.components.other.GlassCard
 
 @Composable
 fun ImagePreviewSection(
@@ -52,27 +60,29 @@ fun ImagePreviewSection(
     }
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+        modifier = modifier.fillMaxSize()
     ) {
-        when {
-            uiState.imageBitmap != null -> ZoomableImageWithBoundingBoxes(
-                viewModel = viewModel,
-                imageBitmap = uiState.imageBitmap!!,
-                modifier = Modifier.fillMaxSize()
-            )
-            else -> EmptyState(
-                icon = R.drawable.icon_ocr_mode,
-                title = stringResource(R.string.ocr_empty_state_title),
-                subtitle = stringResource(R.string.ocr_empty_state_description),
-                modifier = Modifier.align(Alignment.Center)
-            )
+        GlassCard(
+            solidBackgroundAlpha = 0.3f
+        ) {
+            when {
+                uiState.imageBitmap != null -> ZoomableImageWithBoundingBoxes(
+                    viewModel = viewModel,
+                    imageBitmap = uiState.imageBitmap!!,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                else -> EmptyState(
+                    icon = R.drawable.icon_ocr_mode,
+                    title = stringResource(R.string.ocr_empty_state_title),
+                    subtitle = stringResource(R.string.ocr_empty_state_description),
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            if (uiState.isLoading) OcrLoadingOverlay()
+            if (uiState.hasError) ErrorOverlay(onRetry = onRetry)
         }
-
-        if (uiState.isLoading) OcrLoadingOverlay()
-
-        if (uiState.hasError) ErrorOverlay(onRetry = onRetry)
 
         Row(
             modifier = Modifier
