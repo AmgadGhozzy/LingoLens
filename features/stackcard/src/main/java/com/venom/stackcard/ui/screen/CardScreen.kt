@@ -49,42 +49,40 @@ import com.venom.utils.Extensions.shareText
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardScreen(
-    wordViewModel: CardSwiperViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
-    phraseViewModel: CardSwiperViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     ttsViewModel: TTSViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     onNavigateToSentence: (String) -> Unit = {},
     initialLevel: WordLevels? = null
 ) {
     val context = LocalContext.current
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val viewModel: CardSwiperViewModel = hiltViewModel()
+
+    LaunchedEffect(selectedTab) {
+        initialLevel?.let { viewModel.setLevel(initialLevel) }
+        viewModel.onEvent(
+            SetCardType(
+                if (selectedTab == 0) CardType.WORD else CardType.PHRASE
+            )
+        )
+    }
 
     // Actions for copy and speak functionalities
     val copyAction: (String) -> Unit = { text -> context.copyToClipboard(text) }
     val shareAction: (String) -> Unit = { text -> context.shareText(text) }
     val speakAction: (String) -> Unit = { text -> ttsViewModel.speak(text) }
 
-    var selectedTab by remember { mutableIntStateOf(0) }
-
-    // Determine the current view model based on the selected tab
-    val currentViewModel = if (selectedTab == 0) wordViewModel else phraseViewModel
-
-    val state by currentViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     // Get the current top card safely - always the first card in visibleCards
     val currentCard = state.visibleCards.firstOrNull()
 
     // Actions for card events using the current view model
     val onBookmarkWord: (CardItem) -> Unit =
-        { currentViewModel.onEvent(CardSwiperEvent.Bookmark(it)) }
+        { viewModel.onEvent(CardSwiperEvent.Bookmark(it)) }
     val onRememberWord: (CardItem) -> Unit =
-        { currentViewModel.onEvent(CardSwiperEvent.Remember(it)) }
-    val onForgotWord: (CardItem) -> Unit = { currentViewModel.onEvent(CardSwiperEvent.Forgot(it)) }
+        { viewModel.onEvent(CardSwiperEvent.Remember(it)) }
+    val onForgotWord: (CardItem) -> Unit = { viewModel.onEvent(CardSwiperEvent.Forgot(it)) }
 
-    // Set initial CardType for each ViewModel
-    LaunchedEffect(selectedTab) {
-        initialLevel?.let { wordViewModel.setLevel(initialLevel) }
-        if (selectedTab == 0) wordViewModel.onEvent(SetCardType(CardType.WORD))
-        else wordViewModel.onEvent(SetCardType(CardType.PHRASE))
-    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -97,7 +95,7 @@ fun CardScreen(
                 TabItem(R.string.phrase_title, R.drawable.icon_dialog)
             ), selectedTab = selectedTab, onTabSelected = { newTab ->
                 selectedTab = newTab
-                currentViewModel.onEvent(SetCardType(if (newTab == 0) CardType.WORD else CardType.PHRASE))
+                viewModel.onEvent(SetCardType(if (newTab == 0) CardType.WORD else CardType.PHRASE))
             }, modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
@@ -106,7 +104,7 @@ fun CardScreen(
 
         CardSwiperStack(
             modifier = Modifier.padding(bottom = 64.dp),
-            viewModel = currentViewModel,
+            viewModel = viewModel,
             onRememberCard = onRememberWord,
             onForgotCard = onForgotWord,
             onBookmarkCard = onBookmarkWord,
@@ -148,7 +146,7 @@ fun CardScreen(
         if (state.visibleCards.isEmpty() && !state.isLoading) {
             EmptyStateCard(
                 onRefresh = {
-                    wordViewModel.onEvent(CardSwiperEvent.LoadNextBatch)
+                    viewModel.onEvent(CardSwiperEvent.LoadNextBatch)
                 },
                 modifier = Modifier.align(Alignment.Center)
             )
