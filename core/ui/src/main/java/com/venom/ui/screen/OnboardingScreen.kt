@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.resources.R
@@ -39,6 +38,7 @@ import com.venom.ui.components.onboarding.PageIndicators
 import com.venom.ui.components.onboarding.getPages
 import com.venom.ui.components.other.FloatingOrbs
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -55,8 +55,7 @@ fun OnboardingScreens(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .systemBarsPadding(),
-        contentAlignment = Alignment.Center
+            .systemBarsPadding()
     ) {
         FloatingOrbs(
             primaryColor = currentPage.primaryColor,
@@ -64,17 +63,48 @@ fun OnboardingScreens(
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
-            TopSection(
-                showSkip = pagerState.currentPage < pages.size - 1,
-                onSkip = { scope.launch { pagerState.animateScrollToPage(pages.size - 1) }; onSkip() }
-            )
+            // Skip Button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (pagerState.currentPage < pages.size - 1) {
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pages.size - 1)
+                            }
+                            onSkip()
+                        },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White.copy(0.1f))
+                    ) {
+                        Text(
+                            text = stringResource(R.string.skip),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = currentPage.primaryColor
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.height(48.dp))
+                }
+            }
 
+            // Pager
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { pageIndex ->
+                val pageOffset = (pagerState.currentPage - pageIndex) +
+                        pagerState.currentPageOffsetFraction
+
                 PageContent(
                     page = pages[pageIndex],
+                    pageOffset = pageOffset,
                     onNext = {
                         scope.launch {
                             if (pageIndex < pages.size - 1) {
@@ -87,46 +117,15 @@ fun OnboardingScreens(
                     isLastPage = pageIndex == pages.size - 1
                 )
             }
+
+            // Page Indicators
             PageIndicators(
                 currentPage = pagerState.currentPage,
                 totalPages = pages.size,
                 onPageClick = { page ->
-                    scope.launch {
-                        pagerState.animateScrollToPage(page)
-                    }
-                },
+                    scope.launch { pagerState.animateScrollToPage(page) }
+                }
             )
-        }
-    }
-}
-
-@Composable
-private fun TopSection(
-    showSkip: Boolean,
-    onSkip: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        if (showSkip) {
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White.copy(0.1f))
-            ) {
-                Text(
-                    text = stringResource(id = R.string.skip),
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        } else {
-            Spacer(modifier = Modifier.size(48.dp))
         }
     }
 }
@@ -134,34 +133,44 @@ private fun TopSection(
 @Composable
 private fun PageContent(
     page: OnboardingPage,
+    pageOffset: Float,
     onNext: () -> Unit,
     isLastPage: Boolean
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = 32.dp)
+            .graphicsLayer {
+                // Scale and fade animation during transitions
+                val scale = 1f - (pageOffset.absoluteValue * 0.1f)
+                scaleX = scale.coerceIn(0.85f, 1f)
+                scaleY = scale.coerceIn(0.85f, 1f)
+                alpha = 1f - (pageOffset.absoluteValue * 0.3f)
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        HeroSection(page)
+        HeroSection(
+            page = page,
+            pageOffset = pageOffset
+        )
 
         Spacer(modifier = Modifier.height(60.dp))
 
-        ContentSection(page)
+        ContentSection(page = page)
 
         Spacer(modifier = Modifier.weight(1f))
 
         ActionButton(
-            text = if (isLastPage) stringResource(R.string.get_started) else stringResource(R.string.next),
+            text = if (isLastPage) {
+                stringResource(R.string.get_started)
+            } else {
+                stringResource(R.string.next)
+            },
             onClick = onNext,
-            colors = listOf(page.primaryColor, page.secondaryColor)
+            colors = listOf(page.primaryColor, page.secondaryColor),
+            modifier = Modifier.padding(bottom = 16.dp)
         )
     }
-}
-
-@Preview()
-@Composable
-private fun OnboardingPreview() {
-    OnboardingScreens()
 }
