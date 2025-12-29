@@ -7,28 +7,26 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SettingsPreferences(
-    val appLanguage: LanguageItem = LANGUAGES_LIST[1],
+    val appLanguage: LanguageItem = LANGUAGES_LIST[0],
     val nativeLanguage: LanguageItem = LANGUAGES_LIST[0],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
     val selectedProvider: TranslationProvider = TranslationProvider.GOOGLE,
     val speechRate: Float = 1.2f,
-
     val themePrefs: ThemePreference = ThemePreference(),
     val personalPrefs: PersonalPreference = PersonalPreference(),
     val splashPrefs: SplashPreferences = SplashPreferences(),
-
-    val autoPronounciation: Boolean = true,
-
-    )
+    val orbPrefs: OrbPreferences = OrbPreferences(),
+    val autoPronunciation: Boolean = true
+)
 
 @Serializable
 data class ThemePreference(
-    val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appTheme: AppTheme = AppTheme.DARK,
     val extractWallpaperColor: Boolean = false,
     val isAmoledBlack: Boolean = false,
-    val colorStyle: PaletteStyle = PaletteStyle.Neutral,
-    val fontFamily: FontStyles = FontStyles.Default,
-    val primaryColor: ThemeColor = ThemeColor("Sky Blue", 0xFF76D1FF)
+    val colorStyle: PaletteStyle = PaletteStyle.Vibrant,
+    val fontFamily: FontStyles = FontStyles.ALEXANDRIA,
+    val primaryColor: ThemeColor = ThemeColor("Ocean Blue", 0xFF0099EE)
 )
 
 @Serializable
@@ -41,7 +39,16 @@ data class PersonalPreference(
 
 @Serializable
 data class SplashPreferences(
-    val splashBackgroundColor: Long = 0xFF6200EE,
+    val splashBackgroundColor: Long = 0x00000000,
     val splashTextColor: Long = 0xFFFFFFFF,
     val splashAnimationDuration: Int = 1000
+)
+
+@Serializable
+data class OrbPreferences(
+    val enabled: Boolean = true,
+    val enableFloatingAnimation: Boolean = true,
+    val enableScaleAnimation: Boolean = false,
+    val enableAlphaAnimation: Boolean = false,
+    val animationSpeed: Float = 1.0f
 )
