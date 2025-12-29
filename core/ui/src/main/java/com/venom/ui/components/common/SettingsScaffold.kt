@@ -49,14 +49,13 @@ fun SettingsScaffold(
             .animateContentSize()
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainerLow,
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -90,7 +89,7 @@ fun SettingsScaffold(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
                 .animateContentSize(),
             contentPadding = contentPadding,
             verticalArrangement = Arrangement.spacedBy(16.dp),
