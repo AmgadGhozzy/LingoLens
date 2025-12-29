@@ -2,7 +2,6 @@ package com.venom.ui.components.common
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,6 +10,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 
@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun CustomBottomSheet(
     onDismiss: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -30,12 +31,11 @@ fun CustomBottomSheet(
     ModalBottomSheet(
         modifier = Modifier
             .height(sheetHeight)
-            .offset(y = screenHeight * 0.06f)
-            .navigationBarsPadding(),
+            .offset(y = screenHeight * 0.06f),
         sheetState = sheetState,
         onDismissRequest = onDismiss,
         tonalElevation = 2.dp,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+        containerColor = containerColor,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = content
     )
