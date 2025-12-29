@@ -87,6 +87,37 @@ object Extensions {
     fun String.splitCamelCaseRegex(): String =
         this.split("(?<!^)(?<!\\s)(?=[A-Z])".toRegex()).joinToString(" ")
 
+    /**
+     * Simple function to clean HTML and prepare text for TTS
+     * Removes all HTML tags, styles, and special characters
+     */
+    fun String.cleanForTTS1(): String {
+        return this
+            // Remove style tags
+            .replace(Regex("<style[^>]*>.*?</style>", RegexOption.DOT_MATCHES_ALL), "")
+            // Remove script tags
+            .replace(Regex("<script[^>]*>.*?</script>", RegexOption.DOT_MATCHES_ALL), "")
+            // Remove meta tags
+            .replace(Regex("<meta[^>]*>", RegexOption.IGNORE_CASE), "")
+            // Remove all HTML tags
+            .replace(Regex("<[^>]+>"), "")
+            // Decode HTML entities
+            .replace("&nbsp;", " ")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            // Replace underscores with "blank"
+            .replace(Regex("[_]{2,}"), " blank ")
+            .replace("_", " blank ")
+            // Remove special characters
+            .replace(Regex("[*#@\\[\\]{}()]"), "")
+            // Clean whitespace
+            .replace(Regex("\\s+"), " ")
+            .trim()
+    }
+
     fun String.sanitize(): String = replace("\n", "").replace(".", "")
 
     fun String.preprocessText(): String = trim().replace("\n", "☆").replace(".", "★")
