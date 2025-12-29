@@ -109,7 +109,6 @@ class MainActivity : ComponentActivity() {
 
         showOnboarding.value = intent.getBooleanExtra("show_onboarding", false)
 
-        setupPermissions()
         setupRemoteConfig()
 
         setContent {
@@ -139,6 +138,7 @@ class MainActivity : ComponentActivity() {
                         imageSelector = ::selectImageFromGallery,
                         fileSelector = ::selectDocumentFromFileManager
                     )
+                    setupPermissions()
                 }
 
                 if (showDialog.value) {
