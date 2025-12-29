@@ -29,6 +29,7 @@ import com.venom.settings.presentation.screen.SettingsBottomSheet
 import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.ContentType
+import com.venom.ui.viewmodel.SettingsViewModel
 import com.venom.ui.viewmodel.TranslateViewModel
 
 @Composable
@@ -56,6 +57,7 @@ fun LingoLensApp(
 private fun LingoLensAppContent(
     appState: AppState,
     translateViewModel: TranslateViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
+    settingsViewModel: SettingsViewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
@@ -65,6 +67,7 @@ private fun LingoLensAppContent(
     }
 
     val translationUiState by translateViewModel.uiState.collectAsStateWithLifecycle()
+    val settingsUiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
 
     when {
         appState.showSettings -> {
@@ -86,7 +89,16 @@ private fun LingoLensAppContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
-        FloatingOrbs()
+        // Floating orbs with settings-controlled parameters
+        if (settingsUiState.orbPrefs.enabled) {
+            FloatingOrbs(
+                enableFloatingAnimation = settingsUiState.orbPrefs.enableFloatingAnimation,
+                enableScaleAnimation = settingsUiState.orbPrefs.enableScaleAnimation,
+                enableAlphaAnimation = settingsUiState.orbPrefs.enableAlphaAnimation,
+                animationDuration = (10000 / settingsUiState.orbPrefs.animationSpeed).toInt()
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
