@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
             LingoLensTheme(
                 primaryColor = Color(themePrefs.primaryColor.color),
                 isAmoledBlack = themePrefs.isAmoledBlack,
-                materialYou = themePrefs.extractWallpaperColor,
+                materialYou = themePrefs.materialYou,
                 appTheme = themePrefs.appTheme,
                 colorStyle = themePrefs.colorStyle,
                 fontFamilyStyle = themePrefs.fontFamily

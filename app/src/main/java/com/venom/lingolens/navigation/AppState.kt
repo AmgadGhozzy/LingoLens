@@ -23,11 +23,13 @@ class AppState(
     val shouldShowTopBar: Boolean
         get() = when {
             // Quiz-related screens - hide top bar (they have custom headers)
+            currentRoute == Screen.StackCard.route -> false
             currentRoute == Screen.Quiz.route -> false
             currentRoute == Screen.Quiz.Levels.route -> false
             currentRoute?.startsWith("quiz/test") == true -> false
             currentRoute?.startsWith("quiz/exam") == true -> false
             currentRoute?.startsWith("quiz/categories") == true -> false
+            currentRoute?.startsWith("quiz/tests") == true -> false
             currentRoute?.startsWith("quiz/tests") == true -> false
 
             // Other screens - hide top bar
@@ -46,9 +48,11 @@ class AppState(
         get() = when {
             // Hide bottom bar for these screens
             currentRoute == Screen.Ocr.route -> false
+            currentRoute == Screen.StackCard.route -> false
             currentRoute?.startsWith("quiz/test") == true -> false
             currentRoute?.startsWith("quiz/exam") == true -> false
             currentRoute?.startsWith("quiz/categories") == true -> false
+            currentRoute?.startsWith("quiz/tests") == true -> false
             currentRoute?.startsWith("quiz/tests") == true -> false
             currentRoute == Screen.Onboarding.route -> false
             currentRoute == Screen.Sentence.route -> false

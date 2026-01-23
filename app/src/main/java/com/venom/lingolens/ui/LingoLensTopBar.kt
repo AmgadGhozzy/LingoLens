@@ -65,9 +65,9 @@ fun LingoLensTopBar(
                 }
             ),
             style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface.copy(0.6f)
             ),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
 
