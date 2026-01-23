@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.venom.data.local.dao.WordDao
 import com.venom.data.local.database.WordDatabase
 import com.venom.data.repo.WordRepositoryImpl
+import com.venom.domain.repo.IWordRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object WordCardModule {
+object WordModule {
 
     @Provides
     @Singleton
@@ -31,4 +32,8 @@ object WordCardModule {
     @Provides
     @Singleton
     fun provideWordRepositoryImpl(wordDao: WordDao) = WordRepositoryImpl(wordDao)
+
+    @Provides
+    @Singleton
+    fun provideWordRepository(impl: WordRepositoryImpl): IWordRepository = impl
 }
