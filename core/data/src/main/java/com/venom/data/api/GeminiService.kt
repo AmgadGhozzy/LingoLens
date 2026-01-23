@@ -18,7 +18,7 @@ interface GeminiService {
      */
     @POST("v1beta/models/{model}:generateContent")
     suspend fun translate(
-        @Path("model") model: String = GEMMA_MODEL,
+        @Path("model") model: String = FLASH_MODEL,
         @Query("key") apiKey: String,
         @Body request: GeminiRequest
     ): GeminiResponse
@@ -32,17 +32,26 @@ interface GeminiService {
 
 data class GeminiRequest(
     val contents: List<GeminiContent>,
+    @SerializedName("systemInstruction")
+    val systemInstruction: GeminiContent? = null,
     @SerializedName("generationConfig")
     val generationConfig: GeminiConfig = GeminiConfig()
 ) {
     companion object {
-        fun create(text: String, role: String = "user") = GeminiRequest(
+        fun create(
+            text: String,
+            role: String = "user",
+            systemInstructionText: String? = null
+        ) = GeminiRequest(
             contents = listOf(
                 GeminiContent(
                     role = role,
                     parts = listOf(GeminiPart(text))
                 )
-            )
+            ),
+            systemInstruction = systemInstructionText?.let {
+                GeminiContent(parts = listOf(GeminiPart(it)))
+            }
         )
     }
 }
@@ -57,6 +66,18 @@ data class GeminiPart(
 )
 
 data class GeminiConfig(
+    val temperature: Double = 2.0,        // Maximum creativity & randomness
+    val maxOutputTokens: Int = 10000,
+    val topP: Double = 0.95,              // Higher diversity in token selection
+    val topK: Int = 64,                   // Wider vocabulary range
+    val responseMimeType: String = "application/json",
+    @SerializedName("response_schema")
+    val responseSchema: Map<String, Any>? = null,
+    @SerializedName("thinkingConfig")
+    val thinkingConfig: Map<String, Any>? = null
+)
+
+data class GeminiConfig1(
     val temperature: Double = 0.2,
     val maxOutputTokens: Int = 1024,
     val topP: Double = 0.95,
