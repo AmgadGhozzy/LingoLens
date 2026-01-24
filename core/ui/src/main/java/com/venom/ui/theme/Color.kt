@@ -20,58 +20,28 @@ import com.kyant.m3color.scheme.SchemeTonalSpot
 import com.kyant.m3color.scheme.SchemeVibrant
 import com.venom.domain.model.PaletteStyle
 
-object ThemeColors {
-    val Green = Color(0xFFBADB94)
-    val Red = Color(0xFFE06565)
-    val Blue = Color(0xFF3B82F6)
-    val Black = Color(0xFF142329)
-    val StrongBlack = Color(0xFF141414)
-    val Gray100 = Color(0xFFE5E7EB)
-    val White = Color(0xFFFFFFFF)
-    val BitcoinColor = Color(0xFFF7931A)
-    val USDTColor = Color(0xFF50AF95)
-    val TONSpaceColor = Color(0xFF232328)
-    val TONColor = Color(0xFF0098EA)
-    val Indigo = Color(0xFF6366F1)
-    val Purple = Color(0xFF8B5CF6)
-
-    val PurplePrimary = Color(0xFF6C63FF)
-    val PurpleSecondary = Color(0xFF5A4BDA)
-
-    val TealPrimary = Color(0xFF00C4CC)
-    val TealSecondary = Color(0xFF00A8B5)
-
-    val CoralPrimary = Color(0xFFFF6B6B)
-    val CoralSecondary = Color(0xFFFF5252)
-
-    val CyanPrimary = Color(0xFF4ECDC4)
-    val CyanSecondary = Color(0xFF45B7D1)
-
-    val OrangePrimary = Color(0xFFFF9E80)
-    val OrangeSecondary = Color(0xFFFF6E40)
-
-    val MagentaPrimary = Color(0xFF9C27B0)
-    val MagentaSecondary = Color(0xFF7B1FA2)
-
-    val GlassPrimary = Color(0xFF3B82F6)
-    val GlassSecondary = Color(0xFF8B5CF6)
-    val GlassTertiary = Color(0xFF06B6D4)
-
-    val DarkGlassBorder = Color(0x1AFFFFFF)
-}
-
+/**
+ * Creates a dynamic Material 3 ColorScheme based on a key color and style
+ *
+ * @param keyColor Base color for generating the color scheme
+ * @param style Palette style (Neutral, Vibrant, Expressive, etc.)
+ * @param isDark Whether to generate a dark or light color scheme
+ * @param isAmoledBlack Enable pure black backgrounds for OLED displays
+ * @param contrastLevel Contrast adjustment (1.0 = normal, higher = more contrast)
+ * @return Material 3 ColorScheme
+ */
 @Composable
 fun createDynamicColorScheme(
     keyColor: Color,
     style: PaletteStyle = PaletteStyle.Neutral,
     isDark: Boolean = isSystemInDarkTheme(),
     isAmoledBlack: Boolean = false,
-    contrastLevel: Double = 0.0
+    contrastLevel: Double = 1.0
 ): ColorScheme {
     val hct = Hct.fromInt(keyColor.toArgb())
     val colors = MaterialDynamicColors()
 
-    // Select scheme based on style - more comprehensive than venom's original
+    // Select scheme based on style
     val scheme = when (style) {
         PaletteStyle.Neutral -> SchemeNeutral(hct, isDark, contrastLevel)
         PaletteStyle.Vibrant -> SchemeVibrant(hct, isDark, contrastLevel)
