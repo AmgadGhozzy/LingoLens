@@ -50,6 +50,17 @@ val JosefinSans = FontFamily(
     Font(R.font.josefin_sans_bold, FontWeight.Bold)
 )
 
+val PlaypenSansAr = FontFamily(
+    Font(R.font.playpen_sans_ar, FontWeight.Normal)
+)
+
+val PlaypenSansEn = FontFamily(
+    Font(R.font.playpen_sans_en, FontWeight.Normal)
+)
+val ArefRuqaa = FontFamily(
+    Font(R.font.aref_ruqaa_regular, FontWeight.Normal)
+)
+
 fun getTypography(fontFamily: FontFamily) = defaultType.copy(
     displayLarge = defaultType.displayLarge.copy(fontFamily = fontFamily),
     displayMedium = defaultType.displayMedium.copy(fontFamily = fontFamily),
