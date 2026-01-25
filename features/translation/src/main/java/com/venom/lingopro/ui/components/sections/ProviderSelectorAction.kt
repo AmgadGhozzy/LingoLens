@@ -1,13 +1,25 @@
 package com.venom.lingopro.ui.components.sections
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,10 +37,17 @@ import com.venom.ui.components.menus.AnimatedDropdownMenu
 fun ProviderSelectorAction(
     selectedProvider: TranslationProvider,
     availableProviders: List<TranslationProvider>,
-    onProviderSelected: (TranslationProvider) -> Unit
+    onProviderSelected: (TranslationProvider) -> Unit,
+    excludedProviders: List<String> = emptyList()
 ) {
     var isMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    val providerActions = availableProviders.map { provider ->
+
+    // Filter out excluded providers
+    val visibleProviders = availableProviders.filter { provider ->
+        provider.id !in excludedProviders
+    }
+
+    val providerActions = visibleProviders.map { provider ->
         ActionItem.Action(
             icon = provider.iconResId,
             description = provider.descriptionResId,
@@ -43,7 +62,7 @@ fun ProviderSelectorAction(
             stringResource(selectedProvider.nameResId)
         ),
         colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.2f),
             contentColor = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(12.dp),
@@ -56,8 +75,8 @@ fun ProviderSelectorAction(
         options = providerActions,
         customContent = { index, _ ->
             ProviderItem(
-                provider = availableProviders[index],
-                isSelected = availableProviders[index].id == selectedProvider.id
+                provider = visibleProviders[index],
+                isSelected = visibleProviders[index].id == selectedProvider.id
             )
         }
     )
@@ -78,7 +97,7 @@ private fun ProviderItem(
         Surface(
             shape = CircleShape,
             color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+            else MaterialTheme.colorScheme.secondaryContainer.copy(0.5f),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
@@ -104,16 +123,13 @@ private fun ProviderItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            stringResource(provider.descriptionResId).takeIf { it.isNotEmpty() }
-                ?.let { description ->
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+            Text(
+                text = stringResource(provider.descriptionResId),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
 
         if (provider.isPremium) {
@@ -122,7 +138,7 @@ private fun ProviderItem(
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(
-                    text = "PRO",
+                    text = stringResource(R.string.premium),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
