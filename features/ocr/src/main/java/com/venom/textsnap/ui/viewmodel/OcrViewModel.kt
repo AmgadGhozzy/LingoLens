@@ -4,13 +4,13 @@ import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.data.local.entity.OcrEntity
 import com.venom.data.mapper.ParagraphBoxMapper.convertToParagraphBoxes
-import com.venom.data.model.OcrEntry
-import com.venom.data.model.OcrResponse
-import com.venom.data.model.OriginalResponse
-import com.venom.data.model.ParagraphBox
+import com.venom.data.remote.respnod.OcrResponse
+import com.venom.data.remote.respnod.OriginalResponse
+import com.venom.data.remote.respnod.ParagraphBox
 import com.venom.data.repo.OcrRepository
-import com.venom.data.repo.TranslationRepository
+import com.venom.data.repo.TranslationRepositoryImpl
 import com.venom.utils.ImageCompressor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OcrViewModel @Inject constructor(
     private val repository: OcrRepository,
-    private val translationRepository: TranslationRepository,
+    private val translationRepository: TranslationRepositoryImpl,
     private val imageCompressor: ImageCompressor
 ) : ViewModel() {
 
@@ -70,7 +70,7 @@ class OcrViewModel @Inject constructor(
         repository.performOcr(compressedFile).onSuccess { response ->
             processParagraphs(response)
             translateParagraphs("ar")
-            val ocrEntry = OcrEntry(
+            val ocrEntry = OcrEntity(
                 recognizedText = uiState.value.recognizedText,
                 imageData = uiState.value.compressedFile?.readBytes() ?: ByteArray(0),
                 boundingBoxes = uiState.value.paragraphBoxes,
