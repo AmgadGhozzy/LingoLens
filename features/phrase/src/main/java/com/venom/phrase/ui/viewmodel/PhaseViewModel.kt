@@ -6,7 +6,7 @@ import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.Category
-import com.venom.phrase.data.model.Phrase
+import com.venom.phrase.data.model.PhraseEntity
 import com.venom.phrase.data.model.SectionWithPhrases
 import com.venom.phrase.data.repo.PhraseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -121,7 +121,7 @@ class PhraseViewModel @Inject constructor(
         }
     }
 
-    fun toggleBookmark(phrase: Phrase) {
+    fun toggleBookmark(phrase: PhraseEntity) {
         viewModelScope.launch {
             repository.toggleBookmark(phrase)
 
