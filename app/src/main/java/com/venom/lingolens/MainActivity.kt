@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,16 +34,14 @@ import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.venom.lingolens.ui.LingoLensApp
 import com.venom.resources.R
-import com.venom.settings.presentation.screen.UpdateScreen
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.SettingsViewModel
-import com.venom.ui.viewmodel.UpdateViewModel
 import com.venom.utils.Extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -53,9 +50,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val settingsViewModel: SettingsViewModel by viewModels()
-    private val updateViewModel: UpdateViewModel by viewModels()
 
-    private val showUpdateDialog = mutableStateOf(false)
     private val showOnboarding = mutableStateOf(false)
 
     private var currentPhotoUri: Uri? = null
@@ -114,7 +109,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val userPrefs = settingsViewModel.uiState.collectAsState().value
             val themePrefs = userPrefs.themePrefs
-            val showDialog = remember { showUpdateDialog }
             val shouldShowOnboarding = remember { showOnboarding }
 
             ApplySelectedLanguage(userPrefs.appLanguage.code)
@@ -140,19 +134,7 @@ class MainActivity : ComponentActivity() {
                     )
                     setupPermissions()
                 }
-
-                if (showDialog.value) {
-                    UpdateScreen(
-                        viewModel = updateViewModel,
-                        onDismiss = {
-                            showDialog.value = false
-                            finish()
-                        }
-                    )
-                }
             }
-
-            CheckForForceUpdate()
         }
     }
 
@@ -163,17 +145,6 @@ class MainActivity : ComponentActivity() {
         config.setLocale(locale)
         val res = LocalResources.current
         res.updateConfiguration(config, res.displayMetrics)
-    }
-
-    @Composable
-    private fun CheckForForceUpdate() {
-        LaunchedEffect(key1 = Unit) {
-            updateViewModel.state.collectLatest { updateState ->
-                if (updateState.isForceUpdate) {
-                    showUpdateDialog.value = true
-                }
-            }
-        }
     }
 
     private fun selectImageFromGallery(callback: (Uri?) -> Unit) {
@@ -257,15 +228,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun fetchAndActivateRemoteConfig() {
-        remoteConfig.fetchAndActivate()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
+        lifecycleScope.launch(Dispatchers.IO) {  // background thread
+            try {
+                val task = remoteConfig.fetchAndActivate().await()  // coroutine
+                if (task) {
                     val message = remoteConfig.getString("welcome_message")
                     Log.d("RemoteConfig", "Config fetched successfully: $message")
                 } else {
-                    Log.e("RemoteConfig", "Fetch failed", task.exception)
+                    Log.e("RemoteConfig", "Fetch failed")
                 }
+            } catch (e: Exception) {
+                Log.e("RemoteConfig", "Error fetching config", e)
             }
+        }
     }
 
     private fun addConfigUpdateListener() {
