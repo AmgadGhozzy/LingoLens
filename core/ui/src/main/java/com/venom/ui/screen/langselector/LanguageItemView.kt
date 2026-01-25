@@ -73,13 +73,10 @@ fun LanguageItemView(
     ) {
         // Flag
         if (showFlag) {
-
             Text(
                 text = language.flag,
                 fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(flagSize)
+                modifier = Modifier.padding(end = 12.dp).size(flagSize)
             )
         }
 
@@ -87,8 +84,10 @@ fun LanguageItemView(
         Column {
             Text(
                 text = language.englishName,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(0.6f)
+                ),
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
 
