@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.venom.qoute"
+    namespace = "com.venom.quiz"
     compileSdk = 35
 
     defaultConfig {
