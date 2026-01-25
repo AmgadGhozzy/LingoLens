@@ -26,14 +26,19 @@ val localVersionCode = versionProperties.getProperty("APP_VERSION_CODE").toInt()
 android {
     namespace = "com.venom.lingolens"
     compileSdk = 35
-
+    lint {
+        disable.add("NullSafeMutableLiveData")
+    checkReleaseBuilds = true
+    }
     defaultConfig {
         applicationId = "com.venom.lingolens"
         minSdk = 24
         targetSdk = 34
         versionCode = localVersionCode
         versionName = "3.8.${localVersionCode}"
-
+        ndk {
+            abiFilters.add("armeabi-v7a")
+        }
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -105,6 +110,7 @@ dependencies {
     implementation(project(":features:dialog"))
     implementation(project(":features:stackcard"))
     implementation(project(":features:quiz"))
+    implementation(project(":features:lingospell"))
     implementation(project(":features:quote"))
     implementation(project(":features:wordcraftai"))
     implementation(project(":features:ocr"))
