@@ -146,7 +146,7 @@ private fun PageContent(
                 val scale = 1f - (pageOffset.absoluteValue * 0.1f)
                 scaleX = scale.coerceIn(0.85f, 1f)
                 scaleY = scale.coerceIn(0.85f, 1f)
-                alpha = 1f - (pageOffset.absoluteValue * 0.3f)
+                1f - (pageOffset.absoluteValue * 0.3f)
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
