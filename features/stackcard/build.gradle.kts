@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(project(":core:ui"))
     implementation(project(":features:phrase"))
+    implementation(project(":features:lingospell"))
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
