@@ -14,6 +14,7 @@ sealed class Screen(val route: String) {
     object Dialog : Screen("dialog")
     object StackCard : Screen("stackcard/{level}") {
         fun createRoute(level: WordLevels? = null) = "stackcard/${level?.id ?: ""}"
+        fun createRoute(levelId: String) = "stackcard/$levelId"
     }
 
     object Phrases : Screen("phrases")
@@ -26,18 +27,34 @@ sealed class Screen(val route: String) {
     }
     object Bookmarks : Screen("bookmarks")
     object Onboarding : Screen("onboarding")
-    
+
     object WordCraft : Screen("wordcraft")
-    
+
+
     object Quote : Screen("quote")
 
-    sealed class Quiz(route: String) : Screen(route) {
-        object MainLevel : Quiz("quiz/main")
-        object LevelTest : Quiz("quiz/test/{level}")
+    // Main quiz screen - hub showing vocab levels and classes
+    object Quiz : Screen("quiz") {
+        // Detailed vocab levels screen
+        object Levels : Screen("quiz/levels")
 
-        companion object {
+        // Vocabulary level test
+        object LevelTest : Screen("quiz/test/{level}") {
             fun createRoute(level: WordLevels) = "quiz/test/${level.id}"
         }
+    }
+
+    // Grammar / exam / classes flow
+    object QuizCategories : Screen("quiz/categories/{classId}") {
+        fun createRoute(classId: Int) = "quiz/categories/$classId"
+    }
+
+    object QuizTests : Screen("quiz/tests/{categoryId}") {
+        fun createRoute(categoryId: Int) = "quiz/tests/$categoryId"
+    }
+
+    object QuizExam : Screen("quiz/exam/{testId}") {
+        fun createRoute(testId: Int) = "quiz/exam/$testId"
     }
 
     companion object {
@@ -47,13 +64,18 @@ sealed class Screen(val route: String) {
                 route == "ocr" -> Ocr
                 route == "dialog" -> Dialog
                 route.startsWith("stackcard") -> StackCard
-                route.startsWith("quiz/main") -> Quiz.MainLevel
+                route == "quiz" -> Quiz
+                route.startsWith("quiz/levels") -> Quiz.Levels
                 route.startsWith("quiz/test") -> Quiz.LevelTest
+                route.startsWith("quiz/categories") -> QuizCategories
+                route.startsWith("quiz/tests") -> QuizTests
+                route.startsWith("quiz/exam") -> QuizExam
                 route == "phrases" -> Phrases
                 route == "dictionary" -> Dictionary
                 route.startsWith("history") -> History
                 route == "bookmarks" -> Bookmarks
                 route == "onboarding" -> Onboarding
+                route == "wordcraft" -> WordCraft
                 route == "quote" -> Quote
                 else -> Translation
             }
