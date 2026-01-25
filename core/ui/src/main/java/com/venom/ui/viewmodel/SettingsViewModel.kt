@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
+import com.venom.data.model.OrbPreferences
 import com.venom.data.model.SettingsPreferences
 import com.venom.data.model.ThemeColor
 import com.venom.data.model.ThemePreference
@@ -24,6 +25,7 @@ import javax.inject.Inject
 @Immutable
 data class SettingsUiState(
     val themePrefs: ThemePreference = ThemePreference(),
+    val orbPrefs: OrbPreferences = OrbPreferences(),
     val appLanguage: LanguageItem = LANGUAGES_LIST[0],
     val nativeLanguage: LanguageItem = LANGUAGES_LIST[1],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
@@ -54,7 +56,8 @@ class SettingsViewModel @Inject constructor(
         nativeLanguage = nativeLanguage,
         targetLanguage = targetLanguage,
         autoPronunciation = autoPronunciation,
-        themePrefs = themePrefs
+        themePrefs = themePrefs,
+        orbPrefs = orbPrefs
     )
 
     private fun updateSetting(action: suspend SettingsRepository.() -> Unit) {
@@ -95,6 +98,13 @@ class SettingsViewModel @Inject constructor(
     fun setFontFamily(style: FontStyles) = updateSetting { setFontFamily(style) }
     fun toggleAmoledBlack() = updateSetting { toggleAmoledBlack() }
     fun toggleWallpaperColor() = updateSetting { toggleWallpaperColor() }
+
+    // Orb controls
+    fun toggleOrbs() = updateSetting { toggleOrbs() }
+    fun toggleFloatingAnimation() = updateSetting { toggleFloatingAnimation() }
+    fun toggleScaleAnimation() = updateSetting { toggleScaleAnimation() }
+    fun toggleAlphaAnimation() = updateSetting { toggleAlphaAnimation() }
+    fun setAnimationSpeed(speed: Float) = updateSetting { setAnimationSpeed(speed) }
 
     // App interaction
     fun checkForUpdates() {
