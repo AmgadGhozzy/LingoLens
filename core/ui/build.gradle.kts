@@ -78,6 +78,7 @@ dependencies {
     api(libs.compose.material3)
     api(libs.compose.animation)
     api(libs.coil.compose)
+    api(libs.m3color)
     api(libs.compose.material.icons.extended) {
         exclude(group = "androidx.compose.material.icons", module = "filled")
         exclude(group = "androidx.compose.material.icons", module = "outlined")
