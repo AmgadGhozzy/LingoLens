@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven("https://jitpack.io")
         gradlePluginPortal()
     }
 }
@@ -16,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
     }
 }
 
@@ -28,7 +30,8 @@ include(":features:phrase")
 include(":features:dialog")
 include(":features:stackcard")
 include(":features:quiz")
-include(":features:qoute")
+include(":features:lingospell")
+include(":features:quote")
 include(":features:wordcraftai")
 include(":features:settings")
 include(":features:ocr")
@@ -40,3 +43,4 @@ include(":core:di")
 include(":core:resources")
 include(":core:utils")
 include(":core:domain")
+
