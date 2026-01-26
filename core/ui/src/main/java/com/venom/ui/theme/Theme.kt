@@ -22,16 +22,19 @@ import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
 import com.venom.ui.theme.tokens.DarkCefrColors
+import com.venom.ui.theme.tokens.DarkDifficultyColors
 import com.venom.ui.theme.tokens.DarkFeatureColors
 import com.venom.ui.theme.tokens.DarkGlassColors
 import com.venom.ui.theme.tokens.DarkSemanticColors
 import com.venom.ui.theme.tokens.DarkStickyColors
 import com.venom.ui.theme.tokens.LightCefrColors
+import com.venom.ui.theme.tokens.LightDifficultyColors
 import com.venom.ui.theme.tokens.LightFeatureColors
 import com.venom.ui.theme.tokens.LightGlassColors
 import com.venom.ui.theme.tokens.LightSemanticColors
 import com.venom.ui.theme.tokens.LightStickyColors
 import com.venom.ui.theme.tokens.LocalCefrColors
+import com.venom.ui.theme.tokens.LocalDifficultyColors
 import com.venom.ui.theme.tokens.LocalFeatureColors
 import com.venom.ui.theme.tokens.LocalGlassColors
 import com.venom.ui.theme.tokens.LocalSemanticColors
@@ -119,14 +122,6 @@ fun LingoLensTheme(
         }
     }
 
-    // Select theme-appropriate custom colors
-    val semanticColors = if (isDark) DarkSemanticColors else LightSemanticColors
-    val glassColors = if (isDark) DarkGlassColors else LightGlassColors
-    val featureColors = if (isDark) DarkFeatureColors else LightFeatureColors
-    val cefrColors = if (isDark) DarkCefrColors else LightCefrColors
-    val stickyColors = if (isDark) DarkStickyColors else LightStickyColors
-
-
     // Handle window insets and system bars
     if (!view.isInEditMode) {
         SideEffect {
@@ -140,13 +135,22 @@ fun LingoLensTheme(
         }
     }
 
+
     // Provide all custom colors via CompositionLocal
+    val semanticColors = if (isDark) DarkSemanticColors else LightSemanticColors
+    val glassColors = if (isDark) DarkGlassColors else LightGlassColors
+    val featureColors = if (isDark) DarkFeatureColors else LightFeatureColors
+    val cefrColors = if (isDark) DarkCefrColors else LightCefrColors
+    val stickyColors = if (isDark) DarkStickyColors else LightStickyColors
+    val difficultyColors = if (isDark) DarkDifficultyColors else LightDifficultyColors
+
     CompositionLocalProvider(
         LocalSemanticColors provides semanticColors,
         LocalGlassColors provides glassColors,
         LocalFeatureColors provides featureColors,
         LocalCefrColors provides cefrColors,
-        LocalStickyColors provides stickyColors
+        LocalStickyColors provides stickyColors,
+        LocalDifficultyColors provides difficultyColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
