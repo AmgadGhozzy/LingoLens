@@ -1,15 +1,27 @@
 package com.venom.settings.presentation.components
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.theme.SettingsSpacing
 
 @Composable
@@ -22,7 +34,7 @@ fun SettingsItem(
         Icon(
             Icons.Outlined.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(SettingsSpacing.iconSize)
         )
     },
@@ -30,14 +42,11 @@ fun SettingsItem(
     onClick: () -> Unit,
     enabled: Boolean = true
 ) {
-    Surface(
+    GlassCard(
         modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        enabled = enabled,
-        shape = MaterialTheme.shapes.medium,
-        color = if (enabled) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f) else
-            MaterialTheme.colorScheme.surface,
-        tonalElevation = 2.dp
+        thickness = GlassThickness.UltraThick,
+        onClick = if (enabled) onClick else null,
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier.padding(SettingsSpacing.cardPadding),
@@ -54,7 +63,7 @@ fun SettingsItem(
                     Text(
                         text = stringResource(title),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.38f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(if (enabled) 1f else 0.38f)
                     )
                     if (badgeText != null) {
                         Surface(
@@ -75,7 +84,7 @@ fun SettingsItem(
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (enabled) 1f else 0.38f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(if (enabled) 1f else 0.38f)
                     )
                 }
             }
@@ -84,4 +93,3 @@ fun SettingsItem(
         }
     }
 }
-
