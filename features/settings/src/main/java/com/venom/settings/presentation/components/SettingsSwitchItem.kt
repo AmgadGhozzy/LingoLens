@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun SettingsSwitchItem(
     @StringRes title: Int,
+    leadingContent: @Composable (() -> Unit)? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -19,6 +20,7 @@ fun SettingsSwitchItem(
         title = title,
         subtitle = subtitle,
         onClick = { onCheckedChange(!checked) },
+        leadingContent = leadingContent,
         enabled = enabled,
         trailingContent = {
             Switch(
