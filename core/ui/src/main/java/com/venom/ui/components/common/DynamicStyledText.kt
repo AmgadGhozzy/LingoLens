@@ -1,5 +1,6 @@
 package com.venom.ui.components.common
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.venom.utils.getTextDirection
 
@@ -55,7 +57,7 @@ fun DynamicStyledText(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = maxLines,
                     style = customStyle,
-                    modifier = modifier
+                    modifier = modifier.padding(4.dp)
                 )
             }
 
@@ -66,7 +68,7 @@ fun DynamicStyledText(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = maxLines,
                     style = customStyle,
-                    modifier = modifier
+                    modifier = modifier.padding(4.dp)
                 )
             }
 
