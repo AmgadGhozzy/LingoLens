@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun SettingsSliderItem(
@@ -28,37 +30,41 @@ fun SettingsSliderItem(
     valueText: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    GlassCard(
+        modifier = modifier.fillMaxWidth(),
+        thickness = GlassThickness.Thick,
+        contentPadding = 12.dp,
+        shape = MaterialTheme.shapes.medium) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = stringResource(title))
+                }
+                Text(
+                    text = valueText, style = MaterialTheme.typography.bodyMedium
                 )
-                Text(text = stringResource(title))
             }
-            Text(
-                text = valueText, style = MaterialTheme.typography.bodyMedium
+            Slider(
+                value = value,
+                onValueChange = onValueChange,
+                valueRange = valueRange,
+                steps = steps,
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
-        Slider(
-            value = value,
-            onValueChange = onValueChange,
-            valueRange = valueRange,
-            steps = steps,
-            modifier = Modifier.padding(top = 8.dp)
-        )
     }
 }
