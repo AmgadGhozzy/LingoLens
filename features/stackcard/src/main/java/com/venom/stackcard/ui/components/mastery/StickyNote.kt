@@ -38,7 +38,9 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.venom.domain.model.AppTheme
 import com.venom.ui.components.other.BiDiFormatter
+import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.PlaypenSansAr
 import com.venom.ui.theme.lingoLens
 import kotlin.random.Random
@@ -63,7 +65,7 @@ fun StickyNoteCard(
         mutableStateOf(
             StickyConfig(
                 rotation = Random.nextFloat() * 6f - 3f,
-                tapeOffset = Random.nextFloat() * 20f - 10f,
+                tapeOffset = Random.nextFloat() * 30f - 15f,
                 variant = StickyVariant.entries.random()
             )
         )
@@ -187,42 +189,26 @@ fun StickyNoteCard(
     }
 }
 
-@Preview(name = "Light Mode - English")
+@Preview(showBackground = true, backgroundColor = 0xFF0F172A)
+@Composable
+fun StickyNotePreview() {
+    LingoLensTheme(appTheme = AppTheme.DARK) {
+        StickyNoteCard(
+            mnemonicText = "The word (كلمة) means 'word' in Arabic",
+            wordId = 101,
+            modifier = Modifier.padding(24.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF1F5F9)
 @Composable
 fun StickyNotePreviewLight() {
-    StickyNoteCard(
-        mnemonicText = "A cat on a mat",
-        wordId = 123,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Preview(name = "Light Mode - Arabic")
-@Composable
-fun StickyNotePreviewArabic() {
-    StickyNoteCard(
-        mnemonicText = "هذه ملاحظة لاصقة",
-        wordId = 456,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Preview(name = "Light Mode - Mixed")
-@Composable
-fun StickyNotePreviewMixed() {
-    StickyNoteCard(
-        mnemonicText = "Learning (انجليش) is fun!",
-        wordId = 789,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Preview(name = "Light Mode - Complex Mixed")
-@Composable
-fun StickyNotePreviewComplexMixed() {
-    StickyNoteCard(
-        mnemonicText = "The word (كلمة) means 'word' in Arabic",
-        wordId = 101,
-        modifier = Modifier.fillMaxWidth()
-    )
+    LingoLensTheme(appTheme = AppTheme.LIGHT) {
+        StickyNoteCard(
+            mnemonicText = "The word (كلمة) means 'word' in Arabic",
+            wordId = 101,
+            modifier = Modifier.padding(24.dp)
+        )
+    }
 }
