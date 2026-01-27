@@ -18,8 +18,7 @@ import com.venom.quiz.ui.screen.QuizMainScreen
 import com.venom.quiz.ui.screen.QuizScreen
 import com.venom.quiz.ui.screen.TestsScreen
 import com.venom.quote.ui.screen.QuoteScreen
-import com.venom.stackcard.ui.screen.BookmarksScreen
-import com.venom.stackcard.ui.screen.CardScreen
+import com.venom.stackcard.ui.screen.WordMasteryScreen
 import com.venom.textsnap.ui.screens.OcrScreen
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.BookmarkHistoryScreen
@@ -65,21 +64,11 @@ fun NavigationGraph(
         }
 
         composable(
-            route = Screen.StackCard.route,
-            arguments = listOf(navArgument("level") {
-                type = NavType.StringType
-                nullable = true
-                defaultValue = null
-            })
-        ) { backStackEntry ->
-            val level = backStackEntry.arguments?.getString("level")?.let { levelId ->
-                WordLevels.values().find { it.id == levelId }
-            }
-            CardScreen(
-                initialLevel = level,
-                onNavigateToSentence = { text ->
-                    navController.navigate(Screen.Sentence.createRoute(text))
-                }
+            route = Screen.StackCard.route
+        ) {
+            WordMasteryScreen(
+                isGenerative = false,
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -133,16 +122,11 @@ fun NavigationGraph(
             val contentTypeString =
                 backStackEntry.arguments?.getString("contentType") ?: "TRANSLATION"
             val contentType = ContentType.valueOf(contentTypeString)
-            if (contentType == ContentType.STACKCARD)
-                BookmarksScreen(
-                    onBackClick = { navController.popBackStack() }
-                )
-            else
-                BookmarkHistoryScreen(
-                    navController = navController,
-                    contentType = contentType,
-                    onBackClick = { navController.popBackStack() }
-                )
+            BookmarkHistoryScreen(
+                navController = navController,
+                contentType = contentType,
+                onBackClick = { navController.popBackStack() }
+            )
         }
 
         // Main Quiz Hub - Shows both vocab levels and classes
