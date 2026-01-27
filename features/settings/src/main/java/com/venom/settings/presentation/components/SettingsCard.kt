@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.theme.SettingsSpacing
 
 @Composable
@@ -24,11 +25,10 @@ fun SettingsCard(
     @StringRes title: Int,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Surface(
+    GlassCard(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
-        shape = MaterialTheme.shapes.large,
-        tonalElevation = 1.dp
+        thickness = GlassThickness.Thin,
+        shape = MaterialTheme.shapes.large
     ) {
         Column {
             Row(

@@ -8,15 +8,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.venom.data.BuildConfig
 import com.venom.resources.R
+import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.WaveShape
 
 @Composable
@@ -28,20 +31,16 @@ fun AppHeader() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Surface(
-            modifier = Modifier
-                .size(96.dp)
-                .padding(4.dp),
-            shape = WaveShape(),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            tonalElevation = 4.dp
+        GlassCard(
+            modifier = Modifier.size(96.dp),
+            thickness = GlassThickness.Thick,
+            shape = WaveShape()
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_launcher),
+                contentScale = ContentScale.FillBounds,
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
             )
         }
 
@@ -55,7 +54,7 @@ fun AppHeader() {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Version 3.8.11",
+                text = BuildConfig.APP_VERSION_NAME + BuildConfig.APP_VERSION_CODE,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )

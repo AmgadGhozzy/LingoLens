@@ -57,7 +57,7 @@ fun ColorPreviewIcon(color: Long) {
         color = Color(color),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {}
 }
