@@ -62,7 +62,7 @@ fun LingoLensTheme(
     primaryColor: Color = BrandColors.Blue500,
     isAmoledBlack: Boolean = false,
     materialYou: Boolean = false,
-    appTheme: AppTheme = AppTheme.DARK,
+    appTheme: AppTheme = AppTheme.LIGHT,
     colorStyle: PaletteStyle = PaletteStyle.Vibrant,
     fontFamilyStyle: FontStyles = FontStyles.ALEXANDRIA,
     content: @Composable (() -> Unit)

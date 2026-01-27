@@ -54,9 +54,6 @@ val PlaypenSansAr = FontFamily(
     Font(R.font.playpen_sans_ar, FontWeight.Normal)
 )
 
-val PlaypenSansEn = FontFamily(
-    Font(R.font.playpen_sans_en, FontWeight.Normal)
-)
 val ArefRuqaa = FontFamily(
     Font(R.font.aref_ruqaa_regular, FontWeight.Normal)
 )
