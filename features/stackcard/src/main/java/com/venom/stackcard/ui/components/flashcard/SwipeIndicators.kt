@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.components
+package com.venom.stackcard.ui.components.flashcard
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -86,7 +86,8 @@ private fun Indicator(
                 rotationZ = rotation
                 scaleX = 0.9f + (alpha * 0.1f)
                 scaleY = 0.9f + (alpha * 0.1f)
-            },
+            }
+            .padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = color),
         elevation = CardDefaults.cardElevation(defaultElevation = (alpha * 8).dp)
