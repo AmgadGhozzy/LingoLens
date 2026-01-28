@@ -7,7 +7,6 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -93,7 +92,6 @@ fun MasterySwipeableCard(
     val configuration = LocalConfiguration.current
     val cardShape = RoundedCornerShape(32.dp)
 
-    // Use derivedStateOf to reduce recompositions
     val absProgress = remember(swipeProgress) { abs(swipeProgress) }
     val borderColor by animateColorAsState(
         targetValue = when {
@@ -115,12 +113,9 @@ fun MasterySwipeableCard(
         animationSpec = spring(
             dampingRatio = 0.75f,
             stiffness = Spring.StiffnessLow
-        ),
-        label = "flipRotation"
+        )
     )
 
-
-    // Cache card dimensions to prevent recalculation
     val cardDimensions = remember(density) {
         val maxWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
         val cardWidth = with(density) { min(maxWidth - 24.dp.toPx(), 400.dp.toPx()).toDp() }
@@ -129,8 +124,6 @@ fun MasterySwipeableCard(
     }
 
     val (cardWidth, cardHeight) = cardDimensions
-
-    // Cache camera distance to prevent recalculation
     val cameraDistance = remember(density) { 12f * density.density }
 
     Card(
@@ -140,23 +133,21 @@ fun MasterySwipeableCard(
                 x = ((offsetX / density.density).dp) + stackOffsetX,
                 y = ((offsetY / density.density).dp) + stackOffsetY
             )
-            // Consolidate graphicsLayer properties to reduce overhead
             .graphicsLayer {
                 rotationZ = if (isFlipped) -rotation else rotation
                 rotationY = animatedRotationY
                 scaleX = scale
                 scaleY = scale
                 this.cameraDistance = cameraDistance
-                // Enable hardware acceleration for smoother animations
                 clip = false
                 renderEffect = null
             }
             .clip(cardShape)
             .border(borderWidth.dp, borderColor, cardShape)
-            // Optimize pointer input by only enabling when needed
             .then(
                 if (isTopCard) {
                     Modifier
+                        // DRAG gesture for swiping
                         .pointerInput(isFlipped) {
                             detectDragGestures(
                                 onDragEnd = { onDragEnd() }
@@ -169,11 +160,6 @@ fun MasterySwipeableCard(
                                 }
                                 onDrag(correctedDrag)
                             }
-                        }
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = { onFlip() }
-                            )
                         }
                 } else {
                     Modifier
@@ -204,7 +190,7 @@ private fun MasterySwipeableCardPreview() {
     LingoLensTheme {
         Box(modifier = Modifier.fillMaxSize()) {
             MasterySwipeableCard(
-                word = MockWordData.venomWord,
+                word = MockWordData.journeyWord,
                 offsetX = 0f,
                 offsetY = 0f,
                 stackOffsetX = 0.dp,
