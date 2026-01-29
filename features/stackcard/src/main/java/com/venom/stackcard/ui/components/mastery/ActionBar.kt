@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.venom.domain.model.AppTheme
 import com.venom.resources.R
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
@@ -180,7 +181,25 @@ private fun PracticeButton(
 @Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
 private fun ActionBarPreview() {
-    LingoLensTheme {
+    LingoLensTheme(appTheme = AppTheme.DARK) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            ActionBar(
+                onFlip = {},
+                onPractice = {},
+                onInfoClick = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF1F5F9)
+@Composable
+private fun ActionBarPreviewLight() {
+    LingoLensTheme(appTheme = AppTheme.LIGHT) {
         Box(
             Modifier
                 .fillMaxWidth()
