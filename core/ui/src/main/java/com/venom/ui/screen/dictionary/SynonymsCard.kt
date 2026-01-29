@@ -4,16 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.CompareArrows
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,67 +23,98 @@ import androidx.compose.ui.unit.dp
 import com.venom.domain.model.Synset
 import com.venom.resources.R
 import com.venom.ui.components.items.WordChip
-import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
+import com.venom.ui.components.other.GradientGlassCard
+import com.venom.ui.theme.BrandColors
+
+private val SYNONYMS_GRADIENT_COLORS = listOf(
+    BrandColors.Blue500,
+    BrandColors.Purple600,
+    BrandColors.Cyan500
+)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SynonymsCard(
     synsets: List<Synset>,
-    onWordClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onWordClick: (String) -> Unit
 ) {
-    var showAll by remember { mutableStateOf(false) }
+    var showAll by rememberSaveable { mutableStateOf(false) }
 
-    GlassCard(modifier = modifier, contentPadding = 16.dp) {
+    GradientGlassCard(
+        thickness = GlassThickness.UltraThin,
+        gradientColors = SYNONYMS_GRADIENT_COLORS,
+        gradientAlpha = 0.1f,
+        contentPadding = 16.dp
+    ) {
         Column(
-            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SectionHeader(
-                title = stringResource(id = R.string.synonyms),
-                icon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.CompareArrows,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            )
+            SectionHeader(title = stringResource(id = R.string.synonyms))
 
             synsets.forEach { synset ->
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = synset.pos.replaceFirstChar { it.uppercase() },
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.semantics {
-                            contentDescription = "${synset.pos} Synonyms"
-                        }
+                key(synset.pos) {
+                    SynsetSection(
+                        synset = synset,
+                        showAll = showAll,
+                        onWordClick = onWordClick,
+                        onToggleShowAll = { showAll = !showAll }
                     )
-
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val synonyms = synset.entry.flatMap { it.synonym }.distinct()
-                        val visibleSynonyms = if (showAll) synonyms else synonyms.take(15)
-                        visibleSynonyms.forEach { synonym ->
-                            WordChip(
-                                word = synonym,
-                                onClick = { onWordClick(synonym) }
-                            )
-                        }
-
-                        if (synonyms.size > 15) {
-                            WordChip(
-                                word = if (showAll) stringResource(id = R.string.show_less)
-                                else stringResource(id = R.string.show_more),
-                                onClick = { showAll = !showAll }
-                            )
-                        }
-                    }
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SynsetSection(
+    synset: Synset,
+    showAll: Boolean,
+    onWordClick: (String) -> Unit,
+    onToggleShowAll: () -> Unit
+) {
+    val synonyms by remember(synset) {
+        derivedStateOf {
+            synset.entry.flatMap { it.synonym }.distinct()
+        }
+    }
+
+    val visibleSynonyms = if (showAll) synonyms else synonyms.take(15)
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = synset.pos.replaceFirstChar { it.uppercase() },
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.semantics {
+                contentDescription = "${synset.pos} Synonyms"
+            }
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            visibleSynonyms.forEach { synonym ->
+                key(synonym) {
+                    WordChip(
+                        word = synonym,
+                        onClick = { onWordClick(synonym) }
+                    )
+                }
+            }
+
+            if (synonyms.size > 15) {
+                WordChip(
+                    word = if (showAll) {
+                        stringResource(id = R.string.show_less)
+                    } else {
+                        stringResource(id = R.string.show_more)
+                    },
+                    onClick = onToggleShowAll
+                )
             }
         }
     }
