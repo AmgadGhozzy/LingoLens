@@ -44,15 +44,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.WordMaster
 import com.venom.lingospell.domain.FeedbackState
 import com.venom.lingospell.domain.MAX_STREAK
 import com.venom.lingospell.presentation.components.HintButton
 import com.venom.lingospell.presentation.components.LetterBank
+import com.venom.lingospell.presentation.components.MasteryDialog
 import com.venom.lingospell.presentation.components.StreakBar
 import com.venom.lingospell.presentation.components.WordSlots
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.other.ConfettiView
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.viewmodel.TTSViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -83,152 +88,152 @@ fun SpellingGameScreen(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { viewModel.onScreenTapDuringSuccess() }
-    ) {
-        // Top Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            StreakBar(
-                streak = state.streak,
-                isMastered = state.streak >= MAX_STREAK
-            )
-            CustomFilledIconButton(
-                icon = Icons.Rounded.Close,
-                onClick = viewModel::onCloseClick, // centralize navigation via ViewModel event
-                contentDescription = stringResource(R.string.action_close),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                size = 38.dp
-            )
-        }
-
-        // Main content area
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { viewModel.onScreenTapDuringSuccess() }
         ) {
-            // Arabic word prompt
-            AnimatedContent(
-                targetState = state.currentWord.arabicAr,
-                transitionSpec = {
-                    (fadeIn() + scaleIn(initialScale = 0.95f)) togetherWith
-                            (fadeOut() + scaleOut(targetScale = 0.95f))
-                }
-            ) { arabic ->
-                val scale by animateFloatAsState(
-                    targetValue = 1f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
-                )
 
-                Text(
-                    text = arabic,
-                    style = MaterialTheme.typography.displayMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .scale(scale)
-                        .padding(horizontal = 32.dp)
+            // Celebration effects for SUCCESS (not MASTERED, as mastered shows dialog)
+            if (state.feedback == FeedbackState.MASTERED) {
+                ConfettiView(modifier = Modifier.fillMaxSize())
+                LottieAnimation(
+                    composition = rememberLottieComposition(
+                        spec = LottieCompositionSpec.RawRes(R.raw.confetti)
+                    ).value,
+                    iterations = 2,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Feedback / Instructions area
-            Box(
+            // Top Bar
+            Row(
                 modifier = Modifier
-                    .height(48.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                StreakBar(
+                    streak = state.streak,
+                    isMastered = state.streak >= MAX_STREAK
+                )
+                CustomFilledIconButton(
+                    icon = Icons.Rounded.Close,
+                    onClick = viewModel::onCloseClick,
+                    contentDescription = stringResource(R.string.action_close),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    size = 38.dp
+                )
+            }
+
+            // Main content area
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Arabic word prompt
                 AnimatedContent(
-                    targetState = state.feedback,
+                    targetState = state.currentWord.arabicAr,
                     transitionSpec = {
-                        (fadeIn() + scaleIn(initialScale = 0.8f)) togetherWith
-                                 (fadeOut() + scaleOut(targetScale = 0.8f))
+                        (fadeIn() + scaleIn(initialScale = 0.95f)) togetherWith
+                                (fadeOut() + scaleOut(targetScale = 0.95f))
                     }
-                ) { feedback ->
-                    when (feedback) {
-                        FeedbackState.MASTERED -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.icon_trophy),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(28.dp),
-                                    tint = MaterialTheme.lingoLens.feature.spelling.mastery
-                                )
+                ) { arabic ->
+                    val scale by animateFloatAsState(
+                        targetValue = 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
+
+                    Text(
+                        text = arabic,
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .scale(scale)
+                            .padding(horizontal = 32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Feedback / Instructions area
+                Box(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AnimatedContent(
+                        targetState = state.feedback,
+                        transitionSpec = {
+                            (fadeIn() + scaleIn(initialScale = 0.8f)) togetherWith
+                                    (fadeOut() + scaleOut(targetScale = 0.8f))
+                        }
+                    ) { feedback ->
+                        when (feedback) {
+                            FeedbackState.MASTERED -> {
+                                // Don't show inline mastered message, dialog will handle it
+                                Spacer(modifier = Modifier.height(48.dp))
+                            }
+
+                            FeedbackState.SUCCESS -> {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icon_circle_check),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(28.dp),
+                                        tint = MaterialTheme.lingoLens.semantic.success
+                                    )
+                                    Text(
+                                        text = "PERFECT!",
+                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.lingoLens.semantic.success
+                                    )
+                                }
+                            }
+
+                            else -> {
                                 Text(
-                                    text = "MASTERED!",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.lingoLens.feature.spelling.mastery
+                                    text = "Translate to English",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                        }
-
-                        FeedbackState.SUCCESS -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.icon_circle_check),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(28.dp),
-                                    tint = MaterialTheme.lingoLens.semantic.success
-                                )
-                                Text(
-                                    text = "PERFECT!",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.lingoLens.semantic.success
-                                )
-                            }
-                        }
-
-                        else -> {
-                            Text(
-                                text = "Translate to English",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            // Word slots
-            WordSlots(
-                slots = state.slots,
-                onSlotClick = viewModel::onSlotClick,
-                shakeTrigger = state.shakeTrigger,
-                feedback = state.feedback
-            )
+                // Word slots
+                WordSlots(
+                    slots = state.slots,
+                    onSlotClick = viewModel::onSlotClick,
+                    shakeTrigger = state.shakeTrigger,
+                    feedback = state.feedback
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
             // Hint button
             Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.Center) {
@@ -246,11 +251,21 @@ fun SpellingGameScreen(
             }
         }
 
-        // Letter bank at bottom
-        LetterBank(
-            letters = state.bank,
-            onLetterClick = viewModel::onLetterClick,
-            onClear = viewModel::onClearAll
-        )
+            // Letter bank at bottom
+            LetterBank(
+                letters = state.bank,
+                onLetterClick = viewModel::onLetterClick,
+                onClear = viewModel::onClearAll
+            )
+        }
+
+        // Mastery Dialog - appears on top of everything
+        if (state.showMasteryDialog) {
+            MasteryDialog(
+                word = state.currentWord.wordEn,
+                arabicWord = state.currentWord.arabicAr,
+                onContinue = viewModel::onContinueAfterMastery
+            )
+        }
     }
 }
