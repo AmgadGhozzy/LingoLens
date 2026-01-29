@@ -31,8 +31,8 @@ fun DefinitionEntry(
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         Column(
             modifier = modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             GlossRow(
@@ -57,4 +57,3 @@ fun DefinitionEntry(
         }
     }
 }
-
