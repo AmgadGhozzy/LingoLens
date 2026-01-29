@@ -1,11 +1,27 @@
 package com.venom.ui.screen.dictionary
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.venom.domain.model.TranslationResult
-import com.venom.ui.components.common.DynamicStyledText
+import com.venom.resources.R
 import com.venom.ui.components.common.ExpandableCard
 
 @Composable
@@ -16,6 +32,7 @@ fun TranslationCard(
     modifier: Modifier = Modifier
 ) {
     val sentence = translationResponse.sentences.firstOrNull() ?: return
+    var showAlternatives by rememberSaveable { mutableStateOf(false) }
 
     ExpandableCard(
         title = sentence.translated,
@@ -23,18 +40,76 @@ fun TranslationCard(
         onCopy = onCopy,
         modifier = modifier,
         expandedContent = {
-            sentence.transliteration?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onPrimary
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Source text with transliteration
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = sentence.original,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    sentence.transliteration?.let { translit ->
+                        Text(
+                            text = "/$translit/",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                            fontWeight = FontWeight.Light
+                        )
+                    }
+
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)
                 )
+
+                if (translationResponse.alternatives.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.alternative_translations),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            TextButton(onClick = { showAlternatives = !showAlternatives }) {
+                                Text(
+                                    text = if (showAlternatives)
+                                        stringResource(R.string.hide)
+                                    else
+                                        stringResource(R.string.show),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                        }
+
+                        AnimatedVisibility(visible = showAlternatives) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier.padding(start = 8.dp)
+                            ) {
+                                translationResponse.alternatives.take(5).forEach { alt ->
+                                    Text(
+                                        text = "• $alt",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            DynamicStyledText(
-                text = sentence.original,
-                maxFontSize = 18,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.8f)
-            )
         }
     )
 }
