@@ -9,7 +9,6 @@ import com.venom.lingospell.domain.FeedbackState
 import com.venom.lingospell.domain.HintLevel
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
-import com.venom.lingospell.domain.MASTERY_ADVANCE_DELAY
 import com.venom.lingospell.domain.MAX_STREAK
 import com.venom.lingospell.domain.SlotStatus
 import com.venom.lingospell.domain.SpellingUtils
@@ -45,7 +44,8 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 mistakes = 0,
                 hintLevel = HintLevel.NONE,
                 feedback = FeedbackState.IDLE,
-                isLoading = true
+                isLoading = true,
+                showMasteryDialog = false
             )
         }
         // Pass wordData directly to avoid reading stale _state.value.overrideWord
@@ -62,7 +62,8 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 mistakes = 0,
                 hintLevel = HintLevel.NONE,
                 feedback = FeedbackState.IDLE,
-                isLoading = true
+                isLoading = true,
+                showMasteryDialog = false
             )
         }
         // Pass defaultWord directly
@@ -92,7 +93,8 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 mistakes = 0,
                 feedback = FeedbackState.IDLE,
                 streak = if (resetStreak) 0 else state.streak,
-                isLoading = false
+                isLoading = false,
+                showMasteryDialog = false
             )
         }
 
@@ -229,14 +231,13 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
             val newSlots = state.slots.toMutableList()
             val prevLetter = newSlots[targetIndex].letter
 
-            // Return previous letter to bank if it exists
-            val newBank = state.bank.map { l ->
-                when (l.id) {
-                    letter.id -> l.copy(status = LetterStatus.USED)
-                    prevLetter?.id -> l.copy(status = LetterStatus.AVAILABLE)
-                    else -> l
-                }
+            if (prevLetter != null) {
+                val bankIdx = bank.indexOfFirst { it.id == prevLetter.id }
+                if (bankIdx != -1) bank[bankIdx] = bank[bankIdx].copy(status = LetterStatus.AVAILABLE)
             }
+
+            val bankIdx = bank.indexOfFirst { it.id == letter.id }
+            if (bankIdx != -1) bank[bankIdx] = bank[bankIdx].copy(status = LetterStatus.USED)
 
             newSlots[targetIndex] = newSlots[targetIndex].copy(
                 letter = letter,
@@ -244,7 +245,7 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 status = SlotStatus.CORRECT
             )
 
-            state.copy(slots = newSlots, bank = newBank)
+            state.copy(slots = newSlots, bank = bank)
         }
     }
 
@@ -269,7 +270,7 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
 
                 // Find letter: prioritize bank, then steal from other slots
                 // Note: We need a fresh lookup each time or careful management of tempBank
-                // For simplicity, we restart search from current state for each slot, 
+                // For simplicity, we restart search from current state for each slot,
                 // but real-world robust impl needs to track claimed letters.
 
                 val letter = findAvailableLetter(targetChar, newBank)
@@ -378,7 +379,8 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
             state.copy(
                 slots = newSlots,
                 streak = newStreak,
-                feedback = if (isMastered) FeedbackState.MASTERED else FeedbackState.SUCCESS
+                feedback = if (isMastered) FeedbackState.MASTERED else FeedbackState.SUCCESS,
+                showMasteryDialog = isMastered // Show dialog when mastered
             )
         }
 
@@ -392,16 +394,25 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
             _events.send(SpellingGameEvent.PlayTts(text, "en-US"))
         }
 
-        // Auto-advance
-        viewModelScope.launch {
-            val delayMs = if (isMastered) MASTERY_ADVANCE_DELAY else AUTO_ADVANCE_DELAY
-            delay(delayMs)
-
-            if (isMastered) {
-                // Advance to next word
-                _state.update { it.copy(wordIndex = it.wordIndex + 1, streak = 0) }
+        // Auto-advance only if NOT mastered
+        if (!isMastered) {
+            viewModelScope.launch {
+                delay(AUTO_ADVANCE_DELAY)
+                initializeWord(resetStreak = false)
             }
-            initializeWord(resetStreak = isMastered)
+        }
+        // If mastered, wait for user to click Continue button
+    }
+
+    /**
+     * Called when user clicks Continue button on mastery dialog
+     */
+    fun onContinueAfterMastery() {
+        _state.update { it.copy(showMasteryDialog = false) }
+        // Advance to next word
+        viewModelScope.launch {
+            _state.update { it.copy(wordIndex = it.wordIndex + 1, streak = 0) }
+            initializeWord(resetStreak = true)
         }
     }
 
