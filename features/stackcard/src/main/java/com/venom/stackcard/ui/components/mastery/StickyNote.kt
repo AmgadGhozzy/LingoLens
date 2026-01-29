@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,13 +40,11 @@ import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
 import com.venom.ui.components.other.BiDiFormatter
 import com.venom.ui.theme.LingoLensTheme
-import com.venom.ui.theme.PlaypenSansAr
+import com.venom.ui.theme.PlaypenSans
 import com.venom.ui.theme.lingoLens
 import kotlin.random.Random
 
-enum class StickyVariant {
-    YELLOW, AMBER, ROSE, BLUE
-}
+enum class StickyVariant { YELLOW, AMBER, ROSE, BLUE }
 
 data class StickyConfig(
     val rotation: Float,
@@ -58,10 +55,10 @@ data class StickyConfig(
 @Composable
 fun StickyNoteCard(
     mnemonicText: String,
-    wordId: Int,
+    wordId: Any,
     modifier: Modifier = Modifier
 ) {
-    var stickyConfig by remember {
+    var stickyConfig by remember(wordId) {
         mutableStateOf(
             StickyConfig(
                 rotation = Random.nextFloat() * 6f - 3f,
@@ -71,16 +68,6 @@ fun StickyNoteCard(
         )
     }
 
-    // Randomize when wordId changes
-    LaunchedEffect(wordId) {
-        stickyConfig = StickyConfig(
-            rotation = Random.nextFloat() * 6f - 3f,
-            tapeOffset = Random.nextFloat() * 20f - 10f,
-            variant = StickyVariant.entries.random()
-        )
-    }
-
-    // Get the color scheme from theme based on variant
     val colorScheme = when (stickyConfig.variant) {
         StickyVariant.YELLOW -> MaterialTheme.lingoLens.sticky.yellow
         StickyVariant.AMBER -> MaterialTheme.lingoLens.sticky.amber
@@ -88,7 +75,6 @@ fun StickyNoteCard(
         StickyVariant.BLUE -> MaterialTheme.lingoLens.sticky.blue
     }
 
-    // Animate rotation changes
     val animatedRotation by animateFloatAsState(
         targetValue = stickyConfig.rotation,
         animationSpec = spring(
@@ -111,12 +97,9 @@ fun StickyNoteCard(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) {
-                    // Simulate loose pin interaction
-                    stickyConfig = stickyConfig.copy(
-                        rotation = Random.nextFloat() * 6f - 3f
-                    )
+                    stickyConfig = stickyConfig.copy(rotation = Random.nextFloat() * 6f - 3f)
                 }
-                .shadow(12.dp, RoundedCornerShape(10.dp), ambientColor = Color.Black.copy(0.2f))
+                .shadow(8.dp, RoundedCornerShape(10.dp), ambientColor = colorScheme.label.copy(0.2f))
                 .background(colorScheme.bg, RoundedCornerShape(10.dp))
                 .border(0.5.dp, colorScheme.border, RoundedCornerShape(10.dp))
                 .padding(20.dp)
@@ -126,61 +109,42 @@ fun StickyNoteCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Label
                 Text(
                     text = "MEMORY HOOK",
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black,
                     color = colorScheme.label,
-                    letterSpacing = 2.sp,
-                    textAlign = TextAlign.Center
+                    letterSpacing = 2.sp
                 )
 
-                // Mnemonic Text - Supports both English and Arabic
-                // FIXED: Cache fontFamily to avoid disk read on recomposition
-                val cachedFont = remember { PlaypenSansAr }
-                val formattedText = remember(mnemonicText) {
-                    BiDiFormatter.format(mnemonicText)
-                }
-
                 Text(
-                    text = formattedText,
+                    text = remember(mnemonicText) { BiDiFormatter.format(mnemonicText) },
                     fontSize = 20.sp,
                     color = colorScheme.text,
                     textAlign = TextAlign.Center,
                     lineHeight = 32.sp,
-                    fontFamily = cachedFont,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textDirection = TextDirection.Content
-                    )
+                    fontFamily = PlaypenSans,
+                    style = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Content)
                 )
             }
         }
 
-        // Realistic Tape Effect
         Box(
             modifier = Modifier
-                .offset(
-                    x = (stickyConfig.tapeOffset).dp,
-                    y = (-12).dp
-                )
+                .offset(x = (stickyConfig.tapeOffset).dp, y = (-12).dp)
                 .width(80.dp)
                 .height(28.dp)
                 .rotate(-2f)
                 .blur(5.dp)
                 .alpha(0.8f)
                 .align(Alignment.TopCenter)
-                .shadow(
-                    elevation = 2.dp,
-                    shape = RoundedCornerShape(2.dp),
-                    ambientColor = Color.Black.copy(0.1f)
-                )
+                .shadow(2.dp, RoundedCornerShape(2.dp), ambientColor = Color.Black.copy(0.1f))
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(
-                            colorScheme.tape.copy(alpha = 0.85f),
-                            colorScheme.tape.copy(alpha = 0.75f),
-                            colorScheme.tape.copy(alpha = 0.85f)
+                        listOf(
+                            colorScheme.tape.copy(0.85f),
+                            colorScheme.tape.copy(0.75f),
+                            colorScheme.tape.copy(0.85f)
                         )
                     ),
                     shape = RoundedCornerShape(2.dp)
