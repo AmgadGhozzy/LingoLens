@@ -26,7 +26,8 @@ data class SpellingGameState(
     val feedback: FeedbackState = FeedbackState.IDLE,
     val shakeTrigger: Int = 0,
     val isLoading: Boolean = true,
-    val overrideWord: WordMaster = MockWordData.journeyWord
+    val overrideWord: WordMaster = MockWordData.journeyWord,
+    val showMasteryDialog: Boolean = false
 ) {
     /**
      * Current word being spelled.
