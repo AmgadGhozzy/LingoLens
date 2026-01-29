@@ -47,7 +47,7 @@ fun ContentSection(
                 text = page.subtitle,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = page.primaryColor,
+                color = page.colors.primary,
                 textAlign = TextAlign.Center
             )
         }
@@ -70,7 +70,7 @@ fun ContentSection(
                 page.features.forEach { feature ->
                     FeatureItem(
                         text = feature,
-                        color = page.primaryColor
+                        color = page.colors.primary
                     )
                 }
             }

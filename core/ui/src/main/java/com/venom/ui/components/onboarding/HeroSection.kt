@@ -29,13 +29,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HeroSection(
     page: OnboardingPage,
-    pageOffset: Float = 0f,
     modifier: Modifier = Modifier,
     size: Dp = 160.dp
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "hero")
 
-    // Floating animation
     val float by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 20f,
@@ -45,7 +43,6 @@ fun HeroSection(
         )
     )
 
-    // Rotation animation
     val rotate by infiniteTransition.animateFloat(
         initialValue = -2f,
         targetValue = 2f,
@@ -55,7 +52,6 @@ fun HeroSection(
         )
     )
 
-    // Pulse animation
     val pulse by infiniteTransition.animateFloat(
         initialValue = 0.96f,
         targetValue = 1.04f,
@@ -77,13 +73,16 @@ fun HeroSection(
             .shadow(
                 elevation = 24.dp,
                 shape = RoundedCornerShape(40.dp),
-                ambientColor = page.primaryColor.copy(0.5f),
-                spotColor = page.secondaryColor.copy(0.6f)
+                ambientColor = page.colors.primary.copy(0.45f),
+                spotColor = page.colors.secondary.copy(0.6f)
             )
             .clip(RoundedCornerShape(40.dp))
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(page.primaryColor, page.secondaryColor)
+                    colors = listOf(
+                        page.colors.primary,
+                        page.colors.secondary
+                    )
                 )
             ),
         contentAlignment = Alignment.Center
