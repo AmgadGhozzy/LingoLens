@@ -42,7 +42,6 @@ import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
 import com.venom.lingospell.domain.Slot
 import com.venom.lingospell.domain.SlotStatus
-import com.venom.lingospell.ui.theme.SpellingDimens
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.SemanticColors
@@ -104,7 +103,7 @@ fun WordSlot(
 
     Box(
         modifier = modifier
-            .size(SpellingDimens.slotWidth, SpellingDimens.slotHeight)
+            .size(64.dp, 80.dp)
             .offset(y = offsetY)
             .scale(scale)
             .then(

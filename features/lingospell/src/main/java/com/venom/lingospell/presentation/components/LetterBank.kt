@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
-import com.venom.lingospell.ui.theme.SpellingDimens
 import com.venom.resources.R
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
@@ -63,16 +62,16 @@ fun LetterBank(
             .shadow(
                 elevation = 48.dp,
                 shape = RoundedCornerShape(
-                    topStart = SpellingDimens.letterBankRadius,
-                    topEnd = SpellingDimens.letterBankRadius
+                    topStart = 40.dp,
+                    topEnd = 40.dp
                 ),
                 ambientColor = MaterialTheme.lingoLens.feature.spelling.shadowPrimary,
                 spotColor = MaterialTheme.lingoLens.feature.spelling.shadowPrimary
             )
             .clip(
                 RoundedCornerShape(
-                    topStart = SpellingDimens.letterBankRadius,
-                    topEnd = SpellingDimens.letterBankRadius
+                    topStart = 40.dp,
+                    topEnd = 40.dp
                 )
             )
             .background(MaterialTheme.colorScheme.surfaceContainer)
