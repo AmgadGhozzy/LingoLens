@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun SectionHeader(
     title: String,
-    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -27,6 +26,5 @@ fun SectionHeader(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
-        //icon()
     }
 }
