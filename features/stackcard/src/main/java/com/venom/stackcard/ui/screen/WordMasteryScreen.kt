@@ -78,7 +78,9 @@ fun WordMasteryScreen(
 
             uiState.visibleCards.isEmpty() && uiState.processedCardsCount > 0 -> {
                 SessionFinishedView(
-                    onRegenerate = { viewModel.onEvent(WordMasteryEvent.RegenerateWords) }
+                    onBackToWelcome = { viewModel.onEvent(WordMasteryEvent.BackToWelcome) },
+                    onExit = onBack,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
