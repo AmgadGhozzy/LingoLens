@@ -11,7 +11,7 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.QuickTr"
+            android:theme="@style/Theme.LingoLens.QuickTranslate"
             android:taskAffinity=""
             android:documentLaunchMode="always">
 

@@ -97,14 +97,14 @@ private fun ProviderItem(
         Surface(
             shape = CircleShape,
             color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
-            else MaterialTheme.colorScheme.secondaryContainer.copy(0.5f),
+            else MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 painter = painterResource(provider.iconResId),
                 contentDescription = null,
                 tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                else MaterialTheme.colorScheme.onSecondaryContainer,
+                else MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(8.dp)
             )
         }

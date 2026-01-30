@@ -145,7 +145,12 @@ fun TranslationScreen(
             onShare = { text ->
                 runCatching { context.shareText(text) }.onFailure { snackbarController.error(R.string.failed_to_share) }
             },
-            onSpeak = ttsViewModel::speak,
+            onSpeak = { text ->
+                ttsViewModel.speakWithGroq(
+                    text,
+                    langSelectorState.targetLang.code
+                )
+            },
             onBookmark = viewModel::toggleBookmark,
             onSpeechToTextStart = {
                 sttViewModel.startRecognition()
