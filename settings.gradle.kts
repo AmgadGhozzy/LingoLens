@@ -43,4 +43,5 @@ include(":core:di")
 include(":core:resources")
 include(":core:utils")
 include(":core:domain")
+include(":core:analytics")
 
