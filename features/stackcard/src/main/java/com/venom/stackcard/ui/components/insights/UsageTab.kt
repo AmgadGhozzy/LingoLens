@@ -50,8 +50,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.CefrLevel
@@ -59,17 +57,14 @@ import com.venom.domain.model.WordMaster
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.InteractiveText
 import com.venom.stackcard.ui.components.mastery.SectionHeader
-import com.venom.ui.theme.BrandColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.getCefrColorScheme
 
 /**
  * Usage tab content for Insights sheet.
- *
- * Displays:
- * - Teacher's Tip card with Amber glassmorphism
- * - Common Collocations as outlined chips (no background)
- * - Contextual Examples with smart word highlighting and 0.3s animations
  *
  * @param word The word to display usage information for
  * @param onSpeak Callback for TTS with text and rate
@@ -102,16 +97,16 @@ fun UsageTab(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(24.dp)
-            .padding(bottom = 40.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(24.adp)
+            .padding(bottom = 40.adp),
+        verticalArrangement = Arrangement.spacedBy(24.adp)
     ) {
-        // Teacher's Tip - Amber glassmorphism
+        // Teacher's Tip
         if (hasUsageNote) {
             TeachersTipCard(usageNote = word.usageNote!!)
         }
 
-        // Collocations - Outlined chips
+        // Collocations
         if (hasCollocations) {
             CollocationsSection(
                 collocations = word.collocations,
@@ -123,7 +118,7 @@ fun UsageTab(
         if (hasExamples) {
             ContextualExamplesSection(
                 examples = word.examples,
-                targetWord = word.wordEn, // NEW: Pass word for highlighting
+                targetWord = word.wordEn,
                 userCefrLevel = userCefrLevel,
                 onSpeak = onSpeak
             )
@@ -132,74 +127,76 @@ fun UsageTab(
 }
 
 /**
- * Teacher's Tip - Amber glassmorphism with watermark
+ * Teacher's Tip card
  */
 @Composable
 private fun TeachersTipCard(
     usageNote: String,
     modifier: Modifier = Modifier
 ) {
+    val tipColors = MaterialTheme.lingoLens.feature.tip
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(BrandColors.Amber400.copy(alpha = 0.12f))
+            .clip(RoundedCornerShape(20.adp))
+            .background(tipColors.background)
             .border(
-                1.dp,
-                BrandColors.Amber500.copy(alpha = 0.25f),
-                RoundedCornerShape(20.dp)
+                1.adp,
+                tipColors.border,
+                RoundedCornerShape(20.adp)
             )
-            .padding(20.dp)
+            .padding(20.adp)
     ) {
         // Watermark lightbulb
         Icon(
             painter = painterResource(id = R.drawable.ic_lightbulb),
             contentDescription = null,
             modifier = Modifier
-                .size(120.dp)
+                .size(120.adp)
                 .align(Alignment.TopEnd)
-                .offset(x = 16.dp, y = (-16).dp)
+                .offset(x = 16.adp, y = (-16).adp)
                 .alpha(0.06f)
                 .rotate(12f),
-            tint = BrandColors.Amber500
+            tint = tipColors.accent
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.adp)) {
             // Header
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.adp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(32.adp)
                         .clip(CircleShape)
-                        .background(BrandColors.Amber400.copy(alpha = 0.2f)),
+                        .background(tipColors.iconBackground),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_student),
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = BrandColors.Amber600
+                        modifier = Modifier.size(16.adp),
+                        tint = tipColors.accent
                     )
                 }
                 Text(
                     text = stringResource(R.string.mastery_teachers_tip).uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 1.5.sp
+                        letterSpacing = 1.5.asp
                     ),
-                    color = BrandColors.Amber600
+                    color = tipColors.text
                 )
             }
 
-            // Usage note
+            // Usage note text
             Text(
                 text = "\"$usageNote\"",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontStyle = FontStyle.Italic,
-                    lineHeight = 24.sp
+                    lineHeight = 24.asp
                 ),
                 color = MaterialTheme.colorScheme.onSurface.copy(0.9f)
             )
@@ -208,7 +205,7 @@ private fun TeachersTipCard(
 }
 
 /**
- * Collocations section - Outlined chips with no background
+ * Collocations section
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -217,50 +214,70 @@ private fun CollocationsSection(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val collocationColors = MaterialTheme.lingoLens.feature.collocation
+
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_collocations),
             icon = painterResource(id = R.drawable.ic_link)
         )
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             collocations.forEach { collocation ->
-                InteractiveText(
+                CollocationChip(
                     text = collocation,
+                    textColor = collocationColors.text,
+                    borderColor = collocationColors.border,
                     onSpeak = onSpeak
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.Transparent) // NO BACKGROUND
-                            .border(
-                                width = 1.5.dp,
-                                color = MaterialTheme.colorScheme.outline.copy(0.4f),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .padding(horizontal = 14.dp, vertical = 10.dp)
-                    ) {
-                        Text(
-                            text = collocation,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
+                )
             }
         }
     }
 }
 
 /**
- * Contextual examples - Accordion system with smart highlighting
+ * Collocation chip - Outlined style with theme colors
+ */
+@Composable
+private fun CollocationChip(
+    text: String,
+    textColor: Color,
+    borderColor: Color,
+    onSpeak: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    InteractiveText(
+        text = text,
+        onSpeak = onSpeak
+    ) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(12.adp))
+                .border(
+                    width = 1.5.adp,
+                    color = borderColor,
+                    shape = RoundedCornerShape(12.adp)
+                )
+                .padding(horizontal = 14.adp, vertical = 10.adp)
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = textColor
+            )
+        }
+    }
+}
+
+/**
+ * Contextual examples section with CEFR-level accordions
  */
 @Composable
 private fun ContextualExamplesSection(
@@ -272,25 +289,23 @@ private fun ContextualExamplesSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
-            title = stringResource(R.string.mastery_examples),
+            title = stringResource(R.string.mastery_contextual_examples),
             icon = painterResource(id = R.drawable.ic_quotes)
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            examples.entries
-                .sortedBy { it.key.ordinal }
-                .forEach { (level, example) ->
-                    ExampleAccordionItem(
-                        level = level,
-                        example = example,
-                        targetWord = targetWord,
-                        isUserLevel = level == userCefrLevel,
-                        onSpeak = onSpeak
-                    )
-                }
+        Column(verticalArrangement = Arrangement.spacedBy(10.adp)) {
+            examples.entries.zip(CefrLevel.entries).forEach { (example, level) ->
+                ExampleAccordionItem(
+                    level = level,
+                    example = example.value,
+                    targetWord = targetWord,
+                    isUserLevel = level == userCefrLevel,
+                    onSpeak = onSpeak
+                )
+            }
         }
     }
 }
@@ -322,16 +337,16 @@ private fun ExampleAccordionItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.adp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(
-                width = if (isUserLevel) 1.dp else 0.5.dp,
+                width = if (isUserLevel) 1.adp else 0.5.adp,
                 color = if (isUserLevel) {
                     MaterialTheme.colorScheme.primary.copy(0.3f)
                 } else {
                     MaterialTheme.colorScheme.outline.copy(0.2f)
                 },
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.adp)
             )
     ) {
         // Header (always visible)
@@ -342,31 +357,31 @@ private fun ExampleAccordionItem(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 ) { isExpanded = !isExpanded }
-                .padding(14.dp),
+                .padding(14.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.adp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // CEFR badge - color-coded
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(6.adp))
                         .background(cefrColors.background)
                         .border(
-                            0.5.dp,
+                            0.5.adp,
                             cefrColors.border,
-                            RoundedCornerShape(6.dp)
+                            RoundedCornerShape(6.adp)
                         )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.adp, vertical = 4.adp)
                 ) {
                     Text(
                         text = level.displayName,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp
+                            fontSize = 10.asp
                         ),
                         color = cefrColors.content
                     )
@@ -376,16 +391,16 @@ private fun ExampleAccordionItem(
                 if (isUserLevel) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(4.adp))
                             .background(MaterialTheme.colorScheme.primary.copy(0.15f))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .padding(horizontal = 6.adp, vertical = 2.adp)
                     ) {
                         Text(
                             text = "YOUR LEVEL",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 8.sp,
-                                letterSpacing = 0.8.sp
+                                fontSize = 8.asp,
+                                letterSpacing = 0.8.asp
                             ),
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -398,7 +413,7 @@ private fun ExampleAccordionItem(
                 painter = painterResource(id = R.drawable.ic_caret_down),
                 contentDescription = if (isExpanded) "Collapse" else "Expand",
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(16.adp)
                     .rotate(rotationAngle),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
             )
@@ -425,15 +440,15 @@ private fun ExampleAccordionItem(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 14.dp, end = 14.dp, bottom = 14.dp)
+                        .padding(start = 14.adp, end = 14.adp, bottom = 14.adp)
                 ) {
                     // Divider
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 12.dp)
+                            .padding(bottom = 12.adp)
                             .background(MaterialTheme.colorScheme.outline.copy(0.1f))
-                            .size(height = 1.dp, width = 1.dp)
+                            .size(height = 1.adp, width = 1.adp)
                     )
 
                     // Smart highlighted text
@@ -463,25 +478,36 @@ private fun HighlightedExampleText(
             val lowerExample = example.lowercase()
             val lowerTarget = targetWord.lowercase()
 
-            // Find all occurrences of the word (including variations)
+            // Find all occurrences of the word (with word boundary checking)
             var lastIndex = 0
             var currentIndex = lowerExample.indexOf(lowerTarget, lastIndex)
 
             while (currentIndex != -1) {
-                // Append text before match
-                append(example.substring(lastIndex, currentIndex))
+                // Check word boundaries: character before and after should not be a letter
+                val isWordStart = currentIndex == 0 || !lowerExample[currentIndex - 1].isLetter()
+                val isWordEnd = currentIndex + lowerTarget.length >= lowerExample.length ||
+                        !lowerExample[currentIndex + lowerTarget.length].isLetter()
 
-                // Append highlighted match
-                withStyle(
-                    style = SpanStyle(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = primaryColor
-                    )
-                ) {
-                    append(example.substring(currentIndex, currentIndex + lowerTarget.length))
+                if (isWordStart && isWordEnd) {
+                    // Append text before match
+                    append(example.substring(lastIndex, currentIndex))
+
+                    // Append highlighted match
+                    withStyle(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.ExtraBold,
+                            color = primaryColor
+                        )
+                    ) {
+                        append(example.substring(currentIndex, currentIndex + lowerTarget.length))
+                    }
+
+                    lastIndex = currentIndex + lowerTarget.length
+                } else {
+                    // Skip this match as it's part of another word
+                    lastIndex = currentIndex + 1
                 }
 
-                lastIndex = currentIndex + lowerTarget.length
                 currentIndex = lowerExample.indexOf(lowerTarget, lastIndex)
             }
 
@@ -495,8 +521,8 @@ private fun HighlightedExampleText(
     Text(
         text = annotatedString,
         style = MaterialTheme.typography.bodyMedium.copy(
-            lineHeight = 22.sp
-            ,color = MaterialTheme.colorScheme.onSurface
+            lineHeight = 22.asp,
+            color = MaterialTheme.colorScheme.onSurface
         ),
         modifier = modifier
     )
