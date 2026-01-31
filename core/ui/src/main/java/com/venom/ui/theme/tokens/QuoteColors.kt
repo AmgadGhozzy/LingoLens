@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.venom.ui.theme.BrandColors as B
 
-/** Colors for the Quote feature. */
 @Immutable
 data class QuoteColors(
     val accent: Color,

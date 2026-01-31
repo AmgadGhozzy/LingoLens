@@ -70,3 +70,9 @@ fun getCefrColorScheme(level: CefrLevel): CefrColorScheme {
         CefrLevel.C1, CefrLevel.C2 -> colors.advanced
     }
 }
+
+@Composable
+@ReadOnlyComposable
+fun getThemeColorForLevel(cefrLevel: CefrLevel): Color {
+    return getCefrColorScheme(cefrLevel).content
+}

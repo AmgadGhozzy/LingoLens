@@ -16,11 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.tokens.DarkCefrColors
 import com.venom.ui.theme.tokens.DarkDifficultyColors
 import com.venom.ui.theme.tokens.DarkFeatureColors
@@ -40,23 +41,6 @@ import com.venom.ui.theme.tokens.LocalGlassColors
 import com.venom.ui.theme.tokens.LocalSemanticColors
 import com.venom.ui.theme.tokens.LocalStickyColors
 
-/**
- * LingoLens Application Theme
- *
- * Unified theme wrapper that provides:
- * - Material 3 ColorScheme (via MaterialTheme.colorScheme)
- * - Semantic Colors (via MaterialTheme.lingoLens.semantic)
- * - Glass Colors (via MaterialTheme.lingoLens.glass)
- * - Feature Colors (via MaterialTheme.lingoLens.feature)
- * - CEFR Colors (via MaterialTheme.lingoLens.cefr)
- *
- * @param primaryColor Base color for dynamic color generation (Material You)
- * @param isAmoledBlack Enable pure black backgrounds for OLED displays
- * @param materialYou Enable dynamic color extraction from wallpaper
- * @param appTheme Theme mode (LIGHT, DARK, SYSTEM)
- * @param colorStyle Palette style for dynamic color generation
- * @param fontFamilyStyle Typography font family
- */
 @Composable
 fun LingoLensTheme(
     primaryColor: Color = BrandColors.Blue500,
@@ -70,21 +54,18 @@ fun LingoLensTheme(
     val view = LocalView.current
     val fontFamily = remember(fontFamilyStyle) { fontFamilyStyle.toFontFamily() }
 
-    // Determine light/dark mode
     val isDark = when (appTheme) {
         AppTheme.DARK -> true
         AppTheme.LIGHT -> false
         AppTheme.SYSTEM -> isSystemInDarkTheme()
     }
 
-    // Extract color from wallpaper or system when Material You is enabled
     val keyColor = when {
         materialYou && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             primaryColor
         }
 
         materialYou && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 -> {
-            // Android 8.1+ with wallpaper color extraction
             val extractedColor = remember {
                 try {
                     WallpaperManager.getInstance(view.context)
@@ -101,18 +82,15 @@ fun LingoLensTheme(
         else -> primaryColor
     }
 
-    // Track surface color for window decorations
     var surfaceColor by remember { mutableStateOf(Color.Transparent) }
 
-    // Generate color scheme
-    // When Material You is enabled, use dynamic colors; otherwise use our static schemes
     val colorScheme = if (materialYou) {
         createDynamicColorScheme(
             keyColor = keyColor,
             style = colorStyle,
             isDark = isDark,
             isAmoledBlack = isAmoledBlack,
-            contrastLevel = if (isDark) 1.2 else 1.0  // Higher contrast for dark mode
+            contrastLevel = if (isDark) 1.2 else 1.0
         )
     } else {
         when {
@@ -122,7 +100,6 @@ fun LingoLensTheme(
         }
     }
 
-    // Handle window insets and system bars
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
@@ -136,7 +113,6 @@ fun LingoLensTheme(
     }
 
 
-    // Provide all custom colors via CompositionLocal
     val semanticColors = if (isDark) DarkSemanticColors else LightSemanticColors
     val glassColors = if (isDark) DarkGlassColors else LightGlassColors
     val featureColors = if (isDark) DarkFeatureColors else LightFeatureColors
@@ -159,14 +135,14 @@ fun LingoLensTheme(
         )
     }
 
-    surfaceColor = colorScheme.surfaceColorAtElevation(3.dp)
+    surfaceColor = colorScheme.surfaceColorAtElevation(3.adp)
 }
 
 object SettingsSpacing {
-    val cardPadding = 16.dp
-    val itemSpacing = 12.dp
-    val contentPadding = 20.dp
-    val iconSize = 24.dp
-    val badgeSize = 8.dp
-    val colorPreviewSize = 24.dp
+    val cardPadding: Dp @Composable get() = 16.adp
+    val itemSpacing: Dp @Composable get() = 12.adp
+    val contentPadding: Dp @Composable get() = 20.adp
+    val iconSize: Dp @Composable get() = 24.adp
+    val badgeSize: Dp @Composable get() = 8.adp
+    val colorPreviewSize: Dp @Composable get() = 24.adp
 }

@@ -22,7 +22,6 @@ data class StickyColors(
     val blue: StickyColorScheme
 )
 
-
 val LightStickyColors = StickyColors(
     yellow = StickyColorScheme(
         bg = B.Yellow50.copy(alpha = 0.96f),
@@ -56,7 +55,6 @@ val LightStickyColors = StickyColors(
         tape = B.Blue300.copy(alpha = 0.85f)
     )
 )
-
 
 val DarkStickyColors = StickyColors(
     yellow = StickyColorScheme(
