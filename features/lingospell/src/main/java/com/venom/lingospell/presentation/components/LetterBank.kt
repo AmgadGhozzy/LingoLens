@@ -32,11 +32,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 
@@ -60,28 +60,28 @@ fun LetterBank(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 48.dp,
+                elevation = 48.adp,
                 shape = RoundedCornerShape(
-                    topStart = 40.dp,
-                    topEnd = 40.dp
+                    topStart = 40.adp,
+                    topEnd = 40.adp
                 ),
                 ambientColor = MaterialTheme.lingoLens.feature.spelling.shadowPrimary,
                 spotColor = MaterialTheme.lingoLens.feature.spelling.shadowPrimary
             )
             .clip(
                 RoundedCornerShape(
-                    topStart = 40.dp,
-                    topEnd = 40.dp
+                    topStart = 40.adp,
+                    topEnd = 40.adp
                 )
             )
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 24.dp, vertical = 24.dp)
+            .padding(horizontal = 24.adp, vertical = 24.adp)
     ) {
         // Controls Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -101,13 +101,13 @@ fun LetterBank(
                         onClear()
                     },
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.adp)
             ) {
                 Icon(
                     painter = painterResource(R.drawable.icon_rotate),
                     contentDescription = "Reset",
                     modifier = Modifier
-                        .size(14.dp)
+                        .size(14.adp)
                         .rotate(rotation),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -124,10 +124,10 @@ fun LetterBank(
             columns = GridCells.Fixed(5),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 8.dp)
+                .padding(top = 24.adp),
+            horizontalArrangement = Arrangement.spacedBy(12.adp),
+            verticalArrangement = Arrangement.spacedBy(12.adp),
+            contentPadding = PaddingValues(bottom = 8.adp)
         ) {
             itemsIndexed(
                 items = visibleLetters,

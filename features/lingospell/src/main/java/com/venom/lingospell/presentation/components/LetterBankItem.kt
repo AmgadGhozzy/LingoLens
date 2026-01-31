@@ -33,11 +33,11 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 
@@ -81,12 +81,13 @@ fun LetterBankItem(
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
 
-            val baseElevation = 4.dp
-            val pressedElevation = 1.dp
+            val baseElevation = 4.adp
+            val pressedElevation = 1.adp
             val elevation = if (isPressed) pressedElevation else baseElevation
 
+            val targetOffset = if (isPressed) 4.adp else 0.adp
             val offsetY by animateDpAsState(
-                targetValue = if (isPressed) 4.dp else 0.dp,
+                targetValue = targetOffset,
                 animationSpec = spring(stiffness = Spring.StiffnessHigh),
                 label = "letterOffsetY"
             )
@@ -96,16 +97,16 @@ fun LetterBankItem(
                     .offset(y = offsetY)
                     .shadow(
                         elevation = elevation,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(16.adp),
                         ambientColor = shadowColor.copy(0.5f),
                         spotColor = shadowColor
                     )
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.adp))
                     .background(MaterialTheme.lingoLens.feature.spelling.surfaceTile)
                     .border(
-                        width = 1.dp,
+                        width = 1.adp,
                         color = MaterialTheme.colorScheme.outline.copy(0.5f),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.adp)
                     )
                     .combinedClickable(
                         interactionSource = interactionSource,
@@ -122,7 +123,7 @@ fun LetterBankItem(
                 Text(
                     text = letter.char.toString(),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 22.sp,
+                        fontSize = 22.asp,
                         fontWeight = FontWeight.Black
                     ),
                     color = MaterialTheme.colorScheme.onSurface
@@ -138,7 +139,7 @@ fun LetterBankItem(
         ) {
             Box(
                 modifier = Modifier
-                    .size(16.dp)
+                    .size(16.adp)
                     .background(
                         MaterialTheme.colorScheme.outlineVariant.copy(0.5f),
                         CircleShape
@@ -155,7 +156,7 @@ private fun LetterBankItemLightPreview() {
         LetterBankItem(
             letter = Letter(id = "1", char = 'A', status = LetterStatus.AVAILABLE),
             onClick = {},
-            modifier = Modifier.size(60.dp, 66.dp)
+            modifier = Modifier.size(60.adp, 66.adp)
         )
     }
 }
@@ -167,7 +168,7 @@ private fun LetterBankItemDarkPreview() {
         LetterBankItem(
             letter = Letter(id = "1", char = 'B', status = LetterStatus.USED),
             onClick = {},
-            modifier = Modifier.size(60.dp, 66.dp)
+            modifier = Modifier.size(60.adp, 66.adp)
         )
     }
 }
