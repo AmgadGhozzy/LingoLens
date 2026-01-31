@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -76,6 +75,11 @@ fun CardBack(
     val difficultyTheme = getDifficultyTheme(word.difficultyScore)
     val scrollState = rememberScrollState()
 
+    // Stable lambda for speaking Arabic
+    val speakArabic = remember(word.arabicAr, onSpeak) {
+        { onSpeak(word.arabicAr) }
+    }
+
     GradientGlassCard(
         modifier = modifier.fillMaxWidth(),
         thickness = GlassThickness.UltraThick,
@@ -97,19 +101,20 @@ fun CardBack(
             isBookmarked = isBookmarked,
             onBookmarkToggle = onBookmarkToggle
         )
-        Spacer(Modifier.height(20.dp))
+
         // Scrollable content
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(scrollState)
+                .padding(top = 20.dp, bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // primary arabic word
+            // Primary arabic word
             DynamicStyledText(
                 text = word.arabicAr,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 maxFontSize = 40,
                 minFontSize = 30,
@@ -118,14 +123,11 @@ fun CardBack(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(Modifier.height(8.dp))
-
             // Phonetic Arabic
             Text(
                 text = word.phoneticAr,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    // Extra line height for diacritics
                     lineHeight = 30.sp,
                     fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
                 ),
@@ -133,172 +135,217 @@ fun CardBack(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.height(8.dp))
-
             // Transliteration with speaker
-            InteractiveText(
-                text = word.arabicAr,
-                onSpeak = onSpeak
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = word.translit,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontStyle = FontStyle.Italic,
-                            letterSpacing = 1.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            TransliterationRow(
+                transliteration = word.translit,
+                onClick = speakArabic
+            )
 
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_speaker_high),
-                            contentDescription = stringResource(R.string.mastery_speak),
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+            // Memory hook (sticky note)
+            word.mnemonicAr?.let { mnemonic ->
+                Box(modifier = Modifier.padding(top = 4.dp)) {
+                    StickyNoteCard(
+                        mnemonicText = mnemonic,
+                        wordId = word.id,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 
-            // memory hook (sticky note)
-            word.mnemonicAr?.let {
-                Spacer(Modifier.height(12.dp))
-                StickyNoteCard(
-                    mnemonicText = it,
-                    wordId = word.id,
+            // Definition block
+            Box(modifier = Modifier.padding(top = 16.dp)) {
+                DefinitionBlock(
+                    definitionEn = word.definitionEn,
+                    definitionAr = word.definitionAr
+                )
+            }
+
+            // Pinned language
+            pinnedLanguage?.translation?.let { translation ->
+                Box(modifier = Modifier.padding(top = 16.dp)) {
+                    PinnedLanguageCard(
+                        language = pinnedLanguage,
+                        translation = translation
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Extracted transliteration row for better composition
+ */
+@Composable
+private fun TransliterationRow(
+    transliteration: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    InteractiveText(
+        text = "",
+        onSpeak = { onClick() }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+        ) {
+            Text(
+                text = transliteration,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontStyle = FontStyle.Italic,
+                    letterSpacing = 1.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_speaker_high),
+                    contentDescription = stringResource(R.string.mastery_speak),
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Extracted definition block for better composition and reusability
+ */
+@Composable
+private fun DefinitionBlock(
+    definitionEn: String,
+    definitionAr: String?,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline.copy(0.2f),
+                RoundedCornerShape(20.dp)
+            )
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_book_open),
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = stringResource(R.string.mastery_meaning).uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    fontSize = 10.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        // English definition
+        DynamicStyledText(
+            text = definitionEn,
+            maxFontSize = 24,
+            minFontSize = 18,
+            lineHeight = 20,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        // Arabic definition (if exists)
+        definitionAr?.let { arabicDef ->
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                color = MaterialTheme.colorScheme.outline.copy(0.2f)
+            )
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                DynamicStyledText(
+                    text = arabicDef,
+                    maxFontSize = 24,
+                    minFontSize = 18,
+                    lineHeight = 24,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                    textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
+    }
+}
 
-            Spacer(Modifier.height(24.dp))
+/**
+ * Pinned language card
+ */
+@Composable
+private fun PinnedLanguageCard(
+    language: LanguageOption,
+    translation: String,
+    modifier: Modifier = Modifier
+) {
 
-            // definition block
+    InteractiveText(
+        text = translation
+    ) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
+                .border(
+                    1.dp,
+                    MaterialTheme.colorScheme.outline.copy(0.2f),
+                    RoundedCornerShape(16.dp)
+                )
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.outline.copy(0.2f),
-                        RoundedCornerShape(20.dp)
-                    )
-                    .padding(20.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Header
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_book_open),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(R.string.mastery_meaning).uppercase(),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.5.sp,
-                            fontSize = 10.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Spacer(Modifier.height(12.dp))
-                DynamicStyledText(
-                    text = word.definitionEn,
-                    maxFontSize = 24,
-                    minFontSize = 18,
-                    lineHeight = 20,
+                Text(
+                    text = language.langName.uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp,
+                        fontSize = 9.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                // Arabic definition
-                word.definitionAr?.let {
-                    HorizontalDivider(
-                        Modifier.padding(vertical = 24.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(0.2f)
-                    )
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                        DynamicStyledText(
-                            text = it,
-                            maxFontSize = 24,
-                            minFontSize = 18,
-                            lineHeight = 24,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            // pinned language
-            pinnedLanguage?.translation?.let { translation ->
-                Spacer(Modifier.height(24.dp))
-                InteractiveText(
+                Text(
                     text = translation,
-                    onSpeak = onSpeak
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.outline.copy(0.2f),
-                                RoundedCornerShape(16.dp)
-                            )
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = pinnedLanguage.langName.uppercase(),
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.5.sp,
-                                    fontSize = 9.sp
-                                ),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = translation,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_push_pin_fill),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
-                        )
-                    }
-                }
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
 
-            // Spacer for scrolling padding
-            Spacer(Modifier.height(32.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_push_pin_fill),
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
+            )
         }
     }
 }
