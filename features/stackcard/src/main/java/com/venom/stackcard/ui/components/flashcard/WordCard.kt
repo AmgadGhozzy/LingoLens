@@ -8,58 +8,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.stackcard.ui.components.mastery.CardBack
 import com.venom.stackcard.ui.components.mastery.CardFront
 
 /**
- * Main Word Mastery card with 3D flip animation.
+ * 3D flip card using alpha + zIndex for smooth visibility transitions.
  *
- * Swipe Gesture Engine. All state is hoisted to the parent or ViewModel.
+ * GLITCH-FREE APPROACH:
+ * - Both faces always composed (no recomposition at 90°)
+ * - Alpha controls GPU visibility (0 or 1, no animation)
+ * - zIndex controls touch priority (visible face on top)
  *
- * Features:
- * - 3D Y-axis rotation flip animation (400ms duration)
- * - Front face shows English word and hints
- * - Back face shows Arabic translation and definitions
- * - Tap anywhere to flip
- *
- * @param word The word data to display
- * @param isFlipped Current flip state (false = front, true = back)
- * @param isBookmarked Current bookmark state
- * @param isHintRevealed Whether the blur hint on front is revealed
- * @param pinnedLanguage Optional language pinned to show on back
- * @param onFlip Callback when card is tapped to flip
- * @param onSpeak Callback for TTS with text and rate
- * @param onBookmarkToggle Callback when bookmark is toggled
- * @param onRevealHint Callback when hint reveal button is tapped
- * @param modifier Modifier for styling
+ * @param word WordMaster instance with all card data
+ * @param isFlipped Boolean state (for external logic)
+ * @param animatedRotationY Current Y-axis rotation (0° = front, 180° = back)
+ * @param isBookmarked Bookmark state
+ * @param isHintRevealed Whether blur hint on front is revealed
+ * @param pinnedLanguage Optional language to show on back
+ * @param onFlip Callback when card is flipped
+ * @param onSpeak TTS callback
+ * @param onBookmarkToggle Bookmark toggle callback
+ * @param onRevealHint Hint reveal callback
  */
 @Composable
 fun WordCard(
     word: WordMaster,
-    isFlipped: Boolean,
     animatedRotationY: Float,
     isBookmarked: Boolean,
     isHintRevealed: Boolean,
     pinnedLanguage: LanguageOption?,
-    onFlip: () -> Unit,
     onSpeak: (text: String) -> Unit,
     onBookmarkToggle: () -> Unit,
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.clip(RoundedCornerShape(32.dp))
-    ) {
+    val normalizedRotation = animatedRotationY % 360f
+    val effectiveRotation = if (normalizedRotation < 0) normalizedRotation + 360f else normalizedRotation
+    val showFront = effectiveRotation <= 90f || effectiveRotation >= 270f
 
-        // FRONT
+    Box(modifier = modifier.clip(RoundedCornerShape(32.dp))) {
+        // Front face
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer {
-                    alpha = if (animatedRotationY <= 90f) 1f else 0f
-                }
+                .zIndex(if (showFront) 1f else 0f)
+                .graphicsLayer { alpha = if (showFront) 1f else 0f }
         ) {
             CardFront(
                 word = word,
@@ -67,18 +63,18 @@ fun WordCard(
                 isHintRevealed = isHintRevealed,
                 onSpeak = onSpeak,
                 onBookmarkToggle = onBookmarkToggle,
-                onRevealHint = onRevealHint,
-                onFlip = onFlip
+                onRevealHint = onRevealHint
             )
         }
 
-        // BACK
+        // Back face
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .zIndex(if (showFront) 0f else 1f)
                 .graphicsLayer {
+                    alpha = if (!showFront) 1f else 0f
                     rotationY = 180f
-                    alpha = if (animatedRotationY > 90f) 1f else 0f
                 }
         ) {
             CardBack(

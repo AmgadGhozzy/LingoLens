@@ -41,9 +41,7 @@ fun SwipeIndicators(
     )
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -55,15 +53,14 @@ fun SwipeIndicators(
             Indicator(
                 text = stringResource(R.string.known),
                 icon = "✓",
-                if (offsetX > 0) progress else 0f,
+                alpha = if (offsetX > 0) progress else 0f,
                 color = BrandColors.Green500,
                 rotation = -8f + (progress * 8f)
             )
-
             Indicator(
                 text = stringResource(R.string.hard),
                 icon = "✗",
-                if (offsetX < 0) progress else 0f,
+                alpha = if (offsetX < 0) progress else 0f,
                 color = BrandColors.Red500,
                 rotation = 8f - (progress * 8f)
             )
@@ -98,12 +95,7 @@ private fun Indicator(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(text = icon, fontSize = 20.sp, color = Color.White)
-            Text(
-                text = text,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = text, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
