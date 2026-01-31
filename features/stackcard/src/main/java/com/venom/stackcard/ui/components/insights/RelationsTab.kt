@@ -26,31 +26,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.InteractiveText
 import com.venom.stackcard.ui.components.mastery.SectionHeader
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.theme.lingoLens
+import com.venom.ui.theme.tokens.getPosColor
 
 /**
  * Relations tab content for Insights sheet.
- *
- * Displays:
- * - Synonyms (Teal accent)
- * - Antonyms (Rose accent)
- * - Related concepts (bilingual EN/AR with opacity hierarchy)
- * - Word family (small cards with POS badges)
  *
  * @param word The word to display relations for
  * @param onSpeak Callback for TTS with text and rate
@@ -94,11 +89,11 @@ fun RelationsTab(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-            .padding(bottom = 40.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(horizontal = 24.adp, vertical = 24.adp)
+            .padding(bottom = 40.adp),
+        verticalArrangement = Arrangement.spacedBy(24.adp)
     ) {
-        // Synonyms - Teal accent
+        // Synonyms
         if (hasSynonyms) {
             SynonymsSection(
                 synonyms = word.synonyms,
@@ -106,7 +101,7 @@ fun RelationsTab(
             )
         }
 
-        // Antonyms - Rose accent
+        // Antonyms
         if (hasAntonyms) {
             AntonymsSection(
                 antonyms = word.antonyms,
@@ -123,7 +118,7 @@ fun RelationsTab(
             )
         }
 
-        // Word family - Small derivative cards
+        // Word family
         if (hasWordFamily) {
             WordFamilySection(
                 entries = wordFamilyEntries,
@@ -134,7 +129,7 @@ fun RelationsTab(
 }
 
 /**
- * Synonyms section - Teal accent
+ * Synonyms section
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -143,24 +138,26 @@ private fun SynonymsSection(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val synonymColors = MaterialTheme.lingoLens.feature.relation.synonym
+
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_synonyms),
             icon = painterResource(id = R.drawable.ic_equals)
         )
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             synonyms.forEach { synonym ->
                 RelationChip(
                     text = synonym,
-                    backgroundColor = Color(0xFF14B8A6).copy(alpha = 0.15f), // Teal-500 @ 15%
-                    borderColor = Color(0xFF14B8A6).copy(alpha = 0.3f),
-                    textColor = Color(0xFF0D9488), // Teal-600
+                    backgroundColor = synonymColors.background,
+                    borderColor = synonymColors.border,
+                    textColor = synonymColors.text,
                     onSpeak = onSpeak
                 )
             }
@@ -169,7 +166,7 @@ private fun SynonymsSection(
 }
 
 /**
- * Antonyms section - Rose accent
+ * Antonyms section
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -178,24 +175,26 @@ private fun AntonymsSection(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val antonymColors = MaterialTheme.lingoLens.feature.relation.antonym
+
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_antonyms),
             icon = painterResource(id = R.drawable.ic_arrows_left_right)
         )
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             antonyms.forEach { antonym ->
                 RelationChip(
                     text = antonym,
-                    backgroundColor = Color(0xFFF43F5E).copy(alpha = 0.15f), // Rose-500 @ 15%
-                    borderColor = Color(0xFFF43F5E).copy(alpha = 0.3f),
-                    textColor = Color(0xFFE11D48), // Rose-600
+                    backgroundColor = antonymColors.background,
+                    borderColor = antonymColors.border,
+                    textColor = antonymColors.text,
                     onSpeak = onSpeak
                 )
             }
@@ -215,13 +214,13 @@ private fun RelatedConceptsSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_related_concepts),
             icon = painterResource(id = R.drawable.ic_circles_three_plus)
         )
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.adp)) {
             englishWords.forEachIndexed { index, englishWord ->
                 val arabicWord = arabicWords.getOrNull(index)
 
@@ -236,7 +235,7 @@ private fun RelatedConceptsSection(
 }
 
 /**
- * Word family - Small derivative cards with POS badges
+ * Word family - Uses MaterialTheme.lingoLens.feature.relation.pos semantic colors
  */
 @Composable
 private fun WordFamilySection(
@@ -246,7 +245,7 @@ private fun WordFamilySection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_word_family),
@@ -258,12 +257,12 @@ private fun WordFamilySection(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.adp)
         ) {
             columns.forEach { columnItems ->
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.adp)
                 ) {
                     columnItems.forEach { (pos, term) ->
                         WordFamilyCard(
@@ -279,14 +278,14 @@ private fun WordFamilySection(
 }
 
 /**
- * Reusable relation chip
+ * Reusable relation chip with theme colors
  */
 @Composable
 private fun RelationChip(
     text: String,
-    backgroundColor: Color,
-    borderColor: Color,
-    textColor: Color,
+    backgroundColor: androidx.compose.ui.graphics.Color,
+    borderColor: androidx.compose.ui.graphics.Color,
+    textColor: androidx.compose.ui.graphics.Color,
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -296,14 +295,14 @@ private fun RelationChip(
     ) {
         Box(
             modifier = modifier
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.adp))
                 .background(backgroundColor)
                 .border(
-                    width = 1.dp,
+                    width = 1.adp,
                     color = borderColor,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.adp)
                 )
-                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .padding(horizontal = 14.adp, vertical = 10.adp)
         ) {
             Text(
                 text = text,
@@ -317,7 +316,7 @@ private fun RelationChip(
 }
 
 /**
- * Related concept item - Arabic at 60% opacity
+ * Related concept item - Arabic at 60% opacity for visual hierarchy
  */
 @Composable
 private fun RelatedConceptItem(
@@ -333,15 +332,15 @@ private fun RelatedConceptItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.adp))
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .border(
-                    width = 0.5.dp,
+                    width = 0.5.adp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.adp)
                 )
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                .padding(14.adp),
+            horizontalArrangement = Arrangement.spacedBy(10.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // English word (primary)
@@ -358,7 +357,7 @@ private fun RelatedConceptItem(
                 // Separator dot
                 Box(
                     modifier = Modifier
-                        .size(3.dp)
+                        .size(3.adp)
                         .clip(CircleShape)
                         .background(
                             MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
@@ -379,7 +378,7 @@ private fun RelatedConceptItem(
 }
 
 /**
- * Small word family card with POS badge
+ * Small word family card with semantic POS badge colors from getPosColor()
  */
 @Composable
 private fun WordFamilyCard(
@@ -388,15 +387,8 @@ private fun WordFamilyCard(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val posColor = remember(partOfSpeech) {
-        when (partOfSpeech.lowercase()) {
-            "noun" -> Color(0xFF3B82F6) // Blue
-            "verb" -> Color(0xFF10B981) // Green
-            "adj" -> Color(0xFFF59E0B) // Amber
-            "adv" -> Color(0xFF8B5CF6) // Purple
-            else -> Color(0xFF6B7280) // Gray
-        }
-    }
+    // Get semantic color based on POS type
+    val posColor = getPosColor(partOfSpeech)
 
     InteractiveText(
         text = term,
@@ -405,34 +397,34 @@ private fun WordFamilyCard(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.adp))
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .border(
-                    width = 0.5.dp,
+                    width = 0.5.adp,
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.adp)
                 )
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+                .padding(12.adp),
+            verticalArrangement = Arrangement.spacedBy(6.adp)
         ) {
-            // POS badge
+            // POS badge with semantic color
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
+                    .clip(RoundedCornerShape(6.adp))
                     .background(posColor.copy(alpha = 0.15f))
                     .border(
-                        0.5.dp,
+                        0.5.adp,
                         posColor.copy(alpha = 0.3f),
-                        RoundedCornerShape(6.dp)
+                        RoundedCornerShape(6.adp)
                     )
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .padding(horizontal = 8.adp, vertical = 3.adp)
             ) {
                 Text(
                     text = partOfSpeech.uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 8.sp,
-                        letterSpacing = 0.8.sp
+                        fontSize = 8.asp,
+                        letterSpacing = 0.8.asp
                     ),
                     color = posColor
                 )
