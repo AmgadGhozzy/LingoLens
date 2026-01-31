@@ -35,13 +35,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
 import com.venom.ui.components.common.DynamicStyledText
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
 import com.venom.ui.theme.BrandColors
@@ -112,8 +112,8 @@ fun CardFront(
         showBorder = true,
         showShadow = true,
         borderColor = difficultyTheme.border,
-        shape = RoundedCornerShape(32.dp),
-        contentPadding = 20.dp
+        shape = RoundedCornerShape(32.adp),
+        contentPadding = 20.adp
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -130,7 +130,7 @@ fun CardFront(
             // Hero word section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(12.adp, Alignment.CenterVertically),
                 modifier = Modifier
                     .weight(1.5f)
                     .fillMaxWidth()
@@ -147,24 +147,24 @@ fun CardFront(
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Black,
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.adp)
                     )
 
                     // Oxford badge + Rank
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalArrangement = Arrangement.spacedBy(2.adp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_seal_check),
                             contentDescription = stringResource(R.string.mastery_oxford_badge),
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(22.adp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             text = "#${word.rank}",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 9.sp,
+                                fontSize = 9.asp,
                                 fontWeight = FontWeight.Bold
                             ),
                             color = difficultyTheme.text // Matches difficulty bar
@@ -177,7 +177,7 @@ fun CardFront(
                     text = word.syllabify?.uppercase() ?: word.phoneticAr,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 3.sp,
+                        letterSpacing = 3.asp,
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.alpha(0.6f)
@@ -186,7 +186,7 @@ fun CardFront(
                 // Difficulty Meter
                 DifficultyMeter(word.difficultyScore)
 
-                Box(modifier = Modifier.padding(top = 8.dp)) {
+                Box(modifier = Modifier.padding(top = 8.adp)) {
                     PhoneticButton(
                         phonetic = word.phoneticUs,
                         onClick = speakWord
@@ -215,14 +215,14 @@ fun CardFront(
                             onSpeak = onSpeak,
                             speakOnTap = isHintRevealed,
                             modifier = Modifier
-                                .blur(blurAmount.dp)
+                                .blur(blurAmount.adp)
                                 .alpha(hintAlpha)
                         ) {
                             Text(
                                 text = "\"$hintExample\"",
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontStyle = FontStyle.Italic,
-                                    lineHeight = 26.sp,
+                                    lineHeight = 26.asp,
                                     fontWeight = FontWeight.Medium
                                 ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -260,18 +260,18 @@ private fun PhoneticButton(
                 .clip(RoundedCornerShape(50))
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
                 .border(
-                    0.5.dp,
+                    0.5.adp,
                     MaterialTheme.colorScheme.outline.copy(0.2f),
                     RoundedCornerShape(50)
                 )
-                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                .padding(start = 20.adp, end = 8.adp, top = 8.adp, bottom = 8.adp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             Text(
                 text = "/$phonetic/",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    letterSpacing = 1.sp,
+                    letterSpacing = 1.asp,
                     fontFamily = FontFamily.Monospace
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
@@ -279,13 +279,13 @@ private fun PhoneticButton(
             // Divider
             Box(
                 modifier = Modifier
-                    .width(1.dp)
-                    .height(16.dp)
+                    .width(1.adp)
+                    .height(16.adp)
                     .background(MaterialTheme.colorScheme.onBackground.copy(0.1f))
             )
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(40.adp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
                 contentAlignment = Alignment.Center
@@ -293,7 +293,7 @@ private fun PhoneticButton(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker_high),
                     contentDescription = stringResource(R.string.mastery_speak),
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.adp),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -310,19 +310,19 @@ private fun TapIndicator(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.adp),
         modifier = modifier.alpha(0.3f)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_hand_tap),
             contentDescription = null,
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(18.adp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = stringResource(R.string.mastery_tap_to_flip).uppercase(),
             style = MaterialTheme.typography.labelSmall.copy(
-                letterSpacing = 1.sp,
+                letterSpacing = 1.asp,
                 fontWeight = FontWeight.Bold
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -341,7 +341,7 @@ private fun CardFrontPreview() {
             onSpeak = { _ -> },
             onBookmarkToggle = {},
             onRevealHint = {},
-            modifier = Modifier.size(320.dp, 580.dp)
+            modifier = Modifier.size(320.adp, 580.adp)
         )
     }
 }
@@ -357,7 +357,7 @@ private fun CardFrontPreviewLight() {
             onSpeak = { _ -> },
             onBookmarkToggle = {},
             onRevealHint = {},
-            modifier = Modifier.size(320.dp, 580.dp)
+            modifier = Modifier.size(320.adp, 580.adp)
         )
     }
 }
