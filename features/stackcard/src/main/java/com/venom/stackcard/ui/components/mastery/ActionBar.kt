@@ -36,10 +36,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 
@@ -56,8 +56,8 @@ fun ActionBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+            .padding(horizontal = 8.adp),
+        horizontalArrangement = Arrangement.spacedBy(16.adp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularButton(
@@ -94,23 +94,23 @@ private fun CircularButton(
     IconButton(
         onClick = onClick,
         modifier = modifier
-            .size(56.dp)
+            .size(56.adp)
             .scale(scale)
             .shadow(
-                elevation = 12.dp,
+                elevation = 12.adp,
                 shape = CircleShape,
                 ambientColor = Color.Black.copy(0.2f),
                 spotColor = Color.Black.copy(0.2f)
             )
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.background)
-            .border(1.dp, Color.White.copy(0.1f), CircleShape),
+            .border(1.adp, Color.White.copy(0.1f), CircleShape),
         interactionSource = interactionSource
     ) {
         Icon(
             painter = painterResource(iconResId),
             contentDescription = contentDescription,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(24.adp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -128,19 +128,19 @@ private fun PracticeButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(56.dp)
+            .height(56.adp)
             .scale(scale)
             .shadow(
-                elevation = 12.dp,
-                shape = RoundedCornerShape(28.dp),
+                elevation = 12.adp,
+                shape = RoundedCornerShape(28.adp),
                 ambientColor = MaterialTheme.colorScheme.primary.copy(0.3f),
                 spotColor = MaterialTheme.colorScheme.primary.copy(0.3f)
             ),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(28.adp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
         ),
-        contentPadding = PaddingValues(0.dp),
+        contentPadding = PaddingValues(0.adp),
         interactionSource = interactionSource
     ) {
         Box(
@@ -153,24 +153,24 @@ private fun PracticeButton(
                             BrandColors.Blue700
                         )
                     ),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(28.adp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.adp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_pencil_simple),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(20.adp),
                     tint = Color.White
                 )
                 Text(
                     text = stringResource(R.string.mastery_practice),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    fontSize = 16.asp,
                     color = Color.White
                 )
             }
@@ -185,7 +185,7 @@ private fun ActionBarPreview() {
         Box(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.adp)
         ) {
             ActionBar(
                 onFlip = {},
@@ -203,7 +203,7 @@ private fun ActionBarPreviewLight() {
         Box(
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.adp)
         ) {
             ActionBar(
                 onFlip = {},

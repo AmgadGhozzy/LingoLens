@@ -31,14 +31,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
 import com.venom.ui.components.common.DynamicStyledText
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
 import com.venom.ui.theme.BrandColors
@@ -91,8 +91,8 @@ fun CardBack(
         showBorder = true,
         showShadow = true,
         borderColor = difficultyTheme.border,
-        shape = RoundedCornerShape(32.dp),
-        contentPadding = 20.dp
+        shape = RoundedCornerShape(32.adp),
+        contentPadding = 20.adp
     ) {
         FlashcardHeader(
             word = word,
@@ -107,9 +107,9 @@ fun CardBack(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(scrollState)
-                .padding(top = 20.dp, bottom = 32.dp),
+                .padding(top = 20.adp, bottom = 32.adp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             // Primary arabic word
             DynamicStyledText(
@@ -128,7 +128,7 @@ fun CardBack(
                 text = word.phoneticAr,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 30.sp,
+                    lineHeight = 30.asp,
                     fontFamily = MaterialTheme.typography.bodyLarge.fontFamily
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -143,7 +143,7 @@ fun CardBack(
 
             // Memory hook (sticky note)
             word.mnemonicAr?.let { mnemonic ->
-                Box(modifier = Modifier.padding(top = 4.dp)) {
+                Box(modifier = Modifier.padding(top = 4.adp)) {
                     StickyNoteCard(
                         mnemonicText = mnemonic,
                         wordId = word.id,
@@ -153,7 +153,7 @@ fun CardBack(
             }
 
             // Definition block
-            Box(modifier = Modifier.padding(top = 16.dp)) {
+            Box(modifier = Modifier.padding(top = 16.adp)) {
                 DefinitionBlock(
                     definitionEn = word.definitionEn,
                     definitionAr = word.definitionAr
@@ -162,7 +162,7 @@ fun CardBack(
 
             // Pinned language
             pinnedLanguage?.translation?.let { translation ->
-                Box(modifier = Modifier.padding(top = 16.dp)) {
+                Box(modifier = Modifier.padding(top = 16.adp)) {
                     PinnedLanguageCard(
                         language = pinnedLanguage,
                         translation = translation
@@ -188,21 +188,21 @@ private fun TransliterationRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
             modifier = modifier
         ) {
             Text(
                 text = transliteration,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontStyle = FontStyle.Italic,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.asp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(32.adp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
                 contentAlignment = Alignment.Center
@@ -210,7 +210,7 @@ private fun TransliterationRow(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker_high),
                     contentDescription = stringResource(R.string.mastery_speak),
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(16.adp),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -230,33 +230,33 @@ private fun DefinitionBlock(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.adp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
             .border(
-                1.dp,
+                1.adp,
                 MaterialTheme.colorScheme.outline.copy(0.2f),
-                RoundedCornerShape(20.dp)
+                RoundedCornerShape(20.adp)
             )
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(20.adp),
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         // Header
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_book_open),
                 contentDescription = null,
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(14.adp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = stringResource(R.string.mastery_meaning).uppercase(),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.5.sp,
-                    fontSize = 10.sp
+                    letterSpacing = 1.5.asp,
+                    fontSize = 10.asp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -274,7 +274,7 @@ private fun DefinitionBlock(
         // Arabic definition (if exists)
         definitionAr?.let { arabicDef ->
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
+                modifier = Modifier.padding(vertical = 12.adp),
                 color = MaterialTheme.colorScheme.outline.copy(0.2f)
             )
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -308,26 +308,26 @@ private fun PinnedLanguageCard(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.adp))
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
                 .border(
-                    1.dp,
+                    1.adp,
                     MaterialTheme.colorScheme.outline.copy(0.2f),
-                    RoundedCornerShape(16.dp)
+                    RoundedCornerShape(16.adp)
                 )
-                .padding(16.dp),
+                .padding(16.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.adp)
             ) {
                 Text(
                     text = language.langName.uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.5.sp,
-                        fontSize = 9.sp
+                        letterSpacing = 1.5.asp,
+                        fontSize = 9.asp
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -343,7 +343,7 @@ private fun PinnedLanguageCard(
             Icon(
                 painter = painterResource(id = R.drawable.ic_push_pin_fill),
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(18.adp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
             )
         }
@@ -360,7 +360,7 @@ private fun CardBackNoPinPreview() {
             pinnedLanguage = null,
             onSpeak = { _ -> },
             onBookmarkToggle = {},
-            modifier = Modifier.size(320.dp, 600.dp)
+            modifier = Modifier.size(320.adp, 600.adp)
         )
     }
 }
@@ -375,7 +375,7 @@ private fun CardBackNoPinPreviewLight() {
             pinnedLanguage = null,
             onSpeak = { _ -> },
             onBookmarkToggle = {},
-            modifier = Modifier.size(320.dp, 600.dp)
+            modifier = Modifier.size(320.adp, 600.adp)
         )
     }
 }

@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.BiDiFormatter
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.PlaypenSans
@@ -103,8 +103,8 @@ fun StickyNoteCard(
 
     Box(
         modifier = modifier
-            .padding(horizontal = 8.dp)
-            .padding(top = 24.dp)
+            .padding(horizontal = 8.adp)
+            .padding(top = 24.adp)
     ) {
         // Main Note Body
         Box(
@@ -119,8 +119,8 @@ fun StickyNoteCard(
                     stickyConfig = stickyConfig.copy(rotation = Random.nextFloat() * 6f - 3f)
                 }
                 .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(10.dp),
+                    elevation = 8.adp,
+                    shape = RoundedCornerShape(10.adp),
                     ambientColor = colorScheme.label.copy(0.2f)
                 )
                 // REALISTIC PAPER GRADIENT
@@ -136,10 +136,10 @@ fun StickyNoteCard(
                         startY = 0f,
                         endY = Float.POSITIVE_INFINITY
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.adp)
                 )
                 .border(
-                    width = 0.5.dp,
+                    width = 0.5.adp,
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             colorScheme.border.copy(0.6f),
@@ -147,31 +147,31 @@ fun StickyNoteCard(
                             colorScheme.border.copy(1f)
                         )
                     ),
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(10.adp)
                 )
-                .padding(20.dp)
+                .padding(20.adp)
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.adp)
             ) {
                 // "MEMORY HOOK" label
                 Text(
                     text = "MEMORY HOOK",
-                    fontSize = 10.sp,
+                    fontSize = 10.asp,
                     fontWeight = FontWeight.Black,
                     color = colorScheme.label,
-                    letterSpacing = 2.sp
+                    letterSpacing = 2.asp
                 )
 
                 // Mnemonic text with handwritten font
                 Text(
                     text = remember(mnemonicText) { BiDiFormatter.format(mnemonicText) },
-                    fontSize = 20.sp,
+                    fontSize = 20.asp,
                     color = colorScheme.text,
                     textAlign = TextAlign.Center,
-                    lineHeight = 32.sp,
+                    lineHeight = 32.asp,
                     fontFamily = PlaypenSans,
                     style = MaterialTheme.typography.bodyLarge.copy(textDirection = TextDirection.Content)
                 )
@@ -181,14 +181,14 @@ fun StickyNoteCard(
         // FROSTED TAPE with realistic translucency
         Box(
             modifier = Modifier
-                .offset(x = (stickyConfig.tapeOffset).dp, y = (-12).dp)
-                .width(80.dp)
-                .height(28.dp)
+                .offset(x = (stickyConfig.tapeOffset).adp, y = (-12).adp)
+                .width(80.adp)
+                .height(28.adp)
                 .rotate(-2f)
-                .blur(5.dp)
+                .blur(5.adp)
                 .alpha(0.8f)
                 .align(Alignment.TopCenter)
-                .shadow(2.dp, RoundedCornerShape(2.dp), ambientColor = Color.Black.copy(0.1f))
+                .shadow(2.adp, RoundedCornerShape(2.adp), ambientColor = Color.Black.copy(0.1f))
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
@@ -198,7 +198,7 @@ fun StickyNoteCard(
                             colorScheme.tape.copy(0.85f)
                         )
                     ),
-                    shape = RoundedCornerShape(2.dp)
+                    shape = RoundedCornerShape(2.adp)
                 )
         )
     }
@@ -209,8 +209,8 @@ fun StickyNoteCard(
 fun StickyNotePreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(24.adp),
+            verticalArrangement = Arrangement.spacedBy(16.adp)
         ) {
             StickyNoteCard(
                 mnemonicText = "The word (كلمة) means 'word' in Arabic - remember it by thinking of 'calm' words",
@@ -237,8 +237,8 @@ fun StickyNotePreview() {
 fun StickyNotePreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(24.adp),
+            verticalArrangement = Arrangement.spacedBy(16.adp)
         ) {
             StickyNoteCard(
                 mnemonicText = "The word (كلمة) means 'word' in Arabic",

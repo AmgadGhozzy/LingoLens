@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.CefrLevel
 import com.venom.domain.model.WordMaster
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.tokens.CefrColorScheme
 import com.venom.ui.theme.tokens.DifficultyTheme
 
@@ -95,22 +95,22 @@ private fun CefrBadge(
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(cefrColors.background)
-            .border(1.dp, cefrColors.border, RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .border(1.adp, cefrColors.border, RoundedCornerShape(50))
+            .padding(horizontal = 12.adp, vertical = 6.adp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.adp)
     ) {
         Text(
             text = cefrLevel.displayName,
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Black,
-                fontSize = 10.sp
+                fontSize = 10.asp
             ),
             color = cefrColors.content
         )
         Box(
             modifier = Modifier
-                .size(3.dp)
+                .size(3.adp)
                 .clip(CircleShape)
                 .background(cefrColors.content.copy(0.5f))
         )
@@ -118,8 +118,8 @@ private fun CefrBadge(
             text = pos.uppercase(),
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp,
-                fontSize = 10.sp
+                letterSpacing = 0.5.asp,
+                fontSize = 10.asp
             ),
             color = cefrColors.content
         )
@@ -136,15 +136,15 @@ private fun SemanticAnchorPill(
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(difficultyTheme.background)
-            .border(1.dp, difficultyTheme.border, RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .border(1.adp, difficultyTheme.border, RoundedCornerShape(50))
+            .padding(horizontal = 12.adp, vertical = 4.adp)
     ) {
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp,
-                fontSize = 9.sp
+                letterSpacing = 1.asp,
+                fontSize = 9.asp
             ),
             color = difficultyTheme.text
         )
