@@ -40,8 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.CefrLevel
@@ -53,37 +51,12 @@ import com.venom.stackcard.ui.components.mastery.InteractiveText
 import com.venom.stackcard.ui.components.mastery.PowerCell
 import com.venom.stackcard.ui.components.mastery.SectionHeader
 import com.venom.stackcard.ui.components.mastery.StatCell
-import com.venom.ui.theme.BrandColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.tokens.CefrColorScheme
 import com.venom.ui.theme.tokens.getCefrColorScheme
-
-/**
- * Helper function to get theme color for CEFR level
- * Used for mastery ring and other dynamic theming
- */
-@Composable
-fun getThemeColorForLevel(cefrLevel: CefrLevel, isDarkTheme: Boolean = true): Color {
-    return when (cefrLevel) {
-        CefrLevel.A1, CefrLevel.A2 -> if (isDarkTheme) {
-            BrandColors.Emerald400
-        } else {
-            BrandColors.Emerald600
-        }
-
-        CefrLevel.B1, CefrLevel.B2 -> if (isDarkTheme) {
-            BrandColors.Blue400
-        } else {
-            BrandColors.Blue600
-        }
-
-        CefrLevel.C1, CefrLevel.C2 -> if (isDarkTheme) {
-            BrandColors.Purple400
-        } else {
-            BrandColors.Purple600
-        }
-    }
-}
+import com.venom.ui.theme.tokens.getThemeColorForLevel
 
 /**
  * Overview tab content for Insights sheet.
@@ -123,8 +96,8 @@ fun OverviewTab(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 20.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(horizontal = 20.adp, vertical = 24.adp),
+        verticalArrangement = Arrangement.spacedBy(20.adp)
     ) {
         // 1. YOUR PROGRESS - With theme-colored ring
         YourProgressCard(
@@ -182,15 +155,15 @@ private fun YourProgressCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.adp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(
-                1.dp,
+                1.adp,
                 MaterialTheme.colorScheme.outline.copy(0.15f),
-                RoundedCornerShape(20.dp)
+                RoundedCornerShape(20.adp)
             )
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(20.adp),
+        verticalArrangement = Arrangement.spacedBy(16.adp)
     ) {
         SectionHeader(
             title = stringResource(R.string.mastery_your_progress),
@@ -206,20 +179,20 @@ private fun YourProgressCard(
             CircularProgressRing(
                 progress = animatedProgress,
                 cefrLevel = cefrLevel,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.adp)
             )
 
             HorizontalDivider(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 16.adp),
                 color = MaterialTheme.colorScheme.outline.copy(0.2f)
             )
 
             // Stats
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.adp)
             ) {
                 // Repetitions
                 Column(horizontalAlignment = Alignment.End) {
@@ -234,7 +207,7 @@ private fun YourProgressCard(
                         text = stringResource(R.string.mastery_repetitions).uppercase(),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
+                            letterSpacing = 1.asp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
                     )
@@ -242,29 +215,29 @@ private fun YourProgressCard(
 
                 // Next review
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.adp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = stringResource(R.string.mastery_next_review).uppercase(),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.8.sp,
-                            fontSize = 9.sp
+                            letterSpacing = 0.8.asp,
+                            fontSize = 9.asp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
                     )
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(6.adp))
                             .background(MaterialTheme.colorScheme.primary.copy(0.15f))
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                            .padding(horizontal = 8.adp, vertical = 3.adp)
                     ) {
                         Text(
                             text = nextReview,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp
+                                fontSize = 10.asp
                             ),
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -285,17 +258,18 @@ private fun CircularProgressRing(
     modifier: Modifier = Modifier
 ) {
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
-    val themeColor = getThemeColorForLevel(cefrLevel, isDarkTheme)
+    val themeColor = getThemeColorForLevel(cefrLevel)
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
     )
 
+    val strokeWidthDp = 8.adp
     Box(
         modifier = modifier
             .drawBehind {
-                val strokeWidth = 8.dp.toPx()
+                val strokeWidth = strokeWidthDp.toPx()
                 val radius = (size.minDimension - strokeWidth) / 2
 
                 // Background track
@@ -344,8 +318,8 @@ private fun CircularProgressRing(
                 text = "MASTERY",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.8.sp,
-                    fontSize = 8.sp
+                    letterSpacing = 0.8.asp,
+                    fontSize = 8.asp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
             )
@@ -363,38 +337,38 @@ private fun OxfordCoreBadge(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.adp))
             .background(MaterialTheme.colorScheme.primary.copy(0.1f))
             .border(
-                1.dp,
+                1.adp,
                 MaterialTheme.colorScheme.primary.copy(0.2f),
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(16.adp)
             )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(16.adp),
+        horizontalArrangement = Arrangement.spacedBy(12.adp),
         verticalAlignment = Alignment.Top
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_seal_check),
             contentDescription = null,
             modifier = Modifier
-                .padding(top = 4.dp)
-                .size(20.dp),
+                .padding(top = 4.adp)
+                .size(20.adp),
             tint = MaterialTheme.colorScheme.primary
         )
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.adp)) {
             Text(
                 text = stringResource(R.string.mastery_oxford_core).uppercase(),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
+                    letterSpacing = 1.asp
                 ),
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(R.string.mastery_oxford_description),
                 style = MaterialTheme.typography.bodySmall.copy(
-                    lineHeight = 18.sp
+                    lineHeight = 18.asp
                 ),
                 color = MaterialTheme.colorScheme.primary.copy(0.7f)
             )
@@ -413,7 +387,7 @@ private fun SemanticCloudSection(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         SectionHeader(
             title = "Semantic Cloud",
@@ -424,20 +398,20 @@ private fun SemanticCloudSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(scrollState),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             tags.forEach { tag ->
                 InteractiveText(text = tag) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(12.adp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                             .border(
-                                1.dp,
+                                1.adp,
                                 MaterialTheme.colorScheme.outline.copy(0.2f),
-                                RoundedCornerShape(12.dp)
+                                RoundedCornerShape(12.adp)
                             )
-                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                            .padding(horizontal = 14.adp, vertical = 10.adp)
                     ) {
                         Text(
                             text = tag,
@@ -470,36 +444,35 @@ private fun StatsGrid(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         // First row: Difficulty + Power
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             // Difficulty Cell
             StatCell(
                 label = stringResource(R.string.mastery_difficulty),
                 watermarkIcon = R.drawable.ic_chart_line_up,
-                modifier = Modifier.weight(1f),
-                iconOpacity = 0.08f // Enhanced from 0.05f
+                modifier = Modifier.weight(1f)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.adp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(RoundedCornerShape(4.adp))
                             .background(cefrColors.background)
-                            .border(0.5.dp, cefrColors.border, RoundedCornerShape(4.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .border(0.5.adp, cefrColors.border, RoundedCornerShape(4.adp))
+                            .padding(horizontal = 6.adp, vertical = 2.adp)
                     ) {
                         Text(
                             text = cefrLevel,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 9.sp
+                                fontSize = 9.asp
                             ),
                             color = cefrColors.content
                         )
@@ -508,7 +481,7 @@ private fun StatsGrid(
                         text = difficulty,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 11.sp
+                            fontSize = 11.asp
                         ),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -525,21 +498,20 @@ private fun StatsGrid(
         // Second row: Category + Register
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             // Category Cell
             category?.let {
                 StatCell(
                     label = stringResource(R.string.mastery_category),
                     watermarkIcon = R.drawable.ic_briefcase,
-                    modifier = Modifier.weight(1f),
-                    iconOpacity = 0.08f // Enhanced from 0.05f
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
+                            fontSize = 12.asp
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 2,
@@ -552,8 +524,7 @@ private fun StatsGrid(
             StatCell(
                 label = stringResource(R.string.mastery_register),
                 watermarkIcon = R.drawable.ic_scales,
-                modifier = Modifier.weight(1f),
-                iconOpacity = 0.08f // Enhanced from 0.05f
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = register,
