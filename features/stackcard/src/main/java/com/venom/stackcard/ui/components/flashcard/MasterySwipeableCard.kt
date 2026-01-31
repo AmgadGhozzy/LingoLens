@@ -1,14 +1,11 @@
 package com.venom.stackcard.ui.components.flashcard
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +13,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,14 +22,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.venom.data.mock.MockWordData
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.ui.theme.BrandColors
-import com.venom.ui.theme.LingoLensTheme
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -93,34 +86,32 @@ fun MasterySwipeableCard(
     val cardShape = RoundedCornerShape(32.dp)
 
     val absProgress = remember(swipeProgress) { abs(swipeProgress) }
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            isRestoringCard -> MaterialTheme.colorScheme.outline.copy(0.2f)
-            absProgress < 0.3f -> MaterialTheme.colorScheme.outline.copy(0.2f)
-            swipeProgress > 0 -> BrandColors.Green500.copy(0.5f)
-            else -> BrandColors.Red500.copy(0.5f)
-        },
-        animationSpec = tween(200)
-    )
 
-    val borderWidth by animateFloatAsState(
-        targetValue = if (absProgress > 0.3f) 2f else 1f,
-        animationSpec = tween(200)
-    )
-
-    val animatedRotationY by animateFloatAsState(
-        targetValue = if (isFlipped) 180f else 0f,
-        animationSpec = spring(
-            dampingRatio = 0.75f,
-            stiffness = Spring.StiffnessLow
+    val borderColor = when {
+        isRestoringCard -> MaterialTheme.colorScheme.outline.copy(0.2f)
+        absProgress < 0.3f -> MaterialTheme.colorScheme.outline.copy(0.2f)
+        swipeProgress > 0 -> BrandColors.Green500.copy(
+            alpha = (0.3f + absProgress * 0.4f).coerceAtMost(
+                0.7f
+            )
         )
-    )
+
+        else -> BrandColors.Red500.copy(alpha = (0.3f + absProgress * 0.4f).coerceAtMost(0.7f))
+    }
+
+    val borderWidth = if (absProgress > 0.3f) 2f else 1f
+
+    val animatedRotationY = if (isTopCard) {
+        animateFloatAsState(
+            targetValue = flipRotation,
+            animationSpec = spring(dampingRatio = 0.65f, stiffness = Spring.StiffnessMediumLow)
+        ).value
+    } else 0f
 
     val cardDimensions = remember(density) {
         val maxWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
         val cardWidth = with(density) { min(maxWidth - 24.dp.toPx(), 400.dp.toPx()).toDp() }
-        val cardHeight = cardWidth * 1.8f
-        Pair(cardWidth, cardHeight)
+        Pair(cardWidth, cardWidth * 1.8f)
     }
 
     val (cardWidth, cardHeight) = cardDimensions
@@ -147,23 +138,18 @@ fun MasterySwipeableCard(
             .then(
                 if (isTopCard) {
                     Modifier
-                        // DRAG gesture for swiping
                         .pointerInput(isFlipped) {
-                            detectDragGestures(
-                                onDragEnd = { onDragEnd() }
-                            ) { change, dragAmount ->
+                            detectDragGestures(onDragEnd = { onDragEnd() }) { change, dragAmount ->
                                 change.consume()
-                                val correctedDrag = if (isFlipped) {
-                                    Offset(-dragAmount.x, dragAmount.y)
-                                } else {
-                                    dragAmount
-                                }
+                                val correctedDrag = if (isFlipped) Offset(
+                                    -dragAmount.x,
+                                    dragAmount.y
+                                ) else dragAmount
                                 onDrag(correctedDrag)
                             }
                         }
-                } else {
-                    Modifier
-                }
+                        .pointerInput(Unit) { detectTapGestures(onTap = { onFlip() }) }
+                } else Modifier
             ),
         shape = cardShape,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -171,46 +157,13 @@ fun MasterySwipeableCard(
     ) {
         WordCard(
             word = word,
-            isFlipped = isFlipped,
             animatedRotationY = animatedRotationY,
             isBookmarked = isBookmarked,
             isHintRevealed = isHintRevealed,
             pinnedLanguage = pinnedLanguage,
-            onFlip = onFlip,
             onSpeak = onSpeak,
             onBookmarkToggle = onBookmark,
             onRevealHint = onRevealHint
         )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF020617)
-@Composable
-private fun MasterySwipeableCardPreview() {
-    LingoLensTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            MasterySwipeableCard(
-                word = MockWordData.journeyWord,
-                offsetX = 0f,
-                offsetY = 0f,
-                stackOffsetX = 0.dp,
-                stackOffsetY = 0.dp,
-                rotation = 0f,
-                scale = 1f,
-                isFlipped = false,
-                flipRotation = 0f,
-                isTopCard = true,
-                swipeProgress = 0f,
-                isBookmarked = false,
-                isHintRevealed = false,
-                pinnedLanguage = null,
-                onFlip = {},
-                onDrag = {},
-                onDragEnd = {},
-                onBookmark = {},
-                onSpeak = { _ -> },
-                onRevealHint = {}
-            )
-        }
     }
 }
