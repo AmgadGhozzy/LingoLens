@@ -3,6 +3,9 @@ package com.venom.lingospell.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.data.mock.MockWordData
+
+import com.venom.data.repo.UserIdentityRepository
+import com.venom.data.repo.UserWordProgressRepository
 import com.venom.domain.model.WordMaster
 import com.venom.lingospell.domain.AUTO_ADVANCE_DELAY
 import com.venom.lingospell.domain.FeedbackState
@@ -24,7 +27,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SpellingGameViewModel @Inject constructor() : ViewModel() {
+class SpellingGameViewModel @Inject constructor(
+    private val progressRepository: UserWordProgressRepository,
+    private val identityRepository: UserIdentityRepository
+) : ViewModel() {
+
 
     private val _state = MutableStateFlow(SpellingGameState())
     val state: StateFlow<SpellingGameState> = _state.asStateFlow()
@@ -97,6 +104,12 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 showMasteryDialog = false
             )
         }
+
+        // Record view
+        viewModelScope.launch {
+            progressRepository.recordView(identityRepository.getCurrentUserId(), currentWord.id)
+        }
+
 
         // Play Arabic TTS after short delay
 //        viewModelScope.launch {
@@ -383,6 +396,15 @@ class SpellingGameViewModel @Inject constructor() : ViewModel() {
                 showMasteryDialog = isMastered // Show dialog when mastered
             )
         }
+
+        // Record progress
+        viewModelScope.launch {
+            progressRepository.recordProductionSuccess(
+                identityRepository.getCurrentUserId(),
+                _state.value.overrideWord.id
+            )
+        }
+
 
         // Play TTS
         viewModelScope.launch {
