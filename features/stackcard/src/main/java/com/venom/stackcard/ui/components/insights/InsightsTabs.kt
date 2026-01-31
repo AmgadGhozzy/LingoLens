@@ -21,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
 
 /**
@@ -42,9 +42,9 @@ fun InsightsTabs(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.adp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .padding(6.dp),
+            .padding(6.adp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         InsightsTab.entries.forEach { tab ->
@@ -85,21 +85,21 @@ private fun TabItem(
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.adp))
             .background(backgroundColor)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onClick
             )
-            .padding(vertical = 12.dp, horizontal = 10.dp),
+            .padding(vertical = 12.adp, horizontal = 10.adp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = tab.title,
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = if (isActive) FontWeight.Bold else FontWeight.Medium,
-                fontSize = 11.sp
+                fontSize = 11.asp
             ),
             color = textColor,
             maxLines = 1
@@ -122,7 +122,7 @@ private fun InsightsTabsPreview() {
         InsightsTabs(
             activeTab = InsightsTab.OVERVIEW,
             onTabChange = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.adp)
         )
     }
 }
@@ -134,7 +134,7 @@ private fun InsightsTabsPreviewLight() {
         InsightsTabs(
             activeTab = InsightsTab.OVERVIEW,
             onTabChange = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.adp)
         )
     }
 }

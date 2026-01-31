@@ -35,8 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.LanguageOption
@@ -44,6 +42,8 @@ import com.venom.domain.model.WordMaster
 import com.venom.domain.model.getLanguageOptions
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.InteractiveText
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 
@@ -83,15 +83,15 @@ fun LanguagesTab(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-            .padding(bottom = 40.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = 24.adp, vertical = 24.adp)
+            .padding(bottom = 40.adp),
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         // Info text
         Text(
             text = stringResource(R.string.mastery_pin_language_hint),
             style = MaterialTheme.typography.bodySmall.copy(
-                lineHeight = 20.sp
+                lineHeight = 20.asp
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
         )
@@ -166,14 +166,14 @@ private fun LanguageRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.adp))
             .background(backgroundColor)
             .border(
-                width = if (isPinned) 1.5.dp else 0.5.dp,
+                width = if (isPinned) 1.5.adp else 0.5.adp,
                 color = borderColor,
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.adp)
             )
-            .padding(16.dp),
+            .padding(16.adp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -183,14 +183,14 @@ private fun LanguageRow(
             onSpeak = onSpeak,
             modifier = Modifier.weight(1f)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.adp)) {
                 // Language name
                 Text(
                     text = language.langName.uppercase(),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.5.sp,
-                        fontSize = 9.sp
+                        letterSpacing = 1.5.asp,
+                        fontSize = 9.asp
                     ),
                     color = if (isPinned) {
                         BrandColors.Blue600
@@ -213,12 +213,12 @@ private fun LanguageRow(
         // Pin button with scale animation
         Box(
             modifier = Modifier
-                .size(44.dp)
+                .size(44.adp)
                 .scale(pinButtonScale)
                 .clip(CircleShape)
                 .background(pinButtonBg)
                 .border(
-                    width = if (isPinned) 1.5.dp else 0.5.dp,
+                    width = if (isPinned) 1.5.adp else 0.5.adp,
                     color = if (isPinned) {
                         BrandColors.Blue500
                     } else {
@@ -240,7 +240,7 @@ private fun LanguageRow(
                 contentDescription = stringResource(
                     if (isPinned) R.string.mastery_unpin else R.string.mastery_pin
                 ),
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(18.adp),
                 tint = pinIconTint
             )
         }
