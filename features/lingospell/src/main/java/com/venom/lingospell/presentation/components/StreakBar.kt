@@ -28,10 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.MAX_STREAK
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 
@@ -46,16 +46,16 @@ fun StreakBar(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.adp)
     ) {
         Text(
             text = "MASTERY",
-            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 2.sp),
+            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 2.asp),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             repeat(MAX_STREAK) { index ->
@@ -109,9 +109,9 @@ private fun StreakBarSegment(
 
     Box(
         modifier = Modifier
-            .width(40.dp)
-            .height(12.dp)
-            .clip(RoundedCornerShape(6.dp))
+            .width(40.adp)
+            .height(12.adp)
+            .clip(RoundedCornerShape(6.adp))
             .background(emptyColor)
     ) {
         Box(
@@ -122,11 +122,12 @@ private fun StreakBarSegment(
         )
 
         if (isActive) {
+            val offsetVal = (shimmerOffset * 40).adp
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth()
-                    .offset(x = (shimmerOffset * 40).dp)
+                    .offset(x = offsetVal)
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(

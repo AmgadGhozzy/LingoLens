@@ -22,10 +22,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.HintLevel
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
 
 @Composable
@@ -39,29 +39,29 @@ fun HintButton(
 
     Row(
         modifier = modifier
-            .shadow(4.dp, RoundedCornerShape(24.dp))
-            .clip(RoundedCornerShape(24.dp))
+            .shadow(4.adp, RoundedCornerShape(24.adp))
+            .clip(RoundedCornerShape(24.adp))
             .background(MaterialTheme.colorScheme.primaryContainer)
             .border(
-                width = 1.dp,
+                width = 1.adp,
                 color = MaterialTheme.colorScheme.primary.copy(0.2f),
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.adp)
             )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = onHintClick
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.adp, vertical = 8.adp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(R.drawable.icon_lightbulb),
             contentDescription = "Hint",
             tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(16.adp)
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(8.adp))
         Text(
             text = "Get Hint (${3 - hintLevel.ordinal} left)",
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
