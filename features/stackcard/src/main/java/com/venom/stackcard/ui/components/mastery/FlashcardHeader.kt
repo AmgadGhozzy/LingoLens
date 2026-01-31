@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,19 @@ import com.venom.domain.model.WordMaster
 import com.venom.ui.theme.tokens.CefrColorScheme
 import com.venom.ui.theme.tokens.DifficultyTheme
 
+/**
+ * Flashcard Header - REFINED VERSION
+ *
+ * Global color linking:
+ * - primarySense chip strictly matches difficulty bar and rank number color
+ *
+ * @param word Word data for header information
+ * @param cefrColors CEFR color scheme for badge
+ * @param difficultyTheme Difficulty theme for semantic pill and rank
+ * @param isBookmarked Current bookmark state
+ * @param onBookmarkToggle Callback when bookmark is toggled
+ * @param modifier Modifier for styling
+ */
 @Composable
 fun FlashcardHeader(
     word: WordMaster,
@@ -57,7 +71,15 @@ fun FlashcardHeader(
         BookmarkButton(
             isBookmarked = isBookmarked,
             onToggle = onBookmarkToggle,
-            modifier = Modifier.align(Alignment.CenterEnd)
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .then(
+                    if (!isBookmarked) {
+                        Modifier.alpha(0.4f)
+                    } else {
+                        Modifier
+                    }
+                )
         )
     }
 }
