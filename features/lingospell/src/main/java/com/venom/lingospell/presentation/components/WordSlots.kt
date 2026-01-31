@@ -19,13 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.FeedbackState
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
 import com.venom.lingospell.domain.Slot
 import com.venom.lingospell.domain.SlotStatus
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -48,17 +48,20 @@ fun WordSlots(
         }
     }
 
+    val shake8 = 8.adp.value
+    val shake4 = 4.adp.value
+
     val shakeOffset by animateFloatAsState(
         targetValue = 0f,
         animationSpec = keyframes {
             durationMillis = 400
             0f at 0
-            (-8f) at 50
-            8f at 100
-            (-8f) at 150
-            8f at 200
-            (-4f) at 250
-            4f at 300
+            (-shake8) at 50
+            shake8 at 100
+            (-shake8) at 150
+            shake8 at 200
+            (-shake4) at 250
+            shake4 at 300
             0f at 400
         },
         label = "shakeOffset"
@@ -69,14 +72,14 @@ fun WordSlots(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 8.adp)
             .offset { IntOffset(x = currentShakeOffset, y = 0) },
         contentAlignment = Alignment.Center
     ) {
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(horizontal = 8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.adp),
+            verticalArrangement = Arrangement.spacedBy(12.adp),
+            modifier = Modifier.padding(horizontal = 8.adp)
         ) {
             slots.forEachIndexed { index, slot ->
                 val isActive = index == firstEmptyIndex && feedback == FeedbackState.IDLE

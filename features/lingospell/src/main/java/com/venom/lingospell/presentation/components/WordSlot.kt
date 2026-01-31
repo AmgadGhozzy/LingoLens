@@ -36,12 +36,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.AppTheme
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
 import com.venom.lingospell.domain.Slot
 import com.venom.lingospell.domain.SlotStatus
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.SemanticColors
@@ -89,8 +89,9 @@ fun WordSlot(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
+    val targetOffsetY = if (isPressed) style.offsetY + 2.adp else style.offsetY
     val offsetY by animateDpAsState(
-        targetValue = if (isPressed) style.offsetY + 2.dp else style.offsetY,
+        targetValue = targetOffsetY,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "offsetY"
     )
@@ -103,32 +104,33 @@ fun WordSlot(
 
     Box(
         modifier = modifier
-            .size(64.dp, 80.dp)
+            .size(64.adp, 80.adp)
             .offset(y = offsetY)
             .scale(scale)
             .then(
                 if (isKeyboardStyle) {
+                    val elev = if (isPressed) 2.adp else 4.adp
                     Modifier.shadow(
-                        elevation = if (isPressed) 2.dp else 4.dp,
-                        shape = RoundedCornerShape(12.dp),
+                        elevation = elev,
+                        shape = RoundedCornerShape(12.adp),
                         ambientColor = style.shadowColor,
                         spotColor = style.shadowColor
                     )
                 } else {
                     Modifier.shadow(
                         elevation = style.elevation,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(12.adp),
                         ambientColor = style.shadowColor,
                         spotColor = style.shadowColor
                     )
                 }
             )
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.adp))
             .background(style.backgroundColor)
             .border(
-                width = if (isKeyboardStyle) 0.dp else 1.dp,
+                width = if (isKeyboardStyle) 0.adp else 1.adp,
                 color = style.borderColor,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.adp)
             )
             .clickable(
                 interactionSource = interactionSource,
@@ -154,7 +156,7 @@ fun WordSlot(
             } else if (visualState == SlotVisualState.EMPTY) {
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(6.adp)
                         .background(colorScheme.outline.copy(0.6f), CircleShape)
                 )
             }
@@ -186,8 +188,8 @@ private fun getSlotStyle(
             borderColor = colorScheme.primary,
             textColor = colorScheme.primary,
             shadowColor = colorScheme.primary.copy(0.3f),
-            elevation = 12.dp,
-            offsetY = (-5).dp,
+            elevation = 12.adp,
+            offsetY = (-5).adp,
             scale = 1.05f
         )
 
@@ -196,8 +198,8 @@ private fun getSlotStyle(
             borderColor = Color.Transparent,
             textColor = colorScheme.onPrimary,
             shadowColor = feature.masteryContainer,
-            elevation = 4.dp,
-            offsetY = 0.dp,
+            elevation = 4.adp,
+            offsetY = 0.adp,
             scale = 1f
         )
 
@@ -206,8 +208,8 @@ private fun getSlotStyle(
             borderColor = Color.Transparent,
             textColor = semantic.onSuccess,
             shadowColor = semantic.successContainer,
-            elevation = 4.dp,
-            offsetY = (-2).dp,
+            elevation = 4.adp,
+            offsetY = (-2).adp,
             scale = 1f
         )
 
@@ -216,8 +218,8 @@ private fun getSlotStyle(
             borderColor = Color.Transparent,
             textColor = colorScheme.onError,
             shadowColor = colorScheme.errorContainer,
-            elevation = 2.dp,
-            offsetY = (-2).dp,
+            elevation = 2.adp,
+            offsetY = (-2).adp,
             scale = 1f
         )
 
@@ -226,8 +228,8 @@ private fun getSlotStyle(
             borderColor = colorScheme.outline.copy(0.5f),
             textColor = colorScheme.onSurfaceVariant,
             shadowColor = feature.shadowPrimary.copy(0.35f),
-            elevation = 2.dp,
-            offsetY = (-1).dp,
+            elevation = 2.adp,
+            offsetY = (-1).adp,
             scale = 1f
         )
 
@@ -236,8 +238,8 @@ private fun getSlotStyle(
             borderColor = colorScheme.outlineVariant.copy(0.3f),
             textColor = Color.Transparent,
             shadowColor = Color.Transparent,
-            elevation = 1.dp,
-            offsetY = 0.dp,
+            elevation = 1.adp,
+            offsetY = 0.adp,
             scale = 1f
         )
     }
@@ -247,7 +249,7 @@ private fun getSlotStyle(
 @Composable
 private fun WordSlotRowLightPreview() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
-        Row(modifier = Modifier.padding(20.dp)) {
+        Row(modifier = Modifier.padding(20.adp)) {
             // Empty
             WordSlot(
                 slot = Slot("1", null, false, SlotStatus.EMPTY),
@@ -257,25 +259,25 @@ private fun WordSlotRowLightPreview() {
             WordSlot(
                 slot = Slot("2", null, false, SlotStatus.EMPTY),
                 isActive = true, isMastered = false, onClick = {},
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.adp)
             )
             // Filled
             WordSlot(
                 slot = Slot("3", Letter("L1", 'A', LetterStatus.USED), false, SlotStatus.FILLED),
                 isActive = false, isMastered = false, onClick = {},
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.adp)
             )
             // Correct
             WordSlot(
                 slot = Slot("4", Letter("L2", 'B', LetterStatus.USED), true, SlotStatus.CORRECT),
                 isActive = false, isMastered = false, onClick = {},
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.adp)
             )
             // Error
             WordSlot(
                 slot = Slot("5", Letter("L3", 'E', LetterStatus.USED), false, SlotStatus.ERROR),
                 isActive = false, isMastered = false, onClick = {},
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.adp)
             )
         }
     }
