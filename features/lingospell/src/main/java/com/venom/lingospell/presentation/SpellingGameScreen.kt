@@ -41,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
@@ -57,6 +56,7 @@ import com.venom.lingospell.presentation.components.StreakBar
 import com.venom.lingospell.presentation.components.WordSlots
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.ConfettiView
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.viewmodel.TTSViewModel
@@ -116,7 +116,7 @@ fun SpellingGameScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = 24.adp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -132,7 +132,7 @@ fun SpellingGameScreen(
                         containerColor = Color.Transparent,
                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
-                    size = 38.dp
+                    size = 38.adp
                 )
             }
 
@@ -167,16 +167,16 @@ fun SpellingGameScreen(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .scale(scale)
-                            .padding(horizontal = 32.dp)
+                            .padding(horizontal = 32.adp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.adp))
 
                 // Feedback / Instructions area
                 Box(
                     modifier = Modifier
-                        .height(48.dp)
+                        .height(48.adp)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -190,18 +190,18 @@ fun SpellingGameScreen(
                         when (feedback) {
                             FeedbackState.MASTERED -> {
                                 // Don't show inline mastered message, dialog will handle it
-                                Spacer(modifier = Modifier.height(48.dp))
+                                Spacer(modifier = Modifier.height(48.adp))
                             }
 
                             FeedbackState.SUCCESS -> {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(8.adp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.icon_circle_check),
                                         contentDescription = null,
-                                        modifier = Modifier.size(28.dp),
+                                        modifier = Modifier.size(28.adp),
                                         tint = MaterialTheme.lingoLens.semantic.success
                                     )
                                     Text(
@@ -223,7 +223,7 @@ fun SpellingGameScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.adp))
 
                 // Word slots
                 WordSlots(
@@ -233,10 +233,10 @@ fun SpellingGameScreen(
                     feedback = state.feedback
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.adp))
 
             // Hint button
-            Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.height(48.adp), contentAlignment = Alignment.Center) {
                 androidx.compose.animation.AnimatedVisibility(
                     visible = state.showHintButton,
                     enter = fadeIn(),
