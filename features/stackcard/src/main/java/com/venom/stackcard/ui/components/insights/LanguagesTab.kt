@@ -50,8 +50,8 @@ import com.venom.ui.theme.LingoLensTheme
 /**
  * Languages tab content for Insights sheet.
  *
- * Displays a list of available language translations that can be pinned
- * to appear on the back of the word card.
+ * Displays a list of available language translations with:
+ * - Dynamic sorting (pinned languages at top)
  *
  * @param word The word to get translations from
  * @param pinnedLanguage Currently pinned language (if any)
@@ -69,9 +69,14 @@ fun LanguagesTab(
 ) {
     val scrollState = rememberScrollState()
 
-    // Get all available languages (cached)
-    val languages by remember(word) {
-        derivedStateOf { getLanguageOptions(word) }
+    // Get all available languages and sort with pinned first
+    val languages by remember(word, pinnedLanguage) {
+        derivedStateOf {
+            val allLanguages = getLanguageOptions(word)
+            allLanguages.sortedByDescending { language ->
+                pinnedLanguage?.langName == language.langName
+            }
+        }
     }
 
     Column(
@@ -91,7 +96,7 @@ fun LanguagesTab(
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
         )
 
-        // Language list
+        // Language list (sorted with pinned at top)
         languages.forEach { language ->
             if (language.translation != null) {
                 LanguageRow(
@@ -106,7 +111,7 @@ fun LanguagesTab(
 }
 
 /**
- * Language row with pinned state
+ * Language row with pinned state and glow effect
  */
 @Composable
 private fun LanguageRow(
@@ -195,22 +200,17 @@ private fun LanguageRow(
                 )
 
                 // Translation
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = language.translation ?: "",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                Text(
+                    text = language.translation ?: "",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
 
-        // Pin button
+        // Pin button with scale animation
         Box(
             modifier = Modifier
                 .size(44.dp)
