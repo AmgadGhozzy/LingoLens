@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -78,8 +79,13 @@ fun CardFront(
 ) {
     val cefrColors = getCefrColorScheme(word.cefrLevel)
     val difficultyTheme = getDifficultyTheme(word.difficultyScore)
-    val hintExample = word.examples[word.cefrLevel] ?: word.examples.values.firstOrNull()
+    val hintExample by remember(word.cefrLevel, word.examples) {
+        derivedStateOf {
+            word.examples[word.cefrLevel] ?: word.examples.values.firstOrNull()
+        }
+    }
 
+    // Animated values
     val blurAmount by animateFloatAsState(
         targetValue = if (isHintRevealed) 0f else 8f,
         animationSpec = tween(durationMillis = 400)
@@ -89,6 +95,12 @@ fun CardFront(
         targetValue = if (isHintRevealed) 1f else 0.2f,
         animationSpec = tween(durationMillis = 400)
     )
+
+    // Stable lambda references
+    val speakWord = remember(word.wordEn, onSpeak) {
+        { onSpeak(word.wordEn) }
+    }
+
     GradientGlassCard(
         modifier = modifier.fillMaxWidth(),
         thickness = GlassThickness.UltraThick,
@@ -114,32 +126,34 @@ fun CardFront(
                 isBookmarked = isBookmarked,
                 onBookmarkToggle = onBookmarkToggle
             )
-            // hero word section
+
+            // Hero word section
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
                 modifier = Modifier
                     .weight(1.5f)
                     .fillMaxWidth()
             ) {
-                // Word with indicators
+                // Word with rank indicator
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Spacer(modifier = Modifier.size(22.dp))
-
                     DynamicStyledText(
                         text = word.wordEn.uppercase(),
                         maxFontSize = 48,
                         minFontSize = 34,
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Black
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier.padding(end = 8.dp)
                     )
 
                     // Oxford badge + Rank
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_seal_check),
@@ -153,10 +167,11 @@ fun CardFront(
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = difficultyTheme.text
+                            color = difficultyTheme.text // Matches difficulty bar
                         )
                     }
                 }
+
                 // Syllables
                 Text(
                     text = word.syllabify?.uppercase() ?: word.phoneticAr,
@@ -164,68 +179,22 @@ fun CardFront(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp,
                     ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.alpha(0.6f)
                 )
-
-                Spacer(Modifier.height(16.dp))
 
                 // Difficulty Meter
                 DifficultyMeter(word.difficultyScore)
 
-                Spacer(Modifier.height(32.dp))
-
-                // Phonetic with Audio
-                InteractiveText(
-                    text = word.wordEn,
-                    onSpeak = onSpeak
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
-                            .border(
-                                0.5.dp,
-                                MaterialTheme.colorScheme.outline.copy(0.2f),
-                                RoundedCornerShape(50)
-                            )
-                            .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Text(
-                            text = "/${word.phoneticUs}/",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                letterSpacing = 1.sp,
-                                fontFamily = FontFamily.Monospace
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
-                        )
-                        // Divider
-                        Box(
-                            modifier = Modifier
-                                .width(1.dp)
-                                .height(16.dp)
-                                .background(MaterialTheme.colorScheme.onBackground.copy(0.1f))
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_speaker_high),
-                                contentDescription = stringResource(R.string.mastery_speak),
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
+                Box(modifier = Modifier.padding(top = 8.dp)) {
+                    PhoneticButton(
+                        phonetic = word.phoneticUs,
+                        onClick = speakWord
+                    )
                 }
             }
 
-            // blurred hint example
+            // Blurred hint example
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -241,7 +210,7 @@ fun CardFront(
                         contentAlignment = Alignment.Center
                     ) {
                         InteractiveText(
-                            text = hintExample,
+                            text = hintExample.toString(),
                             onClick = onRevealHint,
                             onSpeak = onSpeak,
                             speakOnTap = isHintRevealed,
@@ -262,31 +231,102 @@ fun CardFront(
                             )
                         }
                     }
+                } else {
+                    Box(modifier = Modifier.weight(0.8f))
                 }
 
                 // Tap indicator
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.alpha(0.3f)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_hand_tap),
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(R.string.mastery_tap_to_flip).uppercase(),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            letterSpacing = 1.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                TapIndicator()
             }
         }
+    }
+}
+
+/**
+ * Phonetic button with IPA notation and speaker icon
+ */
+@Composable
+private fun PhoneticButton(
+    phonetic: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    InteractiveText(
+        text = "",
+        onSpeak = { onClick() }
+    ) {
+        Row(
+            modifier = modifier
+                .clip(RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.3f))
+                .border(
+                    0.5.dp,
+                    MaterialTheme.colorScheme.outline.copy(0.2f),
+                    RoundedCornerShape(50)
+                )
+                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "/$phonetic/",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    letterSpacing = 1.sp,
+                    fontFamily = FontFamily.Monospace
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
+            )
+            // Divider
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .height(16.dp)
+                    .background(MaterialTheme.colorScheme.onBackground.copy(0.1f))
+            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_speaker_high),
+                    contentDescription = stringResource(R.string.mastery_speak),
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Tap to flip indicator
+ */
+@Composable
+private fun TapIndicator(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier.alpha(0.3f)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_hand_tap),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(R.string.mastery_tap_to_flip).uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(
+                letterSpacing = 1.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
