@@ -66,13 +66,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.domain.model.Author
 import com.venom.resources.R
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import kotlinx.coroutines.delay
 
 @Composable
@@ -83,6 +82,8 @@ fun AuthorCard(
     onToggleSelection: () -> Unit,
     onViewDetails: () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     SelectableItemCard(
         isSelected = isSelected,
         onClick = onClick,
@@ -91,15 +92,15 @@ fun AuthorCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(20.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Avatar
             Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(56.adp)
                     .background(
-                        QuoteColors.primary().copy(alpha = 0.2f),
+                        colorScheme.primary.copy(0.2f),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -108,7 +109,7 @@ fun AuthorCard(
                     text = author.authorName.first().uppercase(),
                     style = MaterialTheme.typography.headlineSmall.copy(
                         fontWeight = FontWeight.Bold,
-                        color = QuoteColors.primary()
+                        color = colorScheme.primary
                     )
                 )
 
@@ -116,22 +117,22 @@ fun AuthorCard(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = stringResource(id = R.string.author_selected),
-                        tint = QuoteColors.primary(),
+                        tint = colorScheme.primary,
                         modifier = Modifier
-                            .size(20.dp)
-                            .offset(x = 18.dp, y = (-18).dp)
+                            .size(20.adp)
+                            .offset(x = 18.adp, y = (-18).adp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.adp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = author.authorName,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        color = QuoteColors.textPrimary()
+                        color = colorScheme.onSurface
                     ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -140,20 +141,20 @@ fun AuthorCard(
                 Text(
                     text = author.authorBio,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = QuoteColors.textSecondary()
+                        color = colorScheme.onSurfaceVariant
                     ),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.adp)
                 )
 
                 Text(
                     text = stringResource(id = R.string.author_quotes_count, author.quotesCount),
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = QuoteColors.primary(),
+                        color = colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     ),
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.adp)
                 )
             }
 
@@ -161,7 +162,7 @@ fun AuthorCard(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = stringResource(id = R.string.view_details),
-                    tint = QuoteColors.textSecondary()
+                    tint = colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -177,6 +178,7 @@ fun AuthorInfoDialog(
 ) {
     val uriHandler = LocalUriHandler.current
     var isVisible by remember { mutableStateOf(false) }
+    val colorScheme = MaterialTheme.colorScheme
 
     LaunchedEffect(Unit) {
         delay(100)
@@ -197,7 +199,7 @@ fun AuthorInfoDialog(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f))
+                .background(Color.Black.copy(0.6f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
@@ -239,17 +241,17 @@ fun AuthorInfoDialog(
                         .fillMaxWidth(0.92f)
                         .wrapContentHeight()
                         .clickable(enabled = false) { },
-                    shape = RoundedCornerShape(28.dp),
+                    shape = RoundedCornerShape(28.adp),
                     colors = CardDefaults.cardColors(
-                        containerColor = QuoteColors.surfacePrimary()
+                        containerColor = colorScheme.surface
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 24.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 24.adp)
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
-                            .padding(24.dp)
+                            .padding(24.adp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -258,8 +260,8 @@ fun AuthorInfoDialog(
                         ) {
                             Text(
                                 text = stringResource(id = R.string.author_details),
-                                color = QuoteColors.textPrimary(),
-                                fontSize = 24.sp,
+                                color = colorScheme.onSurface,
+                                fontSize = 24.asp,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -269,22 +271,22 @@ fun AuthorInfoDialog(
                                     onClose()
                                 },
                                 modifier = Modifier
-                                    .size(40.dp)
+                                    .size(40.adp)
                                     .background(
-                                        QuoteColors.surfaceSecondary(),
+                                        colorScheme.surfaceContainerHighest,
                                         CircleShape
                                     )
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = stringResource(id = R.string.close_dialog),
-                                    tint = QuoteColors.textSecondary(),
-                                    modifier = Modifier.size(20.dp)
+                                    tint = colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(20.adp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.adp))
 
                         Column(
                             modifier = Modifier.fillMaxWidth(),
@@ -292,13 +294,13 @@ fun AuthorInfoDialog(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(80.dp)
+                                    .size(80.adp)
                                     .clip(CircleShape)
                                     .background(
                                         Brush.linearGradient(
                                             colors = listOf(
-                                                QuoteColors.primary(),
-                                                QuoteColors.secondary()
+                                                colorScheme.primary,
+                                                colorScheme.secondary
                                             )
                                         )
                                     ),
@@ -307,49 +309,49 @@ fun AuthorInfoDialog(
                                 Text(
                                     text = author.authorName.first().uppercase(),
                                     color = Color.White,
-                                    fontSize = 32.sp,
+                                    fontSize = 32.asp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.adp))
 
                             Text(
                                 text = author.authorName,
-                                color = QuoteColors.textPrimary(),
-                                fontSize = 20.sp,
+                                color = colorScheme.onSurface,
+                                fontSize = 20.asp,
                                 fontWeight = FontWeight.SemiBold
                             )
 
                             if (author.authorBio.isNotEmpty()) {
                                 Text(
                                     text = author.authorBio,
-                                    color = QuoteColors.textSecondary(),
-                                    fontSize = 14.sp,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    color = colorScheme.onSurfaceVariant,
+                                    fontSize = 14.asp,
+                                    modifier = Modifier.padding(top = 4.adp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.adp))
 
                         if (author.authorDescription.isNotEmpty()) {
                             Card(
-                                shape = RoundedCornerShape(16.dp),
+                                shape = RoundedCornerShape(16.adp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = QuoteColors.surfaceSecondary()
+                                    containerColor = colorScheme.surfaceContainerHighest
                                 )
                             ) {
                                 Text(
                                     text = author.authorDescription,
-                                    color = QuoteColors.textSecondary(),
-                                    fontSize = 14.sp,
-                                    lineHeight = 20.sp,
-                                    modifier = Modifier.padding(16.dp)
+                                    color = colorScheme.onSurfaceVariant,
+                                    fontSize = 14.asp,
+                                    lineHeight = 20.asp,
+                                    modifier = Modifier.padding(16.adp)
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(24.adp))
                         }
 
                         Row(
@@ -360,22 +362,22 @@ fun AuthorInfoDialog(
                             Icon(
                                 imageVector = Icons.Default.FormatQuote,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = QuoteColors.primary()
+                                modifier = Modifier.size(20.adp),
+                                tint = colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(8.adp))
                             Text(
                                 text = stringResource(
                                     id = R.string.quotes_available,
                                     author.quotesCount
                                 ),
-                                color = QuoteColors.primary(),
-                                fontSize = 16.sp,
+                                color = colorScheme.primary,
+                                fontSize = 16.asp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.adp))
 
                         Button(
                             onClick = {
@@ -384,13 +386,13 @@ fun AuthorInfoDialog(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(16.dp),
+                                .height(56.adp),
+                            shape = RoundedCornerShape(16.adp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent,
                                 contentColor = Color.White
                             ),
-                            contentPadding = PaddingValues(0.dp)
+                            contentPadding = PaddingValues(0.adp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -398,11 +400,11 @@ fun AuthorInfoDialog(
                                     .background(
                                         Brush.horizontalGradient(
                                             colors = listOf(
-                                                QuoteColors.primary(),
-                                                QuoteColors.secondary()
+                                                colorScheme.primary,
+                                                colorScheme.secondary
                                             )
                                         ),
-                                        RoundedCornerShape(16.dp)
+                                        RoundedCornerShape(16.adp)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -411,7 +413,7 @@ fun AuthorInfoDialog(
                                         id = R.string.view_all_quotes,
                                         author.authorName
                                     ),
-                                    fontSize = 16.sp,
+                                    fontSize = 16.asp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color.White
                                 )
@@ -419,7 +421,7 @@ fun AuthorInfoDialog(
                         }
 
                         if (author.authorLink.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(12.adp))
 
                             OutlinedButton(
                                 onClick = {
@@ -427,14 +429,14 @@ fun AuthorInfoDialog(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(48.dp),
-                                shape = RoundedCornerShape(16.dp),
+                                    .height(48.adp),
+                                shape = RoundedCornerShape(16.adp),
                                 colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = QuoteColors.textSecondary()
+                                    contentColor = colorScheme.onSurfaceVariant
                                 ),
                                 border = BorderStroke(
-                                    1.dp,
-                                    QuoteColors.border()
+                                    1.adp,
+                                    colorScheme.outlineVariant
                                 )
                             ) {
                                 Row(
@@ -444,9 +446,9 @@ fun AuthorInfoDialog(
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.OpenInNew,
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(18.adp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Spacer(modifier = Modifier.width(8.adp))
                                     Text(
                                         text = stringResource(id = R.string.learn_more),
                                         fontWeight = FontWeight.Medium
@@ -467,8 +469,8 @@ private fun AuthorCardPreview() {
     MaterialTheme {
         Surface {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.padding(16.adp),
+                verticalArrangement = Arrangement.spacedBy(16.adp)
             ) {
                 // Regular card
                 AuthorCard(
