@@ -1,14 +1,9 @@
 package com.venom.lingopro.ui.screens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -21,22 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.lingopro.ui.components.sections.FloatingDialogActions
-import com.venom.lingopro.ui.components.sections.TranslationSection
 import com.venom.lingopro.ui.viewmodel.TranslationActions
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.DraggableDialog
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.other.SnackbarHost
 import com.venom.ui.components.other.rememberSnackbarController
 import com.venom.ui.components.speech.SpeechToTextDialog
 import com.venom.ui.screen.dictionary.DictionaryScreen
-import com.venom.ui.screen.dictionary.TranslationsCard
 import com.venom.ui.screen.langselector.LangSelectorViewModel
 import com.venom.ui.viewmodel.STTViewModel
 import com.venom.ui.viewmodel.TTSViewModel
@@ -59,7 +52,6 @@ fun TranslationScreen(
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
-
     val snackbarController = rememberSnackbarController()
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -136,14 +128,14 @@ fun TranslationScreen(
             },
             onCopy = { text ->
                 runCatching { context.copyToClipboard(text) }.onSuccess {
-                    snackbarController.success(
-                        R.string.action_copy
-                    )
+                    snackbarController.success(R.string.action_copy)
                 }
                     .onFailure { snackbarController.error(R.string.failed_to_copy) }
             },
             onShare = { text ->
-                runCatching { context.shareText(text) }.onFailure { snackbarController.error(R.string.failed_to_share) }
+                runCatching { context.shareText(text) }.onFailure {
+                    snackbarController.error(R.string.failed_to_share)
+                }
             },
             onSpeak = { text ->
                 ttsViewModel.speakWithGroq(
@@ -177,42 +169,6 @@ fun TranslationScreen(
             onSentenceExplorer = { word -> onNavigateToSentence(word) })
     }
 
-    @Composable
-    fun TranslationContent(modifier: Modifier = Modifier) {
-        Column(
-            modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            TranslationSection(
-                viewModel = langSelectorViewModel,
-                sourceTextValue = sourceTextFieldValue,
-                translatedTextValue = translatedTextFieldValue,
-                actions = actions,
-                isLoading = state.isLoading,
-                isSpeaking = ttsState.isSpeaking,
-                isBookmarked = state.isBookmarked,
-                backgroundAlpha = if (isDialog) 1f else 0.1f
-            )
-
-            if (state.translationResult.dict.isNotEmpty() && !isDialog) {
-                TranslationsCard(
-                    translations = state.translationResult.dict,
-                    onWordClick = { selectedWord ->
-                        if (selectedWord.isNotBlank() && selectedWord != sourceTextFieldValue.text) {
-                            sourceTextFieldValue = TextFieldValue(selectedWord)
-                            viewModel.onSourceTextChanged(selectedWord)
-                        }
-                    },
-                    onExpand = { showDictionaryDialog = true },
-                    onSpeak = ttsViewModel::speak,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 100.dp)
-                        .verticalScroll(rememberScrollState())
-                )
-            }
-        }
-    }
-
     val handleDismiss: () -> Unit = remember(sttViewModel, ttsViewModel, onDismiss) {
         {
             sttViewModel.stopRecognition()
@@ -221,13 +177,24 @@ fun TranslationScreen(
         }
     }
 
+    // State-hoisted Content
     Box(modifier = Modifier.fillMaxSize()) {
         if (isDialog) {
             DraggableDialog(
                 onDismissRequest = handleDismiss
             ) {
                 Box {
-                    TranslationContent()
+                    TranslationContent(
+                        langSelectorViewModel = langSelectorViewModel,
+                        state = state,
+                        sourceTextFieldValue = sourceTextFieldValue,
+                        translatedTextFieldValue = translatedTextFieldValue,
+                        actions = actions,
+                        isSpeakingText = ttsState::isSpeakingText,
+                        onExpandDictionary = { showDictionaryDialog = true },
+                        onSpeakDictionaryWord = ttsViewModel::speak,
+                        isDialog = true
+                    )
                     FloatingDialogActions(
                         onDismiss = handleDismiss,
                         onOpenInApp = { onOpenInApp(sourceTextFieldValue.text) }
@@ -235,14 +202,27 @@ fun TranslationScreen(
                 }
             }
         } else {
-            TranslationContent(modifier = Modifier.padding(8.dp))
+            TranslationContent(
+                langSelectorViewModel = langSelectorViewModel,
+                state = state,
+                sourceTextFieldValue = sourceTextFieldValue,
+                translatedTextFieldValue = translatedTextFieldValue,
+                actions = actions,
+                isSpeakingText = ttsState::isSpeakingText,
+                onExpandDictionary = { showDictionaryDialog = true },
+                onSpeakDictionaryWord = ttsViewModel::speak,
+                isDialog = false,
+                modifier = Modifier.padding(8.adp)
+            )
         }
-        SnackbarHost(snackbarController)
+
+        SnackbarHost(controller = snackbarController)
     }
 
     if (showDictionaryDialog) {
         Dialog(
-            onDismissRequest = { showDictionaryDialog = false }, properties = DialogProperties(
+            onDismissRequest = { showDictionaryDialog = false },
+            properties = DialogProperties(
                 usePlatformDefaultWidth = false,
                 decorFitsSystemWindows = false,
                 dismissOnBackPress = true
@@ -258,17 +238,21 @@ fun TranslationScreen(
                      }*/
                 },
                 onSpeak = ttsViewModel::speak,
+                isSpeakingText = ttsState::isSpeakingText,
                 onCopy = actions.onCopy,
-                onDismiss = { showDictionaryDialog = false })
+                onDismiss = { showDictionaryDialog = false }
+            )
         }
     }
 
     if (showSpeechToTextDialog) {
         SpeechToTextDialog(
-            sttViewModel = sttViewModel, onDismiss = {
+            sttViewModel = sttViewModel,
+            onDismiss = {
                 showSpeechToTextDialog = false
                 sttViewModel.stopRecognition()
-            })
+            }
+        )
     }
 
     fullscreenText?.let { text ->
