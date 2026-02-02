@@ -52,7 +52,6 @@ class PhraseViewModel @Inject constructor(
         val targetLangCode = _state.value.targetLang.code
 
         return sections.mapNotNull { sectionWithPhrases ->
-            // Check if section name matches in both languages
             val sectionMatchesSource =
                 sectionWithPhrases.section.getTranslation(sourceLangCode).lowercase()
                     .contains(searchQuery)
@@ -61,14 +60,12 @@ class PhraseViewModel @Inject constructor(
                 sectionWithPhrases.section.getTranslation(targetLangCode).lowercase()
                     .contains(searchQuery)
 
-            // Filter matching phrases in both languages
             val matchingPhrases = sectionWithPhrases.phrases.filter { phrase ->
                 phrase.getTranslation(sourceLangCode).lowercase()
                     .contains(searchQuery) || phrase.getTranslation(targetLangCode).lowercase()
                     .contains(searchQuery)
             }
 
-            // Return section with filtered phrases if either condition is met
             when {
                 sectionMatchesSource || sectionMatchesTarget -> sectionWithPhrases
                 matchingPhrases.isNotEmpty() -> sectionWithPhrases.copy(phrases = matchingPhrases)
@@ -126,7 +123,6 @@ class PhraseViewModel @Inject constructor(
             repository.toggleBookmark(phrase)
 
             if (_state.value.isBookmarkedView) {
-                // Reload all bookmarked phrases
                 loadBookmarkedPhrases()
             } else {
                 _state.update { currentState ->

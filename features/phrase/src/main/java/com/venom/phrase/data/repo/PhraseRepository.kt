@@ -20,7 +20,6 @@ class PhraseRepository(private val dao: PhraseDao) {
     suspend fun getSectionsWithBookmarkedPhrases(): List<SectionWithPhrases> =
         withContext(Dispatchers.IO) {
             val sections = dao.getSectionsWithPhrases()
-            // Filter each section to only include bookmarked phrases
             sections.map { sectionWithPhrases ->
                 sectionWithPhrases.copy(
                     phrases = sectionWithPhrases.phrases.filter { it.isBookmarked }
