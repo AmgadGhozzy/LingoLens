@@ -1,5 +1,6 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,15 +11,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,34 +27,26 @@ import com.venom.stackcard.ui.components.mastery.ActionBar
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryUiState
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
-/**
- * Main screen for Word Mastery feature.
- *
- * Displays a stack of swipeable word cards with flip animation,
- * action bar, and insights sheet.
- */
 @Composable
 fun WordMasteryScreen(
     isGenerative: Boolean,
     onBack: () -> Unit = {},
+    onGoogleSignIn: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: WordMasteryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Initialize checking mode
-    LaunchedEffect(isGenerative) {
-        if (!isGenerative && uiState.visibleCards.isEmpty() && !uiState.isLoading && uiState.error == null) {
-            viewModel.onEvent(WordMasteryEvent.Initialize(false))
-        }
-    }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
             uiState.visibleCards.isEmpty() && uiState.processedCardsCount == 0 && uiState.error == null -> {
                 WelcomeScreen(
                     onBack = onBack,
+                    onGoogleSignIn = onGoogleSignIn,
                     isLoading = uiState.isLoading,
                     onStart = { topic ->
                         viewModel.onEvent(
@@ -70,7 +60,7 @@ fun WordMasteryScreen(
             }
 
             uiState.error != null -> {
-                ErrorScreen(
+                ErrorView(
                     message = uiState.error ?: "Unknown error",
                     onRetry = { viewModel.onEvent(WordMasteryEvent.Initialize(uiState.isGenerativeMode)) }
                 )
@@ -79,18 +69,15 @@ fun WordMasteryScreen(
             uiState.visibleCards.isEmpty() && uiState.processedCardsCount > 0 -> {
                 SessionFinishedView(
                     onBackToWelcome = { viewModel.onEvent(WordMasteryEvent.BackToWelcome) },
-                    onExit = onBack,
-                    modifier = Modifier.fillMaxSize()
+                    onExit = onBack
                 )
             }
 
             else -> {
-                WordMasteryContent(
+                MasteryContent(
                     uiState = uiState,
                     viewModel = viewModel,
-                    onEvent = viewModel::onEvent,
-                    onSpeak = { },
-                    modifier = Modifier.fillMaxSize()
+                    onEvent = viewModel::onEvent
                 )
             }
         }
@@ -98,53 +85,35 @@ fun WordMasteryScreen(
 }
 
 @Composable
-fun WordMasteryContent(
+private fun MasteryContent(
     uiState: WordMasteryUiState,
     viewModel: WordMasteryViewModel,
-    onEvent: (WordMasteryEvent) -> Unit,
-    onSpeak: (text: String) -> Unit,
-    modifier: Modifier = Modifier
+    onEvent: (WordMasteryEvent) -> Unit
 ) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Main card stack area
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
+                modifier = Modifier.weight(1f).fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                // Card Swiper Stack - uses the same ViewModel
                 CardSwiperStack(
                     viewModel = viewModel,
-                    onSpeak = onSpeak,
-                    onRememberWord = { word ->
-                        // Additional callback if needed
-                    },
-                    onForgotWord = { word ->
-                        // Additional callback if needed
-                    }
+                    onSpeak = {},
+                    onRememberWord = {},
+                    onForgotWord = {}
                 )
             }
 
-            // Action bar
             ActionBar(
                 onFlip = { onEvent(WordMasteryEvent.FlipCard) },
                 onPractice = { onEvent(WordMasteryEvent.StartPractice) },
                 onInfoClick = { onEvent(WordMasteryEvent.OpenSheet) },
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 20.adp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.adp))
         }
 
-        // Insights bottom sheet
         InsightsSheet(
             isOpen = uiState.isSheetOpen,
             word = uiState.currentWord,
@@ -155,10 +124,9 @@ fun WordMasteryContent(
             onTabChange = { tab -> onEvent(WordMasteryEvent.ChangeTab(tab)) },
             onPinLanguage = { lang -> onEvent(WordMasteryEvent.PinLanguage(lang)) },
             onTogglePowerTip = { onEvent(WordMasteryEvent.TogglePowerTip) },
-            onSpeak = onSpeak
+            onSpeak = {}
         )
 
-        // Practice dialog
         if (uiState.isPracticeMode && uiState.currentWord != null) {
             Dialog(
                 onDismissRequest = { onEvent(WordMasteryEvent.PracticeHandled) },
@@ -168,45 +136,39 @@ fun WordMasteryContent(
                     decorFitsSystemWindows = false
                 )
             ) {
-                SpellingGameScreen(customWord = uiState.currentWord, onNavigateBack = {
-                    onEvent(WordMasteryEvent.PracticeHandled)
-                })
+                SpellingGameScreen(
+                    customWord = uiState.currentWord,
+                    onNavigateBack = { onEvent(WordMasteryEvent.PracticeHandled) }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ErrorScreen(
-    message: String,
-    onRetry: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+private fun ErrorView(message: String, onRetry: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
+            modifier = Modifier.padding(32.adp),
+            verticalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             Text(
                 text = "Something went wrong",
-                fontSize = 20.sp,
+                fontSize = 20.asp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.error
             )
-            Spacer(Modifier.height(12.dp))
             Text(
                 text = message,
-                fontSize = 14.sp,
+                fontSize = 14.asp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(12.adp))
             Button(onClick = onRetry) {
                 Text("Try Again")
             }
         }
     }
 }
-
