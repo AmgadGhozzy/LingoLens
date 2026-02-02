@@ -28,9 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
 
 @Composable
 fun QuoteTabs(
@@ -38,47 +37,47 @@ fun QuoteTabs(
     onTabSelected: (QuoteTab) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tabShape = RoundedCornerShape(16.dp)
-    val selectedTabShape = RoundedCornerShape(12.dp)
+    val colorScheme = MaterialTheme.colorScheme
+    val tabShape = RoundedCornerShape(16.adp)
+    val selectedTabShape = RoundedCornerShape(12.adp)
 
-    // Colors for gradients and shadows
-    val surfaceColor = QuoteColors.surfaceSecondary()
-    val shadowColor = QuoteColors.primary()
+    val surfaceColor = colorScheme.surfaceContainerHighest
+    val shadowColor = colorScheme.primary
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(tabShape)
-            .background(surfaceColor.copy(alpha = 0.6f))
+            .background(surfaceColor.copy(0.6f))
             .border(
-                1.dp,
-                surfaceColor.copy(alpha = 0.3f),
+                1.adp,
+                surfaceColor.copy(0.3f),
                 tabShape
             )
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(8.adp),
+        horizontalArrangement = Arrangement.spacedBy(8.adp)
     ) {
         QuoteTab.entries.toList().forEach { tab ->
             val isSelected = selectedTab == tab
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(42.dp)
+                    .height(42.adp)
                     .then(
                         if (isSelected) {
                             Modifier.shadow(
-                                elevation = 30.dp,
+                                elevation = 30.adp,
                                 shape = selectedTabShape,
-                                ambientColor = shadowColor.copy(alpha = 0.3f),
-                                spotColor = shadowColor.copy(alpha = 0.5f)
+                                ambientColor = shadowColor.copy(0.3f),
+                                spotColor = shadowColor.copy(0.5f)
                             )
                         } else Modifier
                     )
                     .clip(selectedTabShape)
                     .background(if (isSelected) surfaceColor else Color.Transparent)
                     .border(
-                        width = 1.dp,
-                        color = if (isSelected) QuoteColors.border() else Color.Transparent,
+                        width = 1.adp,
+                        color = if (isSelected) colorScheme.outlineVariant else Color.Transparent,
                         shape = selectedTabShape
                     )
                     .clickable { onTabSelected(tab) },
@@ -90,9 +89,9 @@ fun QuoteTabs(
                     tint = if (isSelected) {
                         shadowColor
                     } else {
-                        QuoteColors.textSecondary()
+                        colorScheme.onSurfaceVariant
                     },
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.adp)
                 )
             }
         }
