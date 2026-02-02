@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,11 +28,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.domain.model.Tag
 import com.venom.resources.R
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 @Composable
 fun TopicCard(
@@ -41,6 +41,8 @@ fun TopicCard(
     isSelected: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     SelectableItemCard(
         isSelected = isSelected,
         onClick = { onClick(tag.tagName) },
@@ -50,43 +52,42 @@ fun TopicCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(20.adp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Icon
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(48.adp)
                     .background(
-                        QuoteColors.primary().copy(alpha = 0.2f),
-                        RoundedCornerShape(12.dp)
+                        colorScheme.primary.copy(0.2f),
+                        RoundedCornerShape(12.adp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (isSelected) Icons.Default.CheckCircle else Icons.Default.Tag,
                     contentDescription = null,
-                    tint = QuoteColors.primary(),
-                    modifier = Modifier.size(24.dp)
+                    tint = colorScheme.primary,
+                    modifier = Modifier.size(24.adp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.adp))
 
             Text(
                 text = stringResource(id = R.string.topic_tag_prefix, tag.tagName),
-                color = QuoteColors.textPrimary(),
-                fontSize = 15.sp,
+                color = colorScheme.onSurface,
+                fontSize = 15.asp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.adp))
 
             Text(
                 text = stringResource(id = R.string.topic_quotes_count, tag.count),
-                color = QuoteColors.textSecondary(),
-                fontSize = 13.sp,
+                color = colorScheme.onSurfaceVariant,
+                fontSize = 13.asp,
                 textAlign = TextAlign.Center
             )
         }
@@ -103,9 +104,9 @@ fun TopicsGrid(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(top = 16.adp, bottom = 100.adp),
+        horizontalArrangement = Arrangement.spacedBy(12.adp),
+        verticalArrangement = Arrangement.spacedBy(12.adp),
         modifier = modifier.fillMaxSize()
     ) {
         items(tags) { tag ->
@@ -123,8 +124,8 @@ fun TopicsGrid(
 @Composable
 fun TopicCardPreview() {
     Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.padding(16.adp),
+        verticalArrangement = Arrangement.spacedBy(16.adp)
     ) {
         TopicCard(
             tag = Tag(0, "Inspiration", 5),
