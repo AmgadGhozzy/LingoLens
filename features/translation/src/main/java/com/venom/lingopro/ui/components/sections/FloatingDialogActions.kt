@@ -25,9 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 @Composable
 fun FloatingDialogActions(
@@ -40,20 +40,20 @@ fun FloatingDialogActions(
         SmallFloatingActionButton(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp),
+                .padding(16.adp),
             onClick = { onDismiss() },
             containerColor = MaterialTheme.colorScheme.errorContainer,
             contentColor = MaterialTheme.colorScheme.onErrorContainer,
             elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 6.dp,
-                pressedElevation = 8.dp
+                defaultElevation = 6.adp,
+                pressedElevation = 8.adp
             ),
             shape = CircleShape
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.action_close),
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.adp)
             )
         }
 
@@ -61,8 +61,8 @@ fun FloatingDialogActions(
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
-                .shadow(12.dp, RoundedCornerShape(16.dp)),
+                .padding(bottom = 24.adp)
+                .shadow(12.adp, RoundedCornerShape(16.adp)),
             onClick = {
                 onOpenInApp()
                 onDismiss()
@@ -70,25 +70,25 @@ fun FloatingDialogActions(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 8.dp,
-                pressedElevation = 12.dp
+                defaultElevation = 8.adp,
+                pressedElevation = 12.adp
             ),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.adp)
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                modifier = Modifier.padding(horizontal = 20.adp, vertical = 12.adp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = stringResource(R.string.open_in_app),
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(22.adp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.adp))
                 Text(
                     text = stringResource(R.string.open_in_app),
-                    fontSize = 15.sp,
+                    fontSize = 15.asp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
