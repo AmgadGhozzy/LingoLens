@@ -42,7 +42,7 @@ fun PhrasesScreen(
         state = state,
         scrollBehavior = scrollBehavior,
         onBookmarkClick = viewModel::toggleBookmark,
-        isSpeaking = ttsState.isSpeaking,
+        isSpeakingText = ttsState::isSpeakingText,
         onSpeakClick = ttsViewModel::speak,
         onSearchQueryChanged = viewModel::onSearchQueryChange,
         onCopy = copyAction,
