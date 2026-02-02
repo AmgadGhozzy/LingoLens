@@ -184,7 +184,8 @@ private fun TransliterationRow(
 ) {
     InteractiveText(
         text = "",
-        onSpeak = { onClick() }
+        onSpeak = { onClick() },
+        hapticStrength = HapticStrength.LIGHT
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -303,7 +304,8 @@ private fun PinnedLanguageCard(
 ) {
 
     InteractiveText(
-        text = translation
+        text = translation,
+        hapticStrength = HapticStrength.LIGHT
     ) {
         Row(
             modifier = modifier
