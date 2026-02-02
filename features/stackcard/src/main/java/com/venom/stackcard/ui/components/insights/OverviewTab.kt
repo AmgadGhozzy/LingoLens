@@ -56,7 +56,6 @@ import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.tokens.CefrColorScheme
 import com.venom.ui.theme.tokens.getCefrColorScheme
-import com.venom.ui.theme.tokens.getThemeColorForLevel
 
 /**
  * Overview tab content for Insights sheet.
@@ -101,9 +100,9 @@ fun OverviewTab(
     ) {
         // 1. YOUR PROGRESS - With theme-colored ring
         YourProgressCard(
-            repetitions = 3, // TODO: Get from user data
+            repetitions = 2, // TODO: Get from user data
             nextReview = stringResource(R.string.mastery_tomorrow),
-            masteryProgress = 0.65f, // TODO: Calculate from user data
+            masteryProgress = 0.5f, // TODO: Calculate from user data
             cefrLevel = word.cefrLevel
         )
 
@@ -258,7 +257,7 @@ private fun CircularProgressRing(
     modifier: Modifier = Modifier
 ) {
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
-    val themeColor = getThemeColorForLevel(cefrLevel)
+    val themeColor = MaterialTheme.colorScheme.primary //getThemeColorForLevel(cefrLevel)
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
