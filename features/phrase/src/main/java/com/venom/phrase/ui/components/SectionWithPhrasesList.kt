@@ -1,8 +1,12 @@
 package com.venom.phrase.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -23,19 +27,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.venom.phrase.data.mapper.getTranslation
 import com.venom.phrase.data.model.PhraseEntity
 import com.venom.phrase.data.model.SectionWithPhrases
-import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.common.DynamicStyledText
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -44,15 +46,13 @@ fun SectionWithPhrasesList(
     sourceLang: String,
     targetLang: String,
     onBookmarkClick: (PhraseEntity) -> Unit,
-    isSpeaking: Boolean,
+    isSpeakingText: (String) -> Boolean,
     onSpeakClick: (String, String) -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-
-    var showCardDialog by remember { mutableStateOf(false) }
     // Track which phrase is expanded (using phrase ID)
     var expandedPhraseId by remember { mutableStateOf<String?>(null) }
 
@@ -62,50 +62,47 @@ fun SectionWithPhrasesList(
             .padding(contentPadding)
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(
+                start = 16.adp,
+                end = 16.adp,
+                top = 8.adp,
+                bottom = 24.adp
+            ),
+            verticalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             sections.filter { it.phrases.isNotEmpty() }.forEach { section ->
-                stickyHeader {
-                    GlassCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        solidBackgroundAlpha = 0.9f,
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            DynamicStyledText(
-                                text = section.section.getTranslation(sourceLang),
-                                maxFontSize = 28,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .semantics { heading() })
-
-                            CustomButton(
-                                icon = R.drawable.icon_cards1,
-                                contentDescription = stringResource(R.string.card_sentence_practice),
-                                onClick = {
-                                    showCardDialog = !showCardDialog
-                                },
-                                showBorder = false,
-                            )
-                        }
-                    }
+                stickyHeader(key = "section_${section.section.sectionId}") {
+                    SectionHeader(
+                        title = section.section.getTranslation(sourceLang),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
-                items(
+                itemsIndexed(
                     items = section.phrases,
-                    key = { it.phraseId }
-                ) { phrase ->
-                    AnimatedVisibility(visible = true, enter = fadeIn()) {
+                    key = { _, phrase -> phrase.phraseId }
+                ) { index, phrase ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ) + slideInVertically(
+                            initialOffsetY = { it / 4 },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    ) {
                         PhraseExpandCard(
                             phrase = phrase,
                             sourceLang = sourceLang,
                             targetLang = targetLang,
                             onBookmarkClick = { onBookmarkClick(phrase) },
-                            isSpeaking = isSpeaking,
+                            isSpeaking = isSpeakingText(phrase.getTranslation(sourceLang)),
                             onSpeakClick = {
                                 onSpeakClick(
                                     phrase.getTranslation(sourceLang), sourceLang
@@ -115,24 +112,79 @@ fun SectionWithPhrasesList(
                             onShare = { onShare(phrase.getTranslation(sourceLang)) },
                             isExpanded = expandedPhraseId == phrase.phraseId.toString(),
                             onExpandChange = { isExpanding ->
-                                expandedPhraseId = if (isExpanding) phrase.phraseId.toString() else null
+                                expandedPhraseId =
+                                    if (isExpanding) phrase.phraseId.toString() else null
                             }
                         )
                     }
                 }
 
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
+                // Section spacing
+                item(key = "spacer_${section.section.sectionId}") {
+                    Spacer(modifier = Modifier.height(8.adp))
                 }
             }
         }
     }
+}
 
-    if (showCardDialog) Dialog(
-        onDismissRequest = { showCardDialog = false }, properties = DialogProperties(
-            usePlatformDefaultWidth = false, decorFitsSystemWindows = false
-        )
+
+@Composable
+private fun SectionHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .padding(vertical = 8.adp)
     ) {
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = GlassThickness.UltraThick,
+            shape = RoundedCornerShape(16.adp),
+            contentPadding = 0.adp,
+            showShadow = true,
+            showBorder = false
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.adp))
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.1f)
+                            )
+                        )
+                    )
+                    .padding(horizontal = 16.adp, vertical = 12.adp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    // Accent line indicator
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(2.adp))
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(horizontal = 3.adp, vertical = 12.adp)
+                    )
 
+                    DynamicStyledText(
+                        text = title,
+                        minFontSize = 20,
+                        maxFontSize = 28,
+                        maxLines = 2,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 12.adp)
+                            .semantics { heading() }
+                    )
+                }
+            }
+        }
     }
 }
