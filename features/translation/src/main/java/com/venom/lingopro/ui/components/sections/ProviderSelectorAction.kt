@@ -26,11 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationProvider
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.menus.AnimatedDropdownMenu
 
 @Composable
@@ -65,7 +65,7 @@ fun ProviderSelectorAction(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.2f),
             contentColor = MaterialTheme.colorScheme.primary
         ),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(12.adp),
         onClick = { isMenuExpanded = true }
     )
 
@@ -90,28 +90,28 @@ private fun ProviderItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.adp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         Surface(
             shape = CircleShape,
             color = if (isSelected) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.primaryContainer.copy(0.5f),
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(40.adp)
         ) {
             Icon(
                 painter = painterResource(provider.iconResId),
                 contentDescription = null,
                 tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
                 else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.adp)
             )
         }
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.adp)
         ) {
             Text(
                 text = stringResource(provider.nameResId),
@@ -141,7 +141,7 @@ private fun ProviderItem(
                     text = stringResource(R.string.premium),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    modifier = Modifier.padding(horizontal = 6.adp, vertical = 2.adp)
                 )
             }
         }
@@ -151,7 +151,7 @@ private fun ProviderItem(
                 imageVector = Icons.Rounded.Check,
                 contentDescription = stringResource(R.string.selected_indicator_cd),
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.adp)
             )
         }
     }
