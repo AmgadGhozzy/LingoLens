@@ -1,6 +1,5 @@
 package com.venom.lingopro.ui.components.sections
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +11,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.lingopro.ui.viewmodel.TranslationActions
 import com.venom.ui.components.bars.SourceTextActionBar
 import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
 import com.venom.ui.screen.langselector.LangSelectorViewModel
@@ -27,12 +25,12 @@ import com.venom.utils.Extensions.showToast
 
 @Composable
 fun TranslationSection(
-    viewModel: LangSelectorViewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+    viewModel: LangSelectorViewModel,
     sourceTextValue: TextFieldValue,
     translatedTextValue: TextFieldValue,
     actions: TranslationActions = TranslationActions.Empty,
     isLoading: Boolean = true,
-    isSpeaking: Boolean = false,
+    isSpeakingText: (String) -> Boolean = { false },
     isBookmarked: Boolean = true,
     showNativeNameHint: Boolean = false,
     showFlag: Boolean = false,
@@ -53,7 +51,7 @@ fun TranslationSection(
             backgroundAlpha < 0.1f -> GlassThickness.UltraThin
             else -> GlassThickness.UltraThick
         },
-        contentPadding = 12.dp
+        contentPadding = 12.adp
     ) {
         // Language selector
         LanguageBar(
@@ -65,7 +63,7 @@ fun TranslationSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(1.dp)
+                .height(1.adp)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
@@ -92,13 +90,10 @@ fun TranslationSection(
             isSpeechToTextActive = actions.isSpeechToTextActive,
             onOcr = actions.onOcr,
             onPaste = actions.onPaste,
-            onCopy = { validateAction { actions.onCopy(sourceText) } },
             onFullscreen = { actions.onFullscreen(sourceText) },
-            onSpeak = { validateAction { actions.onSpeak(sourceText) } },
             onSentenceExplorer = sourceTextValue.text
                 .takeIf { isValidWordForSentences(it) }
-                ?.let { { validateAction { actions.onSentenceExplorer?.invoke(sourceText) } } },
-            isSpeaking = isSpeaking
+                ?.let { { validateAction { actions.onSentenceExplorer?.invoke(sourceText) } } }
         )
 
         // Translated text section
@@ -112,11 +107,12 @@ fun TranslationSection(
             onBookmark = { validateAction(actions.onBookmark) },
             onCopy = { validateAction { actions.onCopy(translatedText) } },
             onShare = { validateAction { actions.onShare(translatedText) } },
-            onFullscreen = { validateAction { actions.onFullscreen(translatedText) } },
+            onFullscreen = translatedTextValue.text.takeIf { it.isNotBlank() }?.let {
+                { validateAction { actions.onFullscreen(it) } }
+            },
             onSpeak = { validateAction { actions.onSpeak(translatedText) } },
-            onMoveUp = actions.onMoveUp,
             isSaved = isBookmarked,
-            isSpeaking = isSpeaking
+            isSpeaking = isSpeakingText(translatedText)
         )
     }
 }
