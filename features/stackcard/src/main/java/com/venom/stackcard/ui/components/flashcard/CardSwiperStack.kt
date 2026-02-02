@@ -20,7 +20,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
@@ -28,8 +27,11 @@ import com.venom.stackcard.ui.components.flashcard.OptimizedCardAnimations.SWIPE
 import com.venom.stackcard.ui.components.flashcard.OptimizedCardAnimations.SwipeAnimationSpec
 import com.venom.stackcard.ui.components.flashcard.OptimizedCardAnimations.calculateRotation
 import com.venom.stackcard.ui.components.flashcard.OptimizedCardAnimations.calculateThrowTarget
+import com.venom.stackcard.ui.components.mastery.HapticStrength
+import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
+import com.venom.ui.components.common.adp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -45,6 +47,7 @@ fun CardSwiperStack(
     onRememberWord: (WordMaster) -> Unit = {},
     onForgotWord: (WordMaster) -> Unit = {},
 ) {
+    val haptic = rememberHapticFeedback()
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val state by viewModel.uiState.collectAsState()
@@ -52,7 +55,7 @@ fun CardSwiperStack(
 
     val topCardId = state.visibleCards.firstOrNull()?.wordEn ?: ""
     val cardAnimState = rememberCardAnimationState()
-    
+
     // Reset animation when top card changes
     DisposableEffect(topCardId) {
         scope.launch { resetAnimationState(cardAnimState) }
@@ -60,9 +63,10 @@ fun CardSwiperStack(
     }
 
     var activeSwipeJob by remember { mutableStateOf<Job?>(null) }
-    
-    val swipeThresholdPx = remember(density) {
-        with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
+
+    val swipeThresholdAdp = SWIPE_THRESHOLD_DP.adp
+    val swipeThresholdPx = remember(density, swipeThresholdAdp) {
+        with(density) { swipeThresholdAdp.toPx() }
     }
 
     val onDragCallback: (Offset) -> Unit = remember(cardAnimState, scope) {
@@ -83,14 +87,20 @@ fun CardSwiperStack(
         state.visibleCards.take(MAX_VISIBLE_CARDS)
     }
 
-    val stackPositions = remember(limitedCards.size) {
+    val fourAdp = 4.adp
+    val eightAdp = 8.adp
+    val stackPositions = remember(limitedCards.size, fourAdp, eightAdp) {
         List(limitedCards.size) { index ->
             val stackPosition = limitedCards.lastIndex - index
             StackPosition(
-                offsetY = stackPosition * 4.dp,
-                offsetX = if (stackPosition > 0) (sin(stackPosition * 0.5f) * 8f).dp else 0.dp,
-                rotation = when (stackPosition) { 1 -> -3f; 2 -> 2f; else -> 0f },
-                scale = when (stackPosition) { 1 -> 0.96f; 2 -> 0.93f; else -> 0.90f }
+                offsetY = fourAdp * stackPosition,
+                offsetX = if (stackPosition > 0) eightAdp * sin(stackPosition * 0.5f) else 0.dp,
+                rotation = when (stackPosition) {
+                    1 -> -3f; 2 -> 2f; else -> 0f
+                },
+                scale = when (stackPosition) {
+                    1 -> 0.96f; 2 -> 0.93f; else -> 0.90f
+                }
             )
         }
     }
@@ -122,7 +132,8 @@ fun CardSwiperStack(
                         position.rotation + (cardAnimState.rotation.value * 0.1f / stackPosition)
                     }
 
-                    val scale = if (stackPosition == 0) cardAnimState.calculateScale() else position.scale
+                    val scale =
+                        if (stackPosition == 0) cardAnimState.calculateScale() else position.scale
 
                     MasterySwipeableCard(
                         word = word,
@@ -150,11 +161,19 @@ fun CardSwiperStack(
                                     abs(currentOffset) > swipeThresholdPx -> {
                                         val velocity = cardAnimState.offsetX.velocity
                                         val targetX = calculateThrowTarget(currentOffset, velocity)
-                                        
-                                        launch { cardAnimState.offsetY.animateTo(-100f, SwipeAnimationSpec) }
+
+                                        // Strong haptic for swipe completion
+                                        haptic(HapticStrength.STRONG)
+
+                                        launch {
+                                            cardAnimState.offsetY.animateTo(
+                                                -100f,
+                                                SwipeAnimationSpec
+                                            )
+                                        }
                                         cardAnimState.offsetX.animateTo(targetX, SwipeAnimationSpec)
                                         resetAnimationState(cardAnimState)
-                                        
+
                                         if (currentOffset > 0) {
                                             viewModel.onEvent(WordMasteryEvent.SwipeRemember(word))
                                             onRememberWord(word)
@@ -164,6 +183,7 @@ fun CardSwiperStack(
                                         }
                                         viewModel.onEvent(WordMasteryEvent.RemoveCard(word))
                                     }
+
                                     else -> returnToCenter(cardAnimState)
                                 }
                                 activeSwipeJob = null
