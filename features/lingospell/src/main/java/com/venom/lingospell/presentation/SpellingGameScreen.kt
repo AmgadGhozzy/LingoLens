@@ -43,9 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.WordMaster
 import com.venom.lingospell.domain.FeedbackState
 import com.venom.lingospell.domain.MAX_STREAK
@@ -101,14 +98,7 @@ fun SpellingGameScreen(
 
             // Celebration effects for SUCCESS (not MASTERED, as mastered shows dialog)
             if (state.feedback == FeedbackState.MASTERED) {
-                ConfettiView(modifier = Modifier.fillMaxSize())
-                LottieAnimation(
-                    composition = rememberLottieComposition(
-                        spec = LottieCompositionSpec.RawRes(R.raw.confetti)
-                    ).value,
-                    iterations = 2,
-                    modifier = Modifier.fillMaxSize()
-                )
+                ConfettiView()
             }
 
             // Top Bar
