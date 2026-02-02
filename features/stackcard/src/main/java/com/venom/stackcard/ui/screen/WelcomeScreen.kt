@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -52,8 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -61,61 +60,90 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
+import com.venom.ui.components.onboarding.GoogleSignInButton
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 
 @Composable
 fun WelcomeScreen(
-    onStart: (String) -> Unit = { _ -> },
+    onStart: (String) -> Unit = {},
     onBack: () -> Unit = {},
+    onGoogleSignIn: () -> Unit = {},
     isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     var topic by remember { mutableStateOf("") }
 
     Box(
-        modifier = modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Back button in top-left corner
         if (!isLoading) {
             CustomFilledIconButton(
                 icon = Icons.Rounded.ArrowForwardIos,
-                modifier = Modifier.align(Alignment.TopEnd),
+                modifier = Modifier.align(Alignment.TopEnd).padding(24.adp),
                 onClick = onBack,
                 contentDescription = stringResource(R.string.action_close),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f),
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f)
                 ),
-                size = 46.dp
+                size = 46.adp
             )
         }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 48.dp),
+                .padding(horizontal = 24.adp, vertical = 48.adp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(56.dp)
+            verticalArrangement = Arrangement.spacedBy(56.adp)
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            LogoSection()
-            TitleSection()
+            AppLogo()
+            AppTitle()
 
             Spacer(modifier = Modifier.weight(0.5f))
 
             Column(
-                modifier = Modifier.widthIn(max = 360.dp),
+                modifier = Modifier.widthIn(max = 360.adp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(20.adp)
             ) {
-                if (!isLoading) {
-                    TopicInput(topic = topic, onValueChange = { topic = it })
-                }
+//                if (!isLoading) {
+//                    TopicInput(topic, onValueChange = { topic = it })
+//                }
 
-                PremiumButton(onClick = { onStart(topic) }, isLoading = isLoading)
+                StartButton(onClick = { onStart(topic) }, isLoading = isLoading)
+
+                if (!isLoading) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.adp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        HorizontalDivider(
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                        Text(
+                            text = "OR",
+                            modifier = Modifier.padding(horizontal = 16.adp),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    }
+
+                    GoogleSignInButton(
+                        onClick = onGoogleSignIn
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -124,19 +152,15 @@ fun WelcomeScreen(
 }
 
 @Composable
-private fun LogoSection() {
-    Box(
-        modifier = Modifier.size(140.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // Main icon card
+private fun AppLogo() {
+    Box(modifier = Modifier.size(140.adp), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(120.adp)
                 .graphicsLayer { rotationZ = 8f }
                 .shadow(
-                    elevation = 24.dp,
-                    shape = RoundedCornerShape(32.dp),
+                    elevation = 24.adp,
+                    shape = RoundedCornerShape(32.adp),
                     ambientColor = BrandColors.Indigo500.copy(0.3f),
                     spotColor = BrandColors.Purple600.copy(0.4f)
                 )
@@ -144,32 +168,31 @@ private fun LogoSection() {
                     brush = Brush.linearGradient(
                         colors = listOf(BrandColors.Indigo500, BrandColors.Purple600)
                     ),
-                    shape = RoundedCornerShape(32.dp)
+                    shape = RoundedCornerShape(32.adp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(R.drawable.icon_graduation_cap),
-                contentDescription = "LingoFlow logo",
-                modifier = Modifier.size(60.dp),
+                contentDescription = null,
+                modifier = Modifier.size(60.adp),
                 tint = Color.White
             )
         }
 
-        // Badge overlay
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(48.adp)
                 .align(Alignment.BottomEnd)
-                .offset(x = 14.dp, y = 14.dp)
+                .offset(x = 14.adp, y = 14.adp)
                 .graphicsLayer { rotationZ = -12f }
-                .shadow(14.dp, RoundedCornerShape(16.dp))
-                .background(BrandColors.Emerald500, RoundedCornerShape(16.dp)),
+                .shadow(14.adp, RoundedCornerShape(16.adp))
+                .background(BrandColors.Emerald500, RoundedCornerShape(16.adp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Aa",
-                fontSize = 20.sp,
+                fontSize = 20.asp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
@@ -178,25 +201,19 @@ private fun LogoSection() {
 }
 
 @Composable
-private fun TitleSection() {
+private fun AppTitle() {
     Column(
-        modifier = Modifier.widthIn(max = 360.dp),
+        modifier = Modifier.widthIn(max = 360.adp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.adp)
     ) {
-        // Title
         Text(
             text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                ) {
+                withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
                     append("Lingo")
                 }
                 withStyle(
-                    style = SpanStyle(
+                    SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -204,37 +221,36 @@ private fun TitleSection() {
                     append("Flow")
                 }
             },
-            fontSize = 52.sp,
-            letterSpacing = (-1).sp
+            fontSize = 48.asp,
+            letterSpacing = (-1).asp,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
-        // Enhanced Description
         Text(
             text = buildAnnotatedString {
                 append("Accelerate your ")
                 withStyle(
-                    style = SpanStyle(
+                    SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 ) {
                     append("English fluency")
                 }
-                append(" with\nsmart ")
+                append(" with smart ")
                 withStyle(
-                    style = SpanStyle(
+                    SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                 ) {
                     append("flashcards")
                 }
-                append(" and active recall")
             },
-            fontSize = 17.sp,
+            fontSize = 16.asp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            lineHeight = 26.sp
+            lineHeight = 26.asp
         )
     }
 }
@@ -242,69 +258,56 @@ private fun TitleSection() {
 @Composable
 private fun TopicInput(
     topic: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onValueChange: (String) -> Unit
 ) {
     TextField(
         value = topic,
         onValueChange = onValueChange,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp)),
+            .shadow(2.adp, RoundedCornerShape(16.adp))
+            .clip(RoundedCornerShape(16.adp)),
         placeholder = {
             Text(
-                text = "Choose a topic or category...",
-                style = MaterialTheme.typography.bodyLarge,
+                text = "Choose a topic...",
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
             )
         },
         leadingIcon = {
             Icon(
                 painter = painterResource(R.drawable.icon_search),
-                contentDescription = "Search topic",
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.adp)
             )
         },
         singleLine = true,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.adp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
             focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-            unfocusedIndicatorColor = Color.Transparent,
-            cursorColor = MaterialTheme.colorScheme.primary
-        ),
-        textStyle = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+            unfocusedIndicatorColor = Color.Transparent
         )
     )
 }
 
 @Composable
-private fun PremiumButton(
-    onClick: () -> Unit,
-    isLoading: Boolean
-) {
+private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val offsetY by animateDpAsState(
-        targetValue = if (isPressed) 8.dp else 0.dp,
-        animationSpec = tween(durationMillis = 100)
+        targetValue = if (isPressed) 8.adp else 0.adp,
+        animationSpec = tween(100)
     )
 
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Shadow layer
+    Box(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .offset(y = 8.dp)
+                .height(56.adp)
+                .offset(y = 8.adp)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
@@ -312,24 +315,17 @@ private fun PremiumButton(
                             BrandColors.Purple600.copy(alpha = 0.6f)
                         )
                     ),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.adp)
                 )
         )
 
-        // Main Button
         Button(
             onClick = onClick,
             enabled = !isLoading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .offset(y = offsetY),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            ),
-            contentPadding = PaddingValues(0.dp),
-            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth().height(56.adp).offset(y = offsetY),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            contentPadding = PaddingValues(0.adp),
+            shape = RoundedCornerShape(16.adp),
             interactionSource = interactionSource
         ) {
             Box(
@@ -339,41 +335,35 @@ private fun PremiumButton(
                         brush = Brush.horizontalGradient(
                             colors = listOf(BrandColors.Indigo600, BrandColors.Purple600)
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.adp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 if (isLoading) {
-                    val composition by rememberLottieComposition(
-                        LottieCompositionSpec.RawRes(R.raw.dot_loading)
-                    )
                     LottieAnimation(
-                        composition = composition,
+                        composition = rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(R.raw.dot_loading)
+                        ).value,
                         iterations = LottieConstants.IterateForever,
                         contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth(0.4f)
-                            .blur(0.5.dp),
+                        modifier = Modifier.fillMaxWidth(0.4f).blur(0.5.adp),
                         speed = 0.8f
                     )
                 } else {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.adp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(24.dp)
-                                .background(
-                                    color = Color.White.copy(alpha = 0.2f),
-                                    shape = CircleShape
-                                ),
+                                .size(24.adp)
+                                .background(Color.White.copy(0.2f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.icon_play),
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(16.adp),
                                 tint = Color.White
                             )
                         }
@@ -381,9 +371,9 @@ private fun PremiumButton(
                         Text(
                             text = "Start Learning",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
+                            fontSize = 16.asp,
                             color = Color.White,
-                            letterSpacing = 0.3.sp
+                            letterSpacing = 0.3.asp
                         )
                     }
                 }
@@ -392,9 +382,9 @@ private fun PremiumButton(
     }
 }
 
-@Preview()
+@Preview
 @Composable
-fun WelcomeScreenLightPreview() {
+fun WelcomeScreenPreview() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         WelcomeScreen()
     }
