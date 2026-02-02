@@ -23,9 +23,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
+import com.venom.stackcard.ui.components.mastery.HapticStrength
+import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.BrandColors
 import kotlin.math.abs
 import kotlin.math.min
@@ -81,9 +83,10 @@ fun MasterySwipeableCard(
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = rememberHapticFeedback()
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
-    val cardShape = RoundedCornerShape(32.dp)
+    val cardShape = RoundedCornerShape(32.adp)
 
     val absProgress = remember(swipeProgress) { abs(swipeProgress) }
 
@@ -108,9 +111,13 @@ fun MasterySwipeableCard(
         ).value
     } else 0f
 
-    val cardDimensions = remember(density) {
-        val maxWidth = with(density) { configuration.screenWidthDp.dp.toPx() }
-        val cardWidth = with(density) { min(maxWidth - 24.dp.toPx(), 400.dp.toPx()).toDp() }
+    val adapterMaxWidth = configuration.screenWidthDp.adp
+    val adapterPadding = 24.adp
+    val adapterLimit = 400.adp
+    
+    val cardDimensions = remember(density, adapterMaxWidth, adapterPadding, adapterLimit) {
+        val maxWidth = with(density) { adapterMaxWidth.toPx() }
+        val cardWidth = with(density) { min(maxWidth - adapterPadding.toPx(), adapterLimit.toPx()).toDp() }
         Pair(cardWidth, cardWidth * 1.8f)
     }
 
@@ -121,8 +128,8 @@ fun MasterySwipeableCard(
         modifier = modifier
             .size(cardWidth, cardHeight)
             .offset(
-                x = ((offsetX / density.density).dp) + stackOffsetX,
-                y = ((offsetY / density.density).dp) + stackOffsetY
+                x = ((offsetX / density.density).adp) + stackOffsetX,
+                y = ((offsetY / density.density).adp) + stackOffsetY
             )
             .graphicsLayer {
                 rotationZ = if (isFlipped) -rotation else rotation
@@ -134,7 +141,7 @@ fun MasterySwipeableCard(
                 renderEffect = null
             }
             .clip(cardShape)
-            .border(borderWidth.dp, borderColor, cardShape)
+            .border(borderWidth.adp, borderColor, cardShape)
             .then(
                 if (isTopCard) {
                     Modifier
@@ -148,12 +155,15 @@ fun MasterySwipeableCard(
                                 onDrag(correctedDrag)
                             }
                         }
-                        .pointerInput(Unit) { detectTapGestures(onTap = { onFlip() }) }
+                        .pointerInput(Unit) { detectTapGestures(onTap = { 
+                            haptic(HapticStrength.MEDIUM)
+                            onFlip() 
+                        }) }
                 } else Modifier
             ),
         shape = cardShape,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.adp)
     ) {
         WordCard(
             word = word,
