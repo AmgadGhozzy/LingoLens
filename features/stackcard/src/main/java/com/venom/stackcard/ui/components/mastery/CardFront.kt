@@ -142,7 +142,7 @@ fun CardFront(
                 ) {
                     DynamicStyledText(
                         text = word.wordEn.uppercase(),
-                        maxFontSize = 48,
+                        maxFontSize = 42,
                         minFontSize = 34,
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -167,7 +167,7 @@ fun CardFront(
                                 fontSize = 9.asp,
                                 fontWeight = FontWeight.Bold
                             ),
-                            color = difficultyTheme.text // Matches difficulty bar
+                            color = difficultyTheme.text
                         )
                     }
                 }
@@ -214,6 +214,7 @@ fun CardFront(
                             onClick = onRevealHint,
                             onSpeak = onSpeak,
                             speakOnTap = isHintRevealed,
+                            hapticStrength = HapticStrength.MEDIUM,
                             modifier = Modifier
                                 .blur(blurAmount.adp)
                                 .alpha(hintAlpha)
@@ -253,7 +254,8 @@ private fun PhoneticButton(
 ) {
     InteractiveText(
         text = "",
-        onSpeak = { onClick() }
+        onSpeak = { onClick() },
+        hapticStrength = HapticStrength.LIGHT
     ) {
         Row(
             modifier = modifier
