@@ -19,12 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.theme.BrandColors
 import kotlin.math.abs
 
@@ -41,13 +40,14 @@ fun SwipeIndicators(
     )
 
     Box(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 32.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 32.adp),
         contentAlignment = Alignment.Center
     ) {
+        val shiftAdp = shift.adp
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .offset(x = with(LocalDensity.current) { shift.dp }),
+                .offset(x = shiftAdp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Indicator(
@@ -84,18 +84,18 @@ private fun Indicator(
                 scaleX = 0.9f + (alpha * 0.1f)
                 scaleY = 0.9f + (alpha * 0.1f)
             }
-            .padding(8.dp),
-        shape = RoundedCornerShape(16.dp),
+            .padding(8.adp),
+        shape = RoundedCornerShape(16.adp),
         colors = CardDefaults.cardColors(containerColor = color),
-        elevation = CardDefaults.cardElevation(defaultElevation = (alpha * 8).dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = (alpha * 8).adp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 20.adp, vertical = 10.adp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.adp)
         ) {
-            Text(text = icon, fontSize = 20.sp, color = Color.White)
-            Text(text = text, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text = icon, fontSize = 20.asp, color = Color.White)
+            Text(text = text, color = Color.White, fontSize = 14.asp, fontWeight = FontWeight.Bold)
         }
     }
 }
