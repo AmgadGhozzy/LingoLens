@@ -71,14 +71,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.domain.model.Author
 import com.venom.domain.model.Tag
 import com.venom.resources.R
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
+import com.venom.ui.theme.lingoLens
 import kotlinx.coroutines.delay
 
 data class FilterOptions(
@@ -112,6 +112,8 @@ fun FilterDialog(
     var localFilters by remember(currentFilters) { mutableStateOf(currentFilters) }
     var isVisible by remember(visible) { mutableStateOf(false) }
     val density = LocalDensity.current
+    val colorScheme = MaterialTheme.colorScheme
+    val feature = MaterialTheme.lingoLens.feature
 
     LaunchedEffect(visible) {
         if (visible) {
@@ -123,6 +125,7 @@ fun FilterDialog(
     }
 
     if (visible) {
+        val animationOffsetPx = with(density) { 40.adp.roundToPx() }
         Dialog(
             onDismissRequest = onDismiss,
             properties = DialogProperties(
@@ -133,7 +136,7 @@ fun FilterDialog(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Color.Black.copy(0.5f))
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -147,11 +150,11 @@ fun FilterDialog(
                             dampingRatio = Spring.DampingRatioMediumBouncy,
                             stiffness = Spring.StiffnessMediumLow
                         ),
-                        initialOffsetY = { with(density) { 40.dp.roundToPx() } }
+                        initialOffsetY = { animationOffsetPx }
                     ) + fadeIn(animationSpec = tween(300)),
                     exit = slideOutVertically(
                         animationSpec = tween(250),
-                        targetOffsetY = { with(density) { 40.dp.roundToPx() } }
+                        targetOffsetY = { animationOffsetPx }
                     ) + fadeOut(animationSpec = tween(250))
                 ) {
                     Card(
@@ -159,18 +162,17 @@ fun FilterDialog(
                             .fillMaxWidth(0.92f)
                             .fillMaxHeight(0.85f)
                             .clickable(enabled = false) { },
-                        shape = RoundedCornerShape(24.dp),
+                        shape = RoundedCornerShape(24.adp),
                         colors = CardDefaults.cardColors(
-                            containerColor = QuoteColors.surfacePrimary()
+                            containerColor = colorScheme.surface
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 24.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 24.adp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(24.dp)
+                                .padding(24.adp)
                         ) {
-                            // Header
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -180,74 +182,70 @@ fun FilterDialog(
                                     text = stringResource(id = R.string.filter_quotes),
                                     style = MaterialTheme.typography.headlineSmall.copy(
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 24.sp
+                                        fontSize = 24.asp
                                     ),
-                                    color = QuoteColors.textPrimary()
+                                    color = colorScheme.onSurface
                                 )
 
                                 IconButton(
                                     onClick = onDismiss,
                                     modifier = Modifier
-                                        .size(40.dp)
+                                        .size(40.adp)
                                         .background(
-                                            QuoteColors.surfaceSecondary(),
+                                            colorScheme.surfaceContainerHighest,
                                             CircleShape
                                         )
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = stringResource(id = R.string.action_close),
-                                        tint = QuoteColors.textSecondary(),
-                                        modifier = Modifier.size(20.dp)
+                                        tint = colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(20.adp)
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(24.adp))
 
-                            // Content
                             LazyColumn(
                                 modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(24.dp)
+                                verticalArrangement = Arrangement.spacedBy(24.adp)
                             ) {
-                                // Favorites Toggle
                                 item {
                                     FilterSection(title = stringResource(id = R.string.quick_filters)) {
                                         FilterCheckbox(
                                             text = stringResource(id = R.string.favorites_only),
                                             checked = localFilters.favoritesOnly,
-                                            onCheckedChange = { localFilters = localFilters.copy(favoritesOnly = it) },
-                                            color = QuoteColors.accentPink()
+                                            onCheckedChange = {
+                                                localFilters = localFilters.copy(favoritesOnly = it)
+                                            },
+                                            color = feature.quote.pink
                                         )
                                     }
                                 }
 
-                                // Authors Section
                                 if (authors.isNotEmpty()) {
                                     item {
                                         FilterSection(title = stringResource(id = R.string.authors)) {
                                             LazyColumn(
-                                                modifier = Modifier.heightIn(max = 200.dp),
-                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                                modifier = Modifier.heightIn(max = 200.adp),
+                                                verticalArrangement = Arrangement.spacedBy(4.adp)
                                             ) {
                                                 items(authors, key = { it.authorId }) { author ->
                                                     FilterCheckbox(
                                                         text = stringResource(
-                                                            id = R.string.author_with_count,
+                                                            R.string.author_with_count,
                                                             author.authorName,
                                                             author.quotesCount
                                                         ),
                                                         checked = author.authorName in localFilters.authors,
                                                         onCheckedChange = { checked ->
                                                             localFilters = localFilters.copy(
-                                                                authors = if (checked) {
-                                                                    localFilters.authors + author.authorName
-                                                                } else {
-                                                                    localFilters.authors - author.authorName
-                                                                }
+                                                                authors = if (checked) localFilters.authors + author.authorName
+                                                                else localFilters.authors - author.authorName
                                                             )
                                                         },
-                                                        color = QuoteColors.primary()
+                                                        color = colorScheme.primary
                                                     )
                                                 }
                                             }
@@ -255,45 +253,46 @@ fun FilterDialog(
                                     }
                                 }
 
-                                // Tags Section
                                 if (tags.isNotEmpty()) {
                                     item {
                                         FilterSection(title = stringResource(id = R.string.tags)) {
                                             LazyColumn(
-                                                modifier = Modifier.heightIn(max = 240.dp),
-                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                                modifier = Modifier.heightIn(max = 240.adp),
+                                                verticalArrangement = Arrangement.spacedBy(4.adp)
                                             ) {
                                                 items(tags.chunked(2)) { rowTags ->
                                                     Row(
                                                         modifier = Modifier.fillMaxWidth(),
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.adp
+                                                        )
                                                     ) {
                                                         rowTags.forEach { tag ->
                                                             Box(modifier = Modifier.weight(1f)) {
                                                                 FilterCheckbox(
                                                                     text = stringResource(
-                                                                        id = R.string.tag_with_count,
+                                                                        R.string.tag_with_count,
                                                                         tag.tagName,
                                                                         tag.count
                                                                     ),
                                                                     checked = tag.tagName in localFilters.tags,
                                                                     onCheckedChange = { checked ->
-                                                                        localFilters = localFilters.copy(
-                                                                            tags = if (checked) {
-                                                                                localFilters.tags + tag.tagName
-                                                                            } else {
-                                                                                localFilters.tags - tag.tagName
-                                                                            }
-                                                                        )
+                                                                        localFilters =
+                                                                            localFilters.copy(
+                                                                                tags = if (checked) localFilters.tags + tag.tagName
+                                                                                else localFilters.tags - tag.tagName
+                                                                            )
                                                                     },
-                                                                    color = QuoteColors.secondary(),
+                                                                    color = colorScheme.secondary,
                                                                     compact = true
                                                                 )
                                                             }
                                                         }
-                                                        if (rowTags.size == 1) {
-                                                            Spacer(modifier = Modifier.weight(1f))
-                                                        }
+                                                        if (rowTags.size == 1) Spacer(
+                                                            modifier = Modifier.weight(
+                                                                1f
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             }
@@ -302,24 +301,18 @@ fun FilterDialog(
                                 }
                             }
 
-                            // Action Buttons
                             val hasFilters = localFilters.hasActiveFilters()
                             val filterCount = localFilters.getFilterCount()
 
-                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(12.adp)) {
                                 Button(
-                                    onClick = {
-                                        onApplyFilters(localFilters)
-                                        onDismiss()
-                                    },
+                                    onClick = { onApplyFilters(localFilters); onDismiss() },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(56.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color.Transparent
-                                    ),
-                                    contentPadding = PaddingValues(0.dp),
+                                        .height(56.adp),
+                                    shape = RoundedCornerShape(16.adp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                    contentPadding = PaddingValues(0.adp),
                                     elevation = null
                                 ) {
                                     Box(
@@ -327,37 +320,40 @@ fun FilterDialog(
                                             .fillMaxSize()
                                             .background(
                                                 Brush.horizontalGradient(
-                                                    colors = listOf(
-                                                        QuoteColors.primary(),
-                                                        QuoteColors.secondary()
+                                                    listOf(
+                                                        colorScheme.primary,
+                                                        colorScheme.secondary
                                                     )
                                                 ),
-                                                RoundedCornerShape(16.dp)
+                                                RoundedCornerShape(16.adp)
                                             ),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Text(
-                                                text = stringResource(id = R.string.apply_filters),
-                                                fontSize = 16.sp,
+                                                stringResource(R.string.apply_filters),
+                                                fontSize = 16.asp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = Color.White
                                             )
-
                                             if (hasFilters) {
-                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Spacer(modifier = Modifier.width(8.adp))
                                                 Box(
                                                     modifier = Modifier
                                                         .background(
-                                                            Color.White.copy(alpha = 0.2f),
-                                                            CircleShape
+                                                            Color.White.copy(
+                                                                0.2f
+                                                            ), CircleShape
                                                         )
-                                                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                                                        .padding(
+                                                            horizontal = 8.adp,
+                                                            vertical = 4.adp
+                                                        ),
                                                     contentAlignment = Alignment.Center
                                                 ) {
                                                     Text(
-                                                        text = filterCount.toString(),
-                                                        fontSize = 12.sp,
+                                                        filterCount.toString(),
+                                                        fontSize = 12.asp,
                                                         fontWeight = FontWeight.Bold,
                                                         color = Color.White
                                                     )
@@ -368,7 +364,7 @@ fun FilterDialog(
                                 }
 
                                 AnimatedVisibility(
-                                    visible = hasFilters,
+                                    hasFilters,
                                     enter = expandVertically() + fadeIn(),
                                     exit = shrinkVertically() + fadeOut()
                                 ) {
@@ -376,16 +372,14 @@ fun FilterDialog(
                                         onClick = { localFilters = FilterOptions() },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(48.dp),
-                                        shape = RoundedCornerShape(16.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = QuoteColors.textSecondary()
-                                        ),
-                                        border = BorderStroke(1.dp, QuoteColors.border())
+                                            .height(48.adp),
+                                        shape = RoundedCornerShape(16.adp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = colorScheme.onSurfaceVariant),
+                                        border = BorderStroke(1.adp, colorScheme.outlineVariant)
                                     ) {
                                         Text(
-                                            text = stringResource(id = R.string.clear_all_filters),
-                                            fontSize = 14.sp,
+                                            stringResource(R.string.clear_all_filters),
+                                            fontSize = 14.asp,
                                             fontWeight = FontWeight.Medium
                                         )
                                     }
@@ -400,19 +394,16 @@ fun FilterDialog(
 }
 
 @Composable
-private fun FilterSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
+private fun FilterSection(title: String, content: @Composable () -> Unit) {
     Column {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
+                fontSize = 18.asp
             ),
-            color = QuoteColors.textPrimary(),
-            modifier = Modifier.padding(bottom = 12.dp)
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 12.adp)
         )
         content()
     }
@@ -426,52 +417,51 @@ private fun FilterCheckbox(
     color: Color,
     compact: Boolean = false
 ) {
-    val size = if (compact) 16.dp else 20.dp
-    val fontSize = if (compact) 12.sp else 14.sp
+    val colorScheme = MaterialTheme.colorScheme
+    val size = if (compact) 16.adp else 20.adp
+    val fontSize = if (compact) 12.asp else 14.asp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.adp))
             .clickable { onCheckedChange(!checked) }
-            .background(if (checked) color.copy(alpha = 0.08f) else Color.Transparent)
-            .padding(vertical = if (compact) 8.dp else 10.dp, horizontal = 8.dp)
+            .background(if (checked) color.copy(0.08f) else Color.Transparent)
+            .padding(vertical = if (compact) 8.adp else 10.adp, horizontal = 8.adp)
             .animateContentSize(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(size)
-                .clip(RoundedCornerShape(if (compact) 4.dp else 6.dp))
+                .clip(RoundedCornerShape(if (compact) 4.adp else 6.adp))
                 .background(if (checked) color else Color.Transparent)
                 .border(
-                    2.dp,
-                    if (checked) color else QuoteColors.border(),
-                    RoundedCornerShape(if (compact) 4.dp else 6.dp)
+                    2.adp,
+                    if (checked) color else colorScheme.outlineVariant,
+                    RoundedCornerShape(if (compact) 4.adp else 6.adp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.animation.AnimatedVisibility(
-                visible = checked,
+                checked,
                 enter = scaleIn(spring(Spring.DampingRatioMediumBouncy)) + fadeIn(),
                 exit = scaleOut() + fadeOut()
             ) {
                 Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
+                    Icons.Default.Check,
+                    null,
                     tint = Color.White,
                     modifier = Modifier.size(size * 0.6f)
                 )
             }
         }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
+        Spacer(modifier = Modifier.width(12.adp))
         Text(
-            text = text,
+            text,
             fontSize = fontSize,
             fontWeight = if (checked) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (checked) color else QuoteColors.textPrimary(),
+            color = if (checked) color else colorScheme.onSurface,
             modifier = Modifier.weight(1f)
         )
     }
@@ -480,83 +470,63 @@ private fun FilterCheckbox(
 @Composable
 fun ActiveFiltersRow(
     filterOptions: FilterOptions,
-    onRemoveFilter: (filterType: String, value: String) -> Unit,
+    onRemoveFilter: (String, String) -> Unit,
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (!filterOptions.hasActiveFilters()) return
+    val colorScheme = MaterialTheme.colorScheme
+    val feature = MaterialTheme.lingoLens.feature
 
     Column(modifier = modifier.animateContentSize()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
             Text(
-                text = stringResource(
-                    id = R.string.active_filters_count,
-                    filterOptions.getFilterCount()
-                ),
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                color = QuoteColors.textSecondary()
+                stringResource(R.string.active_filters_count, filterOptions.getFilterCount()),
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = colorScheme.onSurfaceVariant
             )
-
             if (filterOptions.getFilterCount() > 1) {
                 TextButton(
-                    onClick = onClearAll,
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    onClearAll,
+                    contentPadding = PaddingValues(horizontal = 8.adp, vertical = 4.adp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.clear_all),
-                        fontSize = 12.sp,
+                        stringResource(R.string.clear_all),
+                        fontSize = 12.asp,
                         fontWeight = FontWeight.Medium,
-                        color = QuoteColors.textTertiary()
+                        color = colorScheme.onSurfaceVariant.copy(0.7f)
                     )
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
+        Spacer(modifier = Modifier.height(8.adp))
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 4.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            contentPadding = PaddingValues(vertical = 4.adp)
         ) {
             if (filterOptions.favoritesOnly) {
-                item(key = "favorites") {
+                item("favorites") {
                     FilterChip(
-                        label = stringResource(id = R.string.favorites),
-                        color = QuoteColors.accentPink(),
-                        icon = Icons.Outlined.FavoriteBorder,
-                        onRemove = { onRemoveFilter("favorites", "Favorites") }
-                    )
+                        stringResource(R.string.favorites),
+                        feature.quote.pink,
+                        Icons.Outlined.FavoriteBorder
+                    ) { onRemoveFilter("favorites", "Favorites") }
                 }
             }
-
-            items(
-                items = filterOptions.authors.toList(),
-                key = { "author_$it" }
-            ) { author ->
+            items(filterOptions.authors.toList(), key = { "author_$it" }) { author ->
                 FilterChip(
-                    label = author,
-                    color = QuoteColors.primary(),
-                    icon = Icons.Outlined.Person,
-                    onRemove = { onRemoveFilter("author", author) }
-                )
+                    author,
+                    colorScheme.primary,
+                    Icons.Outlined.Person
+                ) { onRemoveFilter("author", author) }
             }
-
-            items(
-                items = filterOptions.tags.toList(),
-                key = { "tag_$it" }
-            ) { tag ->
-                FilterChip(
-                    label = tag,
-                    color = QuoteColors.secondary(),
-                    icon = Icons.Outlined.Tag,
-                    onRemove = { onRemoveFilter("tag", tag) }
-                )
+            items(filterOptions.tags.toList(), key = { "tag_$it" }) { tag ->
+                FilterChip(tag, colorScheme.secondary, Icons.Outlined.Tag) {
+                    onRemoveFilter(
+                        "tag",
+                        tag
+                    )
+                }
             }
         }
     }
@@ -570,43 +540,31 @@ private fun FilterChip(
     onRemove: () -> Unit
 ) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = color.copy(alpha = 0.1f),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(20.adp),
+        color = color.copy(0.1f),
+        border = BorderStroke(1.adp, color.copy(0.3f)),
         modifier = Modifier.animateContentSize()
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 12.adp, vertical = 8.adp),
+            horizontalArrangement = Arrangement.spacedBy(6.adp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    tint = color,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-
+            icon?.let { Icon(it, null, tint = color, modifier = Modifier.size(14.adp)) }
             Text(
-                text = label,
-                fontSize = 12.sp,
+                label,
+                fontSize = 12.asp,
                 fontWeight = FontWeight.Medium,
                 color = color,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-
-            IconButton(
-                onClick = onRemove,
-                modifier = Modifier.size(20.dp)
-            ) {
+            IconButton(onRemove, Modifier.size(20.adp)) {
                 Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(id = R.string.remove_filter, label),
+                    Icons.Default.Close,
+                    stringResource(R.string.remove_filter, label),
                     tint = color,
-                    modifier = Modifier.size(12.dp)
+                    modifier = Modifier.size(12.adp)
                 )
             }
         }
@@ -625,19 +583,10 @@ private fun FilterDialogPreview() {
                 favoritesOnly = false
             ),
             authors = listOf(
-                Author(authorId = 1, authorName = "Marcus Aurelius", quotesCount = 45),
-                Author(authorId = 2, authorName = "The Buddha", quotesCount = 32),
-                Author(authorId = 3, authorName = "Steve Jobs", quotesCount = 28),
-                Author(authorId = 4, authorName = "Thomas Edison", quotesCount = 19)
+                Author(1, "Marcus Aurelius", quotesCount = 45),
+                Author(2, "The Buddha", quotesCount = 32)
             ),
-            tags = listOf(
-                Tag(1, "wisdom", 156),
-                Tag(2, "motivation", 134),
-                Tag(3, "success", 89),
-                Tag(4, "inspiration", 67),
-                Tag(5, "life", 198),
-                Tag(6, "happiness", 76)
-            ),
+            tags = listOf(Tag(1, "wisdom", 156), Tag(2, "motivation", 134)),
             onDismiss = {},
             onApplyFilters = {}
         )
