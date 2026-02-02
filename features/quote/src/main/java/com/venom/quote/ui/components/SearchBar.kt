@@ -41,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -62,11 +63,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.venom.resources.R
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
+import com.venom.ui.theme.lingoLens
 
 @Composable
 fun SearchBar(
@@ -88,30 +89,33 @@ fun SearchBar(
     val focusRequester = remember { FocusRequester() }
     val showDropdown = isActive && (suggestions.isNotEmpty() || recentSearches.isNotEmpty())
 
+    val colorScheme = MaterialTheme.colorScheme
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     Column(modifier) {
         Card(
             Modifier
                 .fillMaxWidth()
                 .zIndex(if (isActive) 10f else 1f),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(if (isActive) 6.dp else 2.dp),
-            border = if (isActive) BorderStroke(1.dp, QuoteColors.primary()) else null,
-            colors = CardDefaults.cardColors(QuoteColors.surfacePrimary())
+            shape = RoundedCornerShape(16.adp),
+            elevation = CardDefaults.cardElevation(if (isActive) 6.adp else 2.adp),
+            border = if (isActive) BorderStroke(1.adp, colorScheme.primary) else null,
+            colors = CardDefaults.cardColors(colorScheme.surfaceContainerHighest)
         ) {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(horizontal = 16.adp, vertical = 14.adp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     Icons.Default.Search,
                     stringResource(R.string.search_hint),
-                    Modifier.size(22.dp),
-                    tint = if (isActive) QuoteColors.primary() else QuoteColors.textSecondary()
+                    Modifier.size(22.adp),
+                    tint = if (isActive) colorScheme.primary else colorScheme.onSurfaceVariant
                 )
 
-                Spacer(Modifier.width(16.dp))
+                Spacer(Modifier.width(16.adp))
 
                 BasicTextField(
                     query,
@@ -121,11 +125,11 @@ fun SearchBar(
                         .focusRequester(focusRequester)
                         .onFocusChanged { isActive = it.isFocused },
                     textStyle = TextStyle(
-                        QuoteColors.textPrimary(),
-                        fontSize = 17.sp,
+                        colorScheme.onSurface,
+                        fontSize = 17.asp,
                         fontWeight = FontWeight.Medium
                     ),
-                    cursorBrush = SolidColor(QuoteColors.primary()),
+                    cursorBrush = SolidColor(colorScheme.primary),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions {
@@ -139,38 +143,38 @@ fun SearchBar(
                     if (query.isEmpty()) {
                         Text(
                             placeholder ?: stringResource(R.string.search_hint),
-                            color = QuoteColors.textTertiary(),
-                            fontSize = 16.sp
+                            color = colorScheme.onSurfaceVariant,
+                            fontSize = 16.asp
                         )
                     }
                     innerTextField()
                 }
 
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(12.adp))
 
                 if (query.isNotEmpty()) {
                     IconButton(
                         { onQueryChange("") },
                         Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(QuoteColors.surfaceSecondary())
+                            .size(36.adp)
+                            .clip(RoundedCornerShape(10.adp))
+                            .background(colorScheme.surfaceContainerHighest)
                     ) {
                         Icon(
                             Icons.Default.Close,
                             stringResource(R.string.action_clear_search),
-                            Modifier.size(16.dp),
-                            tint = QuoteColors.textSecondary()
+                            Modifier.size(16.adp),
+                            tint = colorScheme.onSurfaceVariant
                         )
                     }
                 } else {
                     Box(
                         Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
+                            .size(36.adp)
+                            .clip(RoundedCornerShape(10.adp))
                             .background(
-                                if (hasActiveFilters) QuoteColors.tagBackground()
-                                else QuoteColors.surfaceSecondary()
+                                if (hasActiveFilters) feature.tagBackground
+                                else colorScheme.surfaceContainerHighest
                             )
                             .clickable { onFilterClick() },
                         Alignment.Center
@@ -178,17 +182,17 @@ fun SearchBar(
                         Icon(
                             Icons.Default.FilterList,
                             "Filter",
-                            Modifier.size(16.dp),
-                            tint = if (hasActiveFilters) QuoteColors.secondary()
-                            else QuoteColors.textSecondary()
+                            Modifier.size(16.adp),
+                            tint = if (hasActiveFilters) colorScheme.secondary
+                            else colorScheme.onSurfaceVariant
                         )
 
                         if (hasActiveFilters) {
                             Box(
                                 Modifier
-                                    .size(6.dp)
-                                    .offset(x = 8.dp, y = (-8).dp)
-                                    .background(QuoteColors.secondary(), CircleShape)
+                                    .size(6.adp)
+                                    .offset(x = 8.adp, y = (-8).adp)
+                                    .background(colorScheme.secondary, CircleShape)
                                     .align(Alignment.TopEnd)
                             )
                         }
@@ -197,7 +201,7 @@ fun SearchBar(
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(8.adp))
 
         AnimatedVisibility(
             showDropdown,
@@ -208,12 +212,12 @@ fun SearchBar(
                 Modifier
                     .fillMaxWidth()
                     .zIndex(20f),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(QuoteColors.surfacePrimary()),
-                elevation = CardDefaults.cardElevation(8.dp),
-                border = BorderStroke(1.dp, QuoteColors.border())
+                shape = RoundedCornerShape(16.adp),
+                colors = CardDefaults.cardColors(colorScheme.surface),
+                elevation = CardDefaults.cardElevation(8.adp),
+                border = BorderStroke(1.adp, colorScheme.outlineVariant)
             ) {
-                LazyColumn(Modifier.heightIn(max = 280.dp)) {
+                LazyColumn(Modifier.heightIn(max = 280.adp)) {
                     if (recentSearches.isNotEmpty() && query.isEmpty()) {
                         item {
                             SectionHeader(
@@ -249,7 +253,7 @@ fun SearchBar(
                             SectionHeader(
                                 Icons.AutoMirrored.Default.TrendingUp,
                                 if (query.isEmpty()) "POPULAR" else "SUGGESTIONS",
-                                tintColor = QuoteColors.primary()
+                                tintColor = colorScheme.primary
                             )
                         }
 
@@ -281,33 +285,35 @@ private fun SectionHeader(
     title: String,
     actionText: String? = null,
     onActionClick: (() -> Unit)? = null,
-    tintColor: androidx.compose.ui.graphics.Color = QuoteColors.textSecondary()
+    tintColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(20.dp, 16.dp, 20.dp, 8.dp),
+            .padding(20.adp, 16.adp, 20.adp, 8.adp),
         Arrangement.SpaceBetween,
         Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, Modifier.size(14.dp), tint = tintColor)
-            Spacer(Modifier.width(8.dp))
+            Icon(icon, null, Modifier.size(14.adp), tint = tintColor)
+            Spacer(Modifier.width(8.adp))
             Text(
                 title,
-                fontSize = 11.sp,
+                fontSize = 11.asp,
                 fontWeight = FontWeight.SemiBold,
-                color = QuoteColors.textSecondary()
+                color = colorScheme.onSurfaceVariant
             )
         }
 
         if (actionText != null && onActionClick != null) {
-            TextButton(onActionClick, contentPadding = PaddingValues(8.dp, 4.dp)) {
+            TextButton(onActionClick, contentPadding = PaddingValues(8.adp, 4.adp)) {
                 Text(
                     actionText,
-                    fontSize = 12.sp,
+                    fontSize = 12.asp,
                     fontWeight = FontWeight.Medium,
-                    color = QuoteColors.primary()
+                    color = colorScheme.primary
                 )
             }
         }
@@ -323,68 +329,76 @@ private fun SuggestionItem(
     isRecent: Boolean,
     showDivider: Boolean
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     Column {
         Row(
             Modifier
                 .fillMaxWidth()
                 .clickable { onClick() }
-                .padding(20.dp, 14.dp),
+                .padding(20.adp, 14.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isRecent) {
-                Icon(icon, null, Modifier.size(18.dp), tint = QuoteColors.textTertiary())
+                Icon(
+                    icon,
+                    null,
+                    Modifier.size(18.adp),
+                    tint = colorScheme.onSurfaceVariant.copy(0.7f)
+                )
             } else {
                 Box(
                     Modifier
-                        .size(28.dp)
-                        .background(QuoteColors.tagBackground(), RoundedCornerShape(7.dp)),
+                        .size(28.adp)
+                        .background(feature.tagBackground, RoundedCornerShape(7.adp)),
                     Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Search,
                         null,
-                        Modifier.size(14.dp),
-                        tint = QuoteColors.secondary()
+                        Modifier.size(14.adp),
+                        tint = colorScheme.secondary
                     )
                 }
             }
 
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.width(14.adp))
 
             Text(
                 text,
                 Modifier.weight(1f),
-                fontSize = 15.sp,
+                fontSize = 15.asp,
                 fontWeight = FontWeight.Medium,
-                color = QuoteColors.textPrimary(),
+                color = colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
             if (isRecent && onRemove != null) {
-                IconButton({ onRemove() }, Modifier.size(32.dp)) {
+                IconButton({ onRemove() }, Modifier.size(32.adp)) {
                     Icon(
                         Icons.Default.Close,
                         "Remove",
-                        Modifier.size(14.dp),
-                        tint = QuoteColors.textTertiary()
+                        Modifier.size(14.adp),
+                        tint = colorScheme.onSurfaceVariant.copy(0.7f)
                     )
                 }
             } else if (!isRecent) {
                 Icon(
                     Icons.Outlined.ArrowOutward,
                     null,
-                    Modifier.size(16.dp),
-                    tint = QuoteColors.textTertiary()
+                    Modifier.size(16.adp),
+                    tint = colorScheme.onSurfaceVariant.copy(0.7f)
                 )
             }
         }
 
         if (showDivider) {
             HorizontalDivider(
-                Modifier.padding(start = 62.dp, end = 20.dp),
-                thickness = 0.5.dp,
-                color = QuoteColors.border().copy(0.3f)
+                Modifier.padding(start = 62.adp, end = 20.adp),
+                thickness = 0.5.adp,
+                color = colorScheme.outlineVariant.copy(0.3f)
             )
         }
     }
@@ -397,7 +411,7 @@ fun SearchBarPreview() {
     val suggestions = listOf("Motivation", "Success", "Life", "Happiness", "Wisdom", "Growth")
     val recentSearches = listOf("Inspiration", "Peace", "Creativity", "Love", "Hope")
 
-    Column(Modifier.padding(16.dp)) {
+    Column(Modifier.padding(16.adp)) {
         SearchBar(
             query = query,
             onQueryChange = { query = it },
