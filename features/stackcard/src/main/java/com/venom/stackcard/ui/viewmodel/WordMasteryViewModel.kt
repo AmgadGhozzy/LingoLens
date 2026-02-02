@@ -109,7 +109,7 @@ class WordMasteryViewModel @Inject constructor(
             is WordMasteryEvent.OpenSheet -> _uiState.update { it.copy(isSheetOpen = true, activeTab = InsightsTab.OVERVIEW) }
             is WordMasteryEvent.CloseSheet -> _uiState.update { it.copy(isSheetOpen = false) }
             is WordMasteryEvent.ChangeTab -> _uiState.update { it.copy(activeTab = event.tab) }
-            is WordMasteryEvent.ToggleBookmark -> _uiState.update { it.copy(isBookmarked = !it.isBookmarked) }
+            is WordMasteryEvent.ToggleBookmark -> toggleBookmark()
             is WordMasteryEvent.PinLanguage -> pinLanguage(event.language)
             is WordMasteryEvent.RevealHint -> _uiState.update { it.copy(isHintRevealed = true) }
             is WordMasteryEvent.TogglePowerTip -> _uiState.update { it.copy(showPowerTip = !it.showPowerTip) }
@@ -148,8 +148,19 @@ class WordMasteryViewModel @Inject constructor(
                         onFailure = { e -> loadFallbackData(e, topic, "generative_fallback") }
                     )
                 } else {
-                    // Enrich NEW words and get them directly (different words each session)
-                    val words = enrichmentRepository.enrichAndGetWords(5)
+                    // SRS Priority: 1. Due Reviews, 2. New Words
+                    val userId = identityRepository.getCurrentUserId()
+                    val reviewLimit = 5
+                    val reviewWords = progressRepository.getWordsDueForReview(userId, reviewLimit)
+                    
+                    val newNeeded = reviewLimit - reviewWords.size
+                    val newWords = if (newNeeded > 0) {
+                        enrichmentRepository.enrichAndGetWords(newNeeded)
+                    } else {
+                        emptyList()
+                    }
+                    
+                    val words = reviewWords + newWords
                     
                     if (words.isNotEmpty()) {
                         val defaultPinnedLanguage = words.firstOrNull()?.let { 
@@ -165,9 +176,9 @@ class WordMasteryViewModel @Inject constructor(
                             )
                         }
                         words.firstOrNull()?.let { recordWordView(it.id) }
-                        logSessionStarted("enriched_db", words.size, null)
+                        logSessionStarted("srs_mixed", words.size, null, "reviews: ${reviewWords.size}, new: ${newWords.size}")
                     } else {
-                        // Fallback to mock data if no unenriched words available
+                        // Fallback only if BOTH reviews and enrichment failed/empty
                         val mockWords = MockWordData.mockWordList.shuffled().take(5)
                         val defaultPinnedLanguage = mockWords.firstOrNull()?.let { 
                             getLanguageOptions(it).find { lang -> lang.langName == "Spanish" } 
@@ -182,7 +193,7 @@ class WordMasteryViewModel @Inject constructor(
                             )
                         }
                         mockWords.firstOrNull()?.let { recordWordView(it.id) }
-                        logSessionStarted("local_mock", mockWords.size, null, "no_unenriched_words")
+                        logSessionStarted("local_mock", mockWords.size, null, "no_data_available")
                     }
                 }
             } catch (e: Exception) {
@@ -297,9 +308,29 @@ class WordMasteryViewModel @Inject constructor(
         }
     }
 
+    private fun toggleBookmark() {
+        val currentWord = _uiState.value.currentWord ?: return
+        val newStatus = !_uiState.value.isBookmarked
+        
+        _uiState.update { it.copy(isBookmarked = newStatus) }
+        
+        viewModelScope.launch {
+             progressRepository.toggleBookmark(
+                 identityRepository.getCurrentUserId(),
+                 currentWord.id,
+                 newStatus
+             )
+        }
+    }
+
     private fun recordWordView(wordId: Int) {
         viewModelScope.launch {
-            progressRepository.recordView(identityRepository.getCurrentUserId(), wordId)
+            val userId = identityRepository.getCurrentUserId()
+            progressRepository.recordView(userId, wordId)
+            
+            // Sync bookmark state from DB
+            val progress = progressRepository.getOrCreateProgress(userId, wordId)
+            _uiState.update { it.copy(isBookmarked = progress.bookmarked) }
         }
     }
 }
