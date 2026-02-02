@@ -10,12 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.menus.ButtonType
 import com.venom.ui.components.menus.OverflowMenu
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun SelectedTextItem(
@@ -27,13 +28,13 @@ fun SelectedTextItem(
 ) {
     GlassCard(
         modifier = modifier.fillMaxWidth(),
-        solidBackgroundAlpha = 0.1f,
+        thickness = GlassThickness.Thin,
         shape = MaterialTheme.shapes.large
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 8.dp, start = 16.dp),
+                .padding(end = 8.adp, start = 16.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -46,7 +47,7 @@ fun SelectedTextItem(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.adp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 actions.take(maxActionsVisible).forEach { action ->

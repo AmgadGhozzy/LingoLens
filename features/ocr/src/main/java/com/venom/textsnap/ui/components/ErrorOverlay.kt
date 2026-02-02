@@ -21,8 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 @Composable
 fun ErrorOverlay(
@@ -32,7 +32,7 @@ fun ErrorOverlay(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface.copy(0.9f))
-            .padding(32.dp)
+            .padding(32.adp)
     ) {
         Column(
             modifier = Modifier
@@ -44,11 +44,11 @@ fun ErrorOverlay(
             Icon(
                 painter = painterResource(id = R.drawable.ic_error),
                 contentDescription = null,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(48.adp),
                 tint = MaterialTheme.colorScheme.error
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.adp))
 
             Text(
                 text = "Failed to process image",
@@ -56,7 +56,7 @@ fun ErrorOverlay(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.adp))
 
             Text(
                 text = stringResource(id = R.string.error_message),
@@ -64,7 +64,7 @@ fun ErrorOverlay(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.adp))
 
             Button(
                 onClick = onRetry, colors = ButtonDefaults.buttonColors(
@@ -74,9 +74,9 @@ fun ErrorOverlay(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_retry),
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.adp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.adp))
                 Text(text = stringResource(id = R.string.retry))
             }
         }

@@ -1,11 +1,13 @@
 package com.venom.textsnap.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.textsnap.ui.components.sections.ImagePreviewSection
 import com.venom.textsnap.ui.viewmodel.OcrViewModel
+import com.venom.ui.components.common.adp
 
 @Composable
 fun OcrScreenContent(
@@ -23,8 +25,8 @@ fun OcrScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(bottom = 8.dp)
-            .padding(horizontal = 12.dp)
+            .padding(bottom = 8.adp)
+            .padding(horizontal = 12.adp)
     ) {
         ImagePreviewSection(
             viewModel = viewModel,

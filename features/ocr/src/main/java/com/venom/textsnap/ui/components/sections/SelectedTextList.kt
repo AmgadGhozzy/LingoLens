@@ -7,10 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.textsnap.ui.components.SelectedTextItem
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
 
 @Composable
 fun SelectedTextList(
@@ -27,7 +27,7 @@ fun SelectedTextList(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         items(texts) { text ->
             SelectedTextItem(

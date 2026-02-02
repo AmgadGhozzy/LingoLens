@@ -14,12 +14,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.FullscreenTextDialog
 import com.venom.ui.components.inputs.CustomTextField
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun RecognizedTextSection(
@@ -34,8 +35,8 @@ fun RecognizedTextSection(
     val configuration = LocalConfiguration.current
     var fullscreenState by remember { mutableStateOf<String?>(null) }
 
-    val collapsedHeight = (peekHeight * 0.6f).coerceIn(56.dp, 112.dp)
-    val expandedHeight = (configuration.screenHeightDp.dp * 0.3f).coerceIn(112.dp, 224.dp)
+    val collapsedHeight = (peekHeight * 0.6f).coerceIn(56.adp, 112.adp)
+    val expandedHeight = (configuration.screenHeightDp.adp * 0.3f).coerceIn(112.adp, 224.adp)
     val currentHeight = if (isExpanded) expandedHeight else collapsedHeight
     val maxLines = with(LocalDensity.current) {
         ((currentHeight.value / 18) * (configuration.densityDpi / 160f)).toInt()
@@ -53,7 +54,7 @@ fun RecognizedTextSection(
 
     Box {
         GlassCard(
-            solidBackgroundAlpha = 0.1f
+            thickness = GlassThickness.Regular
         ) {
             SelectionContainer {
                 CustomTextField(

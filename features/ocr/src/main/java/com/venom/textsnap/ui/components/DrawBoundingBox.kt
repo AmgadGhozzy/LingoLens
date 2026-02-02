@@ -20,9 +20,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import com.venom.data.remote.respnod.ParagraphBox
 import com.venom.textsnap.ui.components.sections.sampleTextColors
+import com.venom.ui.components.common.adp
 
 @Composable
 fun DrawBoundingBox(
@@ -52,28 +52,31 @@ fun DrawBoundingBox(
         sampleTextColors(imageBitmap, boxRect)
     }
     if (showLabels) {
-        Box(modifier = Modifier
-            .offset {
-                IntOffset(
-                    rect.left
-                        .toDp()
-                        .roundToPx(),
-                    rect.top
-                        .toDp()
-                        .roundToPx()
-                )
-            }
-            .size(width = with(density) { rect.width.toDp() },
-                height = with(density) { rect.height.toDp() })
-            .pointerInput(Unit) { detectTapGestures(onTap = { onSelect() }) }
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        rect.left
+                            .toDp()
+                            .roundToPx(),
+                        rect.top
+                            .toDp()
+                            .roundToPx()
+                    )
+                }
+                .size(
+                    width = with(density) { rect.width.toDp() },
+                    height = with(density) { rect.height.toDp() })
+                .pointerInput(Unit) { detectTapGestures(onTap = { onSelect() }) }
 
-            .background(
-                if (isSelected) MaterialTheme.colorScheme.primary.copy(0.5f)
-                else colors.backgroundColor, RoundedCornerShape(6.dp)
-            )) {
+                .background(
+                    if (isSelected) MaterialTheme.colorScheme.primary.copy(0.5f)
+                    else colors.backgroundColor, RoundedCornerShape(6.adp)
+                )) {
 
             SelectionContainer {
-                Text(text = box.text,
+                Text(
+                    text = box.text,
                     color = colors.textColor,
                     fontSize = with(density) { textSize.toSp() },
                     fontWeight = FontWeight.Bold,

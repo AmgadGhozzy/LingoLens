@@ -11,14 +11,15 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.textsnap.ui.components.sections.RecognizedTextSection
 import com.venom.textsnap.ui.components.sections.SelectedTextList
 import com.venom.textsnap.ui.viewmodel.OcrUiState
 import com.venom.ui.components.bars.TextActionBar
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,11 +37,13 @@ fun OcrBottomSheet(
         modifier = Modifier
             .fillMaxSize()
             .heightIn(max = maxHeight),
-        contentPadding = 18.dp,
-        solidBackgroundAlpha = 0.01f
+        thickness = GlassThickness.UltraThin,
+        contentPadding = 18.adp,
+        showBorder = false,
+        showShadow = false
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.adp)
         ) {
             RecognizedTextSection(
                 text = uiState.recognizedText,
@@ -53,7 +56,7 @@ fun OcrBottomSheet(
 
             if (uiState.recognizedText.isNotEmpty()) {
                 GlassCard(
-                    solidBackgroundAlpha = 0.8f,
+                    thickness = GlassThickness.Thick,
                     shape = MaterialTheme.shapes.medium
                 ) {
                     TextActionBar(

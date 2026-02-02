@@ -14,7 +14,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.resources.R
@@ -25,9 +24,11 @@ import com.venom.textsnap.ui.viewmodel.OcrViewModel
 import com.venom.ui.components.bars.ImageActionBar
 import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.common.EmptyState
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.ImageCropperDialog
 import com.venom.ui.components.menus.ExpandableFAB
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun ImagePreviewSection(
@@ -63,7 +64,7 @@ fun ImagePreviewSection(
         modifier = modifier.fillMaxSize()
     ) {
         GlassCard(
-            solidBackgroundAlpha = 0.3f
+            thickness = GlassThickness.Thin
         ) {
             when {
                 uiState.imageBitmap != null -> ZoomableImageWithBoundingBoxes(
@@ -75,8 +76,7 @@ fun ImagePreviewSection(
                 else -> EmptyState(
                     icon = R.drawable.icon_ocr_mode,
                     title = stringResource(R.string.ocr_empty_state_title),
-                    subtitle = stringResource(R.string.ocr_empty_state_description),
-                    modifier = Modifier.align(Alignment.Center)
+                    subtitle = stringResource(R.string.ocr_empty_state_description)
                 )
             }
 
@@ -88,8 +88,8 @@ fun ImagePreviewSection(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(8.adp),
+            horizontalArrangement = Arrangement.spacedBy(16.adp),
             verticalAlignment = Alignment.Bottom
         ) {
             ImageActionBar(
