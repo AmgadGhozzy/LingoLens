@@ -9,8 +9,8 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.dp
 import com.venom.phrase.ui.viewmodel.PhraseUiState
+import com.venom.ui.components.common.adp
 import com.venom.ui.screen.langselector.LangSelectorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,9 +38,12 @@ fun PhrasebookContent(
             modifier = Modifier
                 .fillMaxSize()
                 .navigationBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
-            CategoryList(state = state, onCategoryClick = onNavigateToCategory)
+            CategoryList(
+                state = state,
+                onCategoryClick = onNavigateToCategory
+            )
         }
     }
 }

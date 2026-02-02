@@ -8,20 +8,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.phrase.data.mapper.getCategoryIcon
+import com.venom.ui.components.common.adp
 
 @Composable
 fun CategoryIcon(icon: String) {
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.adp),
         color = MaterialTheme.colorScheme.primary.copy(0.1f),
-        modifier = Modifier.size(52.dp)
+        modifier = Modifier.size(52.adp)
     ) {
         Icon(
             imageVector = getCategoryIcon(icon),
             contentDescription = null,
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(14.adp),
             tint = MaterialTheme.colorScheme.primary
         )
     }
