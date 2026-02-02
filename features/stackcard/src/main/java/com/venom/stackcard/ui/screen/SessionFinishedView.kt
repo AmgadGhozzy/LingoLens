@@ -28,30 +28,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.ConfettiView
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 
-/**
- * Session completion screen with celebration animation.
- *
- * Performance optimizations:
- * - Lottie animation limited to 2 iterations
- * - Removed unnecessary state management
- * - Simplified button interaction
- *
- * @param onBackToWelcome Callback to return to welcome screen
- * @param onExit Callback to exit/close the screen
- * @param modifier Modifier for styling
- */
 @Composable
 fun SessionFinishedView(
     onBackToWelcome: () -> Unit,
@@ -59,107 +44,81 @@ fun SessionFinishedView(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Celebration effects
-        ConfettiView(modifier = Modifier.fillMaxSize())
+        ConfettiView()
 
-        LottieAnimation(
-            composition = rememberLottieComposition(
-                spec = LottieCompositionSpec.RawRes(R.raw.confetti)
-            ).value,
-            iterations = 2,
-            modifier = Modifier.fillMaxSize()
-        )
-        // Exit button (top-end)
         CustomFilledIconButton(
             icon = Icons.Rounded.ArrowForwardIos,
-            modifier = Modifier.align(Alignment.TopEnd),
+            modifier = Modifier.align(Alignment.TopEnd).padding(24.adp),
             onClick = onExit,
             contentDescription = stringResource(R.string.action_close),
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f),
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f)
             ),
-            size = 46.dp
+            size = 46.adp
         )
 
-        // Main content
         Column(
-            modifier = Modifier.padding(horizontal = 32.dp),
+            modifier = Modifier.padding(horizontal = 32.adp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(32.adp)
         ) {
-            // Success Icon
             Box(
                 modifier = Modifier
-                    .size(96.dp)
-                    .shadow(8.dp, CircleShape)
-                    .background(
-                        MaterialTheme.lingoLens.semantic.success,
-                        CircleShape
-                    ),
+                    .size(96.adp)
+                    .shadow(8.adp, CircleShape)
+                    .background(MaterialTheme.lingoLens.semantic.success, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(R.drawable.icon_circle_check),
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(48.adp),
                     tint = MaterialTheme.lingoLens.semantic.onSuccess
                 )
             }
 
-            // Text Content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.adp)
             ) {
                 Text(
                     text = stringResource(R.string.session_complete),
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp
+                        fontSize = 28.asp
                     ),
-                    color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
                     text = stringResource(R.string.session_complete_message),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 24.sp
-                    ),
+                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 24.asp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
 
-            // Action button
             Button(
                 onClick = onBackToWelcome,
-                modifier = Modifier
-                    .widthIn(max = 260.dp)
-                    .height(56.dp),
+                modifier = Modifier.widthIn(max = 260.adp).height(56.adp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ),
                 elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 8.dp
+                    defaultElevation = 4.adp,
+                    pressedElevation = 8.adp
                 )
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.adp)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_house),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.adp)
                     )
                     Text(
                         text = stringResource(R.string.action_back_to_home),
@@ -175,22 +134,16 @@ fun SessionFinishedView(
 
 @Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
-private fun SessionFinishedViewPreview() {
+private fun SessionFinishedPreviewDark() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
-        SessionFinishedView(
-            onBackToWelcome = {},
-            onExit = {}
-        )
+        SessionFinishedView({}, {})
     }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFFF1F5F9)
 @Composable
-private fun SessionFinishedViewPreviewLight() {
+private fun SessionFinishedPreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
-        SessionFinishedView(
-            onBackToWelcome = {},
-            onExit = {}
-        )
+        SessionFinishedView({}, {})
     }
 }
