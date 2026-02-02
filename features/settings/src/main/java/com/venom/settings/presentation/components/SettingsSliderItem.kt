@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
 import com.venom.ui.components.other.GlassThickness
 
@@ -33,7 +33,7 @@ fun SettingsSliderItem(
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         thickness = GlassThickness.Thick,
-        contentPadding = 12.dp,
+        contentPadding = 12.adp,
         shape = MaterialTheme.shapes.medium) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -44,7 +44,7 @@ fun SettingsSliderItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.adp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -63,7 +63,7 @@ fun SettingsSliderItem(
                 onValueChange = onValueChange,
                 valueRange = valueRange,
                 steps = steps,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.adp)
             )
         }
     }

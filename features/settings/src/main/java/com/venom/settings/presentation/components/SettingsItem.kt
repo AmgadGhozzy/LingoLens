@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.theme.SettingsSpacing
@@ -57,7 +57,7 @@ fun SettingsItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.adp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -74,13 +74,13 @@ fun SettingsItem(
                                 text = badgeText,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                modifier = Modifier.padding(horizontal = 4.adp, vertical = 2.adp)
                             )
                         }
                     }
                 }
                 if (subtitle != null) {
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(4.adp))
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,

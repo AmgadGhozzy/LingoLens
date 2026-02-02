@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.data.BuildConfig
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.WaveShape
@@ -27,12 +27,12 @@ fun AppHeader() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(24.adp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.adp)
     ) {
         GlassCard(
-            modifier = Modifier.size(96.dp),
+            modifier = Modifier.size(96.adp),
             thickness = GlassThickness.Thick,
             shape = WaveShape()
         ) {
@@ -46,7 +46,7 @@ fun AppHeader() {
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.adp)
         ) {
             Text(
                 text = stringResource(R.string.app_name),

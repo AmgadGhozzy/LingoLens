@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.SettingsSpacing
 
 
@@ -56,7 +56,7 @@ fun ColorPreviewIcon(color: Long) {
         shape = CircleShape,
         color = Color(color),
         border = BorderStroke(
-            width = 1.dp,
+            width = 1.adp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.24f)
         )
     ) {}

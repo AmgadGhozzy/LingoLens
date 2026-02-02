@@ -1,16 +1,23 @@
 package com.venom.settings.presentation.screen
 
 import android.content.Context
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.LocalLibrary
+import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.rounded.MailOutline
 import androidx.compose.material.icons.rounded.Star
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
@@ -20,6 +27,7 @@ import com.venom.settings.presentation.components.SettingsCard
 import com.venom.settings.presentation.components.SettingsIcon
 import com.venom.settings.presentation.components.SettingsItem
 import com.venom.ui.components.common.SettingsScaffold
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.WebViewDialog
 import com.venom.utils.EMAIL
 import com.venom.utils.Extensions.shareText
@@ -80,7 +88,7 @@ fun AboutScreen(
 private fun SocialSection(context: Context) {
     SettingsCard(title = R.string.connect_with_us) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             SettingsItem(
                 leadingContent = { SettingsIcon(R.drawable.ic_github) },

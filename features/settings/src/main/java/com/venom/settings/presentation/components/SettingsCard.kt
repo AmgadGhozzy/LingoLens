@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.theme.SettingsSpacing
@@ -28,13 +28,14 @@ fun SettingsCard(
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         thickness = GlassThickness.Thin,
-        shape = MaterialTheme.shapes.large
+        shape = MaterialTheme.shapes.large,
+        showShadow = false,
     ) {
         Column {
             Row(
                 modifier = Modifier.padding(
                     start = SettingsSpacing.cardPadding,
-                    top = 16.dp
+                    top = 16.adp
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
