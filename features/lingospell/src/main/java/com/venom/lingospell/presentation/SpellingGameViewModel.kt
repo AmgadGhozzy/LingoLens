@@ -431,10 +431,9 @@ class SpellingGameViewModel @Inject constructor(
      */
     fun onContinueAfterMastery() {
         _state.update { it.copy(showMasteryDialog = false) }
-        // Advance to next word
+        // Navigate back to flashcard after mastering the word
         viewModelScope.launch {
-            _state.update { it.copy(wordIndex = it.wordIndex + 1, streak = 0) }
-            initializeWord(resetStreak = true)
+            _events.send(SpellingGameEvent.NavigateBack)
         }
     }
 
