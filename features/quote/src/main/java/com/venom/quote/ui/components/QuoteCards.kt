@@ -53,14 +53,16 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.domain.model.Quote
 import com.venom.resources.R
+import com.venom.ui.components.common.DynamicStyledText
 import com.venom.ui.components.common.ExpandableTranslation
-import com.venom.ui.components.other.GlassCard
-import com.venom.ui.theme.QuoteColors
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
+import com.venom.ui.components.other.GlassThickness
+import com.venom.ui.components.other.GradientGlassCard
+import com.venom.ui.theme.lingoLens
 import com.venom.ui.viewmodel.ExpandableCardViewModel
 
 @Composable
@@ -84,28 +86,26 @@ fun QuoteCard(
     val isExpanded = translationState.expandedCardId == cardId
 
     val isSpecialCard = useGradientBackground || showDailyHeader
+    val feature = MaterialTheme.lingoLens.feature.quote
 
-    GlassCard(
+    GradientGlassCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)),
-        shape = RoundedCornerShape(20.dp),
-        solidBackground = if (index % 2 == 0)
-            MaterialTheme.colorScheme.surfaceContainer.copy(0.5f)
-        else
-            MaterialTheme.colorScheme.surface.copy(0.5f)
+        thickness = GlassThickness.Regular,
+        shape = RoundedCornerShape(20.adp),
+        gradientColors = listOf(
+            if (index % 2 == 0) MaterialTheme.colorScheme.surfaceContainerHigh
+            else MaterialTheme.colorScheme.surfaceContainerHighest
+        ),
+        gradientAlpha = 0.5f
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .run {
+            modifier = Modifier.fillMaxWidth().run {
                     if (isSpecialCard) {
-                        background(
-                            brush = QuoteColors.dailyQuoteGradient()
-                        )
+                        background(brush = feature.gradient)
                     } else this
-                }
-        ) {
+                }) {
             // Decorative circles for special cards
             if (isSpecialCard) {
                 DecorativeElements()
@@ -115,10 +115,10 @@ fun QuoteCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = if (isSpecialCard) 20.dp else 18.dp,
-                        end = if (isSpecialCard) 20.dp else 18.dp,
-                        bottom = if (isSpecialCard) 20.dp else 18.dp,
-                        top = if (isSpecialCard) 20.dp else 0.dp
+                        start = if (isSpecialCard) 20.adp else 18.adp,
+                        end = if (isSpecialCard) 20.adp else 18.adp,
+                        bottom = if (isSpecialCard) 20.adp else 18.adp,
+                        top = if (isSpecialCard) 20.adp else 0.adp
                     )
             ) {
                 // Daily Quote Header
@@ -131,9 +131,7 @@ fun QuoteCard(
 
                 // Quote content
                 QuoteContent(
-                    quote = quote,
-                    searchQuery = searchQuery,
-                    isSpecialCard = isSpecialCard
+                    quote = quote, searchQuery = searchQuery, isSpecialCard = isSpecialCard
                 )
 
                 // Author
@@ -150,7 +148,7 @@ fun QuoteCard(
                     isLoading = translationState.isLoading,
                     error = translationState.error,
                     onRetry = { viewModel.retry(quote.quoteContent) },
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.adp)
                 )
 
                 // Action buttons
@@ -163,14 +161,12 @@ fun QuoteCard(
                     onCopy = { onCopy(quote.quoteContent) },
                     onToggleTranslation = { viewModel.toggleCard(cardId, quote.quoteContent) },
                     isSpecialCard = isSpecialCard,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = 12.adp)
                 )
 
                 // Tags
                 QuoteTags(
-                    tags = quote.tags,
-                    onTagClick = onTagClick,
-                    isSpecialCard = isSpecialCard
+                    tags = quote.tags, onTagClick = onTagClick, isSpecialCard = isSpecialCard
                 )
             }
         }
@@ -183,44 +179,46 @@ private fun DecorativeElements() {
 
     Box(
         modifier = Modifier
-            .size(100.dp)
-            .offset(x = (-30).dp, y = (-30).dp)
-            .background(decorativeColor.copy(alpha = 0.05f), CircleShape)
+            .size(100.adp)
+            .offset(x = (-30).adp, y = (-30).adp)
+            .background(decorativeColor.copy(0.05f), CircleShape)
     )
 
     Box(
         modifier = Modifier
-            .size(70.dp)
-            .offset(x = 250.dp, y = (-15).dp)
-            .background(decorativeColor.copy(alpha = 0.08f), CircleShape)
+            .size(70.adp)
+            .offset(x = 250.adp, y = (-15).adp)
+            .background(decorativeColor.copy(0.08f), CircleShape)
     )
 }
 
 @Composable
 private fun DailyQuoteHeader() {
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .background(QuoteColors.accentGold().copy(alpha = 0.1f), CircleShape)
-                .padding(8.dp),
+                .background(feature.gold.copy(0.1f), CircleShape)
+                .padding(8.adp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.icon_sparkles),
                 contentDescription = stringResource(id = R.string.daily_quote),
-                tint = QuoteColors.accentGold(),
-                modifier = Modifier.size(20.dp)
+                tint = feature.gold,
+                modifier = Modifier.size(20.adp)
             )
         }
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(10.adp))
 
         Text(
             text = stringResource(id = R.string.daily_quote),
-            color = QuoteColors.accentGold(),
-            fontSize = 14.sp,
+            color = feature.gold,
+            fontSize = 14.asp,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.titleMedium
         )
@@ -229,35 +227,36 @@ private fun DailyQuoteHeader() {
 
 @Composable
 private fun QuoteMark(isSpecialCard: Boolean) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Text(
         text = "“",
         color = when {
-            isSpecialCard -> Color.White.copy(alpha = 0.2f)
-            else -> QuoteColors.accentBlue().copy(alpha = 0.6f)
+            isSpecialCard -> Color.White.copy(0.2f)
+            else -> colorScheme.primary.copy(0.6f)
         },
-        fontSize = if (isSpecialCard) 52.sp else 48.sp,
+        fontSize = if (isSpecialCard) 52.asp else 48.asp,
         fontWeight = FontWeight.Light,
-        modifier = Modifier.offset(x = (-4).dp, y = 16.dp)
+        modifier = Modifier.offset(x = (-4).adp, y = 16.adp)
     )
 }
 
 @Composable
 private fun QuoteContent(
-    quote: Quote,
-    searchQuery: String,
-    isSpecialCard: Boolean
+    quote: Quote, searchQuery: String, isSpecialCard: Boolean
 ) {
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     val annotatedString = buildAnnotatedString {
         if (searchQuery.isNotEmpty() && quote.quoteContent.contains(
-                searchQuery,
-                ignoreCase = true
+                searchQuery, ignoreCase = true
             )
         ) {
             val startIndex = quote.quoteContent.indexOf(searchQuery, ignoreCase = true)
             val endIndex = startIndex + searchQuery.length
 
-            append(quote.quoteContent.substring(0, startIndex))
-            withStyle(SpanStyle(background = QuoteColors.accentGold().copy(alpha = 0.3f))) {
+            append(quote.run { quoteContent.take(startIndex) })
+            withStyle(SpanStyle(background = feature.gold.copy(0.3f))) {
                 append(quote.quoteContent.substring(startIndex, endIndex))
             }
             append(quote.quoteContent.substring(endIndex))
@@ -266,44 +265,39 @@ private fun QuoteContent(
         }
     }
 
-    Text(
+    DynamicStyledText(
         text = annotatedString,
         color = when {
-            isSpecialCard -> Color.White
-            else -> QuoteColors.textPrimary()
+            isSpecialCard -> Color.White.copy(0.8f)
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
         },
-        fontSize = 18.sp,
-        lineHeight = 26.sp,
+        lineHeight = 26,
         fontWeight = FontWeight.Medium,
-        fontStyle = if (isSpecialCard) FontStyle.Italic else FontStyle.Normal,
-        style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = 16.adp)
     )
 }
 
 @Composable
 private fun QuoteAuthor(
-    authorName: String,
-    onAuthorClick: () -> Unit,
-    isSpecialCard: Boolean
+    authorName: String, onAuthorClick: () -> Unit, isSpecialCard: Boolean
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Text(
         text = stringResource(id = R.string.quote_author_prefix, authorName),
         style = MaterialTheme.typography.bodyMedium.copy(
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Normal
+            fontStyle = FontStyle.Italic, fontWeight = FontWeight.Normal
         ),
         color = when {
-            isSpecialCard -> Color.White.copy(alpha = 0.9f)
-            else -> QuoteColors.textSecondary()
+            isSpecialCard -> Color.White.copy(0.9f)
+            else -> colorScheme.onSurfaceVariant
         },
-        fontSize = 14.sp,
+        fontSize = 14.asp,
         modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(6.adp))
             .clickable { onAuthorClick() }
-            .padding(4.dp)
-            .padding(bottom = 12.dp)
-    )
+            .padding(4.adp)
+            .padding(bottom = 12.adp))
 }
 
 @Composable
@@ -319,13 +313,16 @@ private fun QuoteActionButtons(
     copySuccess: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val feature = MaterialTheme.lingoLens.feature.quote
+    val semantic = MaterialTheme.lingoLens.semantic
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
     ) {
         // Primary Actions (Left side)
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.adp)) {
             ActionButton(
                 icon = Icons.AutoMirrored.Filled.VolumeUp,
                 onClick = { onPlayAudio(quote.quoteContent) },
@@ -338,7 +335,7 @@ private fun QuoteActionButtons(
                 onClick = onCopy,
                 isSpecialCard = isSpecialCard,
                 isSelected = copySuccess,
-                selectedColor = if (isSpecialCard) QuoteColors.accentGold() else QuoteColors.success()
+                selectedColor = if (isSpecialCard) feature.gold else semantic.success
             )
 
             ActionButton(
@@ -349,12 +346,12 @@ private fun QuoteActionButtons(
         }
 
         // Secondary Actions (Right side)
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.adp)) {
             ActionButton(
                 icon = if (isFavorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                 onClick = onToggleFavorite,
                 isSelected = isFavorited,
-                selectedColor = QuoteColors.accentPink(),
+                selectedColor = feature.pink,
                 isSpecialCard = isSpecialCard
             )
 
@@ -372,38 +369,40 @@ private fun ActionButton(
     icon: ImageVector,
     onClick: () -> Unit,
     isSelected: Boolean = false,
-    selectedColor: Color = QuoteColors.accentBlue(),
+    selectedColor: Color = MaterialTheme.colorScheme.primary,
     isSpecialCard: Boolean = false,
     isPrimary: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.05f else 1f,
-        animationSpec = tween(200)
+        targetValue = if (isSelected) 1.05f else 1f, animationSpec = tween(200)
     )
 
     val backgroundColor = when {
-        isPrimary && isSpecialCard -> QuoteColors.accentGold().copy(alpha = 0.2f)
-        isPrimary -> Color(0x1A3B82F6)
-        isSpecialCard -> Color.White.copy(alpha = 0.15f)
-        else -> if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.05f) else Color.Black.copy(
-            alpha = 0.05f
+        isPrimary && isSpecialCard -> feature.gold.copy(0.2f)
+        isPrimary -> colorScheme.primary.copy(0.1f)
+        isSpecialCard -> Color.White.copy(0.15f)
+        else -> if (isSystemInDarkTheme()) Color.White.copy(0.05f) else Color.Black.copy(
+            0.05f
         )
     }
 
     val iconColor = when {
         isSelected -> selectedColor
-        isPrimary && isSpecialCard -> QuoteColors.accentGold()
-        isPrimary -> QuoteColors.accentBlue()
+        isPrimary && isSpecialCard -> feature.gold
+        isPrimary -> colorScheme.primary
         isSpecialCard -> Color.White
-        else -> QuoteColors.textSecondary()
+        else -> colorScheme.onSurfaceVariant
     }
 
     Box(
         modifier = modifier
             .scale(scale)
-            .size(44.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .size(44.adp)
+            .clip(RoundedCornerShape(12.adp))
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -412,7 +411,7 @@ private fun ActionButton(
             imageVector = icon,
             contentDescription = null,
             tint = iconColor,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.adp)
         )
     }
 }
@@ -425,14 +424,12 @@ private fun QuoteTags(
     modifier: Modifier = Modifier
 ) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(6.adp, Alignment.CenterHorizontally),
         modifier = modifier.fillMaxWidth()
     ) {
         items(tags) { tag ->
             TagChip(
-                tag = tag,
-                onClick = { onTagClick(tag) },
-                isSpecialCard = isSpecialCard
+                tag = tag, onClick = { onTagClick(tag) }, isSpecialCard = isSpecialCard
             )
         }
     }
@@ -440,32 +437,31 @@ private fun QuoteTags(
 
 @Composable
 private fun TagChip(
-    tag: String,
-    onClick: () -> Unit,
-    isSpecialCard: Boolean = false
+    tag: String, onClick: () -> Unit, isSpecialCard: Boolean = false
 ) {
+    val feature = MaterialTheme.lingoLens.feature.quote
+
     val backgroundColor = when {
-        isSpecialCard -> Color.White.copy(alpha = 0.2f)
-        else -> QuoteColors.tagBackground()
+        isSpecialCard -> Color.White.copy(0.2f)
+        else -> feature.tagBackground
     }
 
     val textColor = when {
-        isSpecialCard -> Color.White.copy(alpha = 0.8f)
-        else -> QuoteColors.tagText()
+        isSpecialCard -> Color.White.copy(0.8f)
+        else -> feature.tagText
     }
 
     Text(
         text = "#${tag.lowercase()}",
         color = textColor,
-        fontSize = 10.sp,
+        fontSize = 10.asp,
         fontWeight = FontWeight.Normal,
         style = MaterialTheme.typography.labelSmall,
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.adp))
             .background(backgroundColor)
             .clickable { onClick() }
-            .padding(horizontal = 8.dp, vertical = 3.dp)
-    )
+            .padding(horizontal = 8.adp, vertical = 3.adp))
 }
 
 @Composable
@@ -474,31 +470,29 @@ fun SelectableItemCard(
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    selectedColor: Color = QuoteColors.primary(),
+    selectedColor: Color = MaterialTheme.colorScheme.primary,
     content: @Composable () -> Unit
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
+                onClick = onClick, onLongClick = onLongClick
             )
-            .clip(RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
+            .clip(RoundedCornerShape(16.adp)),
+        shape = RoundedCornerShape(16.adp),
         colors = CardDefaults.cardColors(
-            containerColor = QuoteColors.surfacePrimary()
+            containerColor = colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 8.dp else 4.dp
+            defaultElevation = if (isSelected) 8.adp else 4.adp
         ),
         border = if (isSelected) {
-            BorderStroke(2.dp, selectedColor)
+            BorderStroke(2.adp, selectedColor)
         } else {
-            BorderStroke(
-                1.dp,
-                QuoteColors.border()
-            )
+            BorderStroke(1.adp, colorScheme.outlineVariant)
         }
     ) {
         content()
