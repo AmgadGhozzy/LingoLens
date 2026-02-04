@@ -1,8 +1,15 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -32,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -65,6 +74,8 @@ import com.venom.ui.components.common.asp
 import com.venom.ui.components.onboarding.GoogleSignInButton
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.theme.lingoLens
+import kotlinx.coroutines.delay
 
 @Composable
 fun WelcomeScreen(
@@ -72,127 +83,326 @@ fun WelcomeScreen(
     onBack: () -> Unit = {},
     onGoogleSignIn: () -> Unit = {},
     isLoading: Boolean = false,
+    isSignedIn: Boolean = false,
+    userName: String? = null,
     modifier: Modifier = Modifier
 ) {
     var topic by remember { mutableStateOf("") }
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) { delay(100); isVisible = true }
+
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.95f,
+        animationSpec = tween(400)
+    )
 
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        // Back button
         if (!isLoading) {
             CustomFilledIconButton(
                 icon = Icons.Rounded.ArrowForwardIos,
-                modifier = Modifier.align(Alignment.TopEnd).padding(24.adp),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(24.adp),
                 onClick = onBack,
                 contentDescription = stringResource(R.string.action_close),
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.4f),
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.8f)
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
-                size = 46.adp
+                size = 44.adp
             )
+        }
+
+        // Signed In Badge
+        AnimatedVisibility(
+            visible = isSignedIn && !isLoading,
+            enter = fadeIn() + slideInVertically { -it },
+            exit = fadeOut() + slideOutVertically { -it },
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(24.adp)
+        ) {
+            SignedInBadge(userName = userName)
         }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.adp, vertical = 48.adp),
+                .padding(horizontal = 24.adp)
+                .scale(scale),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(56.adp)
+            verticalArrangement = Arrangement.spacedBy(40.adp)
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
             AppLogo()
             AppTitle()
-
-            Spacer(modifier = Modifier.weight(0.5f))
 
             Column(
                 modifier = Modifier.widthIn(max = 360.adp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.adp)
+                verticalArrangement = Arrangement.spacedBy(16.adp)
             ) {
-//                if (!isLoading) {
-//                    TopicInput(topic, onValueChange = { topic = it })
-//                }
+                // Topic Input
+                if (!isLoading) {
+                    TopicInput(topic = topic, onValueChange = { topic = it })
+                }
 
+                // Start Button
                 StartButton(onClick = { onStart(topic) }, isLoading = isLoading)
 
-                if (!isLoading) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.adp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        HorizontalDivider(
-                            modifier = Modifier.weight(1f),
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
-                        Text(
-                            text = "OR",
-                            modifier = Modifier.padding(horizontal = 16.adp),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
-                        )
-                        HorizontalDivider(
-                            modifier = Modifier.weight(1f),
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
-                    }
+                // Sign In Section Only show if NOT signed in
+                if (!isSignedIn && !isLoading) {
+                    SignInSection(onGoogleSignIn = onGoogleSignIn)
+                }
 
-                    GoogleSignInButton(
-                        onClick = onGoogleSignIn
-                    )
+                // Progress Saved Indicator Show when signed in
+                if (isSignedIn && !isLoading) {
+                    ProgressSavedIndicator()
                 }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun AppLogo() {
-    Box(modifier = Modifier.size(140.adp), contentAlignment = Alignment.Center) {
+private fun SignedInBadge(
+    userName: String?,
+    modifier: Modifier = Modifier
+) {
+    val semantic = MaterialTheme.lingoLens.semantic
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.adp))
+            .background(semantic.success.copy(alpha = 0.1f))
+            .border(1.adp, semantic.success.copy(alpha = 0.2f), RoundedCornerShape(12.adp))
+            .padding(horizontal = 12.adp, vertical = 8.adp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.adp)
+    ) {
         Box(
             modifier = Modifier
-                .size(120.adp)
-                .graphicsLayer { rotationZ = 8f }
+                .size(20.adp)
+                .clip(CircleShape)
+                .background(semantic.success),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Check,
+                contentDescription = null,
+                modifier = Modifier.size(12.adp),
+                tint = semantic.onSuccess
+            )
+        }
+
+        Column {
+            Text(
+                text = "Signed in",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.asp
+                ),
+                color = semantic.success
+            )
+            userName?.let {
+                Text(
+                    text = it.split(" ").firstOrNull() ?: it,
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.asp),
+                    color = semantic.success.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SignInSection(
+    onGoogleSignIn: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.adp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.adp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+            Text(
+                text = "OR",
+                modifier = Modifier.padding(horizontal = 16.adp),
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
+            )
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+        }
+
+        SaveProgressBanner()
+
+        GoogleSignInButton(onClick = onGoogleSignIn)
+    }
+}
+
+@Composable
+private fun SaveProgressBanner(
+    modifier: Modifier = Modifier
+) {
+    val semantic = MaterialTheme.lingoLens.semantic
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.adp))
+            .background(semantic.info.copy(alpha = 0.08f))
+            .border(1.adp, semantic.info.copy(alpha = 0.15f), RoundedCornerShape(12.adp))
+            .padding(12.adp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.adp)
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_shield_check),
+            contentDescription = null,
+            modifier = Modifier.size(18.adp),
+            tint = semantic.info
+        )
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Sign in to save progress",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Sync across devices & keep your streak",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProgressSavedIndicator(
+    modifier: Modifier = Modifier
+) {
+    val semantic = MaterialTheme.lingoLens.semantic
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.adp))
+            .background(semantic.success.copy(alpha = 0.08f))
+            .padding(horizontal = 14.adp, vertical = 10.adp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.adp)
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_shield_check),
+            contentDescription = null,
+            modifier = Modifier.size(16.adp),
+            tint = semantic.success
+        )
+        Text(
+            text = "Progress synced to cloud",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+            color = semantic.success
+        )
+    }
+}
+
+@Composable
+private fun TopicInput(
+    topic: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = topic,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(2.adp, RoundedCornerShape(16.adp))
+            .clip(RoundedCornerShape(16.adp)),
+        placeholder = {
+            Text(
+                text = "Choose a topic (optional)",
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
+            )
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.icon_search),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(22.adp)
+            )
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(16.adp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        )
+    )
+}
+
+@Composable
+private fun AppLogo() {
+    Box(modifier = Modifier.size(130.adp), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .size(100.adp)
+                .graphicsLayer { rotationZ = 6f }
                 .shadow(
-                    elevation = 24.adp,
-                    shape = RoundedCornerShape(32.adp),
-                    ambientColor = BrandColors.Indigo500.copy(0.3f),
-                    spotColor = BrandColors.Purple600.copy(0.4f)
+                    elevation = 20.adp,
+                    shape = RoundedCornerShape(28.adp),
+                    ambientColor = BrandColors.Indigo500.copy(0.25f),
+                    spotColor = BrandColors.Purple600.copy(0.3f)
                 )
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(BrandColors.Indigo500, BrandColors.Purple600)
                     ),
-                    shape = RoundedCornerShape(32.adp)
+                    shape = RoundedCornerShape(28.adp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(R.drawable.icon_graduation_cap),
                 contentDescription = null,
-                modifier = Modifier.size(60.adp),
+                modifier = Modifier.size(50.adp),
                 tint = Color.White
             )
         }
 
         Box(
             modifier = Modifier
-                .size(48.adp)
+                .size(40.adp)
                 .align(Alignment.BottomEnd)
-                .offset(x = 14.adp, y = 14.adp)
-                .graphicsLayer { rotationZ = -12f }
-                .shadow(14.adp, RoundedCornerShape(16.adp))
-                .background(BrandColors.Emerald500, RoundedCornerShape(16.adp)),
+                .offset(x = 10.adp, y = 10.adp)
+                .graphicsLayer { rotationZ = -10f }
+                .shadow(10.adp, RoundedCornerShape(12.adp))
+                .background(BrandColors.Emerald500, RoundedCornerShape(12.adp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Aa",
-                fontSize = 20.asp,
+                fontSize = 16.asp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White
             )
@@ -203,93 +413,33 @@ private fun AppLogo() {
 @Composable
 private fun AppTitle() {
     Column(
-        modifier = Modifier.widthIn(max = 360.adp),
+        modifier = Modifier.widthIn(max = 340.adp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.adp)
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         Text(
             text = buildAnnotatedString {
-                withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) {
-                    append("Lingo")
-                }
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                ) {
-                    append("Flow")
-                }
+                withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) { append("Lingo") }
+                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold)) { append("Flow") }
             },
-            fontSize = 48.asp,
+            fontSize = 44.asp,
             letterSpacing = (-1).asp,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
             text = buildAnnotatedString {
-                append("Accelerate your ")
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append("English fluency")
-                }
+                append("Master ")
+                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)) { append("English") }
                 append(" with smart ")
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append("flashcards")
-                }
+                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)) { append("flashcards") }
             },
-            fontSize = 16.asp,
+            fontSize = 15.asp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            lineHeight = 26.asp
+            lineHeight = 24.asp
         )
     }
-}
-
-@Composable
-private fun TopicInput(
-    topic: String,
-    onValueChange: (String) -> Unit
-) {
-    TextField(
-        value = topic,
-        onValueChange = onValueChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.adp, RoundedCornerShape(16.adp))
-            .clip(RoundedCornerShape(16.adp)),
-        placeholder = {
-            Text(
-                text = "Choose a topic...",
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.6f)
-            )
-        },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(R.drawable.icon_search),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.adp)
-            )
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(16.adp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-            unfocusedIndicatorColor = Color.Transparent
-        )
-    )
 }
 
 @Composable
@@ -298,34 +448,38 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val offsetY by animateDpAsState(
-        targetValue = if (isPressed) 8.adp else 0.adp,
-        animationSpec = tween(100)
+        targetValue = if (isPressed) 6.adp else 0.adp,
+        animationSpec = tween(80),
+        label = "buttonOffset"
     )
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.adp)
-                .offset(y = 8.adp)
+                .height(52.adp)
+                .offset(y = 6.adp)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            BrandColors.Indigo600.copy(alpha = 0.6f),
-                            BrandColors.Purple600.copy(alpha = 0.6f)
+                            BrandColors.Indigo700.copy(alpha = 0.5f),
+                            BrandColors.Purple700.copy(alpha = 0.5f)
                         )
                     ),
-                    shape = RoundedCornerShape(16.adp)
+                    shape = RoundedCornerShape(14.adp)
                 )
         )
 
         Button(
             onClick = onClick,
             enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth().height(56.adp).offset(y = offsetY),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.adp)
+                .offset(y = offsetY),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             contentPadding = PaddingValues(0.adp),
-            shape = RoundedCornerShape(16.adp),
+            shape = RoundedCornerShape(14.adp),
             interactionSource = interactionSource
         ) {
             Box(
@@ -335,7 +489,7 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
                         brush = Brush.horizontalGradient(
                             colors = listOf(BrandColors.Indigo600, BrandColors.Purple600)
                         ),
-                        shape = RoundedCornerShape(16.adp)
+                        shape = RoundedCornerShape(14.adp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -346,34 +500,35 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
                         ).value,
                         iterations = LottieConstants.IterateForever,
                         contentScale = ContentScale.FillWidth,
-                        modifier = Modifier.fillMaxWidth(0.4f).blur(0.5.adp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.35f)
+                            .blur(0.5.adp),
                         speed = 0.8f
                     )
                 } else {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.adp),
+                        horizontalArrangement = Arrangement.spacedBy(10.adp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(24.adp)
+                                .size(22.adp)
                                 .background(Color.White.copy(0.2f), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.icon_play),
                                 contentDescription = null,
-                                modifier = Modifier.size(16.adp),
+                                modifier = Modifier.size(12.adp),
                                 tint = Color.White
                             )
                         }
 
                         Text(
                             text = "Start Learning",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.asp,
-                            color = Color.White,
-                            letterSpacing = 0.3.asp
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.asp,
+                            color = Color.White
                         )
                     }
                 }
@@ -382,10 +537,18 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
     }
 }
 
-@Preview
+@Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
-fun WelcomeScreenPreview() {
-    LingoLensTheme(appTheme = AppTheme.LIGHT) {
-        WelcomeScreen()
+private fun WelcomeScreenNotSignedInPreview() {
+    LingoLensTheme(appTheme = AppTheme.DARK) {
+        WelcomeScreen(isSignedIn = false)
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0F172A)
+@Composable
+private fun WelcomeScreenSignedInPreview() {
+    LingoLensTheme(appTheme = AppTheme.DARK) {
+        WelcomeScreen(isSignedIn = true, userName = "John Doe")
     }
 }
