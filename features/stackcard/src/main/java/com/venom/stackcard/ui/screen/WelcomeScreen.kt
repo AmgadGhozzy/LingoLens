@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -68,6 +68,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
 import com.venom.resources.R
+import com.venom.stackcard.ui.components.mastery.MiniProgressDashboard
+import com.venom.stackcard.ui.components.mastery.UserProgressData
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
@@ -85,6 +87,7 @@ fun WelcomeScreen(
     isLoading: Boolean = false,
     isSignedIn: Boolean = false,
     userName: String? = null,
+    userProgress: UserProgressData? = null,
     modifier: Modifier = Modifier
 ) {
     var topic by remember { mutableStateOf("") }
@@ -97,17 +100,112 @@ fun WelcomeScreen(
         animationSpec = tween(400)
     )
 
+    val showDashboard = isSignedIn && userProgress != null && !isLoading
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.adp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Top Bar
+        TopBar(
+            isSignedIn = isSignedIn,
+            userName = userName,
+            isLoading = isLoading,
+            onBack = onBack
+        )
+
+        // Dashboard Section - Centered between TopBar and Logo
+        DashboardSection(
+            showDashboard = showDashboard,
+            userProgress = userProgress,
+            modifier = Modifier.weight(0.25f)
+        )
+
+        // Logo & Title Section - Centered top
+        Column(
+            modifier = Modifier
+                .weight(0.35f)
+                .scale(scale),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            AppLogo()
+            Spacer(modifier = Modifier.height(20.adp))
+            AppTitle()
+        }
+
+        // Actions Section
+        Column(
+            modifier = Modifier
+                .weight(0.4f)
+                .widthIn(max = 360.adp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.adp, Alignment.Top)
+        ) {
+            if (!isLoading) {
+                TopicInput(topic = topic, onValueChange = { topic = it })
+            }
+
+            StartButton(onClick = { onStart(topic) }, isLoading = isLoading)
+
+            if (!isSignedIn && !isLoading) {
+                SignInSection(onGoogleSignIn = onGoogleSignIn)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.adp))
+    }
+}
+
+@Composable
+private fun DashboardSection(
+    showDashboard: Boolean,
+    userProgress: UserProgressData?,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        // Back button
+        AnimatedVisibility(
+            visible = showDashboard,
+            enter = fadeIn(tween(300)) + slideInVertically { -it },
+            exit = fadeOut(tween(200)) + slideOutVertically { -it }
+        ) {
+            MiniProgressDashboard(
+                data = userProgress ?: UserProgressData(),
+                modifier = Modifier.widthIn(max = 360.adp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TopBar(
+    isSignedIn: Boolean,
+    userName: String?,
+    isLoading: Boolean,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.adp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (isSignedIn && !isLoading) {
+            SignedInBadge(userName = userName)
+        } else {
+            Box(modifier = Modifier.weight(1f))
+        }
+
         if (!isLoading) {
             CustomFilledIconButton(
                 icon = Icons.Rounded.ArrowForwardIos,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(24.adp),
                 onClick = onBack,
                 contentDescription = stringResource(R.string.action_close),
                 colors = IconButtonDefaults.filledIconButtonColors(
@@ -116,54 +214,6 @@ fun WelcomeScreen(
                 ),
                 size = 44.adp
             )
-        }
-
-        // Signed In Badge
-        AnimatedVisibility(
-            visible = isSignedIn && !isLoading,
-            enter = fadeIn() + slideInVertically { -it },
-            exit = fadeOut() + slideOutVertically { -it },
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(24.adp)
-        ) {
-            SignedInBadge(userName = userName)
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.adp)
-                .scale(scale),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(40.adp)
-        ) {
-            AppLogo()
-            AppTitle()
-
-            Column(
-                modifier = Modifier.widthIn(max = 360.adp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.adp)
-            ) {
-                // Topic Input
-                if (!isLoading) {
-                    TopicInput(topic = topic, onValueChange = { topic = it })
-                }
-
-                // Start Button
-                StartButton(onClick = { onStart(topic) }, isLoading = isLoading)
-
-                // Sign In Section Only show if NOT signed in
-                if (!isSignedIn && !isLoading) {
-                    SignInSection(onGoogleSignIn = onGoogleSignIn)
-                }
-
-                // Progress Saved Indicator Show when signed in
-                if (isSignedIn && !isLoading) {
-                    ProgressSavedIndicator()
-                }
-            }
         }
     }
 }
@@ -192,7 +242,7 @@ private fun SignedInBadge(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = Icons.Rounded.Check,
+                painter = painterResource(R.drawable.ic_shield_check),
                 contentDescription = null,
                 modifier = Modifier.size(12.adp),
                 tint = semantic.onSuccess
@@ -252,15 +302,12 @@ private fun SignInSection(
         }
 
         SaveProgressBanner()
-
         GoogleSignInButton(onClick = onGoogleSignIn)
     }
 }
 
 @Composable
-private fun SaveProgressBanner(
-    modifier: Modifier = Modifier
-) {
+private fun SaveProgressBanner(modifier: Modifier = Modifier) {
     val semantic = MaterialTheme.lingoLens.semantic
 
     Row(
@@ -279,7 +326,6 @@ private fun SaveProgressBanner(
             modifier = Modifier.size(18.adp),
             tint = semantic.info
         )
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = "Sign in to save progress",
@@ -292,34 +338,6 @@ private fun SaveProgressBanner(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
         }
-    }
-}
-
-@Composable
-private fun ProgressSavedIndicator(
-    modifier: Modifier = Modifier
-) {
-    val semantic = MaterialTheme.lingoLens.semantic
-
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(10.adp))
-            .background(semantic.success.copy(alpha = 0.08f))
-            .padding(horizontal = 14.adp, vertical = 10.adp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.adp)
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_shield_check),
-            contentDescription = null,
-            modifier = Modifier.size(16.adp),
-            tint = semantic.success
-        )
-        Text(
-            text = "Progress synced to cloud",
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-            color = semantic.success
-        )
     }
 }
 
@@ -413,14 +431,18 @@ private fun AppLogo() {
 @Composable
 private fun AppTitle() {
     Column(
-        modifier = Modifier.widthIn(max = 340.adp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.ExtraBold)) { append("Lingo") }
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold)) { append("Flow") }
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                ) { append("Flow") }
             },
             fontSize = 44.asp,
             letterSpacing = (-1).asp,
@@ -430,9 +452,19 @@ private fun AppTitle() {
         Text(
             text = buildAnnotatedString {
                 append("Master ")
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)) { append("English") }
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                ) { append("English") }
                 append(" with smart ")
-                withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)) { append("flashcards") }
+                withStyle(
+                    SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                ) { append("flashcards") }
             },
             fontSize = 15.asp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -450,7 +482,6 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
     val offsetY by animateDpAsState(
         targetValue = if (isPressed) 6.adp else 0.adp,
         animationSpec = tween(80),
-        label = "buttonOffset"
     )
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -539,7 +570,7 @@ private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
 
 @Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
-private fun WelcomeScreenNotSignedInPreview() {
+private fun WelcomeScreenNewUserPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         WelcomeScreen(isSignedIn = false)
     }
@@ -549,6 +580,34 @@ private fun WelcomeScreenNotSignedInPreview() {
 @Composable
 private fun WelcomeScreenSignedInPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
-        WelcomeScreen(isSignedIn = true, userName = "John Doe")
+        WelcomeScreen(
+            isSignedIn = true,
+            userName = "John Doe",
+            userProgress = UserProgressData(
+                totalWordsLearned = 156,
+                masteredCount = 42,
+                currentStreak = 7,
+                todayXp = 85,
+                masteryProgress = 0.68f
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF8FAFC)
+@Composable
+private fun WelcomeScreenLightPreview() {
+    LingoLensTheme(appTheme = AppTheme.LIGHT) {
+        WelcomeScreen(
+            isSignedIn = true,
+            userName = "Jane",
+            userProgress = UserProgressData(
+                totalWordsLearned = 89,
+                masteredCount = 25,
+                currentStreak = 14,
+                todayXp = 120,
+                masteryProgress = 0.45f
+            )
+        )
     }
 }
