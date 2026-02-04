@@ -51,6 +51,7 @@ import com.venom.stackcard.ui.components.mastery.InteractiveText
 import com.venom.stackcard.ui.components.mastery.PowerCell
 import com.venom.stackcard.ui.components.mastery.SectionHeader
 import com.venom.stackcard.ui.components.mastery.StatCell
+import com.venom.stackcard.ui.viewmodel.CurrentWordProgress
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
@@ -60,13 +61,8 @@ import com.venom.ui.theme.tokens.getCefrColorScheme
 /**
  * Overview tab content for Insights sheet.
  *
- * Displays:
- * 1. Your Progress with theme-colored mastery ring
- * 2. Frequency widget with inline Oxford Core badge
- * 3. Semantic Cloud tags
- * 4. Stats grid with enhanced icon visibility
- *
  * @param word The word to display overview for
+ * @param wordProgress Real user progress data for this word
  * @param showPowerTip Whether the power card flip message is shown
  * @param onTogglePowerTip Callback to toggle power tip visibility
  * @param modifier Modifier for styling
@@ -74,6 +70,7 @@ import com.venom.ui.theme.tokens.getCefrColorScheme
 @Composable
 fun OverviewTab(
     word: WordMaster,
+    wordProgress: CurrentWordProgress,
     showPowerTip: Boolean,
     onTogglePowerTip: () -> Unit,
     modifier: Modifier = Modifier
@@ -82,7 +79,6 @@ fun OverviewTab(
     val horizontalScrollState = rememberScrollState()
     val cefrColors = getCefrColorScheme(word.cefrLevel)
 
-    // Derived values
     val hasSemanticTags by remember(word.semanticTags) {
         derivedStateOf { word.semanticTags.isNotEmpty() }
     }
@@ -98,11 +94,11 @@ fun OverviewTab(
             .padding(horizontal = 20.adp, vertical = 24.adp),
         verticalArrangement = Arrangement.spacedBy(20.adp)
     ) {
-        // 1. YOUR PROGRESS - With theme-colored ring
+        // 1. YOUR PROGRESS - With REAL data
         YourProgressCard(
-            repetitions = 2, // TODO: Get from user data
-            nextReview = stringResource(R.string.mastery_tomorrow),
-            masteryProgress = 0.5f, // TODO: Calculate from user data
+            repetitions = wordProgress.repetitions,
+            nextReview = wordProgress.nextReviewText,
+            masteryProgress = wordProgress.masteryProgress,
             cefrLevel = word.cefrLevel
         )
 
@@ -114,7 +110,7 @@ fun OverviewTab(
             OxfordCoreBadge()
         }
 
-        // 3. Semantic Cloud - Horizontal scroll
+        // 4. Semantic Cloud
         if (hasSemanticTags) {
             SemanticCloudSection(
                 tags = word.semanticTags,
@@ -122,7 +118,7 @@ fun OverviewTab(
             )
         }
 
-        // 4. Stats Grid - Enhanced icon visibility
+        // 5. Stats Grid
         StatsGrid(
             difficulty = word.cefrLevel.getDifficulty(),
             cefrLevel = word.cefrLevel.displayName,
@@ -136,7 +132,7 @@ fun OverviewTab(
 }
 
 /**
- * Circular progress ring with dynamic theme color
+ * Circular progress ring with dynamic theme color - NOW WITH REAL DATA
  */
 @Composable
 private fun YourProgressCard(
@@ -148,7 +144,8 @@ private fun YourProgressCard(
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = masteryProgress,
-        animationSpec = tween(durationMillis = 1000)
+        animationSpec = tween(durationMillis = 1000),
+        label = "progress"
     )
 
     Column(
@@ -174,7 +171,7 @@ private fun YourProgressCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Circular mastery ring with theme color
+            // Circular mastery ring
             CircularProgressRing(
                 progress = animatedProgress,
                 cefrLevel = cefrLevel,
@@ -193,7 +190,7 @@ private fun YourProgressCard(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(8.adp)
             ) {
-                // Repetitions
+                // Repetitions - REAL DATA
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = repetitions.toString(),
@@ -212,7 +209,7 @@ private fun YourProgressCard(
                     )
                 }
 
-                // Next review
+                // Next review - REAL DATA
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.adp),
                     verticalAlignment = Alignment.CenterVertically
@@ -247,9 +244,6 @@ private fun YourProgressCard(
     }
 }
 
-/**
- * Circular progress ring with theme-aware color
- */
 @Composable
 private fun CircularProgressRing(
     progress: Float,
@@ -257,11 +251,12 @@ private fun CircularProgressRing(
     modifier: Modifier = Modifier
 ) {
     val isDarkTheme = MaterialTheme.colorScheme.surface.luminance() < 0.5f
-    val themeColor = MaterialTheme.colorScheme.primary //getThemeColorForLevel(cefrLevel)
+    val themeColor = MaterialTheme.colorScheme.primary
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
+        label = "ring"
     )
 
     val strokeWidthDp = 8.adp
@@ -289,7 +284,7 @@ private fun CircularProgressRing(
                     size = Size(radius * 2, radius * 2)
                 )
 
-                // Progress arc with theme color
+                // Progress arc
                 drawArc(
                     color = themeColor,
                     startAngle = -90f,
@@ -309,7 +304,8 @@ private fun CircularProgressRing(
             Text(
                 text = "${(animatedProgress * 100).toInt()}%",
                 style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Black
+                    fontWeight = FontWeight.Black,
+                    lineHeight = 10.asp
                 ),
                 color = themeColor
             )
@@ -318,7 +314,8 @@ private fun CircularProgressRing(
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.8.asp,
-                    fontSize = 8.asp
+                    fontSize = 8.asp,
+                    lineHeight = 10.asp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.5f)
             )
@@ -326,13 +323,8 @@ private fun CircularProgressRing(
     }
 }
 
-/**
- * Oxford Core badge - optimized
- */
 @Composable
-private fun OxfordCoreBadge(
-    modifier: Modifier = Modifier
-) {
+private fun OxfordCoreBadge(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -366,18 +358,13 @@ private fun OxfordCoreBadge(
             )
             Text(
                 text = stringResource(R.string.mastery_oxford_description),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    lineHeight = 18.asp
-                ),
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 18.asp),
                 color = MaterialTheme.colorScheme.primary.copy(0.7f)
             )
         }
     }
 }
 
-/**
- * Horizontal scrollable semantic cloud
- */
 @Composable
 private fun SemanticCloudSection(
     tags: List<String>,
@@ -427,9 +414,6 @@ private fun SemanticCloudSection(
     }
 }
 
-/**
- * Stats grid with enhanced icon visibility (0.8f opacity)
- */
 @Composable
 private fun StatsGrid(
     difficulty: String,
@@ -445,12 +429,10 @@ private fun StatsGrid(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
-        // First row: Difficulty + Power
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
-            // Difficulty Cell
             StatCell(
                 label = stringResource(R.string.mastery_difficulty),
                 watermarkIcon = R.drawable.ic_chart_line_up,
@@ -494,12 +476,10 @@ private fun StatsGrid(
             )
         }
 
-        // Second row: Category + Register
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
-            // Category Cell
             category?.let {
                 StatCell(
                     label = stringResource(R.string.mastery_category),
@@ -519,7 +499,6 @@ private fun StatsGrid(
                 }
             }
 
-            // Register Cell
             StatCell(
                 label = stringResource(R.string.mastery_register),
                 watermarkIcon = R.drawable.ic_scales,
@@ -537,12 +516,18 @@ private fun StatsGrid(
     }
 }
 
+// Keep your previews but update them:
 @Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
 private fun OverviewTabPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         OverviewTab(
             word = MockWordData.journeyWord,
+            wordProgress = CurrentWordProgress(
+                repetitions = 5,
+                nextReviewText = "Tomorrow",
+                masteryProgress = 0.65f
+            ),
             showPowerTip = false,
             onTogglePowerTip = {}
         )
@@ -555,6 +540,11 @@ private fun OverviewTabPreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         OverviewTab(
             word = MockWordData.journeyWord,
+            wordProgress = CurrentWordProgress(
+                repetitions = 12,
+                nextReviewText = "3 days",
+                masteryProgress = 0.85f
+            ),
             showPowerTip = true,
             onTogglePowerTip = {}
         )
