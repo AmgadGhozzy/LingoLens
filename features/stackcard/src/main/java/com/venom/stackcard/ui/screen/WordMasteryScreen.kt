@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import com.venom.lingospell.presentation.SpellingGameScreen
 import com.venom.stackcard.ui.components.flashcard.CardSwiperStack
 import com.venom.stackcard.ui.components.insights.InsightsSheet
 import com.venom.stackcard.ui.components.mastery.ActionBar
+import com.venom.stackcard.ui.components.mastery.CardsProgressIndicator
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryUiState
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
@@ -39,7 +41,6 @@ fun WordMasteryScreen(
     viewModel: WordMasteryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
@@ -68,6 +69,7 @@ fun WordMasteryScreen(
 
             uiState.visibleCards.isEmpty() && uiState.processedCardsCount > 0 -> {
                 SessionFinishedView(
+                    sessionStats = uiState.sessionStats,
                     onBackToWelcome = { viewModel.onEvent(WordMasteryEvent.BackToWelcome) },
                     onExit = onBack
                 )
@@ -84,6 +86,7 @@ fun WordMasteryScreen(
     }
 }
 
+
 @Composable
 private fun MasteryContent(
     uiState: WordMasteryUiState,
@@ -91,9 +94,25 @@ private fun MasteryContent(
     onEvent: (WordMasteryEvent) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Progress Indicator with difficulty theming
+            CardsProgressIndicator(
+                currentIndex = uiState.processedCardsCount,
+                totalCards = uiState.initialCardCount,
+                difficultyScore = uiState.currentWord?.difficultyScore ?: 5,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.adp, vertical = 12.adp)
+            )
+
+            // Card Stack
             Box(
-                modifier = Modifier.weight(1f).fillMaxSize(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CardSwiperStack(
@@ -104,6 +123,7 @@ private fun MasteryContent(
                 )
             }
 
+            // Action Bar
             ActionBar(
                 onFlip = { onEvent(WordMasteryEvent.FlipCard) },
                 onPractice = { onEvent(WordMasteryEvent.StartPractice) },
@@ -114,12 +134,14 @@ private fun MasteryContent(
             Spacer(modifier = Modifier.height(24.adp))
         }
 
+        // Insights Sheet
         InsightsSheet(
             isOpen = uiState.isSheetOpen,
             word = uiState.currentWord,
             activeTab = uiState.activeTab,
             pinnedLanguage = uiState.pinnedLanguage,
             showPowerTip = uiState.showPowerTip,
+            currentWordProgress = uiState.currentWordProgress, // NEW: Pass progress
             onClose = { onEvent(WordMasteryEvent.CloseSheet) },
             onTabChange = { tab -> onEvent(WordMasteryEvent.ChangeTab(tab)) },
             onPinLanguage = { lang -> onEvent(WordMasteryEvent.PinLanguage(lang)) },
@@ -127,6 +149,7 @@ private fun MasteryContent(
             onSpeak = {}
         )
 
+        // Practice Dialog
         if (uiState.isPracticeMode && uiState.currentWord != null) {
             Dialog(
                 onDismissRequest = { onEvent(WordMasteryEvent.PracticeHandled) },
