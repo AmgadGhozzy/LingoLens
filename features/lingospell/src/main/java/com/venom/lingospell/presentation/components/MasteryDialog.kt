@@ -34,12 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.resources.R
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
+import com.venom.ui.components.other.ConfettiView
 import com.venom.ui.theme.lingoLens
 
 @Composable
@@ -53,7 +51,6 @@ fun MasteryDialog(
     val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Animate entrance
         scale.animateTo(
             targetValue = 1f,
             animationSpec = spring(
@@ -61,42 +58,26 @@ fun MasteryDialog(
                 stiffness = Spring.StiffnessMedium
             )
         )
-        alpha.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(durationMillis = 500)
-        )
+        alpha.animateTo(targetValue = 1f, animationSpec = tween(500))
     }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f))
+            .background(Color.Black.copy(0.7f))
             .alpha(alpha.value),
         contentAlignment = Alignment.Center
     ) {
-        // Celebration animation background
-        LottieAnimation(
-            composition = rememberLottieComposition(
-                spec = LottieCompositionSpec.RawRes(R.raw.confetti)
-            ).value,
-            iterations = Int.MAX_VALUE,
-            modifier = Modifier.fillMaxSize()
-        )
+        ConfettiView()
 
-        // Content card
         Column(
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .scale(scale.value)
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(24.adp)
-                )
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.adp))
                 .padding(32.adp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Trophy icon
             Icon(
                 painter = painterResource(R.drawable.icon_trophy),
                 contentDescription = null,
@@ -106,7 +87,6 @@ fun MasteryDialog(
 
             Spacer(modifier = Modifier.height(16.adp))
 
-            // Mastered title
             Text(
                 text = "MASTERED!",
                 style = MaterialTheme.typography.displaySmall.copy(
@@ -119,7 +99,6 @@ fun MasteryDialog(
 
             Spacer(modifier = Modifier.height(8.adp))
 
-            // Subtitle
             Text(
                 text = "You've spelled this word correctly 3 times!",
                 style = MaterialTheme.typography.bodyLarge,
@@ -129,7 +108,6 @@ fun MasteryDialog(
 
             Spacer(modifier = Modifier.height(32.adp))
 
-            // Arabic word
             Text(
                 text = arabicWord,
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -141,7 +119,6 @@ fun MasteryDialog(
 
             Spacer(modifier = Modifier.height(8.adp))
 
-            // English word
             Text(
                 text = word.uppercase(),
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -154,12 +131,9 @@ fun MasteryDialog(
 
             Spacer(modifier = Modifier.height(40.adp))
 
-            // Continue button
             Button(
                 onClick = onContinue,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.adp),
+                modifier = Modifier.fillMaxWidth().height(56.adp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.lingoLens.feature.spelling.mastery,
                     contentColor = Color.White
@@ -167,7 +141,7 @@ fun MasteryDialog(
                 shape = RoundedCornerShape(16.adp)
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.spacedBy(8.adp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -176,7 +150,6 @@ fun MasteryDialog(
                             fontWeight = FontWeight.Bold
                         )
                     )
-                    Spacer(modifier = Modifier.size(8.adp))
                     Icon(
                         imageVector = Icons.Rounded.ArrowForward,
                         contentDescription = null,

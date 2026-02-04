@@ -74,7 +74,7 @@ fun LetterBank(
                     topEnd = 40.adp
                 )
             )
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(horizontal = 24.adp, vertical = 24.adp)
     ) {
         // Controls Bar
