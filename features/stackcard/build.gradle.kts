@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":core:di"))
     implementation(project(":core:resources"))
     implementation(project(":core:ui"))
+    implementation(project(":core:analytics"))
     implementation(project(":features:phrase"))
     implementation(project(":features:lingospell"))
 
