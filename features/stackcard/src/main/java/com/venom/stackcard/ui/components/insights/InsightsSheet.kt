@@ -52,6 +52,7 @@ import com.venom.domain.model.AppTheme
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
+import com.venom.stackcard.ui.viewmodel.CurrentWordProgress
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.CustomDragHandle
 import com.venom.ui.components.common.adp
@@ -83,6 +84,7 @@ import kotlin.math.roundToInt
 fun InsightsSheet(
     isOpen: Boolean,
     word: WordMaster?,
+    currentWordProgress: CurrentWordProgress,
     activeTab: InsightsTab,
     pinnedLanguage: LanguageOption?,
     showPowerTip: Boolean,
@@ -149,6 +151,7 @@ fun InsightsSheet(
             ) {
                 SheetContent(
                     word = word,
+                    currentWordProgress = currentWordProgress,
                     pagerState = pagerState,
                     activeTab = activeTab,
                     pinnedLanguage = pinnedLanguage,
@@ -167,6 +170,7 @@ fun InsightsSheet(
 @Composable
 private fun SheetContent(
     word: WordMaster?,
+    currentWordProgress: CurrentWordProgress,
     pagerState: PagerState,
     activeTab: InsightsTab,
     pinnedLanguage: LanguageOption?,
@@ -275,7 +279,8 @@ private fun SheetContent(
                         InsightsTab.OVERVIEW -> OverviewTab(
                             word = currentWord,
                             showPowerTip = showPowerTip,
-                            onTogglePowerTip = onTogglePowerTip
+                            onTogglePowerTip = onTogglePowerTip,
+                            wordProgress = currentWordProgress
                         )
 
                         InsightsTab.RELATIONS -> RelationsTab(
@@ -308,6 +313,11 @@ private fun InsightsSheetPreview() {
         InsightsSheet(
             isOpen = true,
             word = MockWordData.journeyWord,
+            currentWordProgress = CurrentWordProgress(
+                repetitions = 5,
+                nextReviewText = "Tomorrow",
+                masteryProgress = 0.65f
+            ),
             activeTab = InsightsTab.OVERVIEW,
             pinnedLanguage = null,
             showPowerTip = false,
@@ -327,6 +337,11 @@ private fun InsightsSheetPreviewLight() {
         InsightsSheet(
             isOpen = true,
             word = MockWordData.journeyWord,
+            currentWordProgress = CurrentWordProgress(
+                repetitions = 5,
+                nextReviewText = "Tomorrow",
+                masteryProgress = 0.65f
+            ),
             activeTab = InsightsTab.OVERVIEW,
             pinnedLanguage = null,
             showPowerTip = false,
