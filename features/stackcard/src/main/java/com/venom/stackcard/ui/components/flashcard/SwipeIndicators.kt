@@ -1,101 +1,96 @@
 package com.venom.stackcard.ui.components.flashcard
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import com.venom.resources.R
 import com.venom.ui.components.common.adp
-import com.venom.ui.components.common.asp
 import com.venom.ui.theme.BrandColors
 import kotlin.math.abs
 
 @Composable
 fun SwipeIndicators(
-    offsetX: Float,
-    swipeThreshold: Float,
+    animState: CardAnimationState,
+    swipeThresholdPx: Float,
     modifier: Modifier = Modifier
 ) {
-    val progress = (abs(offsetX) / swipeThreshold).coerceIn(0f, 1f)
-    val shift by animateFloatAsState(
-        targetValue = (offsetX / swipeThreshold * 50f).coerceIn(-50f, 50f),
-        animationSpec = spring(stiffness = 200f)
-    )
-
-    Box(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 32.adp),
-        contentAlignment = Alignment.Center
+    Row(
+        modifier = modifier.fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val shiftAdp = shift.adp
-        Row(
+        // Forgot indicator (left side)
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .offset(x = shiftAdp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .graphicsLayer {
+                    // Read animation value inside graphicsLayer
+                    val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(-1f, 0f)
+                    val absProgress = abs(progress)
+
+                    // Fade in and scale up as user swipes left
+                    alpha = if (absProgress > 0.2f) {
+                        ((absProgress - 0.2f) / 0.8f).coerceIn(0f, 1f)
+                    } else 0f
+
+                    scaleX = 0.5f + (absProgress * 0.5f)
+                    scaleY = 0.5f + (absProgress * 0.5f)
+                }
+                .size(56.adp)
+                .clip(CircleShape)
+                .background(BrandColors.Red500.copy(alpha = 0.9f))
+                .padding(12.adp),
+            contentAlignment = Alignment.Center
         ) {
-            Indicator(
-                text = stringResource(R.string.known),
-                icon = "✓",
-                alpha = if (offsetX > 0) progress else 0f,
-                color = BrandColors.Green500,
-                rotation = -8f + (progress * 8f)
-            )
-            Indicator(
-                text = stringResource(R.string.hard),
-                icon = "✗",
-                alpha = if (offsetX < 0) progress else 0f,
-                color = BrandColors.Red500,
-                rotation = 8f - (progress * 8f)
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Forgot",
+                tint = BrandColors.White,
+                modifier = Modifier.size(32.adp)
             )
         }
-    }
-}
 
-@Composable
-private fun Indicator(
-    text: String,
-    icon: String,
-    alpha: Float,
-    color: Color,
-    rotation: Float
-) {
-    Card(
-        modifier = Modifier
-            .alpha(alpha)
-            .graphicsLayer {
-                rotationZ = rotation
-                scaleX = 0.9f + (alpha * 0.1f)
-                scaleY = 0.9f + (alpha * 0.1f)
-            }
-            .padding(8.adp),
-        shape = RoundedCornerShape(16.adp),
-        colors = CardDefaults.cardColors(containerColor = color),
-        elevation = CardDefaults.cardElevation(defaultElevation = (alpha * 8).adp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.adp, vertical = 10.adp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.adp)
+        Spacer(modifier = Modifier.width(200.adp))
+
+        // Remember indicator (right side)
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    // Read animation value inside graphicsLayer
+                    val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(0f, 1f)
+
+                    // Fade in and scale up as user swipes right
+                    alpha = if (progress > 0.2f) {
+                        ((progress - 0.2f) / 0.8f).coerceIn(0f, 1f)
+                    } else 0f
+
+                    scaleX = 0.5f + (progress * 0.5f)
+                    scaleY = 0.5f + (progress * 0.5f)
+                }
+                .size(56.adp)
+                .clip(CircleShape)
+                .background(BrandColors.Green500.copy(alpha = 0.9f))
+                .padding(12.adp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = icon, fontSize = 20.asp, color = Color.White)
-            Text(text = text, color = Color.White, fontSize = 14.asp, fontWeight = FontWeight.Bold)
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Remember",
+                tint = BrandColors.White,
+                modifier = Modifier.size(32.adp)
+            )
         }
     }
 }
