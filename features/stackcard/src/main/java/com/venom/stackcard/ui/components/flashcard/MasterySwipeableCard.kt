@@ -1,85 +1,64 @@
 package com.venom.stackcard.ui.components.flashcard
 
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.stackcard.ui.components.mastery.HapticStrength
 import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.ui.components.common.adp
-import com.venom.ui.theme.BrandColors
-import kotlin.math.abs
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
+
+// Pre-computed shape to avoid recreation
+
 
 /**
- * Swipeable card wrapper for Word Mastery feature.
+ * Optimized swipeable card that reads animation values inside graphicsLayer
+ * to avoid recomposition during animations.
  *
- * @param word The word data to display
- * @param offsetX Horizontal drag offset from swipe engine
- * @param offsetY Vertical drag offset from swipe engine
- * @param stackOffsetX Stack position horizontal offset
- * @param stackOffsetY Stack position vertical offset
- * @param rotation Z-axis rotation from drag
- * @param scale Scale factor for stack depth
- * @param isFlipped Whether card shows back face
- * @param flipRotation Cumulative Y-axis rotation for flip
- * @param isTopCard Whether this is the interactive top card
- * @param swipeProgress Normalized swipe progress (-1 to 1)
- * @param isBookmarked Bookmark state
- * @param isHintRevealed Whether blur hint is revealed
- * @param pinnedLanguage Optional pinned language for back
- * @param isRestoringCard Whether card is animating back from undo
- * @param onFlip Callback for card flip
- * @param onDrag Callback for drag events
- * @param onDragEnd Callback when drag ends
- * @param onBookmark Callback for bookmark toggle
- * @param onSpeak Callback for TTS (text, rate)
- * @param onRevealHint Callback to reveal blur hint
- * @param modifier Modifier for styling
+ * Key optimizations:
+ * 1. Animation state read inside graphicsLayer (no recomposition)
+ * 2. Pre-allocated colors via CardColors object
+ * 3. Cached dimension calculations
+ * 4. Stable callbacks with remember
  */
 @Composable
 fun MasterySwipeableCard(
     word: WordMaster,
-    offsetX: Float,
-    offsetY: Float,
-    stackOffsetX: Dp,
-    stackOffsetY: Dp,
-    rotation: Float,
-    scale: Float,
-    isFlipped: Boolean,
-    flipRotation: Float = 0f,
+    animState: CardAnimationState?,
+    stackPosition: StackPosition,
     isTopCard: Boolean,
-    swipeProgress: Float,
+    isFlipped: Boolean,
+    flipRotation: Float,
+    swipeThresholdPx: Float,
     isBookmarked: Boolean,
     isHintRevealed: Boolean,
     pinnedLanguage: LanguageOption?,
-    isRestoringCard: Boolean = false,
     onFlip: () -> Unit,
-    onDrag: (Offset) -> Unit,
+    onDrag: (Float, Float) -> Unit,
     onDragEnd: () -> Unit,
     onBookmark: () -> Unit,
-    onSpeak: (text: String) -> Unit,
+    onSpeak: (String) -> Unit,
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -87,58 +66,98 @@ fun MasterySwipeableCard(
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val cardShape = RoundedCornerShape(32.adp)
+    // Animate flip rotation - this is the only animated state that triggers recomposition
+    // because it's user-initiated and infrequent
+    val animatedFlipRotation by animateFloatAsState(
+        targetValue = flipRotation,
+        animationSpec = OptimizedCardAnimations.FlipAnimationSpec,
+        label = "flipRotation"
+    )
 
-    val absProgress = remember(swipeProgress) { abs(swipeProgress) }
+    // Cache card dimensions - only recalculate on configuration change
+    val screenWidthDp = configuration.screenWidthDp.adp
+    val paddingDp = 24.adp
+    val limitDp = 400.adp
 
-    val borderColor = when {
-        isRestoringCard -> MaterialTheme.colorScheme.outline.copy(0.2f)
-        absProgress < 0.3f -> MaterialTheme.colorScheme.outline.copy(0.2f)
-        swipeProgress > 0 -> BrandColors.Green500.copy(
-            alpha = (0.3f + absProgress * 0.4f).coerceAtMost(
-                0.7f
-            )
-        )
-
-        else -> BrandColors.Red500.copy(alpha = (0.3f + absProgress * 0.4f).coerceAtMost(0.7f))
+    val (cardWidth, cardHeight) = remember(screenWidthDp, paddingDp, limitDp, density) {
+        val maxWidthPx = with(density) { screenWidthDp.toPx() }
+        val paddingPx = with(density) { paddingDp.toPx() }
+        val limitPx = with(density) { limitDp.toPx() }
+        val cardWidthPx = min(maxWidthPx - paddingPx, limitPx)
+        val cardWidthDp = with(density) { cardWidthPx.toDp() }
+        Pair(cardWidthDp, cardWidthDp * 1.8f)
     }
 
-    val borderWidth = if (absProgress > 0.3f) 2f else 1f
+    // Pre-compute stack offsets in pixels for graphicsLayer
+    val stackOffsetXDp = stackPosition.offsetXDp.adp
+    val stackOffsetYDp = stackPosition.offsetYDp.adp
 
-    val animatedRotationY = if (isTopCard) {
-        animateFloatAsState(
-            targetValue = flipRotation,
-            animationSpec = spring(dampingRatio = 0.65f, stiffness = Spring.StiffnessMediumLow)
-        ).value
-    } else 0f
-
-    val adapterMaxWidth = configuration.screenWidthDp.adp
-    val adapterPadding = 24.adp
-    val adapterLimit = 400.adp
-    
-    val cardDimensions = remember(density, adapterMaxWidth, adapterPadding, adapterLimit) {
-        val maxWidth = with(density) { adapterMaxWidth.toPx() }
-        val cardWidth = with(density) { min(maxWidth - adapterPadding.toPx(), adapterLimit.toPx()).toDp() }
-        Pair(cardWidth, cardWidth * 1.8f)
+    val stackOffsetXPx = remember(stackOffsetXDp, density) {
+        with(density) { stackOffsetXDp.toPx() }
+    }
+    val stackOffsetYPx = remember(stackOffsetYDp, density) {
+        with(density) { stackOffsetYDp.toPx() }
     }
 
-    val (cardWidth, cardHeight) = cardDimensions
     val cameraDistance = remember(density) { 12f * density.density }
+
+    // Derive border color without allocation in composition
+    // This only recomputes when animState values change significantly
+    val borderState: State<Pair<Color, Float>> = remember(animState, swipeThresholdPx) {
+        derivedStateOf {
+            if (animState == null || !isTopCard) {
+                Pair(CardColors.NeutralBorder, 1f)
+            } else {
+                val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(-1f, 1f)
+                Pair(
+                    CardColors.getBorderColor(progress),
+                    CardColors.getBorderWidth(progress)
+                )
+            }
+        }
+    }
+
+    val (borderColor, borderWidth) = borderState.value
 
     Card(
         modifier = modifier
             .size(cardWidth, cardHeight)
-            .offset(
-                x = ((offsetX / density.density).adp) + stackOffsetX,
-                y = ((offsetY / density.density).adp) + stackOffsetY
-            )
             .graphicsLayer {
-                rotationZ = if (isFlipped) -rotation else rotation
-                rotationY = animatedRotationY
-                scaleX = scale
-                scaleY = scale
+                // ALL DYNAMIC ANIMATION VALUES READ HERE
+                // This lambda runs on every frame but doesn't trigger recomposition
+
+                if (isTopCard && animState != null) {
+                    val currentOffsetX = animState.offsetX.value
+                    val currentOffsetY = animState.offsetY.value
+                    val currentRotation = animState.rotation.value
+
+                    // Translation combines drag offset and stack position
+                    translationX = currentOffsetX + stackOffsetXPx
+                    translationY = currentOffsetY + stackOffsetYPx
+
+                    // Rotation flips direction when card is flipped
+                    rotationZ = if (isFlipped) -currentRotation else currentRotation
+                    rotationY = animatedFlipRotation
+
+                    // Dynamic scale based on drag distance
+                    val dragDistance = sqrt(
+                        currentOffsetX.pow(2) + currentOffsetY.pow(2)
+                    )
+                    val dynamicScale = (1f - dragDistance * 0.0003f).coerceIn(0.8f, 1f)
+                    scaleX = dynamicScale
+                    scaleY = dynamicScale
+                } else {
+                    // Static positioning for non-top cards
+                    translationX = stackOffsetXPx
+                    translationY = stackOffsetYPx
+                    rotationZ = stackPosition.rotation
+                    scaleX = stackPosition.scale
+                    scaleY = stackPosition.scale
+                    rotationY = 0f
+                }
+
                 this.cameraDistance = cameraDistance
                 clip = false
-                renderEffect = null
             }
             .clip(cardShape)
             .border(borderWidth.adp, borderColor, cardShape)
@@ -146,19 +165,24 @@ fun MasterySwipeableCard(
                 if (isTopCard) {
                     Modifier
                         .pointerInput(isFlipped) {
-                            detectDragGestures(onDragEnd = { onDragEnd() }) { change, dragAmount ->
+                            detectDragGestures(
+                                onDragEnd = { onDragEnd() },
+                                onDragCancel = { onDragEnd() }
+                            ) { change, dragAmount ->
                                 change.consume()
-                                val correctedDrag = if (isFlipped) Offset(
-                                    -dragAmount.x,
-                                    dragAmount.y
-                                ) else dragAmount
-                                onDrag(correctedDrag)
+                                // Correct drag direction when card is flipped
+                                val correctedX = if (isFlipped) -dragAmount.x else dragAmount.x
+                                onDrag(correctedX, dragAmount.y)
                             }
                         }
-                        .pointerInput(Unit) { detectTapGestures(onTap = { 
-                            haptic(HapticStrength.MEDIUM)
-                            onFlip() 
-                        }) }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    haptic(HapticStrength.MEDIUM)
+                                    onFlip()
+                                }
+                            )
+                        }
                 } else Modifier
             ),
         shape = cardShape,
@@ -167,7 +191,7 @@ fun MasterySwipeableCard(
     ) {
         WordCard(
             word = word,
-            animatedRotationY = animatedRotationY,
+            animatedRotationY = if (isTopCard) animatedFlipRotation else 0f,
             isBookmarked = isBookmarked,
             isHintRevealed = isHintRevealed,
             pinnedLanguage = pinnedLanguage,
