@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
@@ -33,31 +34,42 @@ fun WordCard(
     isBookmarked: Boolean,
     isHintRevealed: Boolean,
     pinnedLanguage: LanguageOption?,
-    onSpeak: (text: String) -> Unit,
+    onSpeak: (String) -> Unit,
     onBookmarkToggle: () -> Unit,
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val normalizedRotation = animatedRotationY % 360f
-    val effectiveRotation = if (normalizedRotation < 0) normalizedRotation + 360f else normalizedRotation
-    val showFront = effectiveRotation <= 90f || effectiveRotation >= 270f
-
-    Box(modifier = modifier.clip(RoundedCornerShape(32.adp))) {
+    // Determine which face is visible based on rotation
+    val showFront = remember(animatedRotationY) {
+        val normalizedRotation = animatedRotationY % 360f
+        val effectiveRotation = if (normalizedRotation < 0) {
+            normalizedRotation + 360f
+        } else {
+            normalizedRotation
+        }
+        effectiveRotation <= 90f || effectiveRotation >= 270f
+    }
+    val cardShape = RoundedCornerShape(32.adp)
+    Box(modifier = modifier.clip(cardShape)) {
         // Front face
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(if (showFront) 1f else 0f)
-                .graphicsLayer { alpha = if (showFront) 1f else 0f }
+                .graphicsLayer {
+                    alpha = if (showFront) 1f else 0f
+                }
         ) {
-            CardFront(
-                word = word,
-                isBookmarked = isBookmarked,
-                isHintRevealed = isHintRevealed,
-                onSpeak = onSpeak,
-                onBookmarkToggle = onBookmarkToggle,
-                onRevealHint = onRevealHint
-            )
+            if (showFront) {
+                CardFront(
+                    word = word,
+                    isBookmarked = isBookmarked,
+                    isHintRevealed = isHintRevealed,
+                    onSpeak = onSpeak,
+                    onBookmarkToggle = onBookmarkToggle,
+                    onRevealHint = onRevealHint
+                )
+            }
         }
 
         // Back face
@@ -70,13 +82,15 @@ fun WordCard(
                     rotationY = 180f
                 }
         ) {
-            CardBack(
-                word = word,
-                isBookmarked = isBookmarked,
-                pinnedLanguage = pinnedLanguage,
-                onSpeak = onSpeak,
-                onBookmarkToggle = onBookmarkToggle
-            )
+            if (!showFront) {
+                CardBack(
+                    word = word,
+                    isBookmarked = isBookmarked,
+                    pinnedLanguage = pinnedLanguage,
+                    onSpeak = onSpeak,
+                    onBookmarkToggle = onBookmarkToggle
+                )
+            }
         }
     }
 }
