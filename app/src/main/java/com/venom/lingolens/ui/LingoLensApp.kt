@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -26,6 +25,7 @@ import com.venom.lingolens.navigation.AppState
 import com.venom.lingolens.navigation.NavigationGraph
 import com.venom.settings.presentation.screen.AboutBottomSheet
 import com.venom.settings.presentation.screen.SettingsBottomSheet
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.FloatingOrbs
 import com.venom.ui.navigation.Screen
 import com.venom.ui.screen.ContentType
@@ -37,6 +37,7 @@ fun LingoLensApp(
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
+    onGoogleSignIn: () -> Unit = {}
 ) {
     val navController = rememberNavController()
     val appState = remember(navController) {
@@ -49,7 +50,8 @@ fun LingoLensApp(
         appState = appState,
         startCamera = startCamera,
         imageSelector = imageSelector,
-        fileSelector = fileSelector
+        fileSelector = fileSelector,
+        onGoogleSignIn = onGoogleSignIn
     )
 }
 
@@ -61,6 +63,7 @@ private fun LingoLensAppContent(
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
+    onGoogleSignIn: () -> Unit,
 ) {
     BackHandler(enabled = appState.showSettings || appState.showAbout) {
         appState.handleBackPress()
@@ -87,7 +90,7 @@ private fun LingoLensAppContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
     ) {
         // Floating orbs with settings-controlled parameters
         if (settingsUiState.orbPrefs.enabled) {
@@ -104,13 +107,14 @@ private fun LingoLensAppContent(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(top = if (appState.shouldShowTopBar) 64.dp else 0.dp)
+                .padding(top = if (appState.shouldShowTopBar) 64.adp else 0.adp)
         ) {
             NavigationGraph(
                 navController = appState.navController,
                 startCamera = startCamera,
                 imageSelector = imageSelector,
                 fileSelector = fileSelector,
+                onGoogleSignIn = onGoogleSignIn
             )
         }
 

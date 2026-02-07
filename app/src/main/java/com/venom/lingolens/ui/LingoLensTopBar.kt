@@ -16,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.data.model.TranslationProvider
 import com.venom.lingopro.ui.components.sections.ProviderSelectorAction
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.navigation.Screen
 
 @Composable
@@ -42,7 +43,7 @@ fun LingoLensTopBar(
         modifier = modifier
             .fillMaxWidth()
             .scale(0.95f)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.adp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CustomButton(
@@ -54,7 +55,7 @@ fun LingoLensTopBar(
             showBorder = false
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(12.adp))
 
         Text(
             text = stringResource(
@@ -66,13 +67,14 @@ fun LingoLensTopBar(
             ),
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.SemiBold,
+                fontSize = 24.asp,
                 color = MaterialTheme.colorScheme.onSurface.copy(0.6f)
             ),
             modifier = Modifier.weight(1f)
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (showProviderSelector) {
@@ -98,7 +100,7 @@ fun TopBarActions(onBookmarkClick: () -> Unit, onSettingsClick: () -> Unit) {
         showBorder = false
     )
     CustomButton(
-        icon = R.drawable.icon_settings,
+        icon = R.drawable.ic_gear_six_fill,
         contentDescription = stringResource(R.string.settings_title),
         onClick = onSettingsClick,
         showBorder = false

@@ -23,15 +23,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.venom.lingolens.navigation.NavigationItems
 import com.venom.lingolens.navigation.navigateToStart
-import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.other.GlassThickness
+import com.venom.ui.components.other.GradientGlassCard
 import com.venom.ui.navigation.Screen
-import com.venom.ui.theme.ThemeColors.GlassPrimary
-import com.venom.ui.theme.ThemeColors.GlassSecondary
-import com.venom.ui.theme.ThemeColors.GlassTertiary
+import com.venom.ui.theme.lingoLens
 
 @Composable
 fun LingoLensBottomBar(
@@ -40,22 +39,24 @@ fun LingoLensBottomBar(
     onScreenSelected: (Screen) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    RoundedCornerShape(20.dp)
-    val itemShape = RoundedCornerShape(14.dp)
+    RoundedCornerShape(20.adp)
+    val itemShape = RoundedCornerShape(14.adp)
     val visibleItems = NavigationItems.entries.filter { it.showInBottomBar }
 
-    GlassCard(
+
+    GradientGlassCard(
         modifier = modifier
             .fillMaxWidth()
             .scale(0.95f)
-            .offset(y = (-8).dp),
-        solidBackgroundAlpha = 0.9f
+            .offset(y = (-12).adp),
+        thickness = GlassThickness.UltraThick,
+        gradientAlpha = 0.1f,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                .padding(10.adp),
+            horizontalArrangement = Arrangement.spacedBy(10.adp)
         ) {
             visibleItems.forEach { item ->
                 val isSelected = currentScreen == item.screen
@@ -63,29 +64,29 @@ fun LingoLensBottomBar(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(52.dp)
+                        .height(52.adp)
                         .then(
                             if (isSelected) Modifier
                                 .border(
-                                    0.8.dp,
+                                    0.8.adp,
                                     MaterialTheme.colorScheme.primary.copy(0.1f),
-                                    RoundedCornerShape(18.dp)
+                                    RoundedCornerShape(18.adp)
                                 )
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            GlassPrimary.copy(0.05f),
-                                            GlassSecondary.copy(0.05f),
-                                            GlassTertiary.copy(0.05f)
+                                            MaterialTheme.lingoLens.glass.tintPrimary.copy(0.05f),
+                                            MaterialTheme.lingoLens.glass.tintSecondary.copy(0.05f),
+                                            MaterialTheme.lingoLens.glass.tintAccent.copy(0.05f)
                                         )
                                     ),
-                                    RoundedCornerShape(18.dp)
+                                    RoundedCornerShape(18.adp)
                                 )
                                 .shadow(
-                                    elevation = 24.dp,
+                                    elevation = 24.adp,
                                     shape = itemShape,
-                                    ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
-                                    spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                    ambientColor = MaterialTheme.colorScheme.primary.copy(0.25f),
+                                    spotColor = MaterialTheme.colorScheme.primary.copy(0.4f)
                                 )
                             else Modifier
                         )
@@ -102,8 +103,8 @@ fun LingoLensBottomBar(
                         tint = if (isSelected)
                             MaterialTheme.colorScheme.primary
                         else
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.size(24.dp)
+                            MaterialTheme.colorScheme.onSurface.copy(0.7f),
+                        modifier = Modifier.size(30.adp)
                     )
                 }
             }
