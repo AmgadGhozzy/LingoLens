@@ -19,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
-import com.venom.stackcard.ui.components.mastery.HapticStrength
-import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
 import kotlin.math.abs
@@ -33,10 +31,10 @@ fun CardSwiperStack(
     modifier: Modifier = Modifier,
     viewModel: WordMasteryViewModel = hiltViewModel(),
     onSpeak: (text: String) -> Unit,
+    onFlip: () -> Unit = {},
     onRememberWord: (WordMaster) -> Unit = {},
     onForgotWord: (WordMaster) -> Unit = {},
 ) {
-    val haptic = rememberHapticFeedback()
     val density = LocalDensity.current
     val state by viewModel.uiState.collectAsState()
     val contentDescriptionString = stringResource(id = R.string.card_swiper_stack)
@@ -90,9 +88,9 @@ fun CardSwiperStack(
     }
 
     // Stabilize unstable lambda parameters
+    val currentOnFlip by rememberUpdatedState(onFlip)
     val currentOnRememberWord by rememberUpdatedState(onRememberWord)
     val currentOnForgotWord by rememberUpdatedState(onForgotWord)
-    val currentHaptic by rememberUpdatedState(haptic)
 
     // Stable drag end handler
     val onDragEndCallback = remember(cardAnimState, swipeThresholdPx, viewModel) {
@@ -102,8 +100,6 @@ fun CardSwiperStack(
 
             when {
                 absOffset > swipeThresholdPx -> {
-                    currentHaptic(HapticStrength.STRONG)
-
                     val targetX = OptimizedCardAnimations.calculateThrowTarget(
                         currentOffset,
                         cardAnimState.offsetX.velocity
@@ -153,7 +149,10 @@ fun CardSwiperStack(
                         isBookmarked = if (isTopCard) state.isBookmarked else false,
                         isHintRevealed = if (isTopCard) state.isHintRevealed else false,
                         pinnedLanguage = if (isTopCard) state.pinnedLanguage else null,
-                        onFlip = { viewModel.onEvent(WordMasteryEvent.FlipCard) },
+                        onFlip = {
+                            viewModel.onEvent(WordMasteryEvent.FlipCard)
+                            currentOnFlip()
+                        },
                         onDrag = onDragCallback,
                         onDragEnd = { onDragEndCallback(word) },
                         onBookmark = { viewModel.onEvent(WordMasteryEvent.ToggleBookmark) },

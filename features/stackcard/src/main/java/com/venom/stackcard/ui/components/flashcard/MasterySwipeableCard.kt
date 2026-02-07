@@ -25,8 +25,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
-import com.venom.stackcard.ui.components.mastery.HapticStrength
-import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.ui.components.common.adp
 import kotlin.math.abs
 import kotlin.math.min
@@ -53,7 +51,6 @@ fun MasterySwipeableCard(
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val haptic = rememberHapticFeedback()
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
 
@@ -187,10 +184,7 @@ fun MasterySwipeableCard(
                         }
                         .pointerInput(Unit) {
                             detectTapGestures(
-                                onTap = {
-                                    haptic(HapticStrength.MEDIUM)
-                                    onFlip()
-                                }
+                                onTap = { onFlip() }
                             )
                         }
                 } else Modifier
