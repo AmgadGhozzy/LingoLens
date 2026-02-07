@@ -24,13 +24,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 @Composable
 fun HeroSection(
     page: OnboardingPage,
     modifier: Modifier = Modifier,
-    size: Dp = 160.dp
+    size: Dp = 160.adp
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "hero")
 
@@ -69,14 +69,14 @@ fun HeroSection(
                 scaleX = pulse
                 scaleY = pulse
             }
-            .offset(y = float.dp)
+            .offset(y = float.adp)
             .shadow(
-                elevation = 24.dp,
-                shape = RoundedCornerShape(40.dp),
+                elevation = 24.adp,
+                shape = RoundedCornerShape(40.adp),
                 ambientColor = page.colors.primary.copy(0.45f),
                 spotColor = page.colors.secondary.copy(0.6f)
             )
-            .clip(RoundedCornerShape(40.dp))
+            .clip(RoundedCornerShape(40.adp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(

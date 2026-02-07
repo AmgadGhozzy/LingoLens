@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 @Composable
 fun ContentSection(
@@ -27,25 +27,25 @@ fun ContentSection(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(20.adp)
     ) {
         // Title & Subtitle
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             Text(
                 text = page.title,
-                fontSize = 32.sp,
+                fontSize = 32.asp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
-                lineHeight = 38.sp
+                lineHeight = 38.asp
             )
 
             Text(
                 text = page.subtitle,
-                fontSize = 18.sp,
+                fontSize = 18.asp,
                 fontWeight = FontWeight.Medium,
                 color = page.colors.primary,
                 textAlign = TextAlign.Center
@@ -55,17 +55,17 @@ fun ContentSection(
         // Description
         Text(
             text = page.description,
-            fontSize = 16.sp,
+            fontSize = 16.asp,
             color = MaterialTheme.colorScheme.onBackground.copy(0.85f),
             textAlign = TextAlign.Center,
-            lineHeight = 24.sp
+            lineHeight = 24.asp
         )
 
         // Features
         if (page.features.isNotEmpty()) {
             Column(
-                modifier = Modifier.padding(top = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                modifier = Modifier.padding(top = 8.adp),
+                verticalArrangement = Arrangement.spacedBy(14.adp)
             ) {
                 page.features.forEach { feature ->
                     FeatureItem(
@@ -85,19 +85,19 @@ private fun FeatureItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         Icon(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = null,
             tint = color,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(22.adp)
         )
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onBackground.copy(0.9f),
             style = MaterialTheme.typography.bodyLarge,
-            fontSize = 15.sp
+            fontSize = 15.asp
         )
     }
 }

@@ -14,8 +14,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 @Composable
 fun ActionButton(
@@ -24,15 +24,15 @@ fun ActionButton(
     colors: List<Color>,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(28.dp)
+    val shape = RoundedCornerShape(28.adp)
 
     Surface(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(56.adp)
             .shadow(
-                elevation = 8.dp,
+                elevation = 8.adp,
                 shape = shape,
                 ambientColor = colors.first().copy(0.3f),
                 spotColor = colors.last().copy(0.4f)
@@ -48,7 +48,7 @@ fun ActionButton(
         ) {
             Text(
                 text = text,
-                fontSize = 18.sp,
+                fontSize = 18.asp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )

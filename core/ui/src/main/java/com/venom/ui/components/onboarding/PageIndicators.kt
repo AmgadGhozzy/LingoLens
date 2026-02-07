@@ -18,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 @Composable
 fun PageIndicators(
@@ -30,8 +30,8 @@ fun PageIndicators(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+            .padding(vertical = 24.adp),
+        horizontalArrangement = Arrangement.spacedBy(8.adp, Alignment.CenterHorizontally)
     ) {
         repeat(totalPages) { index ->
             Indicator(
@@ -48,14 +48,14 @@ private fun Indicator(
     onClick: () -> Unit
 ) {
     val width by animateDpAsState(
-        targetValue = if (isActive) 32.dp else 8.dp,
+        targetValue = if (isActive) 32.adp else 8.adp,
         animationSpec = tween(300, easing = FastOutSlowInEasing)
     )
 
     Box(
         modifier = Modifier
-            .size(width = width, height = 8.dp)
-            .clip(RoundedCornerShape(4.dp))
+            .size(width = width, height = 8.adp)
+            .clip(RoundedCornerShape(4.adp))
             .background(
                 if (isActive)
                     MaterialTheme.colorScheme.onBackground
