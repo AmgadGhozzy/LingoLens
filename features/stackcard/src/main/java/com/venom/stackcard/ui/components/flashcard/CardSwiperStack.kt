@@ -3,13 +3,12 @@ package com.venom.stackcard.ui.components.flashcard
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -24,7 +23,6 @@ import com.venom.stackcard.ui.components.mastery.HapticStrength
 import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
-import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sin
 
@@ -39,7 +37,6 @@ fun CardSwiperStack(
     onForgotWord: (WordMaster) -> Unit = {},
 ) {
     val haptic = rememberHapticFeedback()
-    val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val state by viewModel.uiState.collectAsState()
     val contentDescriptionString = stringResource(id = R.string.card_swiper_stack)
@@ -52,7 +49,7 @@ fun CardSwiperStack(
         with(density) { OptimizedCardAnimations.SWIPE_THRESHOLD_DP.dp.toPx() }
     }
 
-    // Reset animation when top card changes
+    // Reset animation when top card changes — single source of truth
     val topCardId = state.visibleCards.firstOrNull()?.wordEn
     LaunchedEffect(topCardId) {
         cardAnimState.resetImmediate()
@@ -63,7 +60,7 @@ fun CardSwiperStack(
         state.visibleCards.take(MAX_VISIBLE_CARDS)
     }
 
-    // Pre-compute stack positions - only changes when list changes
+    // Pre-compute stack positions
     val stackPositions = remember(limitedCards.size) {
         List(limitedCards.size) { index ->
             val stackIndex = limitedCards.lastIndex - index
@@ -85,30 +82,27 @@ fun CardSwiperStack(
         }
     }
 
-    // Stable drag callback - no recomposition when called
+    // Stable drag callback
     val onDragCallback = remember(cardAnimState) {
         { deltaX: Float, deltaY: Float ->
             cardAnimState.updateDragPosition(deltaX, deltaY)
         }
     }
 
+    // Stabilize unstable lambda parameters
+    val currentOnRememberWord by rememberUpdatedState(onRememberWord)
+    val currentOnForgotWord by rememberUpdatedState(onForgotWord)
+    val currentHaptic by rememberUpdatedState(haptic)
+
     // Stable drag end handler
-    val onDragEndCallback = remember(
-        cardAnimState,
-        swipeThresholdPx,
-        viewModel,
-        haptic,
-        onRememberWord,
-        onForgotWord
-    ) {
+    val onDragEndCallback = remember(cardAnimState, swipeThresholdPx, viewModel) {
         { word: WordMaster ->
             val currentOffset = cardAnimState.offsetX.value
             val absOffset = abs(currentOffset)
 
             when {
                 absOffset > swipeThresholdPx -> {
-                    // Swipe threshold exceeded - animate off and process
-                    haptic(HapticStrength.STRONG)
+                    currentHaptic(HapticStrength.STRONG)
 
                     val targetX = OptimizedCardAnimations.calculateThrowTarget(
                         currentOffset,
@@ -116,32 +110,21 @@ fun CardSwiperStack(
                     )
 
                     cardAnimState.animateSwipeOff(targetX) {
-                        scope.launch {
-                            cardAnimState.resetImmediate()
-
-                            if (currentOffset > 0) {
-                                viewModel.onEvent(WordMasteryEvent.SwipeRemember(word))
-                                onRememberWord(word)
-                            } else {
-                                viewModel.onEvent(WordMasteryEvent.SwipeForgot(word))
-                                onForgotWord(word)
-                            }
-                            viewModel.onEvent(WordMasteryEvent.RemoveCard(word))
+                        if (currentOffset > 0) {
+                            viewModel.onEvent(WordMasteryEvent.SwipeRemember(word))
+                            currentOnRememberWord(word)
+                        } else {
+                            viewModel.onEvent(WordMasteryEvent.SwipeForgot(word))
+                            currentOnForgotWord(word)
                         }
+                        viewModel.onEvent(WordMasteryEvent.RemoveCard(word))
                     }
                 }
+
                 else -> {
-                    // Below threshold - return to center
                     cardAnimState.animateReturnToCenter()
                 }
             }
-        }
-    }
-
-    // Cleanup on dispose
-    DisposableEffect(Unit) {
-        onDispose {
-            cardAnimState.cleanup()
         }
     }
 
@@ -153,7 +136,6 @@ fun CardSwiperStack(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Render cards from bottom to top (reversed iteration)
         limitedCards.reversed().forEachIndexed { renderIndex, word ->
             key(word.wordEn) {
                 val isTopCard = renderIndex == limitedCards.lastIndex
@@ -165,7 +147,7 @@ fun CardSwiperStack(
                         animState = if (isTopCard) cardAnimState else null,
                         stackPosition = position,
                         isTopCard = isTopCard,
-                        isFlipped = isTopCard && state.isFlipped,
+                        isFlipped = if (isTopCard) state.isFlipped else false,
                         flipRotation = if (isTopCard) state.flipRotation else 0f,
                         swipeThresholdPx = swipeThresholdPx,
                         isBookmarked = if (isTopCard) state.isBookmarked else false,
@@ -182,7 +164,6 @@ fun CardSwiperStack(
             }
         }
 
-        // Swipe indicators (optimized to read animation state in graphicsLayer)
         SwipeIndicators(
             animState = cardAnimState,
             swipeThresholdPx = swipeThresholdPx,
