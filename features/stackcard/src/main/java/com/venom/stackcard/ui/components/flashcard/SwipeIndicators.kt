@@ -32,15 +32,12 @@ fun SwipeIndicators(
         modifier = modifier.fillMaxHeight(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Forgot indicator (left side)
         Box(
             modifier = Modifier
                 .graphicsLayer {
-                    // Read animation value inside graphicsLayer
                     val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(-1f, 0f)
                     val absProgress = abs(progress)
 
-                    // Fade in and scale up as user swipes left
                     alpha = if (absProgress > 0.2f) {
                         ((absProgress - 0.2f) / 0.8f).coerceIn(0f, 1f)
                     } else 0f
@@ -64,14 +61,11 @@ fun SwipeIndicators(
 
         Spacer(modifier = Modifier.width(200.adp))
 
-        // Remember indicator (right side)
         Box(
             modifier = Modifier
                 .graphicsLayer {
-                    // Read animation value inside graphicsLayer
                     val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(0f, 1f)
 
-                    // Fade in and scale up as user swipes right
                     alpha = if (progress > 0.2f) {
                         ((progress - 0.2f) / 0.8f).coerceIn(0f, 1f)
                     } else 0f
