@@ -12,6 +12,7 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 val versionFile = rootProject.file("version.properties")
@@ -37,7 +38,7 @@ android {
         versionCode = localVersionCode
         versionName = "3.8.${localVersionCode}"
         ndk {
-            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
         }
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -62,7 +63,11 @@ android {
         compose = true
         buildConfig = true
     }
-
+    android {
+        lint {
+            disable += "NullSafeMutableLiveData"
+        }
+    }
     // Auto increment app version
     gradle.startParameter.taskNames.forEach {
         if (it.contains(":app:assembleRelease")) {
@@ -92,6 +97,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // Ads
     api(libs.play.services.ads)
@@ -103,6 +109,7 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(project(":core:utils"))
     implementation(project(":core:domain"))
+    implementation(project(":core:analytics"))
 
     // Features
     implementation(project(":features:translation"))

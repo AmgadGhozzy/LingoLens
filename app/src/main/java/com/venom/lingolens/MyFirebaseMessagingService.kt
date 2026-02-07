@@ -14,10 +14,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         remoteMessage.notification?.let { sendNotification(it) }
     }
 
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-    }
-
     private fun sendNotification(notification: RemoteMessage.Notification) {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -34,7 +30,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_launcher)
             // Basic
             .setContentTitle(notification.title)
             .setContentText(notification.body)
