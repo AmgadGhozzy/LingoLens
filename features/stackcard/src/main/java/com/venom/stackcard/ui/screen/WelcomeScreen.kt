@@ -1,7 +1,6 @@
 package com.venom.stackcard.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -10,12 +9,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,8 +26,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForwardIos
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -46,14 +41,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -67,9 +60,10 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
+import com.venom.domain.model.UserProgressData
 import com.venom.resources.R
+import com.venom.stackcard.ui.components.mastery.GradientActionButton
 import com.venom.stackcard.ui.components.mastery.MiniProgressDashboard
-import com.venom.stackcard.ui.components.mastery.UserProgressData
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
@@ -84,6 +78,7 @@ fun WelcomeScreen(
     onStart: (String) -> Unit = {},
     onBack: () -> Unit = {},
     onGoogleSignIn: () -> Unit = {},
+    onOpenProgress: () -> Unit = {},
     isLoading: Boolean = false,
     isSignedIn: Boolean = false,
     userName: String? = null,
@@ -97,10 +92,11 @@ fun WelcomeScreen(
 
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.95f,
-        animationSpec = tween(400)
+        animationSpec = tween(400),
+        label = "scale"
     )
 
-    val showDashboard = isSignedIn && userProgress != null && !isLoading
+    val displayName = userName?.takeIf { it.isNotBlank() }
 
     Column(
         modifier = modifier
@@ -108,47 +104,60 @@ fun WelcomeScreen(
             .padding(horizontal = 24.adp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top Bar
         TopBar(
             isSignedIn = isSignedIn,
-            userName = userName,
+            userName = displayName,
             isLoading = isLoading,
             onBack = onBack
         )
 
-        // Dashboard Section - Centered between TopBar and Logo
-        DashboardSection(
-            showDashboard = showDashboard,
-            userProgress = userProgress,
-            modifier = Modifier.weight(0.25f)
-        )
+        if (userProgress != null && isSignedIn) {
+            DashboardSection(
+                userProgress = userProgress,
+                onOpenProgress = onOpenProgress,
+                modifier = Modifier.weight(0.25f)
+            )
+        }
 
-        // Logo & Title Section - Centered top
         Column(
             modifier = Modifier
-                .weight(0.35f)
+                .weight(if (userProgress != null && isSignedIn) 0.30f else 0.45f)
                 .scale(scale),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
             AppLogo()
             Spacer(modifier = Modifier.height(20.adp))
             AppTitle()
         }
 
-        // Actions Section
         Column(
             modifier = Modifier
-                .weight(0.4f)
+                .weight(0.35f)
                 .widthIn(max = 360.adp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.adp, Alignment.Top)
         ) {
-            if (!isLoading) {
-                TopicInput(topic = topic, onValueChange = { topic = it })
+            GradientActionButton(
+                text = "Start Learning",
+                onClick = { onStart(topic) },
+                enabled = !isLoading,
+                leadingIcon = R.drawable.icon_play,
+                maxWidth = 360
+            ) {
+                if (isLoading) {
+                    LottieAnimation(
+                        composition = rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(R.raw.dot_loading)
+                        ).value,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.fillMaxWidth(0.35f),
+                        speed = 0.8f
+                    )
+                } else {
+                    null
+                }
             }
-
-            StartButton(onClick = { onStart(topic) }, isLoading = isLoading)
 
             if (!isSignedIn && !isLoading) {
                 SignInSection(onGoogleSignIn = onGoogleSignIn)
@@ -161,23 +170,36 @@ fun WelcomeScreen(
 
 @Composable
 private fun DashboardSection(
-    showDashboard: Boolean,
     userProgress: UserProgressData?,
+    onOpenProgress: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.adp))
+            .clickable(onClick = onOpenProgress),
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
-            visible = showDashboard,
+            visible = userProgress != null,
             enter = fadeIn(tween(300)) + slideInVertically { -it },
             exit = fadeOut(tween(200)) + slideOutVertically { -it }
         ) {
-            MiniProgressDashboard(
-                data = userProgress ?: UserProgressData(),
-                modifier = Modifier.widthIn(max = 360.adp)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(6.adp)
+            ) {
+                MiniProgressDashboard(
+                    data = userProgress ?: UserProgressData(),
+                    modifier = Modifier.widthIn(max = 360.adp)
+                )
+                Text(
+                    text = "Tap to view details",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                )
+            }
         }
     }
 }
@@ -219,10 +241,7 @@ private fun TopBar(
 }
 
 @Composable
-private fun SignedInBadge(
-    userName: String?,
-    modifier: Modifier = Modifier
-) {
+private fun SignedInBadge(userName: String?, modifier: Modifier = Modifier) {
     val semantic = MaterialTheme.lingoLens.semantic
 
     Row(
@@ -253,14 +272,13 @@ private fun SignedInBadge(
             Text(
                 text = "Signed in",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.asp
+                    fontWeight = FontWeight.Bold, fontSize = 10.asp
                 ),
                 color = semantic.success
             )
-            userName?.let {
+            if (!userName.isNullOrBlank()) {
                 Text(
-                    text = it.split(" ").firstOrNull() ?: it,
+                    text = userName.split(" ").firstOrNull() ?: userName,
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.asp),
                     color = semantic.success.copy(alpha = 0.7f)
                 )
@@ -270,10 +288,7 @@ private fun SignedInBadge(
 }
 
 @Composable
-private fun SignInSection(
-    onGoogleSignIn: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun SignInSection(onGoogleSignIn: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -387,16 +402,13 @@ private fun AppLogo() {
                 .size(100.adp)
                 .graphicsLayer { rotationZ = 6f }
                 .shadow(
-                    elevation = 20.adp,
-                    shape = RoundedCornerShape(28.adp),
+                    20.adp, RoundedCornerShape(28.adp),
                     ambientColor = BrandColors.Indigo500.copy(0.25f),
                     spotColor = BrandColors.Purple600.copy(0.3f)
                 )
                 .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(BrandColors.Indigo500, BrandColors.Purple600)
-                    ),
-                    shape = RoundedCornerShape(28.adp)
+                    Brush.linearGradient(listOf(BrandColors.Indigo500, BrandColors.Purple600)),
+                    RoundedCornerShape(28.adp)
                 ),
             contentAlignment = Alignment.Center
         ) {
@@ -412,8 +424,8 @@ private fun AppLogo() {
             modifier = Modifier
                 .size(40.adp)
                 .align(Alignment.BottomEnd)
-                .offset(x = 10.adp, y = 10.adp)
-                .graphicsLayer { rotationZ = -10f }
+                .offset(x = 8.adp, y = 8.adp)
+                .graphicsLayer { rotationZ = -15f }
                 .shadow(10.adp, RoundedCornerShape(12.adp))
                 .background(BrandColors.Emerald500, RoundedCornerShape(12.adp)),
             contentAlignment = Alignment.Center
@@ -474,103 +486,9 @@ private fun AppTitle() {
     }
 }
 
-@Composable
-private fun StartButton(onClick: () -> Unit, isLoading: Boolean) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val offsetY by animateDpAsState(
-        targetValue = if (isPressed) 6.adp else 0.adp,
-        animationSpec = tween(80),
-    )
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.adp)
-                .offset(y = 6.adp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            BrandColors.Indigo700.copy(alpha = 0.5f),
-                            BrandColors.Purple700.copy(alpha = 0.5f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(14.adp)
-                )
-        )
-
-        Button(
-            onClick = onClick,
-            enabled = !isLoading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.adp)
-                .offset(y = offsetY),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            contentPadding = PaddingValues(0.adp),
-            shape = RoundedCornerShape(14.adp),
-            interactionSource = interactionSource
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(BrandColors.Indigo600, BrandColors.Purple600)
-                        ),
-                        shape = RoundedCornerShape(14.adp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isLoading) {
-                    LottieAnimation(
-                        composition = rememberLottieComposition(
-                            LottieCompositionSpec.RawRes(R.raw.dot_loading)
-                        ).value,
-                        iterations = LottieConstants.IterateForever,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth(0.35f)
-                            .blur(0.5.adp),
-                        speed = 0.8f
-                    )
-                } else {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.adp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(22.adp)
-                                .background(Color.White.copy(0.2f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.icon_play),
-                                contentDescription = null,
-                                modifier = Modifier.size(12.adp),
-                                tint = Color.White
-                            )
-                        }
-
-                        Text(
-                            text = "Start Learning",
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 15.asp,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true, backgroundColor = 0xFF0F172A)
 @Composable
-private fun WelcomeScreenNewUserPreview() {
+private fun WelcomeScreenPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         WelcomeScreen(isSignedIn = false)
     }
@@ -582,31 +500,8 @@ private fun WelcomeScreenSignedInPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         WelcomeScreen(
             isSignedIn = true,
-            userName = "John Doe",
             userProgress = UserProgressData(
-                totalWordsLearned = 156,
-                masteredCount = 42,
-                currentStreak = 7,
-                todayXp = 85,
-                masteryProgress = 0.68f
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF8FAFC)
-@Composable
-private fun WelcomeScreenLightPreview() {
-    LingoLensTheme(appTheme = AppTheme.LIGHT) {
-        WelcomeScreen(
-            isSignedIn = true,
-            userName = "Jane",
-            userProgress = UserProgressData(
-                totalWordsLearned = 89,
-                masteredCount = 25,
-                currentStreak = 14,
-                todayXp = 120,
-                masteryProgress = 0.45f
+                totalWordsLearned = 156, masteredCount = 42, currentStreak = 7, todayXp = 85
             )
         )
     }
