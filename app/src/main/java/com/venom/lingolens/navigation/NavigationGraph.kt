@@ -33,6 +33,7 @@ fun NavigationGraph(
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
+    onGoogleSignIn: () -> Unit = {}
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -68,7 +69,8 @@ fun NavigationGraph(
         ) {
             WordMasteryScreen(
                 isGenerative = false,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onGoogleSignIn = onGoogleSignIn
             )
         }
 
@@ -84,9 +86,21 @@ fun NavigationGraph(
         }
 
         composable(Screen.Onboarding.route) {
+            val viewModel: com.venom.ui.viewmodel.OnboardingViewModel = androidx.hilt.navigation.compose.hiltViewModel()
             OnboardingScreens(
                 onGetStarted = {
-                    navController.navigate(Screen.Translation.createRoute())
+                    viewModel.restoreUserProgress {
+                        navController.navigate(Screen.Translation.createRoute()) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    }
+                },
+                onSkip = {
+                    viewModel.restoreUserProgress {
+                        navController.navigate(Screen.Translation.createRoute()) {
+                            popUpTo(Screen.Onboarding.route) { inclusive = true }
+                        }
+                    }
                 }
             )
         }

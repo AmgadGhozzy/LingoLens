@@ -24,12 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.venom.data.model.SplashPreferences
 import com.venom.data.repo.SettingsRepository
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -93,10 +93,10 @@ class SplashActivity : ComponentActivity() {
                     Image(
                         painter = painterResource(R.drawable.ic_launcher),
                         contentDescription = null,
-                        modifier = Modifier.size(160.dp)
+                        modifier = Modifier.size(160.adp)
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.adp))
 
                     Text(
                         text = "LingoLens",
