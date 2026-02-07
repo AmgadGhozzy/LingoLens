@@ -17,7 +17,7 @@ interface GeminiService {
      * @return The response from the Gemini API containing the translated text.
      */
     @POST("v1beta/models/{model}:generateContent")
-    suspend fun translate(
+    suspend fun generate(
         @Path("model") model: String = FLASH_MODEL,
         @Query("key") apiKey: String,
         @Body request: GeminiRequest
@@ -26,6 +26,7 @@ interface GeminiService {
     companion object {
         const val BASE_URL = "https://generativelanguage.googleapis.com/"
         const val FLASH_MODEL = "gemini-2.5-flash-lite"
+        const val PRO_MODEL = "gemini-2.5-pro"
         const val GEMMA_MODEL = "gemma-3-27b"
     }
 }
@@ -66,10 +67,10 @@ data class GeminiPart(
 )
 
 data class GeminiConfig(
-    val temperature: Double = 2.0,        // Maximum creativity & randomness
-    val maxOutputTokens: Int = 10000,
-    val topP: Double = 0.95,              // Higher diversity in token selection
-    val topK: Int = 64,                   // Wider vocabulary range
+    val temperature: Double = 0.7,
+    val maxOutputTokens: Int = 16384,
+    val topP: Double = 0.95,
+    val topK: Int = 64,
     val responseMimeType: String = "application/json",
     @SerializedName("response_schema")
     val responseSchema: Map<String, Any>? = null,
