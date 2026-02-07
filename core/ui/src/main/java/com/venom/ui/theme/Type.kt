@@ -1,6 +1,8 @@
 package com.venom.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +90,30 @@ val PlaypenSans: FontFamily by lazy {
     }
 }
 
+/**
+ * Safely loads a FontFamily with fallback to default if loading fails.
+ * This function can be used to prevent StrictMode violations by ensuring
+ * fonts are loaded safely.
+ */
+@Composable
+fun safeLoadFontFamily(fontStyle: FontStyles): FontFamily {
+    return remember(fontStyle) {
+        try {
+            when (fontStyle) {
+                FontStyles.CAIRO -> Cairo
+                FontStyles.ALEXANDRIA -> Alexandria
+                FontStyles.CAVEAT -> Caveat
+                FontStyles.ROBOTO -> Roboto
+                FontStyles.QUICKSAND -> Quicksand
+                FontStyles.JOSEFIN_SANS -> JosefinSans
+                FontStyles.PLAYPEN_SANS -> PlaypenSans
+                else -> FontFamily.Default
+            }
+        } catch (e: Exception) {
+            FontFamily.Default
+        }
+    }
+}
 
 fun getTypography(fontFamily: FontFamily) = defaultType.copy(
     displayLarge = defaultType.displayLarge.copy(fontFamily = fontFamily),
@@ -120,4 +146,5 @@ fun FontStyles.toFontFamily(): FontFamily = when (this) {
     FontStyles.ROBOTO -> Roboto
     FontStyles.QUICKSAND -> Quicksand
     FontStyles.JOSEFIN_SANS -> JosefinSans
+    FontStyles.PLAYPEN_SANS -> PlaypenSans
 }

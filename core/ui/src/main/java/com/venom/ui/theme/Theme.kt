@@ -52,7 +52,7 @@ fun LingoLensTheme(
     content: @Composable (() -> Unit)
 ) {
     val view = LocalView.current
-    val fontFamily = remember(fontFamilyStyle) { fontFamilyStyle.toFontFamily() }
+    val fontFamily = safeLoadFontFamily(fontFamilyStyle)
 
     val isDark = when (appTheme) {
         AppTheme.DARK -> true

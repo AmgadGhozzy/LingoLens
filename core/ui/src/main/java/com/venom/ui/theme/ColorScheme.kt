@@ -16,10 +16,10 @@ val LightColorScheme: ColorScheme = lightColorScheme(
     secondaryContainer = BrandColors.Indigo100,
     onSecondaryContainer = BrandColors.Indigo900,
 
-    tertiary = BrandColors.Emerald600,
+    tertiary = BrandColors.Purple600,
     onTertiary = BrandColors.White,
-    tertiaryContainer = BrandColors.Emerald100,
-    onTertiaryContainer = BrandColors.Emerald900,
+    tertiaryContainer = BrandColors.Purple100,
+    onTertiaryContainer = BrandColors.Purple900,
 
     error = BrandColors.Rose600,
     onError = BrandColors.White,
@@ -34,10 +34,10 @@ val LightColorScheme: ColorScheme = lightColorScheme(
     onSurfaceVariant = BrandColors.Slate700,
 
     surfaceContainerLowest = BrandColors.White,
-    surfaceContainerLow = BrandColors.Slate50,
-    surfaceContainer = BrandColors.Slate100,
-    surfaceContainerHigh = BrandColors.Slate200,
-    surfaceContainerHighest = BrandColors.Slate300,
+    surfaceContainerLow = BrandColors.White,
+    surfaceContainer = BrandColors.Slate25,
+    surfaceContainerHigh = BrandColors.Slate50,
+    surfaceContainerHighest = BrandColors.Slate200,
 
     surfaceBright = BrandColors.White,
     surfaceDim = BrandColors.Slate100,
@@ -54,7 +54,7 @@ val LightColorScheme: ColorScheme = lightColorScheme(
 )
 
 val DarkColorScheme: ColorScheme = darkColorScheme(
-    primary = BrandColors.Blue400,
+    primary = BrandColors.Blue500,
     onPrimary = BrandColors.Blue900,
     primaryContainer = BrandColors.Blue800,
     onPrimaryContainer = BrandColors.Blue100,
@@ -64,10 +64,10 @@ val DarkColorScheme: ColorScheme = darkColorScheme(
     secondaryContainer = BrandColors.Indigo800,
     onSecondaryContainer = BrandColors.Indigo100,
 
-    tertiary = BrandColors.Emerald400,
-    onTertiary = BrandColors.Emerald900,
-    tertiaryContainer = BrandColors.Emerald800,
-    onTertiaryContainer = BrandColors.Emerald100,
+    tertiary = BrandColors.Purple400,
+    onTertiary = BrandColors.Purple900,
+    tertiaryContainer = BrandColors.Purple800,
+    onTertiaryContainer = BrandColors.Purple100,
 
     error = BrandColors.Rose400,
     onError = BrandColors.Rose900,
@@ -84,8 +84,8 @@ val DarkColorScheme: ColorScheme = darkColorScheme(
     surfaceContainerLowest = BrandColors.Black,
     surfaceContainerLow = BrandColors.Slate950,
     surfaceContainer = BrandColors.Slate900,
-    surfaceContainerHigh = BrandColors.Slate800,
-    surfaceContainerHighest = BrandColors.Slate700,
+    surfaceContainerHigh = BrandColors.Slate850,
+    surfaceContainerHighest = BrandColors.Slate800,
 
     surfaceBright = BrandColors.Slate700,
     surfaceDim = BrandColors.Slate950,
