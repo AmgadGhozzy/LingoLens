@@ -19,7 +19,7 @@ import com.venom.ui.components.common.adp
  * 3D flip card using alpha + zIndex for smooth visibility transitions.
  *
  * @param word WordMaster instance with all card data
- * @param animatedRotationY Current Y-axis rotation (0° = front, 180° = back)
+ * @param showFront Whether front face is visible (derived from rotation thresholds)
  * @param isBookmarked Bookmark state
  * @param isHintRevealed Whether blur hint on front is revealed
  * @param pinnedLanguage Optional language to show on back
@@ -30,7 +30,7 @@ import com.venom.ui.components.common.adp
 @Composable
 fun WordCard(
     word: WordMaster,
-    animatedRotationY: Float,
+    showFront: Boolean,
     isBookmarked: Boolean,
     isHintRevealed: Boolean,
     pinnedLanguage: LanguageOption?,
@@ -39,17 +39,10 @@ fun WordCard(
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Determine which face is visible based on rotation
-    val showFront = remember(animatedRotationY) {
-        val normalizedRotation = animatedRotationY % 360f
-        val effectiveRotation = if (normalizedRotation < 0) {
-            normalizedRotation + 360f
-        } else {
-            normalizedRotation
-        }
-        effectiveRotation <= 90f || effectiveRotation >= 270f
-    }
-    val cardShape = RoundedCornerShape(32.adp)
+    // adp evaluated in composable scope, then remembered
+    val cornerRadiusDp = 32.adp
+    val cardShape = remember(cornerRadiusDp) { RoundedCornerShape(cornerRadiusDp) }
+
     Box(modifier = modifier.clip(cardShape)) {
         // Front face
         Box(
