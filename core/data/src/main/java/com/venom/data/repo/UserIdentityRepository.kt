@@ -4,6 +4,8 @@ import android.content.Context
 import android.provider.Settings
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.venom.data.local.dao.UserIdentityDao
 import com.venom.data.local.entity.UserIdentityEntity
 import com.venom.domain.model.UserIdentity
@@ -17,36 +19,45 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class SignInResult(
+    val identity: UserIdentity,
+    val previousAnonymousUid: String? = null
+)
+
 @Singleton
 class UserIdentityRepository @Inject constructor(
     private val dao: UserIdentityDao,
     private val context: Context
 ) {
     private val auth = FirebaseAuth.getInstance()
-    // Observable auth state
+
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     init {
-        // Listen to auth state changes
         auth.addAuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
+            
+            // Find the Google provider if linked
+            val googleProvider = user?.providerData?.find { 
+                it.providerId == GoogleAuthProvider.PROVIDER_ID 
+            }
+            val hasGoogle = googleProvider != null
+
             _authState.value = AuthState(
-                isSignedIn = user != null && !user.isAnonymous,
-                userName = user?.displayName,
-                userEmail = user?.email,
-                photoUrl = user?.photoUrl?.toString()
+                isSignedIn = user != null && hasGoogle,
+                userName = googleProvider?.displayName ?: user?.displayName,
+                userEmail = googleProvider?.email ?: user?.email,
+                photoUrl = googleProvider?.photoUrl?.toString() ?: user?.photoUrl?.toString()
             )
         }
     }
-    /**
-     * Get or create user identity using Firebase Auth.
-     */
+
     suspend fun getOrCreateIdentity(): UserIdentity = withContext(Dispatchers.IO) {
         val currentUser = auth.currentUser ?: auth.signInAnonymously().await().user
         val userId = currentUser?.uid ?: throw IllegalStateException("Firebase Auth failed")
 
-        Log.d("UserIdentity", "Authenticated with Firebase UID: $userId (Anonymous: ${currentUser.isAnonymous})")
+        Log.d("UserIdentity", "Auth UID: $userId (Anonymous: ${currentUser.isAnonymous})")
 
         val existing = dao.getIdentity()
         if (existing != null && existing.userId == userId) {
@@ -73,65 +84,97 @@ class UserIdentityRepository @Inject constructor(
 
     suspend fun getCurrentUserId(): String = getOrCreateIdentity().userId
 
-    /**
-     * Get current user's display name from Firebase Auth.
-     * Returns null if user is anonymous or name is not set.
-     */
-    fun getCurrentUserName(): String? {
-        val user = auth.currentUser ?: return null
-        return if (user.isAnonymous) null else user.displayName
+    private fun getGoogleProvider() = auth.currentUser?.providerData?.find { 
+        it.providerId == GoogleAuthProvider.PROVIDER_ID 
     }
 
-    /**
-     * Get current user's email from Firebase Auth.
-     * Returns null if user is anonymous or email is not set.
-     */
-    fun getCurrentUserEmail(): String? {
-        val user = auth.currentUser ?: return null
-        return if (user.isAnonymous) null else user.email
-    }
-
-    /**
-     * Check if current user is signed in (not anonymous).
-     */
-    fun isSignedIn(): Boolean {
-        val user = auth.currentUser ?: return false
-        return !user.isAnonymous
-    }
-
-    /**
-     * Get current user's photo URL from Firebase Auth.
-     */
-    fun getCurrentUserPhotoUrl(): String? {
-        val user = auth.currentUser ?: return null
-        return if (user.isAnonymous) null else user.photoUrl?.toString()
-    }
+    fun isSignedIn(): Boolean = getGoogleProvider() != null
 
     /**
      * Signs in with Google and links to the current anonymous account if applicable.
      */
-    suspend fun signInWithGoogle(idToken: String): UserIdentity = withContext(Dispatchers.IO) {
-        val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
+    suspend fun signInWithGoogle(idToken: String): SignInResult = withContext(Dispatchers.IO) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
         val currentUser = auth.currentUser
 
-        val result = if (currentUser != null && currentUser.isAnonymous) {
-            currentUser.linkWithCredential(credential).await()
-        } else {
-            auth.signInWithCredential(credential).await()
-        }
+        // Remember the anonymous UID before we potentially lose it
+        val anonymousUid = if (currentUser?.isAnonymous == true) currentUser.uid else null
 
-        val user = result.user ?: throw IllegalStateException("Firebase Google Auth failed")
+        Log.d("UserIdentity", "Sign-in attempt. Current user: ${currentUser?.uid}, anonymous: ${currentUser?.isAnonymous}")
+
+        val firebaseUser = when {
+            // Case 1 & 2: Currently anonymous → try to link
+            currentUser != null && currentUser.isAnonymous -> {
+                try {
+                    // Case 1: Link succeeds — anonymous account upgraded to Google
+                    val result = currentUser.linkWithCredential(credential).await()
+                    Log.d("UserIdentity", "Link succeeded. UID unchanged: ${result.user?.uid}")
+                    result.user
+                } catch (_: FirebaseAuthUserCollisionException) {
+                    Log.w("UserIdentity",
+                        "Link collision: Google already linked to another account. " +
+                                "Falling back to signInWithCredential. Anonymous UID to migrate: $anonymousUid"
+                    )
+
+                    // Clean up the orphaned anonymous account
+                    try {
+                        currentUser.delete().await()
+                        Log.d("UserIdentity", "Deleted orphaned anonymous account: $anonymousUid")
+                    } catch (deleteError: Exception) {
+                        Log.w("UserIdentity", "Could not delete anonymous account: ${deleteError.message}")
+                    }
+
+                    // Sign in directly — this returns the ORIGINAL Google-linked UID
+                    val result = auth.signInWithCredential(credential).await()
+                    Log.d("UserIdentity", "Direct sign-in succeeded. Restored UID: ${result.user?.uid}")
+                    result.user
+                }
+            }
+
+            // Case 3: No current user, or already a non-anonymous user
+            else -> {
+                val result = auth.signInWithCredential(credential).await()
+                Log.d("UserIdentity", "Direct sign-in. UID: ${result.user?.uid}")
+                result.user
+            }
+        } ?: throw IllegalStateException("Firebase Google Auth failed — no user returned")
+
+        val resolvedUid = firebaseUser.uid
+
+        // Determine if migration is needed:
+        // Migration needed when we had an anonymous account AND the UID changed
+        val needsMigration = anonymousUid != null && anonymousUid != resolvedUid
+
+        Log.d("UserIdentity",
+            "Sign-in complete. UID: $resolvedUid, " +
+                    "migration needed: $needsMigration" +
+                    if (needsMigration) " (from $anonymousUid)" else ""
+        )
+
+        // Update local identity
+        val deviceId = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID
+        ) ?: ""
 
         val identity = UserIdentity(
-            userId = user.uid,
-            deviceId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "",
+            userId = resolvedUid,
+            deviceId = deviceId,
             isAnonymous = false,
-            createdAt = user.metadata?.creationTimestamp ?: System.currentTimeMillis(),
+            createdAt = firebaseUser.metadata?.creationTimestamp ?: System.currentTimeMillis(),
             lastActiveAt = System.currentTimeMillis()
         )
 
+        // Clean up old identity record if UID changed
+        if (needsMigration) {
+            dao.deleteByUserId(anonymousUid)
+        }
         dao.insertOrUpdate(identity.toEntity())
-        identity
+
+        SignInResult(
+            identity = identity,
+            previousAnonymousUid = if (needsMigration) anonymousUid else null
+        )
     }
 
     private fun UserIdentityEntity.toDomain() = UserIdentity(
