@@ -1,9 +1,13 @@
 package com.venom.data.repo
 
 import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.PersistentCacheSettings
 import com.venom.data.local.dao.UserWordProgressDao
 import com.venom.data.local.dao.WordMasterDao
 import com.venom.data.local.entity.UserWordProgressEntity
+import com.venom.data.mapper.WordMasterEntityMapper
 import com.venom.domain.model.DifficultyState
 import com.venom.domain.model.KnownState
 import com.venom.domain.model.SessionStatsData
@@ -22,7 +26,7 @@ class UserWordProgressRepository @Inject constructor(
     private val progressDao: UserWordProgressDao,
     private val wordMasterDao: WordMasterDao,
     private val srsEngine: SrsEngine,
-    private val activityRepository: UserActivityRepository  // ADD THIS
+    private val activityRepository: UserActivityRepository
 ) {
 
     suspend fun getOrCreateProgress(userId: String, wordId: Int): UserWordProgress =
@@ -43,10 +47,51 @@ class UserWordProgressRepository @Inject constructor(
 
             dueProgress.mapNotNull { progress ->
                 wordMasterDao.getWordById(progress.wordId)?.let { entity ->
-                    com.venom.data.mapper.WordMasterEntityMapper.toDomain(entity)
+                    WordMasterEntityMapper.toDomain(entity)
                 }
             }
         }
+
+    suspend fun recordRecallSuccess(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
+        val word = wordMasterDao.getWordById(wordId) ?: return@withContext
+
+        val before = getOrCreateProgress(userId, wordId)
+
+        updateProgress(userId, wordId) { progress ->
+            srsEngine.onRecallSuccess(progress, word.rank ?: 0, word.frequency ?: 1)
+        }
+
+        val after = getOrCreateProgress(userId, wordId)
+        if (after.knownState == KnownState.MASTERED && before.knownState != KnownState.MASTERED) {
+            activityRepository.recordWordMastered(userId)
+        }
+
+        activityRepository.recordRecallSuccess(userId)
+    }
+
+    suspend fun recordRecallFail(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
+        updateProgress(userId, wordId) { progress ->
+            srsEngine.onRecallFail(progress)
+        }
+        activityRepository.recordRecallFail(userId)
+    }
+
+    suspend fun recordProductionSuccess(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
+        val word = wordMasterDao.getWordById(wordId) ?: return@withContext
+
+        val before = getOrCreateProgress(userId, wordId)
+
+        updateProgress(userId, wordId) { progress ->
+            srsEngine.onProductionSuccess(progress, word.rank ?: 0, word.frequency ?: 1)
+        }
+
+        val after = getOrCreateProgress(userId, wordId)
+        if (after.knownState == KnownState.MASTERED && before.knownState != KnownState.MASTERED) {
+            activityRepository.recordWordMastered(userId)
+        }
+
+        activityRepository.recordPracticeSuccess(userId)
+    }
 
     suspend fun recordView(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
         ensureProgressExists(userId, wordId)
@@ -64,64 +109,49 @@ class UserWordProgressRepository @Inject constructor(
         activityRepository.recordSwipeLeft(userId)
     }
 
-    suspend fun recordRecallSuccess(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
-        val word = wordMasterDao.getWordById(wordId) ?: return@withContext
-        updateProgress(userId, wordId) { progress ->
-            srsEngine.onRecallSuccess(progress, word.rank ?: 0, word.frequency ?: 1)
-        }
-        activityRepository.recordRecallSuccess(userId, xpEarned = 5)
-    }
-
-    suspend fun recordRecallFail(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
-        updateProgress(userId, wordId) { progress ->
-            srsEngine.onRecallFail(progress)
-        }
-        activityRepository.recordRecallFail(userId)
-    }
-
-    suspend fun recordProductionSuccess(userId: String, wordId: Int) = withContext(Dispatchers.IO) {
-        val word = wordMasterDao.getWordById(wordId) ?: return@withContext
-        updateProgress(userId, wordId) { progress ->
-            srsEngine.onProductionSuccess(progress, word.rank ?: 0, word.frequency ?: 1)
-        }
-        activityRepository.recordPracticeSuccess(userId, xpEarned = 10)
-    }
-
-    /**
-     * Get session statistics from database
-     */
     suspend fun getSessionStats(userId: String): SessionStatsData = withContext(Dispatchers.IO) {
         val allProgress = progressDao.getAllProgressSnapshot(userId)
-
-        val masteredCount = allProgress.count { it.knownState == KnownState.MASTERED.name }
-        val learningCount = allProgress.count {
-            it.knownState == KnownState.LEARNING.name || it.knownState == KnownState.KNOWN.name
-        }
-        val needsReviewCount = allProgress.count {
-            it.nextReview != null && it.nextReview <= System.currentTimeMillis()
-        }
-        val currentStreak = activityRepository.getCurrentStreak(userId)
-        val todayActivity = activityRepository.getTodayActivity(userId)
+        val dashboard = activityRepository.getDashboardData(userId)
 
         SessionStatsData(
             totalWordsLearned = allProgress.size,
-            masteredCount = masteredCount,
-            learningCount = learningCount,
-            needsReviewCount = needsReviewCount,
-            currentStreak = currentStreak,
-            todayWordsViewed = todayActivity?.wordsViewed ?: 0,
-            todayXpEarned = todayActivity?.totalXpEarned ?: 0
+            masteredCount = allProgress.count { it.knownState == KnownState.MASTERED.name },
+            learningCount = allProgress.count {
+                it.knownState == KnownState.LEARNING.name || it.knownState == KnownState.KNOWN.name
+            },
+            needsReviewCount = allProgress.count {
+                it.nextReview != null && it.nextReview <= System.currentTimeMillis()
+            },
+            currentStreak = dashboard.currentStreak,
+            todayWordsViewed = dashboard.dailyGoalProgress,
+            todayXpEarned = dashboard.todayXp
         )
     }
+
+    suspend fun migrateLocalData(fromUserId: String, toUserId: String) =
+        withContext(Dispatchers.IO) {
+            try {
+                val count = progressDao.getProgressCount(fromUserId)
+                if (count > 0) {
+                    progressDao.migrateUserId(fromUserId, toUserId)
+                    Log.d(
+                        "UserProgress",
+                        "Migrated $count word progress records: $fromUserId → $toUserId"
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("UserProgress", "Migration failed: ${e.message}", e)
+            }
+        }
 
     // Firebase Sync
     private val firestore by lazy {
         try {
-            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            val cacheSettings = com.google.firebase.firestore.PersistentCacheSettings.newBuilder()
-                .setSizeBytes(com.google.firebase.firestore.FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            val db = FirebaseFirestore.getInstance()
+            val cacheSettings = PersistentCacheSettings.newBuilder()
+                .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
                 .build()
-            val settings = com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+            val settings = FirebaseFirestoreSettings.Builder()
                 .setLocalCacheSettings(cacheSettings)
                 .build()
             db.firestoreSettings = settings
