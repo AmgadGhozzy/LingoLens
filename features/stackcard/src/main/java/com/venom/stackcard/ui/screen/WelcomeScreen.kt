@@ -62,9 +62,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.UserProgressData
 import com.venom.resources.R
-import com.venom.stackcard.ui.components.mastery.GradientActionButton
 import com.venom.stackcard.ui.components.mastery.MiniProgressDashboard
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.GradientActionButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.components.onboarding.GoogleSignInButton

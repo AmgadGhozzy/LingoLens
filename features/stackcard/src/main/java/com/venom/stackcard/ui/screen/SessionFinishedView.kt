@@ -39,11 +39,11 @@ import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.AnimatedSuccessIcon
 import com.venom.stackcard.ui.components.mastery.GlassOutlinedButton
 import com.venom.stackcard.ui.components.mastery.GlassSurface
-import com.venom.stackcard.ui.components.mastery.GradientActionButton
 import com.venom.stackcard.ui.components.mastery.OverallStatItem
 import com.venom.stackcard.ui.components.mastery.SessionProgressCard
 import com.venom.stackcard.ui.viewmodel.SessionStats
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.GradientActionButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.ConfettiView
@@ -106,7 +106,7 @@ fun SessionFinishedView(
         ) {
             Spacer(modifier = Modifier.height(48.adp))
 
-            AnimatedSuccessIcon(icon = R.drawable.icon_circle_check)
+            AnimatedSuccessIcon()
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

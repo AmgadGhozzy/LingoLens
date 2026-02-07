@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,8 @@ import com.venom.stackcard.ui.components.flashcard.CardSwiperStack
 import com.venom.stackcard.ui.components.insights.InsightsSheet
 import com.venom.stackcard.ui.components.mastery.ActionBar
 import com.venom.stackcard.ui.components.mastery.CardsProgressIndicator
+import com.venom.stackcard.ui.components.mastery.HapticStrength
+import com.venom.stackcard.ui.components.mastery.rememberHapticFeedback
 import com.venom.stackcard.ui.viewmodel.WordMasteryEvent
 import com.venom.stackcard.ui.viewmodel.WordMasteryUiState
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
@@ -45,7 +48,6 @@ fun WordMasteryScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showProgress by remember { mutableStateOf(false) }
-
     Box(modifier = modifier.fillMaxSize()) {
         when {
             showProgress -> {
@@ -108,6 +110,8 @@ private fun MasteryContent(
     viewModel: WordMasteryViewModel,
     onEvent: (WordMasteryEvent) -> Unit
 ) {
+    val haptic = rememberHapticFeedback()
+    val currentHaptic by rememberUpdatedState(haptic)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -131,8 +135,15 @@ private fun MasteryContent(
                 CardSwiperStack(
                     viewModel = viewModel,
                     onSpeak = {},
-                    onRememberWord = {},
-                    onForgotWord = {}
+                    onFlip = {
+                        currentHaptic(HapticStrength.LIGHT)
+                    },
+                    onRememberWord = {
+                        currentHaptic(HapticStrength.STRONG)
+                    },
+                    onForgotWord = {
+                        currentHaptic(HapticStrength.LIGHT)
+                    }
                 )
             }
 
