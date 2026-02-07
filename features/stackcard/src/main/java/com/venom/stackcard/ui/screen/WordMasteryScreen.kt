@@ -14,6 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,14 +44,26 @@ fun WordMasteryScreen(
     viewModel: WordMasteryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showProgress by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
+            showProgress -> {
+                ProgressScreen(
+                    viewModel = viewModel,
+                    onBack = { showProgress = false }
+                )
+            }
+
             uiState.visibleCards.isEmpty() && uiState.processedCardsCount == 0 && uiState.error == null -> {
                 WelcomeScreen(
                     onBack = onBack,
                     onGoogleSignIn = onGoogleSignIn,
                     isLoading = uiState.isLoading,
+                    isSignedIn = uiState.isSignedIn,
+                    userName = uiState.userName,
+                    userProgress = uiState.userProgress,
+                    onOpenProgress = { showProgress = true },
                     onStart = { topic ->
                         viewModel.onEvent(
                             WordMasteryEvent.Initialize(
@@ -71,6 +86,7 @@ fun WordMasteryScreen(
                 SessionFinishedView(
                     sessionStats = uiState.sessionStats,
                     onBackToWelcome = { viewModel.onEvent(WordMasteryEvent.BackToWelcome) },
+                    onViewProgress = { showProgress = true },
                     onExit = onBack
                 )
             }
@@ -86,7 +102,6 @@ fun WordMasteryScreen(
     }
 }
 
-
 @Composable
 private fun MasteryContent(
     uiState: WordMasteryUiState,
@@ -98,7 +113,6 @@ private fun MasteryContent(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Progress Indicator with difficulty theming
             CardsProgressIndicator(
                 currentIndex = uiState.processedCardsCount,
                 totalCards = uiState.initialCardCount,
@@ -108,7 +122,6 @@ private fun MasteryContent(
                     .padding(horizontal = 20.adp, vertical = 12.adp)
             )
 
-            // Card Stack
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -123,7 +136,6 @@ private fun MasteryContent(
                 )
             }
 
-            // Action Bar
             ActionBar(
                 onFlip = { onEvent(WordMasteryEvent.FlipCard) },
                 onPractice = { onEvent(WordMasteryEvent.StartPractice) },
@@ -134,14 +146,13 @@ private fun MasteryContent(
             Spacer(modifier = Modifier.height(24.adp))
         }
 
-        // Insights Sheet
         InsightsSheet(
             isOpen = uiState.isSheetOpen,
             word = uiState.currentWord,
             activeTab = uiState.activeTab,
             pinnedLanguage = uiState.pinnedLanguage,
             showPowerTip = uiState.showPowerTip,
-            currentWordProgress = uiState.currentWordProgress, // NEW: Pass progress
+            currentWordProgress = uiState.currentWordProgress,
             onClose = { onEvent(WordMasteryEvent.CloseSheet) },
             onTabChange = { tab -> onEvent(WordMasteryEvent.ChangeTab(tab)) },
             onPinLanguage = { lang -> onEvent(WordMasteryEvent.PinLanguage(lang)) },
@@ -149,7 +160,6 @@ private fun MasteryContent(
             onSpeak = {}
         )
 
-        // Practice Dialog
         if (uiState.isPracticeMode && uiState.currentWord != null) {
             Dialog(
                 onDismissRequest = { onEvent(WordMasteryEvent.PracticeHandled) },
