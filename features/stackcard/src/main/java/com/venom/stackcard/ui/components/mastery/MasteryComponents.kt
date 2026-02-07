@@ -1,6 +1,5 @@
 package com.venom.stackcard.ui.components.mastery
 
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -44,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,37 +57,6 @@ import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.getDifficultyTheme
-
-/**
- * Haptic feedback strength levels for different interactions
- */
-enum class HapticStrength {
-    LIGHT,   // Tab switch, minor interactions
-    MEDIUM,  // Pin/unpin, accordion expand, important actions
-    STRONG   // Error states, important confirmations
-}
-
-@Composable
-fun rememberHapticFeedback(): (HapticStrength) -> Unit {
-    val view = LocalView.current
-    return remember(view) {
-        { strength ->
-            when (strength) {
-                HapticStrength.LIGHT -> view.performHapticFeedback(
-                    HapticFeedbackConstants.CLOCK_TICK
-                )
-
-                HapticStrength.MEDIUM -> view.performHapticFeedback(
-                    HapticFeedbackConstants.CONTEXT_CLICK
-                )
-
-                HapticStrength.STRONG -> view.performHapticFeedback(
-                    HapticFeedbackConstants.LONG_PRESS
-                )
-            }
-        }
-    }
-}
 
 /**
  * Interactive text wrapper that handles TTS with visual feedback.
