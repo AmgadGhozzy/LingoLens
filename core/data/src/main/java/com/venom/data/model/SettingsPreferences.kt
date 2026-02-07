@@ -22,7 +22,7 @@ data class SettingsPreferences(
 @Serializable
 data class ThemePreference(
     val appTheme: AppTheme = AppTheme.DARK,
-    val extractWallpaperColor: Boolean = false,
+    val materialYou: Boolean = false,
     val isAmoledBlack: Boolean = false,
     val colorStyle: PaletteStyle = PaletteStyle.Vibrant,
     val fontFamily: FontStyles = FontStyles.ALEXANDRIA,
