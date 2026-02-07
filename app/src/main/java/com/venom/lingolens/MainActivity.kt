@@ -19,11 +19,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.google.firebase.remoteconfig.ConfigUpdate
@@ -36,6 +40,7 @@ import com.venom.lingolens.ui.LingoLensApp
 import com.venom.resources.R
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
+import com.venom.ui.viewmodel.OnboardingViewModel
 import com.venom.ui.viewmodel.SettingsViewModel
 import com.venom.utils.Extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,6 +55,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val settingsViewModel: SettingsViewModel by viewModels()
+    private val onboardingViewModel: OnboardingViewModel by viewModels()
 
     private val showOnboarding = mutableStateOf(false)
 
@@ -94,6 +100,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -123,14 +130,28 @@ class MainActivity : ComponentActivity() {
             ) {
                 if (shouldShowOnboarding.value) {
                     OnboardingScreens(
-                        onGetStarted = { shouldShowOnboarding.value = false },
-                        onSkip = { shouldShowOnboarding.value = false }
+                        onGetStarted = {
+                            onboardingViewModel.restoreUserProgress {
+                                shouldShowOnboarding.value = false
+                            }
+                        },
+                        onSkip = {
+                            onboardingViewModel.restoreUserProgress {
+                                shouldShowOnboarding.value = false
+                            }
+                        },
+                        onGoogleSignIn = {
+                            startGoogleSignIn(isFromOnboarding = true)
+                        }
                     )
                 } else {
                     LingoLensApp(
                         startCamera = ::startCamera,
                         imageSelector = ::selectImageFromGallery,
-                        fileSelector = ::selectDocumentFromFileManager
+                        fileSelector = ::selectDocumentFromFileManager,
+                        onGoogleSignIn = {
+                            startGoogleSignIn(isFromOnboarding = false)
+                        }
                     )
                     setupPermissions()
                 }
@@ -143,8 +164,8 @@ class MainActivity : ComponentActivity() {
         val locale = if (languageCode.isEmpty()) Locale.getDefault() else Locale(languageCode)
         val config = LocalConfiguration.current
         config.setLocale(locale)
-        val res = LocalResources.current
-        res.updateConfiguration(config, res.displayMetrics)
+        val context = LocalContext.current
+        context.createConfigurationContext(config)
     }
 
     private fun selectImageFromGallery(callback: (Uri?) -> Unit) {
@@ -260,5 +281,44 @@ class MainActivity : ComponentActivity() {
                 Log.w("RemoteConfig", "Config update error: ${error.code}", error)
             }
         })
+    }
+
+    private fun startGoogleSignIn(isFromOnboarding: Boolean = false) {
+        val credentialManager = CredentialManager.create(this)
+
+        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId("482771743461-er7fil93cgv5tcf9t6m28c2sahb2iium.apps.googleusercontent.com")
+            .setAutoSelectEnabled(true)
+            .build()
+
+        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = this@MainActivity,
+                )
+
+                val credential = result.credential
+                if (credential is GoogleIdTokenCredential) {
+                    val idToken = credential.idToken
+
+                    if (isFromOnboarding) {
+                        onboardingViewModel.onGoogleSignInResult(idToken) {
+                            showOnboarding.value = false
+                        }
+                    } else {
+                        onboardingViewModel.onGoogleSignInResult(idToken) {}
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Credential Manager failed", e)
+                showToast("Sign-in failed: ${e.message}")
+            }
+        }
     }
 }
