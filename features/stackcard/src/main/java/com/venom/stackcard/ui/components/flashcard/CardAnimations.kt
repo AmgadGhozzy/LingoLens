@@ -18,9 +18,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 
-/**
- * Pre-instantiated animation specs and physics constants.
- */
 object OptimizedCardAnimations {
     const val SWIPE_THRESHOLD_DP = 150
     const val MAX_ROTATION_DEGREES = 15f
@@ -31,6 +28,7 @@ object OptimizedCardAnimations {
     private const val VELOCITY_ROTATION_MULTIPLIER = 0.0008f
     private const val VELOCITY_THROW_MULTIPLIER = 0.3f
     private const val VELOCITY_THROW_CLAMP = 400f
+
     val SwipeAnimationSpec: AnimationSpec<Float> = spring(
         dampingRatio = 0.75f,
         stiffness = Spring.StiffnessMediumLow,
@@ -48,9 +46,6 @@ object OptimizedCardAnimations {
         stiffness = Spring.StiffnessMediumLow
     )
 
-    /**
-     * Calculate rotation based on horizontal offset and velocity
-     */
     fun calculateRotation(offsetX: Float, velocity: Float = 0f): Float {
         val baseRotation = (offsetX * ROTATION_MULTIPLIER)
             .coerceIn(-MAX_ROTATION_DEGREES, MAX_ROTATION_DEGREES)
@@ -58,9 +53,6 @@ object OptimizedCardAnimations {
         return baseRotation + velocityInfluence
     }
 
-    /**
-     * Calculate throw target for swipe-off animation
-     */
     fun calculateThrowTarget(currentOffset: Float, velocity: Float): Float {
         val baseTarget = if (currentOffset > 0) THROW_TARGET_BASE else -THROW_TARGET_BASE
         val velocityContribution = (velocity * VELOCITY_THROW_MULTIPLIER)
@@ -69,9 +61,6 @@ object OptimizedCardAnimations {
     }
 }
 
-/**
- * Stable animation state container that avoids recomposition triggers
- */
 @Stable
 class CardAnimationState(
     val offsetX: Animatable<Float, AnimationVector1D>,
@@ -84,17 +73,9 @@ class CardAnimationState(
     @Volatile
     private var isDisposed = false
 
-    /**
-     * Fast path for drag updates. Uses UNDISPATCHED start to execute
-     * synchronously when possible, avoiding coroutine scheduling overhead.
-     *
-     * This is called 60-120 times per second during drag, so performance
-     * is critical.
-     */
     fun updateDragPosition(deltaX: Float, deltaY: Float) {
         if (isDisposed) return
 
-        // Cancel any running animation
         currentJob.getAndSet(null)?.cancel()
 
         val newX = offsetX.value + deltaX
@@ -106,17 +87,15 @@ class CardAnimationState(
                 offsetY.snapTo(newY)
                 rotation.snapTo(OptimizedCardAnimations.calculateRotation(newX))
             } catch (_: CancellationException) {
+                // Ignored
             }
         }
     }
 
-    /**
-     * Animate card off-screen after successful swipe.
-     */
     fun animateSwipeOff(
         targetX: Float,
         targetY: Float = OptimizedCardAnimations.THROW_TARGET_Y,
-        onComplete: () -> Unit
+        onComplete: suspend () -> Unit
     ) {
         if (isDisposed) return
 
@@ -132,16 +111,13 @@ class CardAnimationState(
                 }
                 onComplete()
             } catch (_: CancellationException) {
+                // Ignored
             }
         }
 
-        // Atomically replace and cancel previous job
         currentJob.getAndSet(newJob)?.cancel()
     }
 
-    /**
-     * Animate card back to center after incomplete swipe.
-     */
     fun animateReturnToCenter() {
         if (isDisposed) return
 
@@ -155,6 +131,7 @@ class CardAnimationState(
                     launch { rotation.animateTo(0f, spec) }
                 }
             } catch (_: CancellationException) {
+                // Ignored
             }
         }
 
@@ -169,38 +146,20 @@ class CardAnimationState(
             offsetY.snapTo(0f)
             rotation.snapTo(0f)
         } catch (_: CancellationException) {
-            // Ignore
+            // Ignored
         }
     }
 
-    /**
-     * Cancel any running animations.
-     */
     fun cancelAnimations() {
         currentJob.getAndSet(null)?.cancel()
     }
 
-    /**
-     * Full cleanup. Must be called when composable leaves composition.
-     */
     fun cleanup() {
         isDisposed = true
         cancelAnimations()
-
-        // Stop animations immediately
-        scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            runCatching {
-                offsetX.stop()
-                offsetY.stop()
-                rotation.stop()
-            }
-        }
     }
 }
 
-/**
- * Remember and manage CardAnimationState lifecycle.
- */
 @Composable
 fun rememberCardAnimationState(): CardAnimationState {
     val scope = rememberCoroutineScope()
@@ -219,12 +178,10 @@ fun rememberCardAnimationState(): CardAnimationState {
             state.cleanup()
         }
     }
+
     return state
 }
 
-/**
- * Stack position data class for card positioning
- */
 @Stable
 data class StackPosition(
     val offsetYDp: Float,
