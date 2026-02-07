@@ -17,4 +17,7 @@ interface UserIdentityDao {
     
     @Query("UPDATE userIdentity SET lastActiveAt = :timestamp WHERE id = 1")
     suspend fun updateLastActive(timestamp: Long)
+
+    @Query("DELETE FROM userIdentity WHERE userId = :userId")
+    suspend fun deleteByUserId(userId: String)
 }

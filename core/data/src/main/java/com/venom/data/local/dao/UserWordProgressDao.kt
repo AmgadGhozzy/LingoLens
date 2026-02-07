@@ -49,7 +49,13 @@ interface UserWordProgressDao {
 
     @Query("SELECT wordId FROM userWordProgress WHERE userId = :userId")
     suspend fun getSeenWordIds(userId: String): List<Int>
-    
+
+    @Query("UPDATE userWordProgress SET userId = :newUserId WHERE userId = :oldUserId")
+    suspend fun migrateUserId(oldUserId: String, newUserId: String)
+
+    @Query("SELECT COUNT(*) FROM userWordProgress WHERE userId = :userId")
+    suspend fun getProgressCount(userId: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(progress: UserWordProgressEntity)
 
