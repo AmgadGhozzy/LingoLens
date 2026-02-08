@@ -39,14 +39,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.resources.R
 import com.venom.ui.components.bars.TranslatedTextActionBar
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.inputs.CustomTextField
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.utils.Extensions.getSelectedOrFullText
 
@@ -72,7 +73,7 @@ fun FullscreenTextDialog(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     var fontSize by rememberSaveable { mutableFloatStateOf(24f) }
-    var isEditing by rememberSaveable { mutableStateOf(false) }
+    var isEditing by rememberSaveable { mutableStateOf(true) }
     var textValue by remember { mutableStateOf(TextFieldValue(text)) }
     val originalText = remember { text }
     val hasChanges = textValue.text != originalText
@@ -85,22 +86,27 @@ fun FullscreenTextDialog(
             decorFitsSystemWindows = false
         )
     ) {
-        GlassCard(solidBackgroundAlpha = 1f) {
+        GlassCard(
+            thickness = GlassThickness.UltraThick,
+            showBorder = false
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.adp),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 18.dp)
+                    .padding(horizontal = 12.adp, vertical = 18.adp)
             ) {
                 // Top Action Bar
                 Row(
-                    modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.adp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (allowEdit) {
@@ -122,7 +128,7 @@ fun FullscreenTextDialog(
                                         MaterialTheme.colorScheme.onSurfaceVariant
                                     }
                                 ),
-                                size = 38.dp
+                                size = 38.adp
                             )
 
                             AnimatedVisibility(
@@ -135,10 +141,12 @@ fun FullscreenTextDialog(
                                     onClick = { textValue = TextFieldValue(originalText) },
                                     contentDescription = stringResource(R.string.action_undo),
                                     colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f),
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                            0.5f
+                                        ),
                                         contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                                     ),
-                                    size = 38.dp
+                                    size = 38.adp
                                 )
                             }
 
@@ -164,7 +172,7 @@ fun FullscreenTextDialog(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f),
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
-                        size = 38.dp
+                        size = 38.adp
                     )
                 }
 
@@ -173,13 +181,13 @@ fun FullscreenTextDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(20.adp),
                     color = if (isEditing) {
                         MaterialTheme.colorScheme.primaryContainer.copy(0.15f)
                     } else {
                         MaterialTheme.colorScheme.primaryContainer.copy(0.1f)
                     },
-                    tonalElevation = if (isEditing) 4.dp else 2.dp
+                    tonalElevation = if (isEditing) 4.adp else 2.adp
                 ) {
                     CustomTextField(
                         textValue = textValue,
@@ -188,11 +196,11 @@ fun FullscreenTextDialog(
                         minFontSize = (fontSize * 0.8f).toInt(),
                         maxFontSize = (fontSize * 1.2f).toInt(),
                         maxLines = Int.MAX_VALUE,
-                        minHeight = 200.dp,
-                        maxHeight = 600.dp,
+                        minHeight = 200.adp,
+                        maxHeight = 600.adp,
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(24.dp)
+                            .padding(24.adp)
                             .verticalScroll(rememberScrollState())
                     )
                 }
@@ -202,7 +210,7 @@ fun FullscreenTextDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 16.adp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
@@ -225,16 +233,16 @@ fun FullscreenTextDialog(
                         thumb = {
                             SliderDefaults.Thumb(
                                 interactionSource = interactionSource,
-                                modifier = Modifier.height(24.dp)
+                                modifier = Modifier.height(24.adp)
                             )
                         },
                         track = {
                             SliderDefaults.Track(
                                 sliderState = it,
-                                modifier = Modifier.height(8.dp)
+                                modifier = Modifier.height(8.adp)
                             )
                         },
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 16.adp)
                     )
                 }
 

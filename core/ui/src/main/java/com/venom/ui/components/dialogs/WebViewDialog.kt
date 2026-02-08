@@ -13,11 +13,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.ui.components.common.SettingsScaffold
+import com.venom.ui.components.common.adp
 
 @Composable
 fun WebViewDialog(
@@ -35,7 +35,7 @@ fun WebViewDialog(
     ) {
         SettingsScaffold(
             title = title,
-            contentPadding = PaddingValues(0.dp),
+            contentPadding = PaddingValues(0.adp),
             onDismiss = onDismiss
         ) {
             item {

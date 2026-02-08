@@ -14,9 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.venom.ui.components.common.adp
 import kotlin.math.roundToInt
 
 /**
@@ -51,7 +51,7 @@ fun DraggableDialog(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp, vertical = 148.dp)
+                .padding(horizontal = 12.adp, vertical = 148.adp)
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()

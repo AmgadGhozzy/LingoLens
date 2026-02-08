@@ -13,8 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 @Composable
 fun CopiedToast(
@@ -27,13 +27,13 @@ fun CopiedToast(
         modifier = modifier
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(24.dp)
+            color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(24.adp)
         ) {
             Text(
                 text = stringResource(R.string.copied_message),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 12.adp, vertical = 8.adp)
             )
         }
     }

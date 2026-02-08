@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 /**
  * A highly customizable dialog component with sensible defaults
@@ -29,7 +29,7 @@ fun CustomCard(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.large,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    elevation: Dp = 2.dp,
+    elevation: Dp = 2.adp,
     contentAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable () -> Unit
 ) {

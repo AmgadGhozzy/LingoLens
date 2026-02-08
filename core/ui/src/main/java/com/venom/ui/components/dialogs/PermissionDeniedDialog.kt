@@ -13,8 +13,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.venom.ui.components.common.adp
 
 @Composable
 fun PermissionDeniedDialog(
@@ -41,7 +41,7 @@ fun PermissionDeniedDialog(
         },
         text = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.adp)
             ) {
                 Text(
                     text = "The microphone permission is required to enable voice recognition features in this app.",
@@ -76,7 +76,7 @@ fun PermissionDeniedDialog(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp,
+        tonalElevation = 8.adp,
         shape = MaterialTheme.shapes.medium,
         properties = DialogProperties(
             dismissOnBackPress = true, dismissOnClickOutside = true
