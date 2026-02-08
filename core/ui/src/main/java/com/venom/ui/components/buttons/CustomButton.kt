@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,14 +31,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.venom.resources.R
-import com.venom.ui.theme.ThemeColors.GlassPrimary
-import com.venom.ui.theme.ThemeColors.GlassSecondary
-import com.venom.ui.theme.ThemeColors.GlassTertiary
+import com.venom.ui.components.common.adp
+import com.venom.ui.theme.lingoLens
 
 /**
  * A modern, animated, and customizable action bar icon component
@@ -61,20 +54,40 @@ import com.venom.ui.theme.ThemeColors.GlassTertiary
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomButton(
-    icon: Any, // Can be @DrawableRes Int or ImageVector
+    icon: Any,
     contentDescription: String,
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     selected: Boolean = false,
-    iconSize: Dp = 26.dp,
-    iconPadding: Dp = 4.dp,
+    iconSize: Dp = 24.adp,
+    iconPadding: Dp = 0.adp,
     selectedTint: Color? = null,
     disabledTint: Color? = null,
     showBorder: Boolean = true
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+
+    val inactiveGradient = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.lingoLens.glass.tintPrimary.copy(0.05f),
+            MaterialTheme.lingoLens.glass.tintSecondary.copy(0.05f),
+            MaterialTheme.lingoLens.glass.tintAccent.copy(0.05f)
+        )
+    )
+
+    // Memoize shape
+    val radius = 12.adp
+    val buttonShape = remember(radius) { RoundedCornerShape(radius) }
+
+    // Memoize animation spec
+    val scaleAnimSpec = remember {
+        spring<Float>(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    }
 
     val scale by animateFloatAsState(
         targetValue = when {
@@ -83,36 +96,40 @@ fun CustomButton(
             selected -> 1.05f
             else -> 1f
         },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
+        animationSpec = scaleAnimSpec
     )
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onSecondaryColor = MaterialTheme.colorScheme.onSecondary
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
 
     val iconColor by animateColorAsState(
         targetValue = when {
-            !enabled -> disabledTint
-                ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(0.38f)
-
-            selected -> selectedTint ?: MaterialTheme.colorScheme.onSecondary
-            else -> MaterialTheme.colorScheme.primary
+            !enabled -> disabledTint ?: onSurfaceVariant.copy(0.38f)
+            selected -> selectedTint ?: onSecondaryColor
+            else -> primaryColor
         }
     )
+
+    val borderWidth = 0.5.adp
+    val borderModifier = remember(showBorder, buttonShape, borderWidth) {
+        if (showBorder) {
+            Modifier
+                .border(borderWidth, Color.Transparent, buttonShape)
+                .background(brush = inactiveGradient, shape = buttonShape)
+        } else {
+            Modifier
+        }
+    }
 
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         TooltipBox(
-            modifier = modifier,
             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
             tooltip = {
-                PlainTooltip(
-                    caretSize = TooltipDefaults.caretSize,
-                    containerColor =
-                        MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ) {
+                PlainTooltip {
                     Text(contentDescription)
                 }
             },
@@ -121,73 +138,51 @@ fun CustomButton(
             IconButton(
                 onClick = onClick,
                 modifier = Modifier
-                    .padding(4.dp)
+                    .padding(4.adp)
                     .scale(scale)
-                    .then(
-                        if (showBorder) Modifier
-                            .border(
-                                0.8.dp,
-                                iconColor.copy(0.1f),
-                                RoundedCornerShape(12.dp)
-                            )
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        GlassPrimary.copy(0.05f),
-                                        GlassSecondary.copy(0.05f),
-                                        GlassTertiary.copy(0.05f)
-                                    )
-                                ),
-                                RoundedCornerShape(12.dp)
-                            )
-                        else Modifier
-                    ),
+                    .then(borderModifier),
                 enabled = enabled,
                 interactionSource = interactionSource
             ) {
-                when (icon) {
-                    is Int -> Icon(
-                        painter = painterResource(id = icon),
-                        contentDescription = contentDescription,
-                        tint = iconColor,
-                        modifier = Modifier
-                            .padding(iconPadding)
-                            .size(iconSize)
-                    )
-
-                    is ImageVector -> Icon(
-                        imageVector = icon,
-                        contentDescription = contentDescription,
-                        tint = iconColor,
-                        modifier = Modifier
-                            .padding(iconPadding)
-                            .size(iconSize)
-                    )
-                }
+                IconContent(
+                    icon = icon,
+                    contentDescription = contentDescription,
+                    iconColor = iconColor,
+                    iconPadding = iconPadding,
+                    iconSize = iconSize
+                )
             }
         }
     }
 }
 
-@Preview
 @Composable
-fun CustomButtonPreview() {
-    MaterialTheme {
-        CustomButton(
-            icon = R.drawable.icon_translate,
-            contentDescription = stringResource(R.string.action_translate),
-            selected = true
-        )
+private fun IconContent(
+    icon: Any,
+    contentDescription: String,
+    iconColor: Color,
+    iconPadding: Dp,
+    iconSize: Dp
+) {
+    val iconModifier = remember(iconPadding, iconSize) {
+        Modifier
+            .padding(iconPadding)
+            .size(iconSize)
     }
-}
 
-@Preview
-@Composable
-fun CustomButtonVectorPreview() {
-    MaterialTheme {
-        CustomButton(
-            icon = Icons.Rounded.Add,
-            contentDescription = "Add"
+    when (icon) {
+        is Int -> Icon(
+            painter = painterResource(id = icon),
+            contentDescription = contentDescription,
+            tint = iconColor.copy(0.9f),
+            modifier = iconModifier
+        )
+
+        is ImageVector -> Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = iconColor.copy(0.9f),
+            modifier = iconModifier
         )
     }
 }
