@@ -4,12 +4,15 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom.analytics.AnalyticsManager
+import com.venom.analytics.CrashlyticsManager
+import com.venom.analytics.ext.logTranslation
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
 import com.venom.data.model.TranslationProvider
 import com.venom.data.repo.SettingsRepository
-import com.venom.data.repo.TranslationRepositoryImpl
 import com.venom.domain.model.TranslationResult
+import com.venom.domain.repo.ITranslationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -24,7 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Immutable
-data class TranslationUiState(
+data class TranslateUiState(
     val sourceLanguage: LanguageItem = LANGUAGES_LIST[0],
     val targetLanguage: LanguageItem = LANGUAGES_LIST[1],
     val sourceText: String = "",
@@ -42,9 +45,11 @@ data class TranslationUiState(
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TranslateViewModel @Inject constructor(
-    private val repository: TranslationRepositoryImpl,
+    private val repository: ITranslationRepository,
     private val settingsRepository: SettingsRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val analyticsManager: AnalyticsManager,
+    private val crashlyticsManager: CrashlyticsManager
 ) : ViewModel() {
 
     companion object {
@@ -55,7 +60,7 @@ class TranslateViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow(
-        TranslationUiState(
+        TranslateUiState(
             sourceText = savedStateHandle.get<String>(KEY_SOURCE_TEXT) ?: "",
             sourceLanguage = findLanguageByCode(savedStateHandle.get<String>(KEY_SOURCE_LANG))
                 ?: LANGUAGES_LIST[0],
@@ -73,8 +78,14 @@ class TranslateViewModel @Inject constructor(
         val forceRefresh: Boolean = false,
         val immediate: Boolean = false
     )
+    
+    // Analytics Track translation timing
+    private var translationStartTime: Long = 0L
 
     init {
+        // Analytics Set screen context
+        crashlyticsManager.setCurrentScreen("TranslationScreen")
+        
         observeSettings()
         observeTranslationTriggers()
         observeStateForSaving()
@@ -334,10 +345,22 @@ class TranslateViewModel @Inject constructor(
                     error = "Offline models not available for ${currentState.sourceLanguage.englishName} -> ${currentState.targetLanguage.englishName}. Please download the required language models or switch to an online provider."
                 )
             }
+            // Log offline model error
+            analyticsManager.logError(
+                errorType = "offline_model_unavailable",
+                errorMessage = "Models missing: ${currentState.sourceLanguage.code} -> ${currentState.targetLanguage.code}",
+                screenName = "TranslationScreen"
+            )
             return
         }
 
         cancelCurrentTranslation()
+        
+        // Track translation start time
+        translationStartTime = System.currentTimeMillis()
+        crashlyticsManager.logBreadcrumb(
+            "Translation started: ${currentState.sourceLanguage.code} -> ${currentState.targetLanguage.code}"
+        )
 
         translationJob = viewModelScope.launch {
             try {
@@ -359,6 +382,17 @@ class TranslateViewModel @Inject constructor(
                                     error = null
                                 )
                             }
+                            
+                            // Log successful translation
+                            val translationDuration = System.currentTimeMillis() - translationStartTime
+                            analyticsManager.logTranslation(
+                                sourceLang = currentState.sourceLanguage.code,
+                                targetLang = currentState.targetLanguage.code,
+                                provider = currentState.selectedProvider.id,
+                                textLength = text.length,
+                                durationMs = translationDuration,
+                                success = true
+                            )
                         }
                     },
                     onFailure = { exception ->
@@ -375,6 +409,23 @@ class TranslateViewModel @Inject constructor(
                                     error = errorMessage
                                 )
                             }
+                            
+                            // Analytics: Log translation failure
+                            val translationDuration = System.currentTimeMillis() - translationStartTime
+                            analyticsManager.logTranslation(
+                                sourceLang = currentState.sourceLanguage.code,
+                                targetLang = currentState.targetLanguage.code,
+                                provider = currentState.selectedProvider.id,
+                                textLength = text.length,
+                                durationMs = translationDuration,
+                                success = false
+                            )
+                            analyticsManager.logError(
+                                errorType = "translation_failed",
+                                errorMessage = exception.message ?: "Unknown error",
+                                screenName = "TranslationScreen"
+                            )
+                            crashlyticsManager.logNonFatalException(exception, "Translation failed")
                         }
                     }
                 )
@@ -386,6 +437,14 @@ class TranslateViewModel @Inject constructor(
                             error = e.message ?: "Translation failed"
                         )
                     }
+                    
+                    // Analytics: Log exception
+                    analyticsManager.logError(
+                        errorType = "translation_exception",
+                        errorMessage = e.message ?: "Unknown error",
+                        screenName = "TranslationScreen"
+                    )
+                    crashlyticsManager.logNonFatalException(e, "Translation exception")
                 }
             }
         }
