@@ -3,8 +3,8 @@ package com.venom.data.repo
 import android.util.Log
 import com.venom.data.BuildConfig
 import com.venom.data.api.OcrService
-import com.venom.data.local.Entity.OcrEntity
 import com.venom.data.local.dao.OcrDao
+import com.venom.data.local.entity.OcrEntity
 import com.venom.data.remote.respnod.OcrResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

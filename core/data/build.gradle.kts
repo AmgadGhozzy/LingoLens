@@ -76,6 +76,7 @@ dependencies {
     api(libs.hilt.android)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.firebase.crashlytics.buildtools)
 
 
     kapt(libs.hilt.android.compiler)
@@ -98,6 +99,15 @@ dependencies {
 //    implementation("com.google.mlkit:language-id:17.0.5")
 //    implementation("com.google.mlkit:text-recognition:16.0.0")
 //    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    api(libs.androidx.credentials)
+    api(libs.androidx.credentials.play.services.auth)
+    api(libs.googleid)
 
     // Testing
     androidTestImplementation(libs.androidx.espresso.core)
