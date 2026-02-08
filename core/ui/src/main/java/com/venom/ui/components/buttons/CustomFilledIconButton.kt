@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 /**
  * An enhanced Material 3 FilledIconButton that supports both resource and vector icons
@@ -59,16 +59,21 @@ fun CustomFilledIconButton(
     isAlpha: Boolean = false,
     shape: Shape = CircleShape,
     color: Color? = null,
-    colors: IconButtonColors = selectedFilledIconButtonColors(
+    colors: IconButtonColors? = null,
+    interactionSource: MutableInteractionSource? = null,
+    size: Dp = Dp.Unspecified,
+    iconSize: Dp = Dp.Unspecified,
+    iconPadding: Dp = Dp.Unspecified
+) {
+    val finalColors = colors ?: selectedFilledIconButtonColors(
         isSelected = selected,
         color = color,
         isAlpha = isAlpha
-    ),
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    size: Dp = 48.dp,
-    iconSize: Dp = 24.dp,
-    iconPadding: Dp = 0.dp
-) {
+    )
+    val finalInteractionSource = interactionSource ?: remember { MutableInteractionSource() }
+    val finalSize = if (size != Dp.Unspecified) size else 48.adp
+    val finalIconSize = if (iconSize != Dp.Unspecified) iconSize else 24.adp
+    val finalIconPadding = if (iconPadding != Dp.Unspecified) iconPadding else 0.adp
 
     Box(modifier = modifier) {
         TooltipBox(
@@ -81,29 +86,29 @@ fun CustomFilledIconButton(
             FilledIconButton(
                 onClick = { if (enabled) onClick() },
                 modifier = modifier
-                    .padding(4.dp)
+                    .padding(all = 4.adp)
                     .scale(if (selected && enabled) 1.1f else 1f)
-                    .size(size),
+                    .size(finalSize),
                 enabled = enabled,
                 shape = shape,
-                colors = colors,
-                interactionSource = interactionSource
+                colors = finalColors,
+                interactionSource = finalInteractionSource
             ) {
                 when (icon) {
                     is Int -> Icon(
                         painter = painterResource(id = icon),
                         contentDescription = contentDescription,
                         modifier = Modifier
-                            .padding(iconPadding)
-                            .size(iconSize)
+                            .padding(all = finalIconPadding)
+                            .size(finalIconSize)
                     )
 
                     is ImageVector -> Icon(
                         imageVector = icon,
                         contentDescription = contentDescription,
                         modifier = Modifier
-                            .padding(iconPadding)
-                            .size(iconSize)
+                            .padding(all = finalIconPadding)
+                            .size(finalIconSize)
                     )
                 }
             }

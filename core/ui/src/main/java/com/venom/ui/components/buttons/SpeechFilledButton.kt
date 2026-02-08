@@ -16,15 +16,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 @Composable
 fun SpeechFilledButton(
     isSpeaking: Boolean,
     onSpeakClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = 48.adp,
     shape: Shape = IconButtonDefaults.filledShape,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
@@ -42,7 +42,7 @@ fun SpeechFilledButton(
     FilledIconButton(
         onClick = onSpeakClick,
         modifier = modifier
-            .padding(4.dp)
+            .padding(4.adp)
             .scale(if (isSpeaking) 1.1f else 1f)
             .size(size),
         shape = shape,
@@ -50,7 +50,7 @@ fun SpeechFilledButton(
         interactionSource = interactionSource
     ) {
         Icon(
-            painter = if (isSpeaking) painterResource(R.drawable.icon_record) else painterResource(R.drawable.icon_sound),
+            painter = if (isSpeaking) painterResource(R.drawable.ic_audio_lines) else painterResource(R.drawable.ic_speaker_high),
             contentDescription = stringResource(
                 if (isSpeaking) R.string.action_speaking
                 else R.string.action_speak
