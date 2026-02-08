@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.venom.data.local.SettingsPreferencesSerializer
 import com.venom.data.model.LanguageItem
+import com.venom.data.model.OrbPreferences
 import com.venom.data.model.PersonalPreference
 import com.venom.data.model.SettingsPreferences
 import com.venom.data.model.SplashPreferences
@@ -60,6 +61,10 @@ class SettingsRepositoryImpl @Inject constructor(
         updateSettings { copy(splashPrefs = update(splashPrefs)) }
     }
 
+    override suspend fun updateOrbPreferences(update: OrbPreferences.() -> OrbPreferences) {
+        updateSettings { copy(orbPrefs = update(orbPrefs)) }
+    }
+
     override suspend fun setAppLanguage(language: LanguageItem) {
         updateSettings { copy(appLanguage = language) }
     }
@@ -84,7 +89,7 @@ class SettingsRepositoryImpl @Inject constructor(
         updateThemePreferences {
             copy(
                 primaryColor = color,
-                extractWallpaperColor = false
+                materialYou = false
             )
         }
     }
@@ -94,7 +99,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleWallpaperColor() {
-        updateThemePreferences { copy(extractWallpaperColor = !extractWallpaperColor) }
+        updateThemePreferences { copy(materialYou = !materialYou) }
     }
 
     override suspend fun setPaletteStyle(style: PaletteStyle) {
@@ -103,6 +108,27 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setFontFamily(style: FontStyles) {
         updateThemePreferences { copy(fontFamily = style) }
+    }
+
+    // Orb preferences
+    override suspend fun toggleOrbs() {
+        updateOrbPreferences { copy(enabled = !enabled) }
+    }
+
+    override suspend fun toggleFloatingAnimation() {
+        updateOrbPreferences { copy(enableFloatingAnimation = !enableFloatingAnimation) }
+    }
+
+    override suspend fun toggleScaleAnimation() {
+        updateOrbPreferences { copy(enableScaleAnimation = !enableScaleAnimation) }
+    }
+
+    override suspend fun toggleAlphaAnimation() {
+        updateOrbPreferences { copy(enableAlphaAnimation = !enableAlphaAnimation) }
+    }
+
+    override suspend fun setAnimationSpeed(speed: Float) {
+        updateOrbPreferences { copy(animationSpeed = speed) }
     }
 
     // First launch state management
