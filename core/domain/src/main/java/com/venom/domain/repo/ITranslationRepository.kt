@@ -11,10 +11,14 @@ interface ITranslationRepository {
         providerId: String,
         forceRefresh: Boolean = false
     ): Result<TranslationResult>
-    
+
     fun getTranslationHistory(): Flow<List<TranslationResult>>
-    
+
     suspend fun bookmarkTranslation(id: Long, isBookmarked: Boolean)
-    
+
     suspend fun clearHistory()
+
+    // Offline logic support
+    suspend fun getDownloadedModels(): Set<String>
+    fun getAllOfflineModels(): List<String>
 }
