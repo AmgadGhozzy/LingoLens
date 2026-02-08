@@ -20,7 +20,7 @@ object DatabaseModule {
     @Singleton
     fun provideTranslationDatabase(@ApplicationContext context: Context): TranslationDatabase {
         return Room.databaseBuilder(
-            context.applicationContext, TranslationDatabase::class.java, "translation_database"
+            context.applicationContext, TranslationDatabase::class.java, "translationDatabase.db"
         ).fallbackToDestructiveMigration().build()
     }
 
@@ -28,7 +28,7 @@ object DatabaseModule {
     @Singleton
     fun provideOcrDatabase(@ApplicationContext context: Context): OcrDatabase {
         return Room.databaseBuilder(
-            context.applicationContext, OcrDatabase::class.java, "ocr_database"
+            context.applicationContext, OcrDatabase::class.java, "ocrDatabase.db"
         ).fallbackToDestructiveMigration().build()
     }
 
