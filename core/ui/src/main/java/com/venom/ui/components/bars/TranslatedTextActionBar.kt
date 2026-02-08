@@ -28,13 +28,12 @@ fun TranslatedTextActionBar(
     isSaved: Boolean,
     onCopy: () -> Unit,
     onShare: () -> Unit,
-    onMoveUp: (() -> Unit)? = null,
     onFullscreen: (() -> Unit)? = null,
     onSpeak: () -> Unit,
     isSpeaking: Boolean
 ) {
     val leftAction = ActionItem.Action(
-        icon = if (isSpeaking) R.drawable.icon_record else R.drawable.icon_sound,
+        icon = if (isSpeaking) R.drawable.ic_audio_lines else R.drawable.ic_speaker_high,
         description = R.string.action_speak_source,
         onClick = onSpeak
     )
@@ -44,13 +43,6 @@ fun TranslatedTextActionBar(
             ActionItem.Action(
                 icon = R.drawable.icon_fullscreen,
                 description = R.string.action_fullscreen_source,
-                onClick = it
-            )
-        },
-        onMoveUp?.let {
-            ActionItem.Action(
-                icon = R.drawable.icon_moveup,
-                description = R.string.action_move_up,
                 onClick = it
             )
         },
@@ -91,7 +83,6 @@ fun TranslatedTextActionBarPreview() {
             onFullscreen = { },
             onCopy = { },
             onBookmark = { },
-            onMoveUp = {},
             onShare = {},
         )
     }

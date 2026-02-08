@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 /**
  * A top app bar with a title and optional navigation or menu icon and actions.
@@ -63,7 +63,7 @@ fun TopBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(56.adp)
             .wrapContentHeight(align = Alignment.CenterVertically)
     )
 }

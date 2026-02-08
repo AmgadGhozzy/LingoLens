@@ -6,11 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.menus.OverflowMenu
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun ImageActionBar(
@@ -20,8 +21,8 @@ fun ImageActionBar(
 ) {
     GlassCard(
         modifier = modifier,
-        contentPadding = 6.dp,
-        solidBackgroundAlpha = 0.5f
+        contentPadding = 6.adp,
+        thickness = GlassThickness.Thick
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -35,7 +36,7 @@ fun ImageActionBar(
             actions.take(maxActionsVisible).forEach { action ->
                 CustomFilledIconButton(
                     icon = action.icon,
-                    size = 42.dp,
+                    size = 42.adp,
                     contentDescription = action.description.toString(),
                     onClick = action.onClick,
                     enabled = action.enabled,

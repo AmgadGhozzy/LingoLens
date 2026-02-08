@@ -1,13 +1,14 @@
 package com.venom.ui.components.bars
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.common.ActionItem
 import com.venom.ui.components.common.BaseActionBar
+import com.venom.ui.components.common.adp
 
 /**
  * A Material 3 action bar component that displays text-related actions.
@@ -21,7 +22,7 @@ import com.venom.ui.components.common.BaseActionBar
 fun TextActionBar(
     actions: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
-    elevation: Dp = 2.dp
+    elevation: Dp = 2.adp
 ) {
     BaseActionBar(
         actions = actions,
@@ -37,16 +38,20 @@ fun TextActionBar(
 fun TextActionBarPreview() {
     TextActionBar(
         actions = listOf(
-            ActionItem.Action(icon = R.drawable.icon_share,
+            ActionItem.Action(
+                icon = R.drawable.icon_share,
                 description = R.string.action_share,
                 onClick = { }),
-            ActionItem.Action(icon = R.drawable.icon_sound,
+            ActionItem.Action(
+                icon = R.drawable.icon_sound,
                 description = R.string.action_speak,
                 onClick = { }),
-            ActionItem.Action(icon = R.drawable.icon_translate,
+            ActionItem.Action(
+                icon = R.drawable.icon_translate,
                 description = R.string.action_translate,
                 onClick = { }),
-            ActionItem.Action(icon = R.drawable.icon_copy,
+            ActionItem.Action(
+                icon = R.drawable.icon_copy,
                 description = R.string.action_copy,
                 onClick = { }),
         )
