@@ -20,11 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
-import com.venom.ui.theme.ThemeColors.GlassPrimary
-import com.venom.ui.theme.ThemeColors.GlassSecondary
-import com.venom.ui.theme.ThemeColors.GlassTertiary
 
 @Composable
 fun WordChip(
@@ -34,33 +31,24 @@ fun WordChip(
     onLongClick: (() -> Unit)? = null,
     isActive: Boolean = false
 ) {
-    val radiatorBrush = if (isActive) {
-        Brush.linearGradient(
-            colors = listOf(
-                GlassPrimary.copy(0.25f),
-                GlassSecondary.copy(0.15f),
-                GlassTertiary.copy(0.1f)
-            )
+
+    val radiatorBrush = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(0.05f),
+            MaterialTheme.colorScheme.secondary.copy(0.05f),
+            MaterialTheme.colorScheme.tertiary.copy(0.05f)
         )
-    } else {
-        Brush.linearGradient(
-            colors = listOf(
-                GlassPrimary.copy(0.15f),
-                GlassSecondary.copy(0.12f),
-                GlassTertiary.copy(0.09f)
-            )
-        )
-    }
+    )
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.adp))
             .background(MaterialTheme.colorScheme.background.copy(0.1f))
             .background(radiatorBrush)
             .border(
-                width = 1.dp,
+                width = 1.adp,
                 color = MaterialTheme.colorScheme.outline.copy(0.1f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.adp)
             )
             .clickable(
                 onClick = onClick,
@@ -71,7 +59,7 @@ fun WordChip(
                     mod.clickable(onClickLabel = "Long click $word") { longClick() }
                 } ?: mod
             }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.adp, vertical = 8.adp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -103,8 +91,8 @@ private fun WordChipPreview() {
                         )
                     )
                 )
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.adp),
+            verticalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             Text(
                 "Modern Radiator Liquid Glass WordChips",
@@ -113,7 +101,7 @@ private fun WordChipPreview() {
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.adp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 WordChip(
@@ -136,7 +124,7 @@ private fun WordChipPreview() {
 
             // Additional row for more examples
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.adp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 WordChip(
