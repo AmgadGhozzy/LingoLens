@@ -14,6 +14,7 @@ import com.venom.data.repo.TranslationRepositoryImpl
 import com.venom.domain.repo.IOfflineTranslation
 import com.venom.domain.repo.IOnlineTranslation
 import com.venom.domain.repo.ITranslationHistory
+import com.venom.domain.repo.ITranslationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,4 +65,10 @@ object TranslationModule {
         offlineTranslationOperations,
         translationHistoryOperations
     )
+
+    @Provides
+    @Singleton
+    fun provideITranslationRepository(
+        repository: TranslationRepositoryImpl
+    ): ITranslationRepository = repository
 }

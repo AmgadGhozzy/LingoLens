@@ -6,12 +6,11 @@ import com.venom.data.BuildConfig
 import com.venom.data.api.ChatGPTService
 import com.venom.data.api.DeepSeekService
 import com.venom.data.api.GeminiService
-import com.venom.data.api.GithubApi
 import com.venom.data.api.GoogleTranslateService
 import com.venom.data.api.GroqService
+import com.venom.data.api.GroqTtsService
 import com.venom.data.api.HuggingFaceService
 import com.venom.data.api.OcrService
-import com.venom.data.repo.UpdateChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,7 +35,11 @@ object NetworkModule {
         } else {
             HttpLoggingInterceptor.Level.NONE
         }
-        return HttpLoggingInterceptor().apply { this.level = level }
+        return HttpLoggingInterceptor().apply {
+            this.level = level
+            redactHeader("Authorization")
+            redactHeader("Cookie")
+        }
     }
 
     @Provides
@@ -66,21 +69,6 @@ object NetworkModule {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideGithubRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(UpdateChecker.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideGithubApi(retrofit: Retrofit): GithubApi {
-        return retrofit.create(GithubApi::class.java)
     }
 
     @Provides
@@ -120,6 +108,12 @@ object NetworkModule {
     @Singleton
     fun provideGroqService(@Named("AiOkHttpClient") client: OkHttpClient): GroqService {
         return createRetrofit(GroqService.BASE_URL, client).create(GroqService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGroqTtsService(@Named("AiOkHttpClient") client: OkHttpClient): GroqTtsService {
+        return createRetrofit(GroqTtsService.BASE_URL, client).create(GroqTtsService::class.java)
     }
 
     @Provides
