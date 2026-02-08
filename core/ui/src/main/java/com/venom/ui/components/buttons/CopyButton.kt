@@ -21,8 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.CopiedToast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -46,22 +46,22 @@ fun CopyButton(
                 }
             },
             enabled = enabled,
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(24.adp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.4f),
                 contentColor = MaterialTheme.colorScheme.primary
             ),
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+            contentPadding = PaddingValues(horizontal = 12.adp, vertical = 8.adp),
 
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.adp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_copy),
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.adp)
                 )
                 Text(
                     text = stringResource(R.string.action_copy),
