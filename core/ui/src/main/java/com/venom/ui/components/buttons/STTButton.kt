@@ -1,9 +1,14 @@
 package com.venom.ui.components.buttons
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -23,13 +28,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.venom.resources.R
-import com.venom.ui.theme.ThemeColors.GlassPrimary
-import com.venom.ui.theme.ThemeColors.GlassSecondary
-import com.venom.ui.theme.ThemeColors.GlassTertiary
+import com.venom.ui.components.common.adp
+import com.venom.ui.theme.lingoLens
 
 /**
  * Microphone button with press-and-hold functionality.
@@ -38,116 +43,122 @@ import com.venom.ui.theme.ThemeColors.GlassTertiary
  * @param onPressEnd Callback when the button is released (stop recording)
  * @param modifier Optional modifier for the button
  * @param size Size of the button (default 56.dp)
- * @param icon Drawable resource for the microphone icon
  * @param enabled Whether the button is enabled
- * @param activeColor Color when the button is pressed
- * @param inactiveColor Color when the button is not pressed
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun STTButton(
     onPressStart: () -> Unit,
     onPressEnd: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 56.dp,
-    icon: Int = R.drawable.icon_mic,
+    size: Dp = 56.adp,
     enabled: Boolean = true,
     isActive: Boolean = false,
-    activeColor: Color = if (isActive) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.primary
-    },
-    inactiveColor: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
+    // Permission handling
+    val micPermission = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
     var isPressed by remember { mutableStateOf(false) }
 
+    // MD3 Color system - container colors
+    val containerColor = when {
+        !enabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f)
+        isPressed || isActive -> MaterialTheme.colorScheme.primaryContainer
+        else -> Color.Transparent
+    }
+
+    // Gradient for inactive state
+    val inactiveGradient = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.lingoLens.glass.tintPrimary.copy(0.05f),
+            MaterialTheme.lingoLens.glass.tintSecondary.copy(0.05f),
+            MaterialTheme.lingoLens.glass.tintAccent.copy(0.05f)
+        )
+    )
+
+    val contentColor = when {
+        !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        isPressed || isActive -> MaterialTheme.colorScheme.onPrimaryContainer
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    // Animations
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 1.15f else 1f,
+        targetValue = if (isPressed) 1.1f else 1f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         )
     )
 
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isPressed) activeColor else inactiveColor,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
-        )
-    )
-
-    val iconColor by animateColorAsState(
-        targetValue = if (isPressed) {
-            Color.White
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMedium
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 0.7f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
         )
     )
 
     Box(
-        modifier = modifier
-            .size(size)
-            .scale(scale)
-            .background(
-                brush = if (isPressed) {
-                    Brush.radialGradient(
-                        colors = listOf(
-                            backgroundColor,
-                            backgroundColor.copy(alpha = 0.8f)
-                        )
-                    )
-                } else {
-                    Brush.linearGradient(
-                        colors = listOf(
-                            GlassPrimary.copy(0.1f),
-                            GlassSecondary.copy(0.1f),
-                            GlassTertiary.copy(0.1f)
-                        )
-                    )
-                },
-                shape = CircleShape
-            )
-            .pointerInput(enabled) {
-                if (enabled) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            onPressStart()
-                            // Wait for the press to be released
-                            tryAwaitRelease()
-                            isPressed = false
-                            onPressEnd()
-                        }
-                    )
-                }
-            },
+        modifier = modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = "Microphone",
-            tint = iconColor,
-            modifier = Modifier.size(size * 0.5f)
-        )
-    }
-}
+        // Pulse effect when active
+        if (isPressed || isActive) {
+            Box(
+                modifier = Modifier
+                    .size(size * 1.3f)
+                    .scale(scale)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = pulseAlpha * 0.2f),
+                        shape = CircleShape
+                    )
+            )
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun STTButtonPreview() {
-    MaterialTheme {
+        // Main button
         Box(
-            modifier = Modifier.size(200.dp),
+            modifier = Modifier
+                .size(size)
+                .scale(scale)
+                .background(
+                    brush = if (isPressed || isActive || !enabled) {
+                        Brush.linearGradient(colors = listOf(containerColor, containerColor))
+                    } else {
+                        inactiveGradient
+                    },
+                    shape = CircleShape
+                )
+                .pointerInput(enabled) {
+                    if (enabled) {
+                        detectTapGestures(
+                            onPress = {
+                                // Check and request permission
+                                if (!micPermission.status.isGranted) {
+                                    micPermission.launchPermissionRequest()
+                                    return@detectTapGestures
+                                }
+
+                                isPressed = true
+                                onPressStart()
+                                tryAwaitRelease()
+                                isPressed = false
+                                onPressEnd()
+                            }
+                        )
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
-            STTButton(
-                onPressStart = { },
-                onPressEnd = { }
+            Icon(
+                painter = painterResource(
+                    id = if (isPressed || isActive) R.drawable.ic_audio_lines
+                    else R.drawable.ic_mic
+                ),
+                contentDescription = "Microphone",
+                tint = contentColor,
+                modifier = Modifier.size(size * 0.45f)
             )
         }
     }
