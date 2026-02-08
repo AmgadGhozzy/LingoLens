@@ -77,7 +77,7 @@ class OnlineTranslationRepositoryImpl @Inject constructor(
         val prompt = buildPrompt(source, target, query)
         val request = GeminiRequest(contents = listOf(GeminiContent(parts = listOf(GeminiPart(text = prompt)))))
         return safeCall {
-            val response = geminiService.translate(GeminiService.FLASH_MODEL, BuildConfig.GEMINI_API_KEY, request)
+            val response = geminiService.generate(GeminiService.FLASH_MODEL, BuildConfig.GEMINI_API_KEY, request)
             TranslateMapper.mapAIProviderResponse(
                 translatedText = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text,
                 sourceText = query,
@@ -137,7 +137,7 @@ class OnlineTranslationRepositoryImpl @Inject constructor(
             )
         )
         return safeCall {
-            val response = huggingFaceService.translate(HuggingFaceService.DEFAULT_MODEL, BuildConfig.HUGGINGFACE_API_KEY, request)
+            val response = huggingFaceService.translate(HuggingFaceService.getModelUrl(), BuildConfig.HUGGINGFACE_API_KEY, request)
             TranslateMapper.mapAIProviderResponse(
                 translatedText = response.firstOrNull()?.translationText,
                 sourceText = query,

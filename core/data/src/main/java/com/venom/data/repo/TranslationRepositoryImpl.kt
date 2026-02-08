@@ -107,11 +107,11 @@ class TranslationRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun getDownloadedModels(): Set<String> {
+    override suspend fun getDownloadedModels(): Set<String> {
         return offlineTranslator.getDownloadedModels()
     }
 
-    fun getAllOfflineModels(): List<String> {
+    override fun getAllOfflineModels(): List<String> {
         return offlineTranslator.getAllModels()
     }
 
