@@ -21,11 +21,8 @@ class SentenceRepository @Inject constructor(
     ): Flow<NetworkResult<SentenceResponse>> = flow {
         val normalizedWord = word.trim().lowercase()
         val normalizedSource = source.lowercase()
-
-        // Create cache key that includes both limit and source
         val cacheKey = buildCacheKey(normalizedWord, limit, normalizedSource)
 
-        // Check cache first
         cacheManager.getCachedResponse(cacheKey)?.let {
             emit(NetworkResult.Success(it))
             return@flow
@@ -45,17 +42,11 @@ class SentenceRepository @Inject constructor(
         }
     }
 
-    /**
-     * Builds a consistent cache key that includes word, limit, and source
-     */
     private fun buildCacheKey(word: String, limit: Int?, source: String): String {
-        val limitPart = when (limit) {
-            null -> "default"
-            else -> limit.toString()
-        }
+        val limitPart = limit?.toString() ?: "default"
         return "${word}_${limitPart}_${source}"
     }
 
     suspend fun clearCache() = cacheManager.clearCache()
-    suspend fun getCacheInfo() = cacheManager.getCachedWordsCount()
+    suspend fun getCacheInfo(): Int = cacheManager.getCachedWordsCount()
 }
