@@ -3,26 +3,22 @@ package com.venom.ui.components.buttons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 /**
  * A composable that creates a text button with an icon and text stacked vertically.
@@ -47,12 +43,16 @@ fun CustomTextButton(
     withText: Boolean = true,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    iconSize: Dp = 24.dp,
+    iconSize: Dp = 24.adp,
     iconTint: Color = MaterialTheme.colorScheme.primary,
     textStyle: TextStyle = MaterialTheme.typography.bodySmall,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    contentPadding: PaddingValues = PaddingValues(vertical = 4.dp)
+    contentPadding: PaddingValues = PaddingValues(vertical = 4.adp)
 ) {
+    // Memoize alpha calculations
+    val iconAlpha = remember(enabled) { if (enabled) 1f else 0.38f }
+    val textAlpha = remember(enabled) { if (enabled) 1f else 0.38f }
+
     TextButton(
         onClick = onClick,
         modifier = modifier,
@@ -60,29 +60,23 @@ fun CustomTextButton(
         contentPadding = contentPadding
     ) {
         Column(
-            modifier = Modifier.padding(6.dp),
+            modifier = Modifier.padding(6.adp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(2.adp)
         ) {
-            when (icon) {
-                is ImageVector -> Icon(
-                    imageVector = icon,
-                    contentDescription = text,
-                    tint = if (enabled) iconTint else iconTint.copy(0.38f),
-                    modifier = Modifier.size(iconSize)
-                )
-                is Int -> Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = text,
-                    tint = if (enabled) iconTint else iconTint.copy(0.38f),
-                    modifier = Modifier.size(iconSize)
-                )
-            }
+            IconContent(
+                icon = icon,
+                text = text,
+                iconTint = iconTint,
+                iconAlpha = iconAlpha,
+                iconSize = iconSize
+            )
+
             if (withText) {
                 Text(
                     text = text,
                     style = textStyle,
-                    color = if (enabled) textColor else textColor.copy(0.38f),
+                    color = textColor.copy(alpha = textAlpha),
                     maxLines = 1,
                 )
             }
@@ -90,25 +84,30 @@ fun CustomTextButton(
     }
 }
 
-@Preview
 @Composable
-private fun CustomTextButtonPreview() {
-    MaterialTheme {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(8.dp)
-        ) {
-            CustomTextButton(
-                onClick = {},
-                icon = Icons.Rounded.Add,
-                text = "Add Item"
-            )
-            CustomTextButton(
-                onClick = {},
-                icon = R.drawable.icon_ocr_mode,
-                text = "Settings",
-                enabled = false
-            )
-        }
+private fun IconContent(
+    icon: Any,
+    text: String,
+    iconTint: Color,
+    iconAlpha: Float,
+    iconSize: Dp
+) {
+    val tint = iconTint.copy(alpha = iconAlpha)
+    val iconModifier = Modifier.size(iconSize)
+
+    when (icon) {
+        is ImageVector -> Icon(
+            imageVector = icon,
+            contentDescription = text,
+            tint = tint,
+            modifier = iconModifier
+        )
+
+        is Int -> Icon(
+            painter = painterResource(id = icon),
+            contentDescription = text,
+            tint = tint,
+            modifier = iconModifier
+        )
     }
 }
