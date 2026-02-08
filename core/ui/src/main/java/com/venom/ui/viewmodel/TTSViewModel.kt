@@ -1,187 +1,229 @@
 package com.venom.ui.viewmodel
 
+import android.content.Context
 import android.media.MediaPlayer
+import android.net.Uri
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import com.venom.data.repo.GroqTtsRepository
 import com.venom.data.repo.SettingsRepository
-import com.venom.domain.repo.tts.MediaPlayerFactory
-import com.venom.domain.repo.tts.TTSUrlGenerator
-import com.venom.domain.repo.tts.TextToSpeechFactory
 import com.venom.utils.Extensions.cleanForTTS
 import com.venom.utils.Extensions.sanitize
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URLEncoder
 import java.util.Locale
 import javax.inject.Inject
 
 @Immutable
 data class TTSUiState(
-    val isInitializing: Boolean = false,
     val isSpeaking: Boolean = false,
-    val currentText: String = "",
+    val speakingText: String = "",
+    val isSlowSpeed: Boolean = false,
     val error: String? = null
-)
+) {
+    fun isSpeakingText(text: String) = isSpeaking && speakingText == text
+}
 
 @HiltViewModel
 class TTSViewModel @Inject constructor(
-    private val textToSpeechFactory: TextToSpeechFactory,
-    private val mediaPlayerFactory: MediaPlayerFactory,
-    private val urlGenerator: TTSUrlGenerator,
-    private val settingsRepository: SettingsRepository
+    @ApplicationContext private val context: Context,
+    private val settingsRepository: SettingsRepository,
+    private val groqTtsRepository: GroqTtsRepository
 ) : ViewModel() {
+
     private var tts: TextToSpeech? = null
     private var mediaPlayer: MediaPlayer? = null
+    private var exoPlayer: ExoPlayer? = null
+    private var baseSpeechRate = 0.8f
+    private var isTTSReady = false
 
     private val _uiState = MutableStateFlow(TTSUiState())
     val uiState: StateFlow<TTSUiState> = _uiState.asStateFlow()
 
+    private companion object {
+        const val NORMAL_RATE = 0.7f
+        const val SLOW_RATE = 0.4f
+        val ARABIC_LOCALE = Locale("ar", "SA")
+        const val GROQ_VOICE_EN = "troy"
+        const val GROQ_VOICE_AR = "noura"
+        val ARABIC_VOICES = setOf("fahad", "sultan", "noura", "lulwa", "aisha")
+        val ENGLISH_VOICES = setOf("autumn", "diana", "hannah", "austin", "daniel", "troy")
+    }
+
     init {
+        tts = TextToSpeech(context) { status ->
+            isTTSReady = status == TextToSpeech.SUCCESS
+            if (isTTSReady) setupListener()
+        }
         viewModelScope.launch {
-            settingsRepository.settings.collect { settings ->
-                tts?.setSpeechRate(settings.speechRate)
-            }
-        }
-        initTTS() // Initialize TextToSpeech
-    }
-
-    private fun initTTS() {
-        _uiState.update { it.copy(isInitializing = true) }
-        tts = textToSpeechFactory.create { status ->
-            _uiState.update { it.copy(isInitializing = false) }
-            if (status == TextToSpeech.SUCCESS) {
-                setupTTSListener()
-            } else {
-                _uiState.update {
-                    it.copy(error = "Failed to initialize TTS")
-                }
-            }
+            settingsRepository.settings.collect { baseSpeechRate = it.speechRate }
         }
     }
 
-    private fun setupTTSListener() {
+    private fun setupListener() {
         tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String) {
-                updateSpeakingState(true)
-            }
-
-            override fun onDone(utteranceId: String) {
-                updateSpeakingState(false)
-            }
-
-            override fun onError(utteranceId: String) {
-                handleError("TTS failed")
-            }
+            override fun onStart(id: String) = setSpeaking(true)
+            override fun onDone(id: String) = setSpeaking(false)
+            override fun onError(id: String) = setSpeaking(false)
         })
     }
 
-    fun speak(text: String, language: String? = null) {
-        if (text.isEmpty()) return
+    // Click: start speaking or stop if same text already playing
+    fun toggle(text: String, languageTag: String? = null) {
+        if (text.isBlank()) return
+        if (_uiState.value.isSpeakingText(text)) stop()
+        else speak(text, languageTag, slow = false)
+    }
 
-        // If currently speaking the same text, stop it
-        if (uiState.value.isSpeaking && uiState.value.currentText == text) {
-            stopSpeaking()
-            return
+    // Long click: speak at slow speed
+    fun speakSlow(text: String, languageTag: String? = null) {
+        if (text.isBlank()) return
+        speak(text, languageTag, slow = true)
+    }
+
+    private fun speak(text: String, languageTag: String?, slow: Boolean) {
+        viewModelScope.launch {
+            stop()
+            val clean = text.cleanForTTS().sanitize().lowercase()
+            val locale = resolveLocale(languageTag, clean)
+            val rate = baseSpeechRate * if (slow) SLOW_RATE else NORMAL_RATE
+
+            _uiState.update { it.copy(speakingText = text, isSlowSpeed = slow) }
+
+            val engine = tts
+            if (engine != null && isTTSReady) {
+                engine.language = locale
+                engine.setSpeechRate(rate)
+                if (engine.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE) {
+                    engine.speak(clean, TextToSpeech.QUEUE_FLUSH, null, text.hashCode().toString())
+                    return@launch
+                }
+            }
+            // Device doesn't support this language — fall back to online
+            speakOnline(clean, locale, slow)
         }
+    }
 
+    private fun speakOnline(text: String, locale: Locale, slow: Boolean) {
         viewModelScope.launch {
             try {
-                stopSpeaking() // Stop any previous speech
-                _uiState.update { it.copy(currentText = text.cleanForTTS()) }
-
-                val locale = language?.let { Locale(it) } ?: determineLocale(_uiState.value.currentText)
-                when (tts?.isLanguageAvailable(locale)) {
-                    TextToSpeech.LANG_AVAILABLE -> speakLocally(_uiState.value.currentText, locale)
-                    else -> speakOnline(_uiState.value.currentText, locale)
+                val url = "https://st.tokhmi.xyz/api/tts/?engine=google&lang=$locale&text=${
+                    URLEncoder.encode(text, "UTF-8")
+                }"
+                releaseMediaPlayer()
+                mediaPlayer = MediaPlayer().apply {
+                    setDataSource(url)
+                    setOnPreparedListener { mp ->
+                        setSpeaking(true)
+                        if (slow && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            mp.playbackParams = mp.playbackParams.setSpeed(SLOW_RATE)
+                        }
+                        mp.start()
+                    }
+                    setOnCompletionListener { setSpeaking(false); releaseMediaPlayer() }
+                    setOnErrorListener { _, _, _ -> setSpeaking(false); releaseMediaPlayer(); true }
+                    prepareAsync()
                 }
             } catch (e: Exception) {
-                handleError(e.message ?: "Unknown error")
+                _uiState.update { it.copy(error = e.message, isSpeaking = false, speakingText = "") }
             }
         }
     }
 
-    private fun determineLocale(text: String): Locale =
-        if (text.matches(Regex("[a-zA-Z]+"))) Locale.ENGLISH else Locale("ar")
+    fun speakWithGroq(text: String, locale: String, voice: String = GROQ_VOICE_EN) {
+        viewModelScope.launch {
+            try {
+                stop()
+                val resolvedLocale = resolveLocale(locale, text)
+                val isArabic = resolvedLocale.language == "ar"
+                val effectiveVoice = if (isArabic) {
+                    if (voice in ARABIC_VOICES) voice else GROQ_VOICE_AR
+                } else {
+                    if (voice in ENGLISH_VOICES) voice else GROQ_VOICE_EN
+                }
 
-    // Speaks text using local TTS
-    private fun speakLocally(text: String, locale: Locale) {
-        try {
-            tts?.apply {
-                language = locale
-                // Speech rate is automatically applied since we're updating it in the flow collection
-                speak(
-                    text.sanitize().lowercase(),
-                    TextToSpeech.QUEUE_FLUSH,
-                    null,
-                    text.hashCode().toString()
-                )
-            } ?: throw Exception("TTS is null")
-        } catch (_: Exception) {
-            speakOnline(text, locale)
-        }
-    }
+                val audioFile = groqTtsRepository.generateSpeech(text, resolvedLocale, effectiveVoice)
+                if (!audioFile.exists()) return@launch
 
-    private fun speakOnline(text: String, locale: Locale) {
-        try {
-            releaseMediaPlayer()
-            mediaPlayer = mediaPlayerFactory.create().apply {
-                val url = urlGenerator.generateTTSUrl(text.sanitize().lowercase(), locale)
-                setDataSource(url)
-                setOnPreparedListener {
-                    updateSpeakingState(true)
-                    start()
+                withContext(Dispatchers.Main) {
+                    releaseExoPlayer()
+                    exoPlayer = ExoPlayer.Builder(context).build().apply {
+                        addListener(object : Player.Listener {
+                            override fun onPlaybackStateChanged(state: Int) {
+                                if (state == Player.STATE_ENDED) {
+                                    setSpeaking(false)
+                                    releaseExoPlayer()
+                                    viewModelScope.launch(Dispatchers.IO) { audioFile.delete() }
+                                }
+                            }
+                            override fun onPlayerError(error: PlaybackException) {
+                                setSpeaking(false)
+                                releaseExoPlayer()
+                                viewModelScope.launch(Dispatchers.IO) { audioFile.delete() }
+                            }
+                        })
+                        setMediaItem(MediaItem.fromUri(Uri.fromFile(audioFile)))
+                        prepare()
+                        setSpeaking(true)
+                        play()
+                    }
                 }
-                setOnCompletionListener {
-                    updateSpeakingState(false)
-                    releaseMediaPlayer()
-                }
-                setOnErrorListener { _, _, _ ->
-                    handleError("Audio playback failed")
-                    releaseMediaPlayer()
-                    true
-                }
-                prepareAsync()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.message, isSpeaking = false, speakingText = "") }
             }
-        } catch (e: Exception) {
-            handleError("Media player error: ${e.message}")
         }
     }
 
-    private fun updateSpeakingState(isSpeaking: Boolean) {
-        _uiState.update { it.copy(isSpeaking = isSpeaking) }
+    private fun resolveLocale(tag: String?, text: String) = when (tag) {
+        "ar-SA" -> ARABIC_LOCALE
+        "en-US" -> Locale.US
+        else -> if (text.contains(Regex("[a-zA-Z]"))) Locale.US else ARABIC_LOCALE
     }
 
-    private fun handleError(message: String) {
+    private fun setSpeaking(speaking: Boolean) {
         _uiState.update {
-            it.copy(
-                error = message, isSpeaking = false
-            )
+            if (speaking) it.copy(isSpeaking = true)
+            else it.copy(isSpeaking = false, speakingText = "", isSlowSpeed = false)
         }
+    }
+
+    fun stop() {
+        tts?.stop()
+        releaseMediaPlayer()
+        releaseExoPlayer()
+        setSpeaking(false)
     }
 
     private fun releaseMediaPlayer() {
         mediaPlayer?.apply {
-            if (isPlaying) stop()
+            try { if (isPlaying) stop() } catch (_: Exception) {}
             release()
         }
         mediaPlayer = null
     }
 
-    fun stopSpeaking() {
-        tts?.stop()
-        releaseMediaPlayer()
-        updateSpeakingState(false)
+    private fun releaseExoPlayer() {
+        exoPlayer?.release()
+        exoPlayer = null
     }
 
     override fun onCleared() {
-        super.onCleared()
-        stopSpeaking()
+        stop()
         tts?.shutdown()
     }
 }
