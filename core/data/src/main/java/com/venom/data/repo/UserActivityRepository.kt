@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.firestore.SetOptions
+import com.venom.analytics.CrashlyticsManager
 import com.venom.data.local.dao.UserActivityDao
 import com.venom.data.local.dao.UserProfileDao
 import com.venom.data.local.entity.UserActivityEntity
@@ -28,7 +29,8 @@ import javax.inject.Singleton
 @Singleton
 class UserActivityRepository @Inject constructor(
     private val activityDao: UserActivityDao,
-    private val profileDao: UserProfileDao
+    private val profileDao: UserProfileDao,
+    private val crashlytics: CrashlyticsManager
 ) {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
@@ -41,10 +43,17 @@ class UserActivityRepository @Inject constructor(
                         .setSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
                         .build()
                 ).build()
+            Log.d(TAG, "Firestore initialized successfully")
             db
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Firestore initialization failed: ${e.message}", e)
+            crashlytics.logNonFatalException(e, "Firestore initialization failed")
             null
         }
+    }
+
+    companion object {
+        private const val TAG = "UserActivityRepo"
     }
 
     private fun today(): String = dateFormat.format(Date())
@@ -377,12 +386,19 @@ class UserActivityRepository @Inject constructor(
             val activity = activityDao.getActivityForDate(userId, dateKey) ?: return
             syncActivityDocToCloud(userId, activity)
         } catch (e: Exception) {
-            Log.e("Activity", "Cloud sync failed for $dateKey: ${e.message}")
+            Log.e(TAG, "Cloud sync failed for $dateKey: ${e.message}")
+            crashlytics.logNonFatalException(e, "Activity sync failed for date: $dateKey")
         }
     }
 
-    private fun syncActivityDocToCloud(userId: String, activity: UserActivityEntity) {
-        val db = firestore ?: return
+    private suspend fun syncActivityDocToCloud(userId: String, activity: UserActivityEntity) {
+        val db = firestore
+        if (db == null) {
+            Log.w(TAG, "Firestore not initialized, skipping activity sync")
+            crashlytics.logBreadcrumb("Activity sync skipped: Firestore null")
+            return
+        }
+
         val data = mapOf(
             "wordsViewed" to activity.wordsViewed,
             "wordsSwipedRight" to activity.wordsSwipedRight,
@@ -402,14 +418,27 @@ class UserActivityRepository @Inject constructor(
             "updatedAt" to activity.updatedAt
         )
 
-        db.collection("users").document(userId)
-            .collection("activity").document(activity.dateKey)
-            .set(data, SetOptions.merge())
-            .addOnFailureListener { Log.e("Activity", "Cloud sync failed: ${it.message}") }
+        try {
+            db.collection("users").document(userId)
+                .collection("activity").document(activity.dateKey)
+                .set(data, SetOptions.merge())
+                .await()
+            Log.d(TAG, "Activity synced for ${activity.dateKey}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Activity cloud sync failed: ${e.message}")
+            crashlytics.logNonFatalException(e, "Activity doc sync failed for ${activity.dateKey}")
+            throw e
+        }
     }
 
-    private fun syncProfileToCloud(userId: String, profile: UserProfileEntity) {
-        val db = firestore ?: return
+    private suspend fun syncProfileToCloud(userId: String, profile: UserProfileEntity) {
+        val db = firestore
+        if (db == null) {
+            Log.w(TAG, "Firestore not initialized, skipping profile sync")
+            crashlytics.logBreadcrumb("Profile sync skipped: Firestore null")
+            return
+        }
+
         val data = mapOf(
             "totalXp" to profile.totalXp,
             "level" to profile.level,
@@ -427,10 +456,17 @@ class UserActivityRepository @Inject constructor(
             "updatedAt" to profile.updatedAt
         )
 
-        db.collection("users").document(userId)
-            .collection("profile").document("main")
-            .set(data, SetOptions.merge())
-            .addOnFailureListener { Log.e("Activity", "Profile sync failed: ${it.message}") }
+        try {
+            db.collection("users").document(userId)
+                .collection("profile").document("main")
+                .set(data, SetOptions.merge())
+                .await()
+            Log.d(TAG, "Profile synced for user: $userId")
+        } catch (e: Exception) {
+            Log.e(TAG, "Profile cloud sync failed: ${e.message}")
+            crashlytics.logNonFatalException(e, "Profile sync failed for user: $userId")
+            throw e
+        }
     }
 
     suspend fun syncFromCloud(userId: String) = withContext(Dispatchers.IO) {

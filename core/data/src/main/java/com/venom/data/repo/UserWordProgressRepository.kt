@@ -4,6 +4,8 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.PersistentCacheSettings
+import com.google.firebase.firestore.SetOptions
+import com.venom.analytics.CrashlyticsManager
 import com.venom.data.local.dao.UserWordProgressDao
 import com.venom.data.local.dao.WordMasterDao
 import com.venom.data.local.entity.UserWordProgressEntity
@@ -26,7 +28,8 @@ class UserWordProgressRepository @Inject constructor(
     private val progressDao: UserWordProgressDao,
     private val wordMasterDao: WordMasterDao,
     private val srsEngine: SrsEngine,
-    private val activityRepository: UserActivityRepository
+    private val activityRepository: UserActivityRepository,
+    private val crashlytics: CrashlyticsManager
 ) {
 
     suspend fun getOrCreateProgress(userId: String, wordId: Int): UserWordProgress =
@@ -155,8 +158,11 @@ class UserWordProgressRepository @Inject constructor(
                 .setLocalCacheSettings(cacheSettings)
                 .build()
             db.firestoreSettings = settings
+            Log.d(TAG, "Firestore initialized successfully")
             db
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "Firestore initialization failed: ${e.message}", e)
+            crashlytics.logNonFatalException(e, "Firestore init failed in UserWordProgressRepo")
             null
         }
     }
@@ -210,8 +216,14 @@ class UserWordProgressRepository @Inject constructor(
         }
     }
 
-    private fun syncToCloud(progress: UserWordProgress) {
-        val db = firestore ?: return
+    private suspend fun syncToCloud(progress: UserWordProgress) {
+        val db = firestore
+        if (db == null) {
+            Log.w(TAG, "Firestore not initialized, skipping word progress sync")
+            crashlytics.logBreadcrumb("Word progress sync skipped: Firestore null")
+            return
+        }
+
         val data = mapOf(
             "viewCount" to progress.viewCount,
             "lastViewed" to progress.lastViewed,
@@ -230,9 +242,17 @@ class UserWordProgressRepository @Inject constructor(
             "nextReview" to progress.nextReview
         )
 
-        db.collection("users").document(progress.userId)
-            .collection("word_progress").document(progress.wordId.toString())
-            .set(data, com.google.firebase.firestore.SetOptions.merge())
+        try {
+            db.collection("users").document(progress.userId)
+                .collection("word_progress").document(progress.wordId.toString())
+                .set(data, SetOptions.merge())
+                .await()
+            Log.d(TAG, "Word progress synced for word: ${progress.wordId}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Word progress sync failed: ${e.message}")
+            crashlytics.logNonFatalException(e, "Word progress sync failed for word: ${progress.wordId}")
+            throw e
+        }
     }
 
     private suspend fun updateProgress(
@@ -307,4 +327,8 @@ class UserWordProgressRepository @Inject constructor(
         lastReview = lastReview,
         nextReview = nextReview
     )
+
+    companion object {
+        private const val TAG = "UserWordProgressRepo"
+    }
 }
