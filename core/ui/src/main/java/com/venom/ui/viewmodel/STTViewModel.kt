@@ -21,7 +21,7 @@ class STTViewModel @Inject constructor(
     private val _transcription = MutableStateFlow("")
     val transcription = _transcription.asStateFlow()
 
-    private var isRecognitionActive = false
+    var isRecognitionActive = false
 
     val speechState = repository.state.stateIn(
         scope = viewModelScope,
