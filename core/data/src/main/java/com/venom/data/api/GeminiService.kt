@@ -18,7 +18,7 @@ interface GeminiService {
      */
     @POST("v1beta/models/{model}:generateContent")
     suspend fun generate(
-        @Path("model") model: String = FLASH_MODEL,
+        @Path("model") model: String = FLASH_MODEL_3,
         @Query("key") apiKey: String,
         @Body request: GeminiRequest
     ): GeminiResponse
@@ -26,6 +26,7 @@ interface GeminiService {
     companion object {
         const val BASE_URL = "https://generativelanguage.googleapis.com/"
         const val FLASH_MODEL = "gemini-2.5-flash-lite"
+        const val FLASH_MODEL_3 = "gemini-3-flash-preview"
         const val PRO_MODEL = "gemini-2.5-pro"
         const val GEMMA_MODEL = "gemma-3-27b"
     }
@@ -67,7 +68,7 @@ data class GeminiPart(
 )
 
 data class GeminiConfig(
-    val temperature: Double = 0.7,
+    val temperature: Double = 1.0,
     val maxOutputTokens: Int = 16384,
     val topP: Double = 0.95,
     val topK: Int = 64,
