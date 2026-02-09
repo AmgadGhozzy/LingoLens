@@ -18,14 +18,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun EmptyState(
     @DrawableRes icon: Int,
     title: String,
     subtitle: String? = null,
-    iconSize: Dp = 120.dp,
+    iconSize: Dp = 120.adp,
     iconAlpha: Float = 0.5f,
     titleStyle: TextStyle = MaterialTheme.typography.titleLarge,
     subtitleStyle: TextStyle = MaterialTheme.typography.bodyMedium,
@@ -37,7 +36,7 @@ fun EmptyState(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.adp)
         ) {
             Icon(
                 painter = painterResource(id = icon),
@@ -53,7 +52,7 @@ fun EmptyState(
                 style = titleStyle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.adp)
             )
 
             subtitle?.let {
@@ -62,7 +61,7 @@ fun EmptyState(
                     style = subtitleStyle,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 8.adp)
                 )
             }
         }

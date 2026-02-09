@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 /**
@@ -35,12 +34,12 @@ fun PulseAnimation(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
     size: Float = 100f,
-    animationDuration: Int = 1200,
+    animationDuration: Int = 2500,
     circleCount: Int = 3,
-    delayBetweenCircles: Int = 300
+    delayBetweenCircles: Int = 600
 ) {
     Box(
-        modifier = modifier.size(size.dp),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         // Create multiple circles with staggered animations
@@ -77,9 +76,10 @@ private fun PulseCircle(
         )
     }
 
-    // Render the pulsing box
-    Box(modifier = Modifier
-            .size(size.dp)
+    // Render the pulsing circle
+    Box(
+        modifier = Modifier
+            .size(size.adp)
             .graphicsLayer {
                 // Scale and fade as the animation progresses
                 scaleX = pulseAnimation.value
@@ -87,7 +87,9 @@ private fun PulseCircle(
                 alpha = 1f - pulseAnimation.value
             }
             .border(
-                width = 3.dp, color = color, shape = CircleShape
+                width = 3.adp,
+                color = color,
+                shape = CircleShape
             )
     )
 }
