@@ -24,15 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.venom.data.model.LanguageItem
 import com.venom.resources.R
 import com.venom.ui.components.common.CustomBottomSheet
 import com.venom.ui.components.common.EmptyState
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.inputs.CustomSearchBar
 import com.venom.ui.components.other.FadeOverlay
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,28 +69,29 @@ fun LangSelectorContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(horizontal = 16.dp)
+        modifier = modifier.padding(horizontal = 16.adp)
     ) {
         // Currently Selecting Indicator
         Text(
             text = stringResource(
-                id = if (state.isSelectingSourceLanguage) 
-                    R.string.select_source_language 
-                else 
+                id = if (state.isSelectingSourceLanguage)
+                    R.string.select_source_language
+                else
                     R.string.select_target_language
             ),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.adp)
         )
 
         // Language Bar
         GlassCard(
+
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            contentPadding = 12.dp,
-            glassAlpha = 0.2f
+            thickness = GlassThickness.Regular,
+            shape = RoundedCornerShape(20.adp),
+            contentPadding = 12.adp
         ) {
             LanguageBar(
                 langSelectorViewModel = viewModel,
@@ -99,7 +101,7 @@ fun LangSelectorContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.adp))
 
         // Search Bar
         CustomSearchBar(
@@ -108,7 +110,7 @@ fun LangSelectorContent(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(12.adp))
 
         // Language List
         AnimatedContent(
@@ -122,8 +124,8 @@ fun LangSelectorContent(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        contentPadding = PaddingValues(vertical = 8.adp),
+                        verticalArrangement = Arrangement.spacedBy(10.adp)
                     ) {
                         items(
                             items = state.filteredLanguages,
@@ -144,7 +146,7 @@ fun LangSelectorContent(
                         }
 
                         item {
-                            Spacer(modifier = Modifier.height(40.dp))
+                            Spacer(modifier = Modifier.height(40.adp))
                         }
                     }
 

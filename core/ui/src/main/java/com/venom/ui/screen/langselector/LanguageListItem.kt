@@ -1,7 +1,9 @@
 package com.venom.ui.screen.langselector
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
@@ -9,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +33,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,11 +46,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
+import com.venom.ui.components.other.GlassTint
 
 @Composable
 fun LanguageListItem(
@@ -63,21 +72,36 @@ fun LanguageListItem(
         )
     )
 
+    var selectedThickness by remember {
+        mutableStateOf(if (isSelected) GlassThickness.Regular else GlassThickness.Thin)
+    }
+
+    LaunchedEffect(isSelected) {
+        selectedThickness = if (isSelected) GlassThickness.Regular else GlassThickness.Thin
+    }
+
     GlassCard(
         modifier = modifier
             .fillMaxWidth()
-            .scale(scale),
+            .scale(scale)
+            .animateContentSize()
+            .border(
+                width = animateDpAsState(if (isSelected) 2.adp else 0.adp).value,
+                color = MaterialTheme.colorScheme.primary.copy(
+                    alpha = animateFloatAsState(if (isSelected) 0.4f else 0f).value
+                ),
+                shape = RoundedCornerShape(20.adp)
+            ),
+        thickness = selectedThickness,
+        tint = if (isSelected) GlassTint.Primary else null,
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
-        glassAlpha = if (isSelected) 0.25f else 0.15f,
-        borderWidth = if (isSelected) 2.dp else 1.dp,
-        borderAlpha = if (isSelected) 0.4f else 0.1f,
-        solidBackgroundAlpha = if (isSelected) 0.2f else 0.08f
+        shape = RoundedCornerShape(20.adp),
+        showShadow = isSelected
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(14.adp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -88,7 +112,7 @@ fun LanguageListItem(
                 // Flag Container
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(56.adp)
                         .clip(CircleShape)
                         .background(
                             brush = Brush.radialGradient(
@@ -111,17 +135,18 @@ fun LanguageListItem(
                 ) {
                     Text(
                         text = language.flag,
-                        fontSize = 28.sp,
+                        fontSize = 28.asp,
                         modifier = Modifier.scale(1.1f)
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.adp))
 
                 Column {
                     Text(
                         text = language.englishName,
                         style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = 18.asp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                             color = if (isSelected) {
                                 MaterialTheme.colorScheme.primary
@@ -134,6 +159,7 @@ fun LanguageListItem(
                     Text(
                         text = language.nativeName,
                         style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 16.asp,
                             color = if (isSelected) {
                                 MaterialTheme.colorScheme.primary.copy(0.7f)
                             } else {
@@ -147,12 +173,12 @@ fun LanguageListItem(
                         if (!language.isDownloaded) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(4.adp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.CloudDownload,
                                     contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(14.adp),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                                 Text(
@@ -170,7 +196,7 @@ fun LanguageListItem(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.adp)
             ) {
                 AnimatedVisibility(
                     visible = isSelected,
@@ -181,7 +207,7 @@ fun LanguageListItem(
                         imageVector = Icons.Rounded.CheckCircle,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(28.adp)
                     )
                 }
 
@@ -189,14 +215,14 @@ fun LanguageListItem(
                     language.isDownloading -> {
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(40.adp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.primaryContainer.copy(0.3f)),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(24.adp),
+                                strokeWidth = 3.adp,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -206,7 +232,7 @@ fun LanguageListItem(
                         IconButton(
                             onClick = { onDeleteClick(language) },
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(40.adp)
                                 .clip(CircleShape)
                                 .background(MaterialTheme.colorScheme.errorContainer.copy(0.3f))
                         ) {
@@ -214,7 +240,7 @@ fun LanguageListItem(
                                 imageVector = Icons.Rounded.Delete,
                                 contentDescription = "Delete offline model",
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.adp)
                             )
                         }
                     }
@@ -223,15 +249,15 @@ fun LanguageListItem(
                         IconButton(
                             onClick = { onDownloadClick(language) },
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(40.adp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.secondaryContainer.copy(0.3f))
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(0.3f))
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.CloudDownload,
                                 contentDescription = "Download offline model",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(20.dp)
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(20.adp)
                             )
                         }
                     }

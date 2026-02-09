@@ -27,10 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.data.model.LANGUAGES_LIST
 import com.venom.data.model.LanguageItem
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 /**
  * Displays a language item with an optional flag and native name hint, now with added clickability.
@@ -52,12 +52,12 @@ fun LanguageItemView(
     showArrow: Boolean = true,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    flagSize: Dp = 40.dp
+    flagSize: Dp = 40.adp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
     val baseModifier = modifier
-        .clip(RoundedCornerShape(12.dp))
+        .clip(RoundedCornerShape(12.adp))
         .then(
             if (onClick != null) {
                 Modifier.clickable(
@@ -66,7 +66,7 @@ fun LanguageItemView(
             } else {
                 Modifier
             })
-        .padding(6.dp)
+        .padding(6.adp)
 
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = baseModifier
@@ -75,8 +75,10 @@ fun LanguageItemView(
         if (showFlag) {
             Text(
                 text = language.flag,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(end = 12.dp).size(flagSize)
+                fontSize = 24.asp,
+                modifier = Modifier
+                    .padding(end = 12.adp)
+                    .size(flagSize)
             )
         }
 
@@ -85,8 +87,11 @@ fun LanguageItemView(
             Text(
                 text = language.englishName,
                 style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 16.asp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(0.6f)
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                        0.6f
+                    )
                 ),
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
@@ -94,7 +99,9 @@ fun LanguageItemView(
             if (showNativeNameHint) {
                 Text(
                     text = language.nativeName,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 14.asp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -111,7 +118,7 @@ fun LanguageItemView(
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowDown,
                 contentDescription = "Select language",
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(20.adp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
