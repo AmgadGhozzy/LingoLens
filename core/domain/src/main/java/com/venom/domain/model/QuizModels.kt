@@ -7,14 +7,15 @@ sealed class QuizQuestionUi {
     abstract val correctAnswer: String?
 
     data class WordQuestion(
-        val word: Word,
+        val word: WordMaster,
         override val options: List<String>,
         override val correctAnswer: String,
         val translation: String
     ) : QuizQuestionUi() {
-        override val prompt: String = word.englishEn
+        override val prompt: String = word.wordEn
         override val isHtml: Boolean = false
     }
+
 
     data class TestQuestion(
         val question: Question,
