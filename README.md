@@ -1,193 +1,158 @@
 <div align="center">
 
-<img src="./images/logo/logo.png" width="200" alt="LingoLens Logo" />
+<img src="./images/logo/logo.png" width="160" alt="LingoLens Logo" />
 
-# 🌍 LingoLens – AI English Learning & Translator
+# 🌍 LingoLens: AI-Powered English Learning
 
-![API 21+](https://img.shields.io/badge/API%2021+-3ddc84?style=for-the-badge&logo=android&logoColor=white)
-![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
-![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
-![Material You](https://img.shields.io/badge/Material%20You-6200EA?style=for-the-badge&logo=materialdesign&logoColor=white)
-![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+[![API 24+](https://img.shields.io/badge/API%2024+-3ddc84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Material You](https://img.shields.io/badge/Material%20You-6200EA?style=for-the-badge&logo=materialdesign&logoColor=white)](https://m3.material.io/)
+[![Hilt](https://img.shields.io/badge/Hilt-Injection-orange?style=for-the-badge)](https://developer.android.com/training/dependency-injection/hilt-android)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 
-[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen?style=for-the-badge&logo=semantic-release)](https://github.com/AmgadGhozzy/LingoLens/releases)
-[![License](https://img.shields.io/badge/License-Apache%202.0-orange?style=for-the-badge&logo=apache&logoColor=white)](https://opensource.org/licenses/Apache-2.0)
+**LingoLens is a professional, AI-driven language learning ecosystem designed to help you master English through real-world context, instant camera translation, and scientifically-backed memory techniques.**
 
-[![Get it on Google Play](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.venom.lingolens)
+[**Explore Features**](#✨-core-features) • [**Tech Stack**](#🛠️-technical-stack) • [**Getting Started**](#🚀-getting-started) • [**Privacy Policy**](./Privacy.md)
 
-# 🗺️ Project Overview
+---
 
-**A smart, feature-rich, AI-powered app that helps users translate, learn and practice English with tools like real-time OCR, speech translation, flashcard quizzes, sentence builders, and more.**
+<img src="./images/banner/banner1.png" width="100%" alt="LingoLens Banner" />
 
-Built with **Jetpack Compose**, **MVVM architecture**, and **modern Android libraries** for a smooth, accessible, and customizable learning experience.
-
-
-</div>
-
-<p align="middle">
-    <img src="./images/banner/banner1.png" width="99%" alt="LingoLens Banner" />
-    <img src="./images/phoneScreenshots/01.png" width="13%" />
-    <img src="./images/phoneScreenshots/02.png" width="13%" />
-    <img src="./images/phoneScreenshots/03.png" width="13%" />
-    <img src="./images/phoneScreenshots/04.png" width="13%" />
-    <img src="./images/phoneScreenshots/05.png" width="13%" />
-    <img src="./images/phoneScreenshots/06.png" width="13%" />
-    <img src="./images/phoneScreenshots/07.png" width="13%" />
+<p align="center">
+  <img src="./images/phoneScreenshots/01.png" width="13%" alt="Intuitive Dashboard" />
+  <img src="./images/phoneScreenshots/02.png" width="13%" alt="Real-time Camera OCR" />
+  <img src="./images/phoneScreenshots/03.png" width="13%" alt="WordCraftAI Deep Explanations" />
+  <img src="./images/phoneScreenshots/04.png" width="13%" alt="SRS Flashcard System" />
+  <img src="./images/phoneScreenshots/05.png" width="13%" alt="Interactive Quizzes" />
+  <img src="./images/phoneScreenshots/06.png" width="13%" alt="Categorized Phrasebook" />
+  <img src="./images/phoneScreenshots/07.png" width="13%" alt="Customizable Material You Themes" />
+</p>
+<p align="center">
+  <i>1. Dashboard • 2. Camera OCR • 3. WordCraftAI • 4. SRS Learning • 5. Quizzes • 6. Phrasebook • 7. Personalization</i>
 </p>
 
-## ✨ Features
-
-### 📖 Translation & Transliteration
-- **Instant Translation**: Translate text, voice, and images in real-time
-- **Voice Support**: Speak and hear accurate translations with natural pronunciation
-- **Multiple Engines**: Choose between Google Translate, DeepL, and other translation services
-- **Script Transliteration**: Convert between different writing systems
-- **Offline Mode**: Basic translation features work without internet connection
-
-### 📷 OCR Image Translation
-- **Smart Text Detection**: Extract and translate text from photos or screenshots
-- **Flexible Scanning**: Process full paragraphs or focus on specific words
-- **Interactive Selection**: Crop, select, and interact with detected text using bounding boxes
-
-### 🧠 Vocabulary & Learning Tools
-- **Interactive Flashcards**: Swipe through engaging word cards for vocabulary building
-- **Floating Word Cards**: Access vocabulary tools from anywhere in the app
-- **Level-Based Learning**: Progress through structured word stacks by difficulty
-- **Typing Practice**: Improve spelling with interactive typing drills
-- **Custom Quizzes**: Create personalized tests with real-time scoring and feedback
-- **Multi-Modal Practice**: Speaking and listening exercises included
-
-### ✍️ Sentence Tools & Phrasebook
-- **Extensive Phrase Library**: Access 1000+ categorized phrases for travel, shopping, business, and daily conversations
-- **Sentence Builder**: Construct grammatically correct sentences with guided assistance
-- **Native Pronunciation**: Search YouTube for real-world pronunciation examples
-
-### 🗣️ Speech Practice
-- **Text-to-Speech (TTS)**: Listen to natural English pronunciation
-- **Speech-to-Text (STT)**: Practice speaking for translation and vocabulary building
-- **Pronunciation Feedback**: Get instant feedback on your pronunciation accuracy
-
-### ⚙️ Personalization & Settings
-- **Theme Customization**: Choose from multiple themes, colors, and font options
-- **Multi-Language Interface**: Support for various interface languages
-- **Personal Library**: Save favorites and view translation history
-- **Progress Tracking**: Monitor learning statistics and performance metrics
-
-## 🛠️ Tech Stack
-
-<div align="center">
-
-![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
-![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
-![Material You](https://img.shields.io/badge/Material%20You-6200EA?style=for-the-badge&logo=materialdesign&logoColor=white)
-![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-
 </div>
 
-### Core Technologies
-- **[Kotlin](https://kotlinlang.org/)** - Modern, expressive programming language for Android
-- **[Jetpack Compose](https://developer.android.com/jetpack/compose)** - Declarative UI toolkit for native Android apps
-- **[MVVM Architecture](https://developer.android.com/jetpack/guide)** - Clean separation of concerns with ViewModel pattern
+---
 
-### Key Libraries & Frameworks
-- **[Hilt](https://dagger.dev/hilt/)** - Dependency injection framework
-- **[Retrofit](https://square.github.io/retrofit/)** - Type-safe HTTP client for REST API integration
-- **[Room Database](https://developer.android.com/training/data-storage/room)** - Local persistent storage solution
-- **[ML Kit](https://developers.google.com/ml-kit)** - Machine learning capabilities for text recognition
-- **[CameraX](https://developer.android.com/camerax)** - Camera functionality and image processing
-- **[Firebase](https://firebase.google.com/)** - Crashlytics, Analytics, and Remote Configuration
+## ✨ Core Features
 
-## 🏗️ Architecture
+### 📸 Smart Camera Translator (OCR)
+- **Instant Recognition:** Point your camera at any surface—books, signs, or screens—to extract and translate text.
+- **Interactive Bounding Boxes:** Select specific words or paragraphs directly from the image.
+- **Contextual Learning:** Immediately send any scanned text to **WordCraftAI** for a deeper dive.
 
-LingoLens follows a clean, modular architecture designed for scalability and maintainability:
+### 🧠 WordCraftAI: Your Personal Tutor
+- **Deep Explanations:** Get more than just a translation. Understand grammar, usage, and nuance.
+- **Sentence Generator:** See how words are used in real-world scenarios with AI-generated examples.
+- **Smart Insights:** Discover synonyms, antonyms, and linguistic roots.
 
-| Module | Purpose |
-|--------|---------|
-| `core/ui` | Shared UI components, themes, and styling |
-| `features/ocr` | Image scanning, text recognition, and OCR functionality |
-| `features/translation` | Translation services and language processing tools |
-| `features/stackcard` | Flashcards, quizzes, tests, and level progression |
-| `features/phrase` | Phrasebook management and contextual learning |
-| `features/settings` | User preferences, configurations, and app settings |
+### 🃏 Vocabulary Mastery (SRS)
+- **Scientific Learning:** Uses a **Spaced Repetition System (SRS)** engine to optimize your memory retention.
+- **Level-Based Progression:** Move from "Novice" to "Master" as you interact with your vocabulary stacks.
+- **Engaging Flashcards:** Beautifully animated cards designed for quick daily reviews.
 
-## 🚀 Getting Started
+### ✍️ Multi-Modal Practice
+- **Speech-to-Text:** Practice speaking and get feedback on your pronunciation.
+- **Text-to-Speech:** Listen to natural-sounding native pronunciations (British & American).
+- **Gamified Quizzes:** Typing drills, multiple-choice, and listening tests with real-time scoring.
 
-### Prerequisites
-- Android Studio Arctic Fox or later
-- Android SDK API 21+
-- Kotlin 1.8+
+---
 
-### Installation
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/AmgadGhozzy/LingoLens.git
-   ```
+## 🛠️ Technical Stack
 
-2. **Open the project in Android Studio**
+LingoLens is built using the latest industry standards for Android development, ensuring a smooth, scalable, and maintainable experience.
 
-3. **Sync project with Gradle files**
+| Category | Technologies |
+|----------|--------------|
+| **Language** | Kotlin (Coroutines, Flow) |
+| **UI Framework** | Jetpack Compose, Material 3 (Material You) |
+| **Architecture** | MVVM, Clean Architecture, Multi-Module |
+| **DI** | Hilt (Dagger) |
+| **Networking** | Retrofit, OkHttp |
+| **Persistence** | Room (Multi-Database), DataStore |
+| **AI & ML** | Google ML Kit (OCR), GPT-4o, Gemini, Groq |
+| **Animation** | Lottie, Compose Animation |
+| **Utilities** | Coil (Images), Firebase (Analytics, Crashlytics) |
 
-4. **Build and run the app on your device or emulator**
+---
 
-## 🤝 Contributing
+## 🏗️ Project Structure
 
-We welcome contributions from the community! Whether it's bug fixes, feature enhancements, or documentation improvements, your help is appreciated.
+The project follows a modular **Clean Architecture** approach to maximize code reuse and maintainability:
 
-### How to Contribute
-1. **Fork the repository**
-2. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. **Commit your changes:**
-   ```bash
-   git commit -m "Add new feature"
-   ```
-4. **Push to the branch:**
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. **Open a Pull Request**
-<div align="center">
-
-## 💬 Support & Feedback
-
-Need help? Found a bug? Have suggestions?
-
-📧 **Email:** [AmgadGhozzy@gmail.com](mailto:AmgadGhozzy@gmail.com)
-
-We're always looking for ways to improve LingoLens, so please don't hesitate to reach out with your feedback and ideas.
-
-## ⚖️ License
-
-```
-Copyright 2025 Amgad Ghozzy
-  Licensed under the Apache License, Version 2.0 (the "License");you may not use this file except in compliance with the License.You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, softwaredistributed under the License is distributed on an "AS IS" BASIS,WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.See the License for the specific language governing permissions andlimitations under the License.
+```text
+├── app/                # Main entry, Navigation, DI Setup
+├── core/               # Shared logic
+│   ├── data/           # Repositories & Databases
+│   ├── domain/         # Use Cases & Business Models
+│   ├── ui/             # Shared Composables & Theme
+│   └── utils/          # Extensions & Helper classes
+└── features/           # Independent Feature Modules
+    ├── ocr/            # Camera & Text Recognition
+    ├── wordcraftai/    # AI Explanation Engine
+    ├── translation/    # Core Translation Services
+    └── stackcard/      # SRS & Learning Logic
 ```
 
 ---
 
-## 💫 Love LingoLens?
+## 🚀 Getting Started
 
-**Star us on GitHub and join our community!**
+### Prerequisites
+- Android Studio Ladybug or later.
+- Android SDK API 24+.
+- A device/emulator with Camera support (for OCR).
 
-[![Star Repository](https://img.shields.io/github/stars/AmgadGhozzy/LingoLens?style=for-the-badge&logo=github&color=yellow&logoColor=white)](https://github.com/AmgadGhozzy/LingoLens/stargazers)
-[![Follow Developer](https://img.shields.io/github/followers/AmgadGhozzy?style=for-the-badge&logo=github&color=blue&logoColor=white)](https://github.com/AmgadGhozzy)
+### Installation
+1. **Clone the Repo:**
+   ```bash
+   git clone https://github.com/AmgadGhozzy/LingoLens.git
+   ```
+2. **Open in Android Studio:** Let Gradle sync all dependencies.
+3. **Configuration:** Ensure you have a valid `google-services.json` in the `app/` directory if you wish to use Firebase features.
+4. **Run:** Deploy to your device and start learning!
 
-### *Helping learners become fluent, one word at a time* ✨
+---
 
-### Connect With Us
+## 🤝 Contributing
 
-[![GitHub](https://img.shields.io/badge/GitHub-1A1A1A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AmgadGhozzy/LingoLens)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/amgadghozzy/)
-[![Email](https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:AmgadGhozzy@gmail.com)
+We welcome contributions! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
 
-**Made with ❤️ by [Amgad Ghozzy](https://www.linkedin.com/in/amgadghozzy)**
+1. Fork the Project.
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the Branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
 
+---
+
+## ❓ FAQ
+
+**Q: Does LingoLens support offline translation?**
+A: Yes! Basic translation and vocabulary practice features are available offline. Advanced AI features like WordCraftAI require an internet connection.
+
+**Q: Is the App free to use?**
+A: LingoLens offers a robust set of core features for free. We also offer a Premium subscription for an ad-free experience and unlimited access to advanced AI tools.
+
+**Q: Which AI models are used?**
+A: We integrate multiple state-of-the-art models including GPT-4o, Gemini, and DeepSeek to ensure the highest accuracy for linguistic explanations.
+
+**Q: Is my data safe?**
+A: Absolutely. Most of your learning data is stored locally on your device. For more details, see our [Privacy Policy](./Privacy.md).
+
+---
+
+## ⚖️ License & Contact
+
+Distributed under the **Apache License 2.0**. See `LICENSE` for more information.
+
+📧 **Developer:** Amgad Ghozzy - [AmgadGhozzy@gmail.com](mailto:AmgadGhozzy@gmail.com)
+🔗 **LinkedIn:** [amgadghozzy](https://www.linkedin.com/in/amgadghozzy)
+
+---
+
+<div align="center">
+  <b>Made with ❤️ for English Learners everywhere.</b>
 </div>
