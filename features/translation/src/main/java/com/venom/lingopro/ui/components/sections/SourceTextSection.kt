@@ -68,25 +68,23 @@ fun SourceTextSection(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if (isLoading) {
+                if (isLoading)
                     PulseAnimation(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.semantics {
                             contentDescription = "Translation in progress"
                         }
                     )
-                } else {
-                    CustomButton(
-                        icon = R.drawable.icon_clear,
-                        contentDescription = stringResource(R.string.action_clear),
-                        onClick = onClearText,
-                        iconSize = 18.adp,
-                        showBorder = false,
-                        modifier = Modifier.semantics {
-                            contentDescription = "Clear input text"
-                        }
-                    )
-                }
+                CustomButton(
+                    icon = R.drawable.icon_clear,
+                    contentDescription = stringResource(R.string.action_clear),
+                    onClick = onClearText,
+                    iconSize = 18.adp,
+                    showBorder = false,
+                    modifier = Modifier.semantics {
+                        contentDescription = "Clear input text"
+                    }
+                )
             }
         }
     }

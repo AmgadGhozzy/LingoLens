@@ -172,7 +172,7 @@ fun TranslationScreen(
     val handleDismiss: () -> Unit = remember(sttViewModel, ttsViewModel, onDismiss) {
         {
             sttViewModel.stopRecognition()
-            ttsViewModel.stopSpeaking()
+            ttsViewModel.stop()
             onDismiss()
         }
     }
@@ -192,7 +192,7 @@ fun TranslationScreen(
                         actions = actions,
                         isSpeakingText = ttsState::isSpeakingText,
                         onExpandDictionary = { showDictionaryDialog = true },
-                        onSpeakDictionaryWord = ttsViewModel::speak,
+                        onSpeakDictionaryWord = ttsViewModel::toggle,
                         isDialog = true
                     )
                     FloatingDialogActions(
@@ -210,7 +210,7 @@ fun TranslationScreen(
                 actions = actions,
                 isSpeakingText = ttsState::isSpeakingText,
                 onExpandDictionary = { showDictionaryDialog = true },
-                onSpeakDictionaryWord = ttsViewModel::speak,
+                onSpeakDictionaryWord = ttsViewModel::toggle,
                 isDialog = false,
                 modifier = Modifier.padding(8.adp)
             )
@@ -237,7 +237,7 @@ fun TranslationScreen(
                          showDictionaryDialog = false
                      }*/
                 },
-                onSpeak = ttsViewModel::speak,
+                onSpeak = ttsViewModel::toggle,
                 isSpeakingText = ttsState::isSpeakingText,
                 onCopy = actions.onCopy,
                 onDismiss = { showDictionaryDialog = false }
@@ -274,7 +274,7 @@ fun TranslationScreen(
     DisposableEffect(Unit) {
         onDispose {
             sttViewModel.stopRecognition()
-            ttsViewModel.stopSpeaking()
+            ttsViewModel.stop()
         }
     }
 }
