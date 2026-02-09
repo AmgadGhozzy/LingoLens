@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButtonDefaults
@@ -43,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.resources.R
 import com.venom.ui.components.bars.TranslatedTextActionBar
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.inputs.CustomTextField
@@ -164,15 +164,8 @@ fun FullscreenTextDialog(
                         }
                     }
 
-                    CustomFilledIconButton(
-                        icon = Icons.Rounded.Close,
-                        onClick = { onDismiss(textValue.text) },
-                        contentDescription = stringResource(R.string.action_close),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f),
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        size = 38.adp
+                    CloseButton(
+                        onClick = { onDismiss(textValue.text) }
                     )
                 }
 
