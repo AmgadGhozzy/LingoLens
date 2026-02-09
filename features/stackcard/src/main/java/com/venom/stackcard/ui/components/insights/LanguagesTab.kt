@@ -56,7 +56,6 @@ import com.venom.ui.theme.LingoLensTheme
  * @param word The word to get translations from
  * @param pinnedLanguage Currently pinned language (if any)
  * @param onPinLanguage Callback when a language is pinned/unpinned
- * @param onSpeak Callback for TTS with text and rate
  * @param modifier Modifier for styling
  */
 @Composable
@@ -64,7 +63,6 @@ fun LanguagesTab(
     word: WordMaster,
     pinnedLanguage: LanguageOption?,
     onPinLanguage: (LanguageOption) -> Unit,
-    onSpeak: (text: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -102,8 +100,7 @@ fun LanguagesTab(
                 LanguageRow(
                     language = language,
                     isPinned = pinnedLanguage?.langName == language.langName,
-                    onPin = { onPinLanguage(language) },
-                    onSpeak = onSpeak
+                    onPin = { onPinLanguage(language) }
                 )
             }
         }
@@ -118,7 +115,6 @@ private fun LanguageRow(
     language: LanguageOption,
     isPinned: Boolean,
     onPin: () -> Unit,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Animated colors
@@ -180,7 +176,6 @@ private fun LanguageRow(
         // Language content
         InteractiveText(
             text = language.translation ?: "",
-            onSpeak = onSpeak,
             modifier = Modifier.weight(1f)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.adp)) {
@@ -254,8 +249,7 @@ private fun LanguagesTabPreview() {
         LanguagesTab(
             word = MockWordData.journeyWord,
             pinnedLanguage = LanguageOption("German", "Reise"),
-            onPinLanguage = {},
-            onSpeak = { _ -> }
+            onPinLanguage = {}
         )
     }
 }
@@ -267,8 +261,7 @@ private fun LanguagesTabPreviewLight() {
         LanguagesTab(
             word = MockWordData.journeyWord,
             pinnedLanguage = LanguageOption("French", "voyage"),
-            onPinLanguage = {},
-            onSpeak = { _ -> }
+            onPinLanguage = {}
         )
     }
 }
@@ -280,8 +273,7 @@ private fun LanguagesTabNoPinPreview() {
         LanguagesTab(
             word = MockWordData.journeyWord,
             pinnedLanguage = null,
-            onPinLanguage = {},
-            onSpeak = { _ -> }
+            onPinLanguage = {}
         )
     }
 }

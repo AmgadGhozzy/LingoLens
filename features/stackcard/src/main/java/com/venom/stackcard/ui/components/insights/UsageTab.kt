@@ -67,14 +67,12 @@ import com.venom.ui.theme.tokens.getCefrColorScheme
  * Usage tab content for Insights sheet.
  *
  * @param word The word to display usage information for
- * @param onSpeak Callback for TTS with text and rate
  * @param modifier Modifier for styling
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UsageTab(
     word: WordMaster,
-    onSpeak: (text: String) -> Unit,
     modifier: Modifier = Modifier,
     userCefrLevel: CefrLevel = CefrLevel.B1 // TODO: Get from user profile
 ) {
@@ -110,7 +108,6 @@ fun UsageTab(
         if (hasCollocations) {
             CollocationsSection(
                 collocations = word.collocations,
-                onSpeak = onSpeak
             )
         }
 
@@ -119,8 +116,7 @@ fun UsageTab(
             ContextualExamplesSection(
                 examples = word.examples,
                 targetWord = word.wordEn,
-                userCefrLevel = userCefrLevel,
-                onSpeak = onSpeak
+                userCefrLevel = userCefrLevel
             )
         }
     }
@@ -211,7 +207,6 @@ private fun TeachersTipCard(
 @Composable
 private fun CollocationsSection(
     collocations: List<String>,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val collocationColors = MaterialTheme.lingoLens.feature.collocation
@@ -232,8 +227,7 @@ private fun CollocationsSection(
                 CollocationChip(
                     text = collocation,
                     textColor = collocationColors.text,
-                    borderColor = collocationColors.border,
-                    onSpeak = onSpeak
+                    borderColor = collocationColors.border
                 )
             }
         }
@@ -248,13 +242,9 @@ private fun CollocationChip(
     text: String,
     textColor: Color,
     borderColor: Color,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    InteractiveText(
-        text = text,
-        onSpeak = onSpeak
-    ) {
+    InteractiveText(text) {
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(12.adp))
@@ -284,7 +274,6 @@ private fun ContextualExamplesSection(
     examples: Map<CefrLevel, String>,
     targetWord: String,
     userCefrLevel: CefrLevel,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -302,8 +291,7 @@ private fun ContextualExamplesSection(
                     level = level,
                     example = example.value,
                     targetWord = targetWord,
-                    isUserLevel = level == userCefrLevel,
-                    onSpeak = onSpeak
+                    isUserLevel = level == userCefrLevel
                 )
             }
         }
@@ -319,7 +307,6 @@ private fun ExampleAccordionItem(
     example: String,
     targetWord: String,
     isUserLevel: Boolean,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember(level, isUserLevel) {
@@ -433,10 +420,7 @@ private fun ExampleAccordionItem(
                 animationSpec = tween(300)
             )
         ) {
-            InteractiveText(
-                text = example,
-                onSpeak = onSpeak
-            ) {
+            InteractiveText(example) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -533,8 +517,7 @@ private fun HighlightedExampleText(
 private fun UsageTabPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         UsageTab(
-            word = MockWordData.journeyWord,
-            onSpeak = { _ -> }
+            word = MockWordData.journeyWord
         )
     }
 }
@@ -544,8 +527,7 @@ private fun UsageTabPreview() {
 private fun UsageTabPreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         UsageTab(
-            word = MockWordData.journeyWord,
-            onSpeak = { _ -> }
+            word = MockWordData.journeyWord
         )
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,14 +49,12 @@ import com.venom.ui.theme.tokens.getPosColor
  * Relations tab content for Insights sheet.
  *
  * @param word The word to display relations for
- * @param onSpeak Callback for TTS with text and rate
  * @param modifier Modifier for styling
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RelationsTab(
     word: WordMaster,
-    onSpeak: (text: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Cached boolean checks
@@ -95,34 +94,26 @@ fun RelationsTab(
     ) {
         // Synonyms
         if (hasSynonyms) {
-            SynonymsSection(
-                synonyms = word.synonyms,
-                onSpeak = onSpeak
-            )
+            SynonymsSection(word.synonyms)
         }
 
         // Antonyms
         if (hasAntonyms) {
-            AntonymsSection(
-                antonyms = word.antonyms,
-                onSpeak = onSpeak
-            )
+            AntonymsSection(word.antonyms)
         }
 
         // Related concepts - EN prioritized, AR at 60% opacity
         if (hasRelatedWords) {
             RelatedConceptsSection(
                 englishWords = word.relatedWords.english,
-                arabicWords = word.relatedWords.arabic,
-                onSpeak = onSpeak
+                arabicWords = word.relatedWords.arabic
             )
         }
 
         // Word family
         if (hasWordFamily) {
             WordFamilySection(
-                entries = wordFamilyEntries,
-                onSpeak = onSpeak
+                entries = wordFamilyEntries
             )
         }
     }
@@ -135,7 +126,6 @@ fun RelationsTab(
 @Composable
 private fun SynonymsSection(
     synonyms: List<String>,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val synonymColors = MaterialTheme.lingoLens.feature.relation.synonym
@@ -157,8 +147,7 @@ private fun SynonymsSection(
                     text = synonym,
                     backgroundColor = synonymColors.background,
                     borderColor = synonymColors.border,
-                    textColor = synonymColors.text,
-                    onSpeak = onSpeak
+                    textColor = synonymColors.text
                 )
             }
         }
@@ -172,7 +161,6 @@ private fun SynonymsSection(
 @Composable
 private fun AntonymsSection(
     antonyms: List<String>,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val antonymColors = MaterialTheme.lingoLens.feature.relation.antonym
@@ -194,8 +182,7 @@ private fun AntonymsSection(
                     text = antonym,
                     backgroundColor = antonymColors.background,
                     borderColor = antonymColors.border,
-                    textColor = antonymColors.text,
-                    onSpeak = onSpeak
+                    textColor = antonymColors.text
                 )
             }
         }
@@ -209,7 +196,6 @@ private fun AntonymsSection(
 private fun RelatedConceptsSection(
     englishWords: List<String>,
     arabicWords: List<String>,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -227,7 +213,7 @@ private fun RelatedConceptsSection(
                 RelatedConceptItem(
                     englishWord = englishWord,
                     arabicWord = arabicWord,
-                    onSpeak = onSpeak
+                    modifier = Modifier
                 )
             }
         }
@@ -240,7 +226,6 @@ private fun RelatedConceptsSection(
 @Composable
 private fun WordFamilySection(
     entries: List<Pair<String, String>>,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -267,8 +252,7 @@ private fun WordFamilySection(
                     columnItems.forEach { (pos, term) ->
                         WordFamilyCard(
                             partOfSpeech = pos,
-                            term = term,
-                            onSpeak = onSpeak
+                            term = term
                         )
                     }
                 }
@@ -283,15 +267,13 @@ private fun WordFamilySection(
 @Composable
 private fun RelationChip(
     text: String,
-    backgroundColor: androidx.compose.ui.graphics.Color,
-    borderColor: androidx.compose.ui.graphics.Color,
-    textColor: androidx.compose.ui.graphics.Color,
-    onSpeak: (String) -> Unit,
+    backgroundColor: Color,
+    borderColor: Color,
+    textColor: Color,
     modifier: Modifier = Modifier
 ) {
     InteractiveText(
-        text = text,
-        onSpeak = onSpeak
+        text = text
     ) {
         Box(
             modifier = modifier
@@ -322,12 +304,10 @@ private fun RelationChip(
 private fun RelatedConceptItem(
     englishWord: String,
     arabicWord: String?,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     InteractiveText(
-        text = englishWord,
-        onSpeak = onSpeak
+        text = englishWord
     ) {
         Row(
             modifier = modifier
@@ -384,15 +364,13 @@ private fun RelatedConceptItem(
 private fun WordFamilyCard(
     partOfSpeech: String,
     term: String,
-    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Get semantic color based on POS type
     val posColor = getPosColor(partOfSpeech)
 
     InteractiveText(
-        text = term,
-        onSpeak = onSpeak
+        text = term
     ) {
         Column(
             modifier = modifier
@@ -447,8 +425,7 @@ private fun WordFamilyCard(
 private fun RelationsTabPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         RelationsTab(
-            word = MockWordData.journeyWord,
-            onSpeak = { _ -> }
+            word = MockWordData.journeyWord
         )
     }
 }
@@ -458,8 +435,7 @@ private fun RelationsTabPreview() {
 private fun RelationsTabPreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         RelationsTab(
-            word = MockWordData.journeyWord,
-            onSpeak = { _ -> }
+            word = MockWordData.journeyWord
         )
     }
 }

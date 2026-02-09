@@ -26,9 +26,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,7 +50,7 @@ import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
 import com.venom.resources.R
 import com.venom.stackcard.ui.viewmodel.CurrentWordProgress
-import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.common.CustomDragHandle
 import com.venom.ui.components.common.adp
 import com.venom.ui.theme.LingoLensTheme
@@ -77,7 +74,6 @@ import kotlin.math.roundToInt
  * @param onTabChange Callback when tab selection changes
  * @param onPinLanguage Callback when a language is pinned/unpinned
  * @param onTogglePowerTip Callback to toggle power tip visibility
- * @param onSpeak Callback for TTS with text and rate
  * @param modifier Modifier for styling
  */
 @Composable
@@ -92,7 +88,6 @@ fun InsightsSheet(
     onTabChange: (InsightsTab) -> Unit,
     onPinLanguage: (LanguageOption) -> Unit,
     onTogglePowerTip: () -> Unit,
-    onSpeak: (text: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(
@@ -159,8 +154,7 @@ fun InsightsSheet(
                     onClose = onClose,
                     onTabChange = onTabChange,
                     onPinLanguage = onPinLanguage,
-                    onTogglePowerTip = onTogglePowerTip,
-                    onSpeak = onSpeak
+                    onTogglePowerTip = onTogglePowerTip
                 )
             }
         }
@@ -178,8 +172,7 @@ private fun SheetContent(
     onClose: () -> Unit,
     onTabChange: (InsightsTab) -> Unit,
     onPinLanguage: (LanguageOption) -> Unit,
-    onTogglePowerTip: () -> Unit,
-    onSpeak: (text: String) -> Unit
+    onTogglePowerTip: () -> Unit
 ) {
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
     val dismissThreshold = 300f
@@ -229,14 +222,8 @@ private fun SheetContent(
                 modifier = Modifier.weight(1f)
             )
 
-            CustomFilledIconButton(
-                icon = Icons.Rounded.Close,
+            CloseButton(
                 onClick = onClose,
-                contentDescription = stringResource(R.string.action_close),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
                 size = 40.adp
             )
         }
@@ -284,20 +271,17 @@ private fun SheetContent(
                         )
 
                         InsightsTab.RELATIONS -> RelationsTab(
-                            word = currentWord,
-                            onSpeak = onSpeak
+                            word = currentWord
                         )
 
                         InsightsTab.USAGE -> UsageTab(
-                            word = currentWord,
-                            onSpeak = onSpeak
+                            word = currentWord
                         )
 
                         InsightsTab.LANGUAGES -> LanguagesTab(
                             word = currentWord,
                             pinnedLanguage = pinnedLanguage,
-                            onPinLanguage = onPinLanguage,
-                            onSpeak = onSpeak
+                            onPinLanguage = onPinLanguage
                         )
                     }
                 }
@@ -324,8 +308,7 @@ private fun InsightsSheetPreview() {
             onClose = {},
             onTabChange = {},
             onPinLanguage = {},
-            onTogglePowerTip = {},
-            onSpeak = { _ -> }
+            onTogglePowerTip = {}
         )
     }
 }
@@ -348,8 +331,7 @@ private fun InsightsSheetPreviewLight() {
             onClose = {},
             onTabChange = {},
             onPinLanguage = {},
-            onTogglePowerTip = {},
-            onSpeak = { _ -> }
+            onTogglePowerTip = {}
         )
     }
 }
