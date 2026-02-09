@@ -71,6 +71,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:utils"))
     implementation(project(":core:resources"))
+    implementation(project(":core:analytics"))
 
     // Hilt
     api(libs.hilt.android)

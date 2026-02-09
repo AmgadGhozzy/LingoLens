@@ -12,3 +12,4 @@ g
 local.properties
 .env
 .aiexclude
+.agent

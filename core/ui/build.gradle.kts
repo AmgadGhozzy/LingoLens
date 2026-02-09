@@ -43,6 +43,7 @@ dependencies {
     api(project(":core:data"))
     api(project(":core:utils"))
     api(project(":core:domain"))
+    api(project(":core:analytics"))
 
     // Hilt
     api(libs.hilt.android)
@@ -69,6 +70,8 @@ dependencies {
     api(libs.okhttp)
     api(libs.retrofit)
     api(libs.converter.gson)
+
+    implementation(libs.androidx.media3.exoplayer)
 
 
     // Compose
