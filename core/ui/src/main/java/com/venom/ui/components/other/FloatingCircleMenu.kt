@@ -14,16 +14,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.MenuBook
-import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Bookmark
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,20 +37,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.venom.ui.theme.ThemeColors.BitcoinColor
-import com.venom.ui.theme.ThemeColors.PurplePrimary
-import com.venom.ui.theme.ThemeColors.TONColor
-import com.venom.ui.theme.ThemeColors.USDTColor
+import androidx.compose.ui.res.painterResource
+import com.venom.ui.components.common.adp
 import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 data class FloatingMenuItem(
-    val icon: ImageVector,
+    val icon: Any,
     val color: Color,
     val description: String? = null,
     val onClick: () -> Unit
@@ -96,13 +86,13 @@ fun FloatingCircleMenu(
     ) {
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(56.adp)
                 .shadow(
-                    elevation = 16.dp,
+                    elevation = 16.adp,
                     shape = CircleShape,
                     ambientColor = Color.Black.copy(0.15f)
                 )
-                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(0.5f), CircleShape)
                 .clickable { if (clickedIndex < 0) isExpanded = !isExpanded },
             contentAlignment = Alignment.Center
         ) {
@@ -110,7 +100,7 @@ fun FloatingCircleMenu(
                 Icons.Rounded.Add,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(24.adp)
                     .rotate(rotation),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -144,11 +134,16 @@ private fun FloatingMenuItemComponent(
     onItemClick: () -> Unit
 ) {
     val angle = (-90f + (index - (totalItems - 1) / 2f) * (120f / totalItems)) * (PI / 180f)
-    val radius = 100.dp
-    val density = LocalDensity.current
+    val radius = 100.adp
+    val waveBaseRad1 = 60.adp
+    val waveBaseRad2 = 100.adp
+    val strokeWidth1 = 4.adp
+    val strokeWidth2 = 3.adp
+    val sparkleDistance = 60.adp
+    val sparkleRadius = 3.adp
 
-    val offsetX = with(density) { (cos(angle) * radius.value).dp }
-    val offsetY = with(density) { (sin(angle) * radius.value).dp }
+    val offsetX = radius * cos(angle).toFloat()
+    val offsetY = radius * sin(angle).toFloat()
 
     Box(
         modifier = Modifier.offset(offsetX, offsetY),
@@ -156,29 +151,31 @@ private fun FloatingMenuItemComponent(
     ) {
         if (isClicked && waveProgress > 0f) {
             repeat(2) { wave ->
-                Canvas(modifier = Modifier.size(12.dp)) {
-                    val waveRadius = (60 + wave * 40).dp.toPx() * waveProgress
+                Canvas(modifier = Modifier.size(12.adp)) {
+                    val baseRad = if (wave == 0) waveBaseRad1 else waveBaseRad2
+                    val waveRadius = baseRad.toPx() * waveProgress
                     val alpha = (1f - waveProgress) * (0.4f - wave * 0.1f)
+                    val sWidth = if (wave == 0) strokeWidth1 else strokeWidth2
                     drawCircle(
                         color = item.color.copy(alpha),
                         radius = waveRadius,
-                        style = Stroke(width = (4 - wave).dp.toPx())
+                        style = Stroke(width = sWidth.toPx())
                     )
                 }
             }
 
             Canvas(
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.adp)
             ) {
                 repeat(6) { i ->
                     val sparkleAngle = (i * 45f) * (PI / 180f)
-                    val distance = 60.dp.toPx() * waveProgress
+                    val distance = sparkleDistance.toPx() * waveProgress
                     val x = center.x + cos(sparkleAngle).toFloat() * distance
                     val y = center.y + sin(sparkleAngle).toFloat() * distance
 
                     drawCircle(
                         color = item.color.copy((1f - waveProgress) * 0.6f),
-                        radius = 3.dp.toPx(),
+                        radius = sparkleRadius.toPx(),
                         center = Offset(x, y)
                     )
                 }
@@ -195,44 +192,35 @@ private fun FloatingMenuItemComponent(
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(48.adp)
                     .shadow(
-                        elevation = 12.dp,
+                        elevation = 12.adp,
                         shape = CircleShape,
                         spotColor = Color.Black.copy(0.3f),
                         ambientColor = Color.Black.copy(0.2f)
                     )
-                    .background(MaterialTheme.colorScheme.surfaceContainerLowest, CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow, CircleShape)
                     .clickable { onItemClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    item.icon,
-                    contentDescription = null,
-                    tint = item.color,
-                    modifier = Modifier.size(24.dp)
-                )
+                when (val icon = item.icon) {
+                    is ImageVector -> Icon(
+                        imageVector = icon,
+                        contentDescription = item.description,
+                        tint = item.color,
+                        modifier = Modifier.size(24.adp)
+                    )
+
+                    is Int -> Icon(
+                        painter = painterResource(icon),
+                        contentDescription = item.description,
+                        tint = item.color,
+                        modifier = Modifier.size(24.adp)
+                    )
+
+                    else -> {}
+                }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun FloatingCircleMenuPreview() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-        contentAlignment = Alignment.Center
-    ) {
-        FloatingCircleMenu(
-            items = listOf(
-                FloatingMenuItem(Icons.Rounded.Bookmark, USDTColor) {},
-                FloatingMenuItem(Icons.AutoMirrored.Rounded.MenuBook, PurplePrimary) {},
-                FloatingMenuItem(Icons.AutoMirrored.Rounded.VolumeUp, BitcoinColor) {},
-                FloatingMenuItem(Icons.Rounded.Share, TONColor) {}
-            )
-        )
     }
 }
