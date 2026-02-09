@@ -24,7 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 @Preview
 @Composable
@@ -36,15 +36,15 @@ fun TextShimmer(
     spacing: Int = 12
 ) {
     Column(
-        modifier = modifier.padding(vertical = 12.dp, horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(spacing.dp)
+        modifier = modifier.padding(vertical = 12.adp, horizontal = 8.adp),
+        verticalArrangement = Arrangement.spacedBy(spacing.adp)
     ) {
         repeat(lines) { index ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth(lineWidths.getOrElse(index) { 0.75f })
-                    .height(lineHeight.dp)
-                    .clip(RoundedCornerShape((lineHeight * 0.3).dp))
+                    .height(lineHeight.adp)
+                    .clip(RoundedCornerShape((lineHeight * 0.3).adp))
                     .animatedShimmer()
             )
         }
@@ -63,10 +63,10 @@ fun Modifier.animatedShimmer(): Modifier = composed {
     ).value
 
     val colors = listOf(
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-        MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
-        MaterialTheme.colorScheme.surface.copy(alpha = 0.1f)
+        MaterialTheme.colorScheme.surface.copy(0.3f),
+        MaterialTheme.colorScheme.primary.copy(0.5f),
+        MaterialTheme.colorScheme.secondary.copy(0.3f),
+        MaterialTheme.colorScheme.surface.copy(0.1f)
     )
 
     background(
@@ -94,6 +94,6 @@ fun Modifier.animatedShimmerWave(): Modifier = composed {
     )
 
     background(
-        MaterialTheme.colorScheme.surface.copy(alpha = alpha)
+        MaterialTheme.colorScheme.surface.copy(alpha)
     )
 }
