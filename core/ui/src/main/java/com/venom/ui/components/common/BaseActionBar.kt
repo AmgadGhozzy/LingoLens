@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.dialogs.CustomCard
 import com.venom.ui.components.menus.ButtonType
 import com.venom.ui.components.menus.OverflowMenu
@@ -74,7 +73,7 @@ fun BaseActionBar(
     overflowOptions: List<ActionItem.Action> = emptyList(),
     useCard: Boolean = false,
     containerColor: Color = Color.Unspecified,
-    elevation: Dp = 2.dp,
+    elevation: Dp = 2.adp,
     useTextButtons: Boolean = false,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (() -> Unit)? = null
@@ -83,7 +82,7 @@ fun BaseActionBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(vertical = 4.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -102,7 +101,7 @@ fun BaseActionBar(
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = if (showOverflowMenu) Modifier.padding(end = 16.dp) else Modifier
+                modifier = if (showOverflowMenu) Modifier.padding(end = 16.adp) else Modifier
             ) {
                 actions.forEach { ActionItemContent(it, useTextButtons) }
             }
@@ -119,7 +118,7 @@ fun BaseActionBar(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(horizontal = 6.dp)
+                .padding(horizontal = 6.adp)
         ) { content() }
     } else {
         Box(

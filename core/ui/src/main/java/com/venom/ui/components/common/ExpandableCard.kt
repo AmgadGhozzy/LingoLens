@@ -19,11 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.buttons.ExpandIndicator
 import com.venom.ui.components.other.GlassCard
+import com.venom.ui.components.other.GlassThickness
 
 @Composable
 fun ExpandableCard(
@@ -36,7 +36,6 @@ fun ExpandableCard(
     expandedContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     var internalExpanded by remember { mutableStateOf(false) }
     val isExpanded = expanded ?: internalExpanded
     GlassCard(
@@ -46,16 +45,16 @@ fun ExpandableCard(
                 stiffness = Spring.StiffnessLow
             )
         ),
+        thickness = GlassThickness.Regular,
         onClick = {
             val newExpanded = !isExpanded
             if (expanded == null) {
                 internalExpanded = newExpanded
             }
             onExpandChange?.invoke(newExpanded)
-        },
-        solidBackgroundAlpha = 0.3f
+        }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.adp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -67,37 +66,18 @@ fun ExpandableCard(
                     modifier = Modifier.weight(1f)
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    CustomFilledIconButton(
-                        icon = R.drawable.icon_sound,
-                        shape = MaterialTheme.shapes.small,
-                        isAlpha = true,
-                        contentDescription = stringResource(R.string.action_speak),
-                        onClick = { onSpeak(title) }
-                    )
-                    CustomFilledIconButton(
-                        icon = R.drawable.icon_copy,
-                        shape = MaterialTheme.shapes.small,
-                        isAlpha = true,
-                        contentDescription = stringResource(R.string.action_copy),
-                        onClick = { onCopy(title) }
-                    )
-                    onBookmark?.let {
-                        CustomFilledIconButton(
-                            icon = R.drawable.icon_bookmark_filled,
-                            shape = MaterialTheme.shapes.small,
-                            isAlpha = true,
-                            contentDescription = stringResource(R.string.bookmark_remove),
-                            onClick = onBookmark
-                        )
-                    }
-                }
+                CardActions(
+                    title = title,
+                    onSpeak = onSpeak,
+                    onCopy = onCopy,
+                    onBookmark = onBookmark
+                )
             }
 
             AnimatedVisibility(visible = isExpanded) {
                 Column(
-                    modifier = Modifier.padding(top = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.padding(top = 12.adp),
+                    verticalArrangement = Arrangement.spacedBy(8.adp)
                 ) {
                     expandedContent()
                 }
@@ -113,6 +93,40 @@ fun ExpandableCard(
                     onExpandChange?.invoke(newExpanded)
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CardActions(
+    title: String,
+    onSpeak: (String) -> Unit,
+    onCopy: (String) -> Unit,
+    onBookmark: (() -> Unit)?
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.adp)) {
+        CustomFilledIconButton(
+            icon = R.drawable.icon_sound,
+            shape = MaterialTheme.shapes.small,
+            isAlpha = true,
+            contentDescription = stringResource(R.string.action_speak),
+            onClick = { onSpeak(title) }
+        )
+        CustomFilledIconButton(
+            icon = R.drawable.icon_copy,
+            shape = MaterialTheme.shapes.small,
+            isAlpha = true,
+            contentDescription = stringResource(R.string.action_copy),
+            onClick = { onCopy(title) }
+        )
+        onBookmark?.let {
+            CustomFilledIconButton(
+                icon = R.drawable.icon_bookmark_filled,
+                shape = MaterialTheme.shapes.small,
+                isAlpha = true,
+                contentDescription = stringResource(R.string.bookmark_remove),
+                onClick = onBookmark
             )
         }
     }

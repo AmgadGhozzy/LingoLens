@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.utils.cropImage
 
@@ -49,13 +48,29 @@ fun ImageCropper(
     var dragHandle by remember { mutableStateOf<DragHandle?>(null) }
 
     val density = LocalDensity.current
-    val visualProps = remember(density) {
-        VisualProperties(handleRadius = with(density) { 8.dp.toPx() },
-            handleLength = with(density) { 56.dp.toPx() },
-            handleThickness = with(density) { 6.dp.toPx() },
-            touchArea = with(density) { 100.dp.toPx() },
-            strokeWidth = with(density) { 4.dp.toPx() },
-            minCropSize = with(density) { 80.dp.toPx() })
+    val handleRadiusDp = 8.adp
+    val handleLengthDp = 56.adp
+    val handleThicknessDp = 6.adp
+    val touchAreaDp = 100.adp
+    val strokeWidthDp = 4.adp
+    val minCropSizeDp = 80.adp
+
+    val visualProps = remember(
+        density,
+        handleRadiusDp,
+        handleLengthDp,
+        handleThicknessDp,
+        touchAreaDp,
+        strokeWidthDp,
+        minCropSizeDp
+    ) {
+        VisualProperties(
+            handleRadius = with(density) { handleRadiusDp.toPx() },
+            handleLength = with(density) { handleLengthDp.toPx() },
+            handleThickness = with(density) { handleThicknessDp.toPx() },
+            touchArea = with(density) { touchAreaDp.toPx() },
+            strokeWidth = with(density) { strokeWidthDp.toPx() },
+            minCropSize = with(density) { minCropSizeDp.toPx() })
     }
 
     LaunchedEffect(imageSize) {
@@ -75,29 +90,30 @@ fun ImageCropper(
             .systemBarsPadding()
             .background(MaterialTheme.colorScheme.scrim), contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier
-            .wrapContentSize()
-            .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height)
-            .onSizeChanged { imageSize = it }
-            .pointerInput(Unit) {
-                detectDragGestures(onDragStart = { offset ->
-                    cropRect?.let { rect ->
-                        dragHandle = DragHandle.fromOffset(offset, rect, visualProps)
+        Canvas(
+            modifier = Modifier
+                .wrapContentSize()
+                .aspectRatio(imageBitmap.width.toFloat() / imageBitmap.height)
+                .onSizeChanged { imageSize = it }
+                .pointerInput(Unit) {
+                    detectDragGestures(onDragStart = { offset ->
+                        cropRect?.let { rect ->
+                            dragHandle = DragHandle.fromOffset(offset, rect, visualProps)
 
-                        // If not on a handle and not in the crop rect, set to MOVE
-                        if (dragHandle == null && offset !in rect) {
-                            dragHandle = DragHandle.MOVE
+                            // If not on a handle and not in the crop rect, set to MOVE
+                            if (dragHandle == null && offset !in rect) {
+                                dragHandle = DragHandle.MOVE
+                            }
                         }
-                    }
-                }, onDrag = { change, dragAmount ->
-                    cropRect = cropRect?.let { rect ->
-                        updateCropRect(
-                            rect, dragHandle, dragAmount, imageSize, visualProps.minCropSize
-                        )
-                    }
-                    change.consume()
-                }, onDragEnd = { dragHandle = null })
-            }) {
+                    }, onDrag = { change, dragAmount ->
+                        cropRect = cropRect?.let { rect ->
+                            updateCropRect(
+                                rect, dragHandle, dragAmount, imageSize, visualProps.minCropSize
+                            )
+                        }
+                        change.consume()
+                    }, onDragEnd = { dragHandle = null })
+                }) {
             drawImage(imageBitmap, dstSize = imageSize)
             cropRect?.let { rect ->
                 drawCropOverlay(rect, Color.White, Color.Black.copy(0.5f), visualProps)
@@ -108,7 +124,7 @@ fun ImageCropper(
             FloatingActionButton(
                 onClick = { cropImage(imageBitmap, rect).let(onImageCropped) },
                 modifier = Modifier
-                    .padding(end = 32.dp, bottom = 48.dp)
+                    .padding(end = 32.adp, bottom = 48.adp)
                     .align(Alignment.BottomEnd),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -303,6 +319,7 @@ private enum class DragHandle {
 @Preview()
 @Composable
 fun PreviewImageCropper() {
-    ImageCropper(imageBitmap = ImageBitmap.imageResource(id = R.drawable.ocr_test_image),
+    ImageCropper(
+        imageBitmap = ImageBitmap.imageResource(id = R.drawable.ocr_test_image),
         onImageCropped = {})
 }
