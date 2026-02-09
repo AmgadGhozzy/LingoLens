@@ -15,8 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.bars.ActionButtons
+import com.venom.ui.components.common.adp
 
 @Composable
 fun ExampleRow(
@@ -32,8 +32,8 @@ fun ExampleRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(start = 16.adp),
+        verticalArrangement = Arrangement.spacedBy(8.adp)
     ) {
         SelectionContainer {
             Text(text = "\"$text\"",

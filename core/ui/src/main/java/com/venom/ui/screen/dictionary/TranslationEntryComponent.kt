@@ -12,9 +12,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DictionaryEntry
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.items.WordChip
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -26,7 +26,7 @@ fun  TranslationEntryComponent(
     onSpeak: (String) -> Unit,
     toggleShowAll: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.adp)) {
         Text(
             text = entry.pos.replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium,
@@ -38,8 +38,8 @@ fun  TranslationEntryComponent(
         )
 
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             val visibleTerms = if (showAll) entry.terms else entry.terms.take(8)
             visibleTerms.forEach { term ->

@@ -9,20 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.Definition
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.items.WordChip
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
-import com.venom.ui.theme.BrandColors
-
-
-private val DEFINITION_GRADIENT_COLORS = listOf(
-    BrandColors.Blue500,
-    BrandColors.Purple600,
-    BrandColors.Cyan500
-)
 
 @Composable
 fun DefinitionsCard(
@@ -31,18 +23,17 @@ fun DefinitionsCard(
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    isSpeaking: Boolean = false
+    isSpeakingText: (String) -> Boolean = { false }
 ) {
     var showAll by rememberSaveable { mutableStateOf(false) }
 
     GradientGlassCard(
         thickness = GlassThickness.UltraThin,
-        gradientColors = DEFINITION_GRADIENT_COLORS,
         gradientAlpha = 0.1f,
-        contentPadding = 16.dp
+        contentPadding = 16.adp
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.adp)
         ) {
             SectionHeader(title = stringResource(id = R.string.definitions))
 
@@ -56,7 +47,7 @@ fun DefinitionsCard(
                         onSpeak = onSpeak,
                         onCopy = onCopy,
                         onShare = onShare,
-                        isSpeaking = isSpeaking
+                        isSpeakingText = isSpeakingText
                     )
                 }
             }

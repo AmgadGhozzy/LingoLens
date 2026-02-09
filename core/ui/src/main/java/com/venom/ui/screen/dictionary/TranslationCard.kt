@@ -19,10 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.TranslationResult
 import com.venom.resources.R
 import com.venom.ui.components.common.ExpandableCard
+import com.venom.ui.components.common.adp
 
 @Composable
 fun TranslationCard(
@@ -41,10 +41,10 @@ fun TranslationCard(
         modifier = modifier,
         expandedContent = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.adp)
             ) {
                 // Source text with transliteration
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.adp)) {
                     Text(
                         text = sentence.original,
                         style = MaterialTheme.typography.titleMedium,
@@ -64,12 +64,12 @@ fun TranslationCard(
                 }
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    modifier = Modifier.padding(vertical = 8.adp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f)
                 )
 
                 if (translationResponse.alternatives.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.adp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -95,8 +95,8 @@ fun TranslationCard(
 
                         AnimatedVisibility(visible = showAlternatives) {
                             Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                                modifier = Modifier.padding(start = 8.dp)
+                                verticalArrangement = Arrangement.spacedBy(4.adp),
+                                modifier = Modifier.padding(start = 8.adp)
                             ) {
                                 translationResponse.alternatives.take(5).forEach { alt ->
                                     Text(

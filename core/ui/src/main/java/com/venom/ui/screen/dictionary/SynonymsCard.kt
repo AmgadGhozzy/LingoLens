@@ -19,19 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.Synset
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.items.WordChip
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
-import com.venom.ui.theme.BrandColors
-
-private val SYNONYMS_GRADIENT_COLORS = listOf(
-    BrandColors.Blue500,
-    BrandColors.Purple600,
-    BrandColors.Cyan500
-)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -43,12 +36,11 @@ fun SynonymsCard(
 
     GradientGlassCard(
         thickness = GlassThickness.UltraThin,
-        gradientColors = SYNONYMS_GRADIENT_COLORS,
         gradientAlpha = 0.1f,
-        contentPadding = 16.dp
+        contentPadding = 16.adp
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.adp)
         ) {
             SectionHeader(title = stringResource(id = R.string.synonyms))
 
@@ -82,7 +74,7 @@ private fun SynsetSection(
 
     val visibleSynonyms = if (showAll) synonyms else synonyms.take(15)
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.adp)) {
         Text(
             text = synset.pos.replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium,
@@ -94,8 +86,8 @@ private fun SynsetSection(
         )
 
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             visibleSynonyms.forEach { synonym ->
                 key(synonym) {

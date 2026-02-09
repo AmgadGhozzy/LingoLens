@@ -10,8 +10,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DefinitionEntry
+import com.venom.ui.components.common.adp
 
 @Composable
 fun DefinitionEntry(
@@ -20,7 +20,7 @@ fun DefinitionEntry(
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    isSpeaking: Boolean = false,
+    isSpeakingText: (String) -> Boolean = { false },
     modifier: Modifier = Modifier
 ) {
     val customTextSelectionColors = TextSelectionColors(
@@ -32,8 +32,8 @@ fun DefinitionEntry(
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(horizontal = 16.adp, vertical = 8.adp),
+            verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             GlossRow(
                 text = entry.gloss,
@@ -41,7 +41,7 @@ fun DefinitionEntry(
                 onSpeak = onSpeak,
                 onCopy = onCopy,
                 onShare = onShare,
-                isSpeaking = isSpeaking,
+                isSpeaking = isSpeakingText(entry.gloss),
             )
 
             entry.example?.let { example ->
@@ -51,7 +51,7 @@ fun DefinitionEntry(
                     onSpeak = onSpeak,
                     onCopy = onCopy,
                     onShare = onShare,
-                    isSpeaking = isSpeaking
+                    isSpeaking = isSpeakingText(example)
                 )
             }
         }

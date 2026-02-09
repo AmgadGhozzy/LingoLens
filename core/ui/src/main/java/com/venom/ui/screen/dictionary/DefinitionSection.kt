@@ -17,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.Definition
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.items.WordChip
 
 @Composable
@@ -29,14 +29,14 @@ fun DefinitionSection(
     onSpeak: (String) -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
-    isSpeaking: Boolean = false,
+    isSpeakingText: (String) -> Boolean = { false },
     modifier: Modifier = Modifier
 ) {
     var showAll by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.adp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -62,7 +62,7 @@ fun DefinitionSection(
                 onSpeak = onSpeak,
                 onCopy = onCopy,
                 onShare = onShare,
-                isSpeaking = isSpeaking
+                isSpeakingText = isSpeakingText
             )
         }
 

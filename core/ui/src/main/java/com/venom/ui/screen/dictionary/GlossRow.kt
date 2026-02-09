@@ -14,8 +14,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.bars.ActionButtons
+import com.venom.ui.components.common.adp
 
 @Composable
 fun GlossRow(
@@ -30,7 +30,7 @@ fun GlossRow(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.adp)
     ) {
         SelectionContainer {
             Text(

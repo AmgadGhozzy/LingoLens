@@ -13,17 +13,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.DictionaryEntry
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassThickness
 import com.venom.ui.components.other.GradientGlassCard
-import com.venom.ui.theme.BrandColors
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TranslationsCard(
+    modifier: Modifier = Modifier,
     translations: List<DictionaryEntry>,
     onWordClick: (String) -> Unit,
     onSpeak: (String) -> Unit,
@@ -32,18 +32,14 @@ fun TranslationsCard(
     var showAll by remember { mutableStateOf(false) }
 
     GradientGlassCard(
+        modifier = modifier,
         thickness = GlassThickness.UltraThin,
-        gradientColors = listOf(
-            BrandColors.Blue500,
-            BrandColors.Purple600,
-            BrandColors.Cyan500
-        ),
         gradientAlpha = 0.1f,
-        contentPadding = 12.dp
-    ){
-        Box(modifier = Modifier.padding(12.dp)) {
+        contentPadding = 24.adp
+    ) {
+        Box {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.adp)
             ) {
                 SectionHeader(title = stringResource(id = R.string.translations))
 
@@ -58,15 +54,15 @@ fun TranslationsCard(
                     )
                 }
             }
-
             onExpand?.let {
                 CustomButton(
                     icon = R.drawable.icon_fullscreen,
                     onClick = it,
                     contentDescription = stringResource(R.string.action_expand),
+                    showBorder = false,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 8.dp)
+                        .padding(top = 8.adp)
                 )
             }
         }
