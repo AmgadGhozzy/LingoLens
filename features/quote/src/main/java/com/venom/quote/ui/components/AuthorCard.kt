@@ -37,7 +37,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -70,6 +69,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.venom.domain.model.Author
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import kotlinx.coroutines.delay
@@ -265,25 +265,13 @@ fun AuthorInfoDialog(
                                 fontWeight = FontWeight.Bold
                             )
 
-                            IconButton(
+                            CloseButton(
                                 onClick = {
                                     isVisible = false
                                     onClose()
                                 },
-                                modifier = Modifier
-                                    .size(40.adp)
-                                    .background(
-                                        colorScheme.surfaceContainerHighest,
-                                        CircleShape
-                                    )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(id = R.string.close_dialog),
-                                    tint = colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(20.adp)
-                                )
-                            }
+                                size = 40.adp
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(24.adp))

@@ -76,6 +76,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.venom.domain.model.Author
 import com.venom.domain.model.Tag
 import com.venom.resources.R
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.theme.lingoLens
@@ -187,22 +188,10 @@ fun FilterDialog(
                                     color = colorScheme.onSurface
                                 )
 
-                                IconButton(
+                                CloseButton(
                                     onClick = onDismiss,
-                                    modifier = Modifier
-                                        .size(40.adp)
-                                        .background(
-                                            colorScheme.surfaceContainerHighest,
-                                            CircleShape
-                                        )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = stringResource(id = R.string.action_close),
-                                        tint = colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(20.adp)
-                                    )
-                                }
+                                    size = 40.adp
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(24.adp))
