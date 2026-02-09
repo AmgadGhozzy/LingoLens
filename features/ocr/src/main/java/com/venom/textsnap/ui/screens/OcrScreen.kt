@@ -57,7 +57,7 @@ fun OcrScreen(
     }
 
     DisposableEffect(Unit) {
-        onDispose { ttsViewModel.stopSpeaking() }
+        onDispose { ttsViewModel.stop() }
     }
 
     BottomSheetScaffold(
@@ -102,7 +102,7 @@ fun OcrScreen(
                 sheetState = sheetState,
                 onCopy = { text -> context.copyToClipboard(text) },
                 onShare = { text -> context.shareText(text) },
-                onSpeak = { text -> ttsViewModel.speak(text) },
+                onSpeak = { text -> ttsViewModel.toggle(text) },
                 onTranslate = onNavigateToTranslation
             )
         }
