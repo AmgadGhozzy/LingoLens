@@ -12,7 +12,8 @@ enum class FontStyles(val title: String) {
     CAVEAT("Caveat"),
     ROBOTO("Roboto"),
     QUICKSAND("Quicksand"),
-    JOSEFIN_SANS("Josefin Sans")
+    JOSEFIN_SANS("Josefin Sans"),
+    PLAYPEN_SANS("Playpen Sans")
 }
 
 data class MultilingualFontConfig(
