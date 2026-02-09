@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 data class OrbConfig(
     val size: Dp,
@@ -115,7 +116,7 @@ fun FloatingOrbs(
                     .align(orb.alignment)
                     .offset(
                         x = orb.offsetX,
-                        y = orb.offsetY + dynamicOffsetY.dp
+                        y = orb.offsetY + dynamicOffsetY.adp
                     )
                     .size(orb.size)
                     .scale(scaleValue)
@@ -135,41 +136,42 @@ fun FloatingOrbs(
     }
 }
 
+@Composable
 private fun getDefaultOrbs(primaryColor: Color, secondaryColor: Color): List<OrbConfig> {
     return listOf(
         OrbConfig(
-            size = 320.dp,
+            size = 320.adp,
             color = primaryColor,
             alignment = Alignment.TopStart,
-            offsetX = (-120).dp,
-            offsetY = (-100).dp,
+            offsetX = (-120).adp,
+            offsetY = (-100).adp,
             scaleMultiplier = 1f,
             alphaMultiplier = 0.5f
         ),
         OrbConfig(
-            size = 280.dp,
+            size = 280.adp,
             color = secondaryColor,
             alignment = Alignment.CenterEnd,
-            offsetX = 60.dp,
-            offsetY = 0.dp,
+            offsetX = 60.adp,
+            offsetY = 0.adp,
             scaleMultiplier = 1f,
             alphaMultiplier = 0.4f
         ),
         OrbConfig(
-            size = 240.dp,
+            size = 240.adp,
             color = primaryColor,
             alignment = Alignment.BottomStart,
-            offsetX = (-60).dp,
-            offsetY = 100.dp,
+            offsetX = (-60).adp,
+            offsetY = 100.adp,
             scaleMultiplier = 1f,
             alphaMultiplier = 0.2f
         ),
         OrbConfig(
-            size = 160.dp,
+            size = 160.adp,
             color = primaryColor,
             alignment = Alignment.TopEnd,
-            offsetX = 40.dp,
-            offsetY = 120.dp,
+            offsetX = 40.adp,
+            offsetY = 120.adp,
             scaleMultiplier = 0.6f,
             alphaMultiplier = 0.1f
         )
