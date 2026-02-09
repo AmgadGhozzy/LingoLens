@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,16 +26,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
-import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.CloseButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScaffold(
     @StringRes title: Int = R.string.settings,
     onDismiss: () -> Unit,
-    contentPadding: PaddingValues = PaddingValues(16.dp),
+    contentPadding: PaddingValues = PaddingValues(16.adp, 16.adp, 16.adp, 96.adp),
     content: LazyListScope.() -> Unit
 ) {
     val titleText = stringResource(title)
@@ -54,9 +50,9 @@ fun SettingsScaffold(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
-                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-                    .padding(horizontal = 16.dp),
+                    .height(48.adp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                    .padding(horizontal = 16.adp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -72,16 +68,9 @@ fun SettingsScaffold(
                     }
                 )
 
-                CustomFilledIconButton(
-                    icon = Icons.Rounded.Close,
-                    modifier = Modifier.align(Alignment.CenterEnd),
+                CloseButton(
                     onClick = onDismiss,
-                    contentDescription = stringResource(R.string.action_close),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.3f),
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                    size = 38.dp
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 )
             }
         }
@@ -89,10 +78,10 @@ fun SettingsScaffold(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow)
                 .animateContentSize(),
             contentPadding = contentPadding,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.adp),
             content = content
         )
     }
