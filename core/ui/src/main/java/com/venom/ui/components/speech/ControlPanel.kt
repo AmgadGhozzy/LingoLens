@@ -20,10 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.SpeechState
 import com.venom.resources.R
 import com.venom.ui.components.common.AnimatedControls
+import com.venom.ui.components.common.adp
 
 @Composable
 fun ControlPanel(
@@ -36,7 +36,7 @@ fun ControlPanel(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = 8.adp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -49,7 +49,7 @@ fun ControlPanel(
                     ) {
                         Icon(Icons.Rounded.Pause, stringResource(R.string.action_pause))
                     }
-                    Spacer(modifier = Modifier.width(20.dp))
+                    Spacer(modifier = Modifier.width(20.adp))
                     FloatingActionButton(
                         onClick = onStop, containerColor = MaterialTheme.colorScheme.error
                     ) {
@@ -65,7 +65,7 @@ fun ControlPanel(
                     ) {
                         Icon(Icons.Rounded.PlayArrow, stringResource(R.string.action_resume))
                     }
-                    Spacer(modifier = Modifier.width(20.dp))
+                    Spacer(modifier = Modifier.width(20.adp))
                     FloatingActionButton(
                         onClick = onStop, containerColor = MaterialTheme.colorScheme.error
                     ) {
@@ -78,12 +78,12 @@ fun ControlPanel(
                 FloatingActionButton(
                     onClick = onStart,
                     containerColor = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(64.adp)
                 ) {
                     Icon(
                         Icons.Rounded.Mic,
                         stringResource(R.string.action_speak),
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(28.adp)
                     )
                 }
             }
@@ -94,7 +94,8 @@ fun ControlPanel(
 @Preview
 @Composable
 fun ControlPanelPreview() {
-    ControlPanel(state = SpeechState.Listening,
+    ControlPanel(
+        state = SpeechState.Listening,
         onStop = {},
         onStart = {},
         onPause = {},

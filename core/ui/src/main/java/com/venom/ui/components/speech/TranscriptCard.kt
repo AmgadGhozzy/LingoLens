@@ -11,18 +11,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 @Composable
 fun TranscriptCard(text: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(20.adp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(16.adp), verticalArrangement = Arrangement.spacedBy(8.adp)
         ) {
             Text(
                 text = stringResource(R.string.transcript_label),

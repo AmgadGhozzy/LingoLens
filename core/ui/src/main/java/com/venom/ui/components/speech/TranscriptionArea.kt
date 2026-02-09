@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.data.mapper.toErrorMessage
 import com.venom.domain.model.SpeechState
 import com.venom.ui.components.common.ErrorMessage
+import com.venom.ui.components.common.adp
 
 @Composable
 fun TranscriptionArea(
@@ -28,8 +28,8 @@ fun TranscriptionArea(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(vertical = 8.adp),
+        verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         // Current recognition
         AnimatedContent(
@@ -40,7 +40,7 @@ fun TranscriptionArea(
             }, label = "Speech Transition"
         ) { currentState ->
             when (currentState) {
-                is SpeechState.Idle -> Spacer(modifier = Modifier.height(56.dp))
+                is SpeechState.Idle -> Spacer(modifier = Modifier.height(56.adp))
                 is SpeechState.Partial -> RecognitionBubble(
                     text = currentState.text,
                     isPartial = true
@@ -56,7 +56,7 @@ fun TranscriptionArea(
                 )
 
                 is SpeechState.Listening,
-                is SpeechState.Paused -> Spacer(modifier = Modifier.height(56.dp))
+                is SpeechState.Paused -> Spacer(modifier = Modifier.height(56.adp))
             }
         }
 

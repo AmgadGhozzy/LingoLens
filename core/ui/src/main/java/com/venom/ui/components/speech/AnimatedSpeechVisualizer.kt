@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCancellationBehavior
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -19,6 +18,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.SpeechState
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
 
 @Composable
 fun AnimatedSpeechVisualizer(state: SpeechState) {
@@ -35,7 +35,7 @@ fun AnimatedSpeechVisualizer(state: SpeechState) {
 
     Box(
         modifier = Modifier
-            .size(160.dp)
+            .size(160.adp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
@@ -43,7 +43,7 @@ fun AnimatedSpeechVisualizer(state: SpeechState) {
         LottieAnimation(
             composition = composition,
             progress = { animationProgress },
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(100.adp)
         )
     }
 }

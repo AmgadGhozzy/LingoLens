@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,9 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.common.PulseAnimation
+import com.venom.ui.components.common.adp
 
 @Composable
 fun RecognitionBubble(
@@ -28,17 +27,17 @@ fun RecognitionBubble(
             MaterialTheme.colorScheme.primaryContainer
         else
             MaterialTheme.colorScheme.primary,
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(20.adp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.adp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.adp)
         ) {
             if (isPartial) {
                 PulseAnimation(
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(16.adp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
