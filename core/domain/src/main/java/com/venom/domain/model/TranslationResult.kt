@@ -1,5 +1,8 @@
 package com.venom.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class TranslationResult(
     val id: Long = 0,
     val sourceText: String = "",
@@ -25,6 +28,7 @@ data class TranslationResult(
     val posTerms: Map<String, List<String>> = emptyMap()
 ) : IHistoryEntry
 
+@Immutable
 data class TranslationSentence(
     val original: String,
     val translated: String,
