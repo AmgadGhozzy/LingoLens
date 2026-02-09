@@ -27,11 +27,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
 import com.venom.ui.components.common.ActionItem
-import com.venom.ui.theme.ThemeColors.GlassPrimary
-import com.venom.ui.theme.ThemeColors.GlassSecondary
-import com.venom.ui.theme.ThemeColors.GlassTertiary
+import com.venom.ui.components.common.adp
 
 @Composable
 fun AnimatedDropdownMenu(
@@ -39,14 +36,15 @@ fun AnimatedDropdownMenu(
     onDismissRequest: () -> Unit,
     options: List<ActionItem.Action>,
     modifier: Modifier = Modifier,
-    offset: DpOffset = DpOffset(x = 0.dp, y = 8.dp),
-    shape: Shape = RoundedCornerShape(12.dp),
-    customContent: (@Composable (index: Int, action: ActionItem.Action) -> Unit)? = null
+    offset: DpOffset = DpOffset(0.adp, 8.adp),
+    shape: Shape = RoundedCornerShape(12.adp),
+    customContent: (@Composable (Int, ActionItem.Action) -> Unit)? = null
 ) {
-    val rollAnimation by animateFloatAsState(
+    val progress by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
-        animationSpec = tween(durationMillis = 600)
+        animationSpec = tween(400)
     )
+    val colors = MaterialTheme.colorScheme
 
     DropdownMenu(
         expanded = expanded,
@@ -55,77 +53,65 @@ fun AnimatedDropdownMenu(
         shape = shape,
         modifier = modifier
             .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        GlassPrimary.copy(0.15f),
-                        GlassSecondary.copy(0.12f),
-                        GlassTertiary.copy(0.09f)
+                Brush.linearGradient(
+                    listOf(
+                        colors.primary.copy(0.05f),
+                        colors.secondary.copy(0.05f),
+                        colors.tertiary.copy(0.05f)
                     )
                 ), shape
             )
-            .alpha(rollAnimation)
-            .graphicsLayer(
-                scaleY = rollAnimation,
+            .alpha(progress)
+            .graphicsLayer {
+                scaleY = progress
                 transformOrigin = TransformOrigin(0f, 0f)
-            )
+            }
     ) {
         options.forEachIndexed { index, action ->
             DropdownMenuItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .padding(horizontal = 8.adp)
+                    .clip(RoundedCornerShape(12.adp)),
                 onClick = {
                     action.onClick()
                     onDismissRequest()
                 },
                 text = {
-                    if (customContent != null) {
-                        customContent(index, action)
-                    } else {
-                        Text(
-                            text = stringResource(action.description),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                    if (customContent != null) customContent(index, action)
+                    else Text(stringResource(action.description), style = MaterialTheme.typography.bodyMedium)
                 },
                 leadingIcon = if (customContent == null) {
-                    {
-                        when (val iconSource = action.icon) {
-                            is ImageVector -> Icon(
-                                imageVector = iconSource,
-                                contentDescription = stringResource(action.description),
-                                modifier = Modifier.padding(end = 8.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(0.8f)
-                            )
-
-                            is Int -> Icon(
-                                painter = painterResource(id = iconSource),
-                                contentDescription = stringResource(action.description),
-                                modifier = Modifier.padding(end = 8.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(0.8f)
-                            )
-                        }
-                    }
+                    { ActionIcon(action, colors.primary.copy(0.8f)) }
                 } else null
             )
 
             if (index < options.lastIndex) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                listOf(
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.outline.copy(0.2f),
-                                    Color.Transparent
-                                )
-                            )
-                        )
-                )
+                GradientDivider(colors.outline.copy(0.2f))
             }
         }
     }
+}
+
+@Composable
+private fun ActionIcon(action: ActionItem.Action, tint: Color) {
+    val desc = stringResource(action.description)
+    when (val icon = action.icon) {
+        is ImageVector -> Icon(icon, desc, tint = tint)
+        is Int -> Icon(painterResource(icon), desc, tint = tint)
+    }
+}
+
+@Composable
+private fun GradientDivider(color: Color) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(1.adp)
+            .background(
+                Brush.horizontalGradient(
+                    listOf(Color.Transparent, color, Color.Transparent)
+                )
+            )
+    )
 }

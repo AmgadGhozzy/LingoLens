@@ -1,18 +1,23 @@
 package com.venom.ui.components.menus
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.common.ActionItem
+import com.venom.ui.components.common.adp
+
+enum class ButtonType { FILLED_ICON, OUTLINED }
 
 @Composable
 fun OverflowMenu(
@@ -20,33 +25,30 @@ fun OverflowMenu(
     modifier: Modifier = Modifier,
     buttonType: ButtonType = ButtonType.FILLED_ICON
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    val desc = stringResource(R.string.action_more_options)
 
-    Box(modifier = modifier) {
+    Box(modifier) {
         when (buttonType) {
             ButtonType.FILLED_ICON -> CustomFilledIconButton(
                 icon = Icons.Rounded.MoreHoriz,
-                contentDescription = stringResource(R.string.action_more_options),
-                onClick = { isExpanded = !isExpanded },
-                iconSize = 32.dp
+                contentDescription = desc,
+                onClick = { expanded = !expanded },
+                iconSize = 32.adp
             )
-
             ButtonType.OUTLINED -> CustomButton(
                 icon = Icons.Rounded.MoreVert,
-                contentDescription = stringResource(R.string.action_more_options),
-                onClick = { isExpanded = !isExpanded },
-                iconSize = 32.dp
+                contentDescription = desc,
+                onClick = { expanded = !expanded },
+                iconSize = 32.adp,
+                showBorder = false
             )
         }
 
         AnimatedDropdownMenu(
-            expanded = isExpanded,
-            onDismissRequest = { isExpanded = false },
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
             options = options
         )
     }
-}
-
-enum class ButtonType {
-    FILLED_ICON, OUTLINED
 }
