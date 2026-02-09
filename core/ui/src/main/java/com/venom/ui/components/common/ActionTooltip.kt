@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 @Composable
@@ -39,15 +38,15 @@ fun ActionTooltip(
     ) {
         Surface(
             modifier = Modifier
-                .padding(top = 64.dp)
-                .clip(RoundedCornerShape(16.dp)),
+                .padding(top = 64.adp)
+                .clip(RoundedCornerShape(16.adp)),
             color = MaterialTheme.colorScheme.surfaceVariant,
-            shadowElevation = 4.dp
+            shadowElevation = 4.adp
         ) {
             Text(
                 text = stringResource(descriptionRes),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(12.adp)
             )
         }
     }
