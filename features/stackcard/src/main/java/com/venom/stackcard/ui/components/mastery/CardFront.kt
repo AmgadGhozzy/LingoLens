@@ -96,11 +96,6 @@ fun CardFront(
         animationSpec = tween(durationMillis = 400)
     )
 
-    // Stable lambda references
-    val speakWord = remember(word.wordEn, onSpeak) {
-        { onSpeak(word.wordEn) }
-    }
-
     GradientGlassCard(
         modifier = modifier.fillMaxWidth(),
         thickness = GlassThickness.UltraThick,
@@ -189,7 +184,7 @@ fun CardFront(
                 Box(modifier = Modifier.padding(top = 8.adp)) {
                     PhoneticButton(
                         phonetic = word.phoneticUs,
-                        onClick = speakWord
+                        wordEn = word.wordEn
                     )
                 }
             }
@@ -212,9 +207,6 @@ fun CardFront(
                         InteractiveText(
                             text = hintExample.toString(),
                             onClick = onRevealHint,
-                            onSpeak = onSpeak,
-                            speakOnTap = isHintRevealed,
-                            hapticStrength = HapticStrength.MEDIUM,
                             modifier = Modifier
                                 .blur(blurAmount.adp)
                                 .alpha(hintAlpha)
@@ -249,14 +241,10 @@ fun CardFront(
 @Composable
 private fun PhoneticButton(
     phonetic: String,
-    onClick: () -> Unit,
+    wordEn: String,
     modifier: Modifier = Modifier
 ) {
-    InteractiveText(
-        text = "",
-        onSpeak = { onClick() },
-        hapticStrength = HapticStrength.LIGHT
-    ) {
+    InteractiveText(wordEn) {
         Row(
             modifier = modifier
                 .clip(RoundedCornerShape(50))

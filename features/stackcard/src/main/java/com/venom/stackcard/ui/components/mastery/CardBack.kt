@@ -137,8 +137,7 @@ fun CardBack(
 
             // Transliteration with speaker
             TransliterationRow(
-                transliteration = word.translit,
-                onClick = speakArabic
+                transliteration = word.translit
             )
 
             // Memory hook (sticky note)
@@ -179,14 +178,9 @@ fun CardBack(
 @Composable
 private fun TransliterationRow(
     transliteration: String,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    InteractiveText(
-        text = "",
-        onSpeak = { onClick() },
-        hapticStrength = HapticStrength.LIGHT
-    ) {
+    InteractiveText(transliteration) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.adp),
@@ -303,10 +297,7 @@ private fun PinnedLanguageCard(
     modifier: Modifier = Modifier
 ) {
 
-    InteractiveText(
-        text = translation,
-        hapticStrength = HapticStrength.LIGHT
-    ) {
+    InteractiveText(translation) {
         Row(
             modifier = modifier
                 .fillMaxWidth()

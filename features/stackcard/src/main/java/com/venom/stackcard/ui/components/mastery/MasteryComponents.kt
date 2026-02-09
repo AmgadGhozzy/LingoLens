@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,11 +42,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.getFrequencyLabel
 import com.venom.resources.R
@@ -57,38 +59,23 @@ import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.getDifficultyTheme
+import com.venom.ui.viewmodel.TTSViewModel
 
-/**
- * Interactive text wrapper that handles TTS with visual feedback.
- *
- * - **Tap**: Speaks text at normal speed (1.0x)
- * - **Long press (600ms)**: Speaks text at slow speed (0.7x)
- *
- * Visual feedback includes scale animation and color change during press.
- *
- * @param text The text to speak
- * @param onSpeak Callback to trigger TTS with text and speed rate
- * @param modifier Modifier for styling
- * @param content Composable content to display
- */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InteractiveText(
     text: String,
+    modifier: Modifier = Modifier,
+    languageTag: String? = null,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    onSpeak: ((text: String) -> Unit)? = null,
-    speakOnTap: Boolean = true,
-    hapticStrength: HapticStrength = HapticStrength.LIGHT,
     content: @Composable () -> Unit
 ) {
+    val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
     val haptic = rememberHapticFeedback()
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressing by interactionSource.collectIsPressedAsState()
-
+    val isPressed by interactionSource.collectIsPressedAsState()
     val scale by animateFloatAsState(
-        targetValue = if (isPressing) 0.97f else 1f,
+        targetValue = if (isPressed) 0.97f else 1f,
         animationSpec = tween(150)
     )
 
@@ -99,15 +86,13 @@ fun InteractiveText(
                 interactionSource = interactionSource,
                 indication = null,
                 onClick = {
-                    if (speakOnTap) {
-                        haptic(hapticStrength)
-                        onSpeak?.invoke(text)
-                    }
+                    haptic(HapticStrength.LIGHT)
+                    ttsViewModel.toggle(text, languageTag)
                     onClick()
                 },
                 onLongClick = {
-                    haptic(hapticStrength)
-                    onSpeak?.invoke(text)
+                    haptic(HapticStrength.LIGHT)
+                    ttsViewModel.speakSlow(text, languageTag)
                     onLongClick()
                 }
             )
@@ -208,7 +193,7 @@ fun BookmarkButton(
             onToggle()
         },
         modifier = modifier
-            .size(32.adp)
+            .size(40.adp)
             .background(backgroundColor, CircleShape)  // Apply shape here
             .border(1.adp, borderColor, CircleShape)
             .clip(CircleShape)  // Clip last to ensure everything is circular
@@ -221,7 +206,7 @@ fun BookmarkButton(
                 id = if (isBookmarked) R.string.mastery_bookmark_remove else R.string.mastery_bookmark_add
             ),
             tint = iconTint,
-            modifier = Modifier.size(20.adp)
+            modifier = Modifier.size(24.adp)
         )
     }
 }
@@ -569,7 +554,6 @@ private fun InteractiveTextPreview() {
     LingoLensTheme {
         InteractiveText(
             text = "Hello World",
-            onSpeak = { _ -> },
             modifier = Modifier.padding(16.adp)
         ) {
             Text(
