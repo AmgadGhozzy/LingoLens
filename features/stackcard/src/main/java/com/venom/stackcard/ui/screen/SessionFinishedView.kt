@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -81,7 +81,7 @@ fun SessionFinishedView(
         ConfettiView()
 
         CustomFilledIconButton(
-            icon = Icons.Rounded.Close,
+            icon = Icons.Rounded.ArrowForwardIos,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(20.adp),

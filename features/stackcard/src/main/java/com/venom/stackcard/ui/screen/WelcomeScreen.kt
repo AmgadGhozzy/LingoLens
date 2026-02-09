@@ -41,12 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -151,7 +153,10 @@ fun WelcomeScreen(
                             LottieCompositionSpec.RawRes(R.raw.dot_loading)
                         ).value,
                         iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.fillMaxWidth(0.35f),
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth(0.35f)
+                            .blur(0.5.adp),
                         speed = 0.8f
                     )
                 } else {
@@ -490,7 +495,7 @@ private fun AppTitle() {
 @Composable
 private fun WelcomeScreenPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
-        WelcomeScreen(isSignedIn = false)
+        WelcomeScreen(isSignedIn = false,isLoading = true)
     }
 }
 

@@ -20,11 +20,13 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.venom.lingospell.presentation.SpellingGameScreen
 import com.venom.stackcard.ui.components.flashcard.CardSwiperStack
 import com.venom.stackcard.ui.components.insights.InsightsSheet
@@ -37,6 +39,7 @@ import com.venom.stackcard.ui.viewmodel.WordMasteryUiState
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
+import com.venom.ui.viewmodel.TTSViewModel
 
 @Composable
 fun WordMasteryScreen(
@@ -112,6 +115,8 @@ private fun MasteryContent(
 ) {
     val haptic = rememberHapticFeedback()
     val currentHaptic by rememberUpdatedState(haptic)
+    val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -134,7 +139,7 @@ private fun MasteryContent(
             ) {
                 CardSwiperStack(
                     viewModel = viewModel,
-                    onSpeak = {},
+                    onSpeak = ttsViewModel::toggle,
                     onFlip = {
                         currentHaptic(HapticStrength.LIGHT)
                     },
@@ -167,8 +172,7 @@ private fun MasteryContent(
             onClose = { onEvent(WordMasteryEvent.CloseSheet) },
             onTabChange = { tab -> onEvent(WordMasteryEvent.ChangeTab(tab)) },
             onPinLanguage = { lang -> onEvent(WordMasteryEvent.PinLanguage(lang)) },
-            onTogglePowerTip = { onEvent(WordMasteryEvent.TogglePowerTip) },
-            onSpeak = {}
+            onTogglePowerTip = { onEvent(WordMasteryEvent.TogglePowerTip) }
         )
 
         if (uiState.isPracticeMode && uiState.currentWord != null) {
