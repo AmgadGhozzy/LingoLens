@@ -77,7 +77,7 @@ class EnrichmentRepositoryImpl @Inject constructor(
                 )
 
                 val response = geminiService.generate(
-                    model = GeminiService.FLASH_MODEL,
+                    model = GeminiService.FLASH_MODEL_3,
                     apiKey = BuildConfig.GEMINI_API_KEY,
                     request = request
                 )
@@ -127,7 +127,7 @@ class EnrichmentRepositoryImpl @Inject constructor(
                 )
 
                 val response = geminiService.generate(
-                    model = GeminiService.FLASH_MODEL,
+                    model = GeminiService.FLASH_MODEL_3,
                     apiKey = BuildConfig.GEMINI_API_KEY,
                     request = request
                 )
