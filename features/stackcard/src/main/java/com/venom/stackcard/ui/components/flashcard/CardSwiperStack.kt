@@ -48,9 +48,13 @@ fun CardSwiperStack(
     }
 
     // Reset animation when top card changes — single source of truth
-    val topCardId = state.visibleCards.firstOrNull()?.wordEn
-    LaunchedEffect(topCardId) {
+    val topCard = state.visibleCards.firstOrNull()
+    LaunchedEffect(topCard) {
         cardAnimState.resetImmediate()
+        // Automatically speak word
+        topCard?.let { word ->
+            onSpeak(word.wordEn)
+        }
     }
 
     // Limit visible cards for performance
