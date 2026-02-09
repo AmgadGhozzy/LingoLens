@@ -1,12 +1,12 @@
 package com.venom.ui.components.inputs
 
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 
 /**
  * A customizable text field supporting multiple languages and text directions
@@ -35,9 +35,9 @@ fun CustomTextField(
     maxLines: Int = 12,
     minLines: Int = 1,
     minFontSize: Int = 16,
-    maxFontSize: Int = 24,
-    minHeight: Dp = 56.dp,
-    maxHeight: Dp = 160.dp,
+    maxFontSize: Int = 32,
+    minHeight: Dp = 56.adp,
+    maxHeight: Dp = 160.adp,
     modifier: Modifier = Modifier
 ) {
     DynamicTextField(

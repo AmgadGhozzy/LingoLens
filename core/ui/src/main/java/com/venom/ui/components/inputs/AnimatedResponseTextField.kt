@@ -1,10 +1,15 @@
 package com.venom.ui.components.inputs
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.venom.ui.components.common.adp
 import kotlinx.coroutines.delay
 
 /**
@@ -34,8 +39,8 @@ fun AnimatedResponseTextField(
     minLines: Int = 1,
     minFontSize: Int = 16,
     maxFontSize: Int = 24,
-    minHeight: Dp = 56.dp,
-    maxHeight: Dp = 160.dp,
+    minHeight: Dp = 56.adp,
+    maxHeight: Dp = 160.adp,
     modifier: Modifier = Modifier,
     onTypingComplete: () -> Unit = {}
 ) {

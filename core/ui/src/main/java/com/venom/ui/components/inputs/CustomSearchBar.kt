@@ -24,9 +24,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CustomButton
+import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.GlassCard
 
 /**
@@ -51,16 +51,19 @@ fun CustomSearchBar(
     enabled: Boolean = true,
     searchIconTint: Color = MaterialTheme.colorScheme.primary,
     clearIconTint: Color = MaterialTheme.colorScheme.error,
-    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
-    contentPadding: PaddingValues = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+    shape: RoundedCornerShape = RoundedCornerShape(16.adp),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 6.adp, vertical = 4.adp),
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    GlassCard(modifier = modifier, padding = 8.dp, shape = shape) {
+    GlassCard(
+        modifier = modifier.padding(8.adp),
+        shape = shape
+    ) {
         Row(
             modifier = Modifier.padding(contentPadding),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.adp)
         ) {
             CustomButton(
                 icon = R.drawable.icon_search,
@@ -116,7 +119,7 @@ fun CustomSearchBar(
                         keyboardController?.hide()
                     },
                     showBorder = false,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(32.adp)
                 )
             }
         }
@@ -131,7 +134,7 @@ fun SearchBarPreview() {
             searchQuery = "",
             onSearchQueryChanged = {},
             searchHint = "Search here...",
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.adp)
         )
     }
 }

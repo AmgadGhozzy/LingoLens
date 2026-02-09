@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.utils.getTextDirection
 
 /**
@@ -45,12 +45,12 @@ fun DynamicTextField(
     minLines: Int = 1,
     minFontSize: Int = 16,
     maxFontSize: Int = 24,
-    minHeight: Dp = 56.dp,
-    maxHeight: Dp = 160.dp,
+    minHeight: Dp = 56.adp,
+    maxHeight: Dp = 160.adp,
     modifier: Modifier = Modifier
 ) {
     val scrollState = remember { ScrollState(0) }
-    val dynamicFontSize = (maxFontSize - (value.length / 40)).coerceAtLeast(minFontSize).sp
+    val dynamicFontSize = (maxFontSize - (value.length / 40)).coerceAtLeast(minFontSize).asp
 
     LaunchedEffect(value) {
         scrollState.scrollTo(scrollState.maxValue)
@@ -61,13 +61,13 @@ fun DynamicTextField(
         fontSize = dynamicFontSize,
         textDirection = getTextDirection(value),
         fontWeight = FontWeight.Medium,
-        lineHeight = (dynamicFontSize.value * 1.4).sp
+        lineHeight = (dynamicFontSize.value * 1.4).asp
     )
 
     val basePlaceholderStyle = MaterialTheme.typography.bodyLarge
     val placeholderTextStyle = basePlaceholderStyle.copy(
         textDirection = getTextDirection(placeHolderText),
-        fontSize = 20.sp
+        fontSize = 20.asp
     )
 
     TextField(
@@ -88,7 +88,7 @@ fun DynamicTextField(
                 modifier = Modifier.fillMaxSize()
             )
         },
-        shape = RoundedCornerShape(0.dp),
+        shape = RoundedCornerShape(0.adp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
