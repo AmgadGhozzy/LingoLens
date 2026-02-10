@@ -18,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.BookmarkFilledButton
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
 import com.venom.utils.Extensions.formatTimestamp
 
 @Composable
@@ -29,7 +29,7 @@ fun HistoryItemHeader(
     timestamp: Long,
     isBookmarked: Boolean,
     onToggleBookmark: () -> Unit,
-    onOpenInNew: () -> Unit = {},
+    onOpenInNew: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -38,28 +38,27 @@ fun HistoryItemHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
-            shape = RoundedCornerShape(12.dp)
+            color = MaterialTheme.colorScheme.primaryContainer,
+            shape = RoundedCornerShape(12.adp)
         ) {
             Text(
                 text = timestamp.formatTimestamp(),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                modifier = Modifier.padding(horizontal = 12.adp, vertical = 6.adp)
             )
         }
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             CustomFilledIconButton(
                 icon = Icons.AutoMirrored.Rounded.OpenInNew,
                 contentDescription = stringResource(R.string.open_in_new),
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(0.1f),
-                    contentColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 onClick = onOpenInNew
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(Modifier.width(4.adp))
             BookmarkFilledButton(
                 isBookmarked = isBookmarked,
                 onToggleBookmark = onToggleBookmark

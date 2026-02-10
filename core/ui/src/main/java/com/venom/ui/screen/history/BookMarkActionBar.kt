@@ -9,11 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CopyButton
 import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.common.adp
 
 @Composable
 fun BookMarkActionBar(
@@ -24,35 +23,27 @@ fun BookMarkActionBar(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+        horizontalArrangement = Arrangement.spacedBy(8.adp, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CopyButton(onClick = onCopyClick)
-
         CustomFilledIconButton(
             icon = R.drawable.icon_share,
             onClick = onShareClick,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.3f),
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ),
             contentDescription = stringResource(R.string.action_share)
         )
-
         CustomFilledIconButton(
             icon = R.drawable.icon_delete_bin,
             onClick = onDeleteClick,
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer.copy(0.3f),
-                contentColor = MaterialTheme.colorScheme.error
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
             ),
             contentDescription = stringResource(R.string.action_delete)
         )
     }
-}
-
-@Preview
-@Composable
-fun BookMarkActionBarsPreview() {
-    BookMarkActionBar(onShareClick = {}, onCopyClick = {}, onDeleteClick = {})
 }

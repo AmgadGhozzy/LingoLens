@@ -2,7 +2,6 @@ package com.venom.ui.screen.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -11,8 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.venom.data.local.Entity.OcrEntity
+import com.venom.data.local.entity.OcrEntity
+import com.venom.ui.components.common.adp
 
 @Composable
 fun OcrBookmarkList(
@@ -22,34 +21,29 @@ fun OcrBookmarkList(
     onToggleBookmark: (OcrEntity) -> Unit,
     onShareClick: (OcrEntity) -> Unit,
     onCopyClick: (OcrEntity) -> Unit,
-    onItemClick: (OcrEntity) -> Unit,
     onOpenInNew: (OcrEntity) -> Unit
 ) {
-    val filteredItems = items.filter { item ->
-        searchQuery.isEmpty() || item.recognizedText.contains(searchQuery, ignoreCase = true)
+    val filteredItems = remember(items, searchQuery) {
+        if (searchQuery.isEmpty()) items
+        else items.filter { it.recognizedText.contains(searchQuery, true) }
     }
 
     var expandedItemId by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.adp)
     ) {
-        items(filteredItems) { entry ->
+        items(filteredItems, key = { it.id }) { entry ->
             OcrHistoryItemView(
                 entry = entry,
                 onEntryRemove = onItemRemove,
                 onToggleBookmark = onToggleBookmark,
                 onShareClick = onShareClick,
                 onCopyClick = onCopyClick,
-                onItemClick = { onItemClick(entry) },
-                onOpenInNew = { onOpenInNew(entry) },
+                onOpenInNew = onOpenInNew,
                 isExpanded = expandedItemId == entry.id.toString(),
-                onExpandChange = { isExpanding ->
-                    expandedItemId = if (isExpanding) entry.id.toString() else null
-                }
+                onExpandChange = { expandedItemId = if (it) entry.id.toString() else null }
             )
         }
     }

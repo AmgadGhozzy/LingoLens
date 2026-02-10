@@ -3,7 +3,6 @@ package com.venom.ui.screen.history
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,18 +16,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.resources.R
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 
 @Composable
 fun LangHistorySection(
@@ -37,24 +34,18 @@ fun LangHistorySection(
     text: String,
     isExpanded: Boolean,
     style: TextStyle,
-    modifier: Modifier = Modifier,
-    maxCollapsedLines: Int = 2,
-    showLanguageCode: Boolean = true,
-    onTextClick: (() -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
+    val lineCount = remember(text) { text.lines().size }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
+            .animateContentSize(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMediumLow))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -62,89 +53,56 @@ fun LangHistorySection(
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurface
             )
-
-            if (showLanguageCode) {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(0.6f),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text(
-                        text = languageCode.uppercase(),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(10.adp)
+            ) {
+                Text(
+                    text = languageCode.uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.asp
+                    ),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = 10.adp, vertical = 6.adp)
+                )
             }
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
+        Spacer(Modifier.height(12.adp))
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics { contentDescription = "$languageName text: $text" }
-                .then(if (onTextClick != null) Modifier.clickable(onClick = onTextClick) else Modifier),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(0.7f),
-            shape = RoundedCornerShape(16.dp),
-            tonalElevation = 2.dp
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = RoundedCornerShape(16.adp),
+            tonalElevation = 2.adp
         ) {
             SelectionContainer {
                 Text(
                     text = text,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = style.copy(lineHeight = 24.sp),
-                    maxLines = if (isExpanded) Int.MAX_VALUE else maxCollapsedLines,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = style.copy(lineHeight = 24.asp),
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(18.dp)
+                        .padding(18.adp)
                 )
             }
         }
-
-        if (!isExpanded && text.lines().size > maxCollapsedLines) {
+        if (!isExpanded && lineCount > 2) {
             Surface(
-                color = MaterialTheme.colorScheme.primary.copy(0.1f),
-                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(8.adp),
                 modifier = Modifier
-                    .padding(top = 8.dp)
+                    .padding(top = 8.adp)
                     .align(Alignment.End)
             ) {
                 Text(
-                    text = stringResource(
-                        R.string.more_lines_count,
-                        text.lines().size - maxCollapsedLines
-                    ),
+                    text = stringResource(R.string.more_lines_count, lineCount - 2),
                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 10.adp, vertical = 4.adp)
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun LanguageSectionPreview() {
-    MaterialTheme {
-        LangHistorySection(
-            languageName = "English",
-            languageCode = "en",
-            text = """
-                This is a sample text that spans
-                multiple lines to demonstrate
-                how the component handles longer content
-                with expansion and collapse functionality.
-            """.trimIndent(),
-            isExpanded = false,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }

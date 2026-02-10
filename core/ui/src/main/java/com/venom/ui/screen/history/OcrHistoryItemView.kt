@@ -13,12 +13,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.venom.data.local.Entity.OcrEntity
+import com.venom.data.local.entity.OcrEntity
+import com.venom.ui.components.common.adp
 import com.venom.utils.Extensions.toBitmap
 
 @Composable
@@ -28,7 +29,6 @@ fun OcrHistoryItemView(
     onToggleBookmark: (OcrEntity) -> Unit,
     onShareClick: (OcrEntity) -> Unit,
     onCopyClick: (OcrEntity) -> Unit,
-    onItemClick: (OcrEntity) -> Unit,
     onOpenInNew: (OcrEntity) -> Unit,
     isExpanded: Boolean,
     onExpandChange: (Boolean) -> Unit,
@@ -40,61 +40,47 @@ fun OcrHistoryItemView(
         onToggleBookmark = { onToggleBookmark(entry) },
         onShareClick = { onShareClick(entry) },
         onCopyClick = { onCopyClick(entry) },
-        onItemClick = { onItemClick(entry) },
         onOpenInNew = { onOpenInNew(entry) },
         isExpanded = isExpanded,
         onExpandChange = onExpandChange,
         modifier = modifier
     ) { itemExpanded, _ ->
-        OcrContent(
-            entry = entry,
-            isExpanded = itemExpanded
-        )
+        OcrContent(entry, itemExpanded)
     }
 }
 
 @Composable
-private fun OcrContent(
-    entry: OcrEntity,
-    isExpanded: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
+private fun OcrContent(entry: OcrEntity, isExpanded: Boolean) {
+    val bitmap = remember(entry.imageData) { entry.imageData.toBitmap() }
+    val shape = RoundedCornerShape(20.adp)
+
+    Column {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(0.6f),
-            shape = RoundedCornerShape(16.dp),
-            tonalElevation = 2.dp
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = RoundedCornerShape(16.adp),
+            tonalElevation = 2.adp
         ) {
             SelectionContainer {
                 Text(
                     text = entry.recognizedText,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(18.dp)
+                        .padding(18.adp)
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp
-        ) {
+        Spacer(Modifier.height(16.adp))
+        Surface(shape = shape, tonalElevation = 6.adp, shadowElevation = 8.adp) {
             Image(
-                bitmap = entry.imageData.toBitmap(),
+                bitmap = bitmap,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(
-                        min = 120.dp,
-                        max = if (isExpanded) 320.dp else 160.dp
-                    )
-                    .clip(RoundedCornerShape(20.dp)),
+                    .heightIn(min = 120.adp, max = if (isExpanded) 320.adp else 160.adp)
+                    .clip(shape),
                 contentScale = ContentScale.Crop
             )
         }

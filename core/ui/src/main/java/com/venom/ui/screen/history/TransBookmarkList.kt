@@ -10,8 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.venom.domain.model.TranslationResult
+import com.venom.ui.components.common.adp
 
 @Composable
 fun TransBookmarkList(
@@ -21,34 +21,32 @@ fun TransBookmarkList(
     onToggleBookmark: (TranslationResult) -> Unit,
     onShareClick: (TranslationResult) -> Unit,
     onCopyClick: (TranslationResult) -> Unit,
-    onItemClick: (TranslationResult) -> Unit,
     onOpenInNew: (TranslationResult) -> Unit
 ) {
-    val filteredItems = items.filter { item ->
-        searchQuery.isEmpty() || listOf(
-            item.sourceText, item.translatedText, item.sourceLang, item.targetLang
-        ).any { it.contains(searchQuery, ignoreCase = true) }
+    val filteredItems = remember(items, searchQuery) {
+        if (searchQuery.isEmpty()) items
+        else items.filter { item ->
+            listOf(item.sourceText, item.translatedText, item.sourceLang, item.targetLang)
+                .any { it.contains(searchQuery, true) }
+        }
     }
 
     var expandedItemId by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.adp)
     ) {
-        items(filteredItems) { entry ->
+        items(filteredItems, key = { it.id }) { entry ->
             TransHistoryItemView(
                 entry = entry,
                 onEntryRemove = onItemRemove,
                 onToggleBookmark = onToggleBookmark,
                 onShareClick = onShareClick,
                 onCopyClick = onCopyClick,
-                onItemClick = { onItemClick(entry) },
-                onOpenInNew = { onOpenInNew(entry) },
+                onOpenInNew = onOpenInNew,
                 isExpanded = expandedItemId == entry.id.toString(),
-                onExpandChange = { isExpanding ->
-                    expandedItemId = if (isExpanding) entry.id.toString() else null
-                }
+                onExpandChange = { expandedItemId = if (it) entry.id.toString() else null }
             )
         }
     }
