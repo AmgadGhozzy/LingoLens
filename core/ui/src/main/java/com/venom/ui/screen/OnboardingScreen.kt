@@ -27,15 +27,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.venom.resources.R
-import com.venom.ui.components.onboarding.ActionButton
+import com.venom.ui.components.buttons.GradientActionButton
+import com.venom.ui.components.common.adp
+import com.venom.ui.components.common.asp
 import com.venom.ui.components.onboarding.ContentSection
+import com.venom.ui.components.onboarding.GoogleSignInButton
 import com.venom.ui.components.onboarding.HeroSection
 import com.venom.ui.components.onboarding.OnboardingPage
 import com.venom.ui.components.onboarding.PageIndicators
-import com.venom.ui.components.onboarding.getPages
+import com.venom.ui.components.onboarding.onboardingPages
 import com.venom.ui.components.other.FloatingOrbs
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -44,9 +45,10 @@ import kotlin.math.absoluteValue
 @Composable
 fun OnboardingScreens(
     onGetStarted: () -> Unit = {},
-    onSkip: () -> Unit = {}
+    onSkip: () -> Unit = {},
+    onGoogleSignIn: () -> Unit = {}
 ) {
-    val pages = getPages()
+    val pages = onboardingPages()
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     val currentPage = pages[pagerState.currentPage]
@@ -54,12 +56,12 @@ fun OnboardingScreens(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .systemBarsPadding()
     ) {
         FloatingOrbs(
-            primaryColor = currentPage.primaryColor,
-            secondaryColor = currentPage.secondaryColor
+            primaryColor = currentPage.colors.primary,
+            secondaryColor = currentPage.colors.secondary
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
@@ -67,7 +69,7 @@ fun OnboardingScreens(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(24.adp),
                 horizontalArrangement = Arrangement.End
             ) {
                 if (pagerState.currentPage < pages.size - 1) {
@@ -79,18 +81,18 @@ fun OnboardingScreens(
                             onSkip()
                         },
                         modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(16.adp))
                             .background(Color.White.copy(0.1f))
                     ) {
                         Text(
                             text = stringResource(R.string.skip),
-                            fontSize = 16.sp,
+                            fontSize = 16.asp,
                             fontWeight = FontWeight.Medium,
-                            color = currentPage.primaryColor
+                            color = currentPage.colors.primary
                         )
                     }
                 } else {
-                    Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(48.adp))
                 }
             }
 
@@ -114,6 +116,7 @@ fun OnboardingScreens(
                             }
                         }
                     },
+                    onGoogleSignIn = onGoogleSignIn,
                     isLastPage = pageIndex == pages.size - 1
                 )
             }
@@ -135,12 +138,13 @@ private fun PageContent(
     page: OnboardingPage,
     pageOffset: Float,
     onNext: () -> Unit,
+    onGoogleSignIn: () -> Unit,
     isLastPage: Boolean
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 32.adp)
             .graphicsLayer {
                 // Scale and fade animation during transitions
                 val scale = 1f - (pageOffset.absoluteValue * 0.1f)
@@ -152,25 +156,36 @@ private fun PageContent(
         verticalArrangement = Arrangement.Center
     ) {
         HeroSection(
-            page = page,
-            pageOffset = pageOffset
+            page = page
         )
 
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(60.adp))
 
         ContentSection(page = page)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        ActionButton(
+        GradientActionButton(
             text = if (isLastPage) {
                 stringResource(R.string.get_started)
             } else {
                 stringResource(R.string.next)
             },
             onClick = onNext,
-            colors = listOf(page.primaryColor, page.secondaryColor),
-            modifier = Modifier.padding(bottom = 16.dp)
+            gradientColors = listOf(page.colors.primary, page.colors.secondary),
+            shadowColors = listOf(
+                page.colors.primary.copy(alpha = 0.5f),
+                page.colors.secondary.copy(alpha = 0.5f)
+            ),
+            maxWidth = 600,
+            modifier = Modifier.padding(bottom = if (isLastPage) 8.adp else 16.adp)
         )
+
+        if (isLastPage) {
+            GoogleSignInButton(
+                onClick = onGoogleSignIn,
+                modifier = Modifier.padding(bottom = 16.adp)
+            )
+        }
     }
 }
