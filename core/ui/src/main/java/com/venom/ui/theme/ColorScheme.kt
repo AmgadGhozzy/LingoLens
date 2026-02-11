@@ -3,7 +3,6 @@ package com.venom.ui.theme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.ui.graphics.Color
 
 val LightColorScheme: ColorScheme = lightColorScheme(
     primary = BrandColors.Blue600,
@@ -49,30 +48,30 @@ val LightColorScheme: ColorScheme = lightColorScheme(
     inverseOnSurface = BrandColors.Slate50,
     inversePrimary = BrandColors.Blue300,
 
-    scrim = BrandColors.Black.copy(alpha = 0.32f),
+    scrim = BrandColors.Black,
     surfaceTint = BrandColors.Blue600
 )
 
 val DarkColorScheme: ColorScheme = darkColorScheme(
-    primary = BrandColors.Blue500,
-    onPrimary = BrandColors.Blue900,
-    primaryContainer = BrandColors.Blue800,
-    onPrimaryContainer = BrandColors.Blue100,
+    primary = BrandColors.Blue400,
+    onPrimary = BrandColors.Blue950,
+    primaryContainer = BrandColors.Blue900,
+    onPrimaryContainer = BrandColors.Blue200,
 
-    secondary = BrandColors.Indigo400,
-    onSecondary = BrandColors.Indigo900,
-    secondaryContainer = BrandColors.Indigo800,
-    onSecondaryContainer = BrandColors.Indigo100,
+    secondary = BrandColors.Indigo300,
+    onSecondary = BrandColors.Indigo950,
+    secondaryContainer = BrandColors.Indigo950,
+    onSecondaryContainer = BrandColors.Indigo200,
 
-    tertiary = BrandColors.Purple400,
-    onTertiary = BrandColors.Purple900,
-    tertiaryContainer = BrandColors.Purple800,
-    onTertiaryContainer = BrandColors.Purple100,
+    tertiary = BrandColors.Purple300,
+    onTertiary = BrandColors.Purple950,
+    tertiaryContainer = BrandColors.Purple950,
+    onTertiaryContainer = BrandColors.Purple200,
 
     error = BrandColors.Rose400,
-    onError = BrandColors.Rose900,
-    errorContainer = BrandColors.Rose800,
-    onErrorContainer = BrandColors.Rose100,
+    onError = BrandColors.Rose950,
+    errorContainer = BrandColors.Rose950,
+    onErrorContainer = BrandColors.Rose200,
 
     background = BrandColors.Slate950,
     onBackground = BrandColors.Slate100,
@@ -97,14 +96,14 @@ val DarkColorScheme: ColorScheme = darkColorScheme(
     inverseOnSurface = BrandColors.Slate900,
     inversePrimary = BrandColors.Blue600,
 
-    scrim = BrandColors.Black.copy(alpha = 0.6f),
+    scrim = BrandColors.Black,
     surfaceTint = BrandColors.Blue400
 )
 
 fun ColorScheme.toAmoledBlack(): ColorScheme = copy(
     background = BrandColors.Black,
     surface = BrandColors.Black,
-    surfaceContainer = Color(0xFF0A0D11),
+    surfaceContainer = BrandColors.Slate925,
     surfaceContainerLow = BrandColors.Black,
     surfaceContainerLowest = BrandColors.Black,
     surfaceDim = BrandColors.Black,

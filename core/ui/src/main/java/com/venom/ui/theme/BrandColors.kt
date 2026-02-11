@@ -76,6 +76,7 @@ object BrandColors {
     val Slate800 = Color(0xFF1B2A43)
     val Slate850 = Color(0xFF12213B)
     val Slate900 = Color(0xFF0B1930)
+    val Slate925 = Color(0xFF060C18)
     val Slate950 = Color(0xFF020617)
 
     val Green50 = Color(0xFFF0FDF4)
@@ -149,6 +150,7 @@ object BrandColors {
     val Yellow800 = Color(0xFF854D0E)
     val Yellow900 = Color(0xFF713F12)
     val Yellow950 = Color(0xFF422006)
+
     val White = Color(0xFFFFFFFF)
     val Black = Color(0xFF000000)
     val Transparent = Color(0x00000000)
