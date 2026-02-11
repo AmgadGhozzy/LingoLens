@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -35,6 +36,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.WordMaster
@@ -48,6 +51,7 @@ import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.tokens.getCefrColorScheme
 import com.venom.ui.theme.tokens.getDifficultyTheme
+import com.venom.ui.viewmodel.TTSViewModel
 
 /**
  * Front face of the Word Mastery card.
@@ -83,6 +87,15 @@ fun CardFront(
         derivedStateOf {
             word.examples[word.cefrLevel] ?: word.examples.values.firstOrNull()
         }
+    }
+
+    // Resolve TTS once at card level
+    val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+    val ttsToggle: (String, String?) -> Unit = remember(ttsViewModel) {
+        { text: String, lang: String? -> ttsViewModel.toggle(text, lang) }
+    }
+    val ttsSpeakSlow: (String, String?) -> Unit = remember(ttsViewModel) {
+        { text: String, lang: String? -> ttsViewModel.speakSlow(text, lang) }
     }
 
     // Animated values
@@ -184,7 +197,9 @@ fun CardFront(
                 Box(modifier = Modifier.padding(top = 8.adp)) {
                     PhoneticButton(
                         phonetic = word.phoneticUs,
-                        wordEn = word.wordEn
+                        wordEn = word.wordEn,
+                        ttsToggle = ttsToggle,
+                        ttsSpeakSlow = ttsSpeakSlow
                     )
                 }
             }
@@ -206,6 +221,8 @@ fun CardFront(
                     ) {
                         InteractiveText(
                             text = hintExample.toString(),
+                            onTtsToggle = ttsToggle,
+                            onTtsSpeakSlow = ttsSpeakSlow,
                             onClick = onRevealHint,
                             modifier = Modifier
                                 .blur(blurAmount.adp)
@@ -242,9 +259,15 @@ fun CardFront(
 private fun PhoneticButton(
     phonetic: String,
     wordEn: String,
+    ttsToggle: (String, String?) -> Unit,
+    ttsSpeakSlow: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    InteractiveText(wordEn) {
+    InteractiveText(
+        wordEn,
+        onTtsToggle = ttsToggle,
+        onTtsSpeakSlow = ttsSpeakSlow
+    ) {
         Row(
             modifier = modifier
                 .clip(RoundedCornerShape(50))

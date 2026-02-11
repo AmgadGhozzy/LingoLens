@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.venom.data.mock.MockWordData
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.LanguageOption
@@ -45,6 +48,7 @@ import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.tokens.getCefrColorScheme
 import com.venom.ui.theme.tokens.getDifficultyTheme
+import com.venom.ui.viewmodel.TTSViewModel
 
 /**
  * Back face of the Word Mastery card.
@@ -74,6 +78,15 @@ fun CardBack(
     val cefrColors = getCefrColorScheme(word.cefrLevel)
     val difficultyTheme = getDifficultyTheme(word.difficultyScore)
     val scrollState = rememberScrollState()
+
+    // Resolve TTS once at card level
+    val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+    val ttsToggle: (String, String?) -> Unit = remember(ttsViewModel) {
+        { text: String, lang: String? -> ttsViewModel.toggle(text, lang) }
+    }
+    val ttsSpeakSlow: (String, String?) -> Unit = remember(ttsViewModel) {
+        { text: String, lang: String? -> ttsViewModel.speakSlow(text, lang) }
+    }
 
     // Stable lambda for speaking Arabic
     val speakArabic = remember(word.arabicAr, onSpeak) {
@@ -137,7 +150,9 @@ fun CardBack(
 
             // Transliteration with speaker
             TransliterationRow(
-                transliteration = word.translit
+                transliteration = word.translit,
+                ttsToggle = ttsToggle,
+                ttsSpeakSlow = ttsSpeakSlow
             )
 
             // Memory hook (sticky note)
@@ -164,7 +179,9 @@ fun CardBack(
                 Box(modifier = Modifier.padding(top = 16.adp)) {
                     PinnedLanguageCard(
                         language = pinnedLanguage,
-                        translation = translation
+                        translation = translation,
+                        ttsToggle = ttsToggle,
+                        ttsSpeakSlow = ttsSpeakSlow
                     )
                 }
             }
@@ -178,9 +195,15 @@ fun CardBack(
 @Composable
 private fun TransliterationRow(
     transliteration: String,
+    ttsToggle: (String, String?) -> Unit,
+    ttsSpeakSlow: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    InteractiveText(transliteration) {
+    InteractiveText(
+        transliteration,
+        onTtsToggle = ttsToggle,
+        onTtsSpeakSlow = ttsSpeakSlow
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.adp),
@@ -294,10 +317,16 @@ private fun DefinitionBlock(
 private fun PinnedLanguageCard(
     language: LanguageOption,
     translation: String,
+    ttsToggle: (String, String?) -> Unit,
+    ttsSpeakSlow: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
-    InteractiveText(translation) {
+    InteractiveText(
+        translation,
+        onTtsToggle = ttsToggle,
+        onTtsSpeakSlow = ttsSpeakSlow
+    ) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
