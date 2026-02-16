@@ -1,5 +1,8 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +31,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom.domain.model.QuizMode
 import com.venom.lingospell.presentation.SpellingGameScreen
+import com.venom.quiz.ui.viewmodel.UnifiedQuizViewModel
 import com.venom.stackcard.ui.components.flashcard.CardSwiperStack
 import com.venom.stackcard.ui.components.insights.InsightsSheet
 import com.venom.stackcard.ui.components.mastery.ActionBar
@@ -46,11 +53,13 @@ fun WordMasteryScreen(
     isGenerative: Boolean,
     onBack: () -> Unit = {},
     onGoogleSignIn: () -> Unit = {},
+    onTakePlacement: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: WordMasteryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showProgress by remember { mutableStateOf(false) }
+
     Box(modifier = modifier.fillMaxSize()) {
         when {
             showProgress -> {
@@ -69,6 +78,7 @@ fun WordMasteryScreen(
                     userName = uiState.userName,
                     userProgress = uiState.userProgress,
                     onOpenProgress = { showProgress = true },
+                    onTakePlacement = onTakePlacement,
                     onStart = { topic ->
                         viewModel.onEvent(
                             WordMasteryEvent.Initialize(
@@ -116,8 +126,33 @@ private fun MasteryContent(
     val haptic = rememberHapticFeedback()
     val currentHaptic by rememberUpdatedState(haptic)
     val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
+    val quizViewModel: UnifiedQuizViewModel =
+        hiltViewModel(LocalActivity.current as ComponentActivity)
+    val quizState by quizViewModel.uiState.collectAsStateWithLifecycle()
+    val quizInput = uiState.quizInput
+    val currentQuizInput by rememberUpdatedState(quizInput)
+
+    BackHandler(
+        enabled = uiState.isSheetOpen && !(uiState.isPracticeMode && uiState.currentWord != null)
+    ) {
+        onEvent(WordMasteryEvent.CloseSheet)
+    }
+
+    val showQuiz = uiState.isPracticeMode && uiState.quizInput != null
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LaunchedEffect(quizInput) {
+            quizInput?.let { input ->
+                quizViewModel.start(QuizMode.Flashcard(input))
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            quizViewModel.quizResult.collect { result ->
+                onEvent(WordMasteryEvent.PracticeResult(result))
+            }
+        }
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -148,12 +183,26 @@ private fun MasteryContent(
                     },
                     onForgotWord = {
                         currentHaptic(HapticStrength.LIGHT)
-                    }
+                    },
+                    // ── Quiz params — decision is HERE ──
+                    /* showQuiz = showQuiz,
+                     quizState = quizState,
+                     onQuizSelect = quizViewModel::selectOption,
+                     onQuizSkip = {
+                         quizViewModel.skipFlashcard()
+                         currentQuizInput?.let { input ->
+                             onEvent(WordMasteryEvent.PracticeSkipped(input.wordId))
+                         }
+                     }*/
                 )
             }
 
             ActionBar(
-                onFlip = { onEvent(WordMasteryEvent.FlipCard) },
+                onFlip = {
+                    if (!uiState.isPracticeMode) {
+                        onEvent(WordMasteryEvent.FlipCard)
+                    }
+                },
                 onPractice = { onEvent(WordMasteryEvent.StartPractice) },
                 onInfoClick = { onEvent(WordMasteryEvent.OpenSheet) },
                 modifier = Modifier.padding(horizontal = 20.adp)
