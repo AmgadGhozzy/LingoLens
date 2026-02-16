@@ -40,8 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.domain.model.AppTheme
+import com.venom.domain.model.DashboardData
 import com.venom.domain.model.UserLevel
-import com.venom.domain.model.UserProgressData
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.GlassStatCard
 import com.venom.stackcard.ui.components.mastery.GlassSurface
@@ -59,7 +59,7 @@ fun ProgressScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val data = uiState.userProgress ?: UserProgressData()
+    val data = uiState.userProgress ?: DashboardData()
 
     LaunchedEffect(Unit) { viewModel.refreshProgress() }
 
@@ -68,7 +68,7 @@ fun ProgressScreen(
 
 @Composable
 private fun ProgressScreenContent(
-    data: UserProgressData,
+    data: DashboardData,
     onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -125,7 +125,7 @@ private fun ProgressScreenContent(
             )
             GlassStatCard(
                 title = "Mastered",
-                value = data.masteredCount.toString(),
+                value = data.totalWordsMastered.toString(),
                 icon = R.drawable.ic_seal_check,
                 color = BrandColors.Green500,
                 modifier = Modifier.weight(1f)
@@ -414,10 +414,10 @@ private fun DailyGoalCard(
 private fun ProgressScreenPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         ProgressScreenContent(
-            data = UserProgressData(
+            data = DashboardData(
                 totalXp = 2450, todayXp = 85, level = UserLevel.ADEPT,
                 levelProgress = 0.68f, xpToNextLevel = 350,
-                totalWordsLearned = 156, masteredCount = 42,
+                totalWordsLearned = 156, totalWordsMastered = 42,
                 currentStreak = 7, bestStreak = 12,
                 totalSessionCount = 23, totalTimeMs = 5400000,
                 totalDaysActive = 15, dailyGoalTarget = 50,
