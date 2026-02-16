@@ -13,14 +13,13 @@ interface SentenceService {
         @Path("word") word: String,
         @Query("limit") limit: Int? = null,
         @Query("source") source: String = "all",
-        @Header("Authorization") authToken: String = "Bearer sb_publishable_nIN5KqWLvbXdPYAYBboOmw_6i81Gv4q",
-        @Header("apikey") apiKey: String = "sb_publishable_nIN5KqWLvbXdPYAYBboOmw_6i81Gv4q",
-        @Header("Content-Type") contentType: String = "application/json"
+        @Header("Authorization") authToken: String,
+        @Header("apikey") apiKey: String
     ): Response<SentenceResponse>
 
 
     companion object {
         const val BASE_URL =
-            "https://qvpfzpsnfsivjstqbsrm.supabase.co/functions/v1/word_to_sentence/"
+            "https://kbfoelamasuioqhdbghg.supabase.co/functions/v1/word_to_sentence/"
     }
 }
