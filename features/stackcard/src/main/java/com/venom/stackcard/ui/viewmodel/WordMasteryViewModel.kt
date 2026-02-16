@@ -12,14 +12,17 @@ import com.venom.data.mock.MockWordData
 import com.venom.data.repo.UserActivityRepository
 import com.venom.data.repo.UserIdentityRepository
 import com.venom.data.repo.UserWordProgressRepository
+import com.venom.domain.model.DashboardData
 import com.venom.domain.model.KnownState
 import com.venom.domain.model.LanguageOption
-import com.venom.domain.model.UserProgressData
+import com.venom.domain.model.QuizInput
+import com.venom.domain.model.QuizResult
 import com.venom.domain.model.UserWordProgress
 import com.venom.domain.model.WordMaster
 import com.venom.domain.model.getLanguageOptions
 import com.venom.domain.repo.IEnrichmentRepository
 import com.venom.stackcard.ui.components.insights.InsightsTab
+import com.venom.stackcard.ui.mapper.toQuizInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
@@ -92,11 +95,13 @@ data class WordMasteryUiState(
     val isGenerativeMode: Boolean = false,
     val isSignedIn: Boolean = true,
     val userName: String? = null,
-    val userProgress: UserProgressData? = null,
+    val userProgress: DashboardData? = null,
     val currentWordProgress: CurrentWordProgress = CurrentWordProgress(),
     val sessionStats: SessionStats = SessionStats(),
     val initialCardCount: Int = 0,
-    val nextWordProgressCache: CurrentWordProgress? = null
+    val nextWordProgressCache: CurrentWordProgress? = null,
+    val quizInput: QuizInput? = null,
+    val cardChangeCounter: Int = 0
 )
 
 sealed class WordMasteryEvent {
@@ -110,6 +115,8 @@ sealed class WordMasteryEvent {
     object TogglePowerTip : WordMasteryEvent()
     object StartPractice : WordMasteryEvent()
     object PracticeHandled : WordMasteryEvent()
+    data class PracticeResult(val result: QuizResult) : WordMasteryEvent()
+    data class PracticeSkipped(val wordId: Int) : WordMasteryEvent()
     data class RemoveCard(val word: WordMaster) : WordMasteryEvent()
     data class SwipeForgot(val word: WordMaster) : WordMasteryEvent()
     data class SwipeRemember(val word: WordMaster) : WordMasteryEvent()
@@ -119,8 +126,8 @@ sealed class WordMasteryEvent {
 }
 
 private sealed class DbOperation {
-    data class RecordSwipeLeft(val userId: String, val wordId: Int) : DbOperation()
-    data class RecordSwipeRight(val userId: String, val wordId: Int) : DbOperation()
+    data class RecordRecallFail(val userId: String, val wordId: Int) : DbOperation()
+    data class RecordRecallSuccess(val userId: String, val wordId: Int) : DbOperation()
     data class RecordView(val userId: String, val wordId: Int) : DbOperation()
     data class ToggleBookmark(val userId: String, val wordId: Int, val bookmarked: Boolean) :
         DbOperation()
@@ -189,10 +196,6 @@ class WordMasteryViewModel @Inject constructor(
                     val userId = identityRepository.getCurrentUserId()
                     crashlyticsManager.logBreadcrumb("Post-login sync started for: $userId")
 
-                    progressRepository.syncFromCloud(userId)
-                    activityRepository.syncFromCloud(userId)
-                    activityRepository.syncAllToCloud(userId)
-
                     reloadUserProgress(userId)
                     wordProgressCache.clear()
 
@@ -216,23 +219,7 @@ class WordMasteryViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    userProgress = UserProgressData(
-                        totalXp = dashboard.totalXp,
-                        todayXp = dashboard.todayXp,
-                        level = dashboard.level,
-                        levelProgress = dashboard.levelProgress,
-                        xpToNextLevel = dashboard.xpToNextLevel,
-                        totalWordsLearned = dashboard.totalWordsViewed,
-                        masteredCount = dashboard.totalWordsMastered,
-                        currentStreak = dashboard.currentStreak,
-                        bestStreak = dashboard.bestStreak,
-                        dailyGoalTarget = dashboard.dailyGoalTarget,
-                        dailyGoalProgress = dashboard.dailyGoalProgress,
-                        dailyGoalMet = dashboard.dailyGoalMet,
-                        totalSessionCount = dashboard.totalSessionCount,
-                        totalTimeMs = dashboard.totalTimeMs,
-                        totalDaysActive = dashboard.totalDaysActive
-                    )
+                    userProgress = dashboard
                 )
             }
         } catch (e: Exception) {
@@ -247,13 +234,11 @@ class WordMasteryViewModel @Inject constructor(
             dbOperationChannel.receiveAsFlow().collect { operation ->
                 try {
                     when (operation) {
-                        is DbOperation.RecordSwipeLeft -> {
-                            progressRepository.recordSwipeLeft(operation.userId, operation.wordId)
+                        is DbOperation.RecordRecallFail -> {
                             progressRepository.recordRecallFail(operation.userId, operation.wordId)
                         }
 
-                        is DbOperation.RecordSwipeRight -> {
-                            progressRepository.recordSwipeRight(operation.userId, operation.wordId)
+                        is DbOperation.RecordRecallSuccess -> {
                             progressRepository.recordRecallSuccess(
                                 operation.userId,
                                 operation.wordId
@@ -324,6 +309,8 @@ class WordMasteryViewModel @Inject constructor(
             is WordMasteryEvent.TogglePowerTip -> togglePowerTip()
             is WordMasteryEvent.StartPractice -> startPractice()
             is WordMasteryEvent.PracticeHandled -> practiceHandled()
+            is WordMasteryEvent.PracticeResult -> handlePracticeResult(event.result)
+            is WordMasteryEvent.PracticeSkipped -> handlePracticeSkipped(event.wordId)
             is WordMasteryEvent.RemoveCard -> handleRemoveCard(event.word)
             is WordMasteryEvent.SwipeForgot -> handleSwipeForgot(event.word)
             is WordMasteryEvent.SwipeRemember -> handleSwipeRemember(event.word)
@@ -335,9 +322,11 @@ class WordMasteryViewModel @Inject constructor(
 
     private fun flipCard() {
         _uiState.update { state ->
+            val newFlipped = !state.isFlipped
             state.copy(
-                isFlipped = !state.isFlipped,
-                flipRotation = state.flipRotation + 180f
+                isFlipped = newFlipped,
+                // Alternate between 0f and 180f — keeps animation work constant
+                flipRotation = if (newFlipped) 180f else 0f
             )
         }
     }
@@ -363,11 +352,51 @@ class WordMasteryViewModel @Inject constructor(
     }
 
     private fun startPractice() {
-        _uiState.update { it.copy(isPracticeMode = true) }
+        val state = _uiState.value
+        val word = state.currentWord ?: return
+        if (state.isPracticeMode && state.quizInput?.wordId == word.id) return
+        if (state.processedCardsCount < 5) return
+
+        // Generate distractors from session words (same CEFR, different word)
+        val distractors = state.visibleCards
+            .plus(state.removedCards)
+            .filter { it.id != word.id && it.cefrLevel == word.cefrLevel }
+            .map { it.arabicAr }
+            .distinct()
+            .filter { it != word.arabicAr }
+            .shuffled()
+            .take(3)
+
+        val quizInput = word.toQuizInput(
+            distractors = distractors,
+            cardPosition = state.processedCardsCount
+        )
+
+        _uiState.update { it.copy(isPracticeMode = true, quizInput = quizInput) }
     }
 
     private fun practiceHandled() {
-        _uiState.update { it.copy(isPracticeMode = false) }
+        _uiState.update { it.copy(isPracticeMode = false, quizInput = null) }
+    }
+
+    private fun handlePracticeResult(result: QuizResult) {
+        _uiState.update { it.copy(isPracticeMode = false, quizInput = null) }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val userId = identityRepository.getCurrentUserId()
+            if (result.isCorrect) {
+                progressRepository.recordRecallSuccess(userId, result.wordId)
+            } else {
+                progressRepository.recordRecallFail(userId, result.wordId)
+            }
+            // Refresh word progress cache
+            wordProgressCache.remove(result.wordId)
+            prefetchWordProgress(result.wordId)
+        }
+    }
+
+    private fun handlePracticeSkipped(wordId: Int) {
+        _uiState.update { it.copy(isPracticeMode = false, quizInput = null) }
     }
 
     private fun pinLanguage(language: LanguageOption?) {
@@ -385,91 +414,113 @@ class WordMasteryViewModel @Inject constructor(
         val currentState = _uiState.value
         val remainingCards = currentState.visibleCards - word
         val nextWord = remainingCards.firstOrNull()
-
-        val nextWordProgress = nextWord?.let {
-            wordProgressCache[it.id]
-        } ?: CurrentWordProgress()
-
         val isSessionFinished = remainingCards.isEmpty()
 
-        val updatedSessionStats = if (isSessionFinished) {
-            val startTime = sessionStartTime.get()
-            val duration = if (startTime > 0) System.currentTimeMillis() - startTime else 0L
-            currentState.sessionStats.copy(
+        // 🔑 LOAD NEXT WORD'S DATA BEFORE UPDATING STATE
+        if (nextWord != null) {
+            viewModelScope.launch {
+                // Load progress synchronously
+                val nextWordProgress = loadWordProgressDirect(nextWord.id)
+
+                // Prefetch the card after the next one
+                remainingCards.getOrNull(1)?.let { prefetchWordProgress(it.id) }
+
+                // Update state with CORRECT data
+                _uiState.update { state ->
+                    state.copy(
+                        visibleCards = remainingCards,
+                        removedCards = state.removedCards + word,
+                        currentWord = nextWord,
+                        processedCardsCount = state.processedCardsCount + 1,
+                        isFlipped = false,
+                        isHintRevealed = false, // 🔑 RESET HINT FOR NEW CARD!
+                        showPowerTip = false,
+                        isSheetOpen = false,
+                        isBookmarked = nextWordProgress.isBookmarked,       // ✅ CORRECT DATA
+                        flipRotation = 0f,
+                        currentWordProgress = nextWordProgress,             // ✅ CORRECT DATA
+                        sessionStats = updateSessionStats(state.sessionStats, isSessionFinished),
+                        cardChangeCounter = state.cardChangeCounter + 1
+                    )
+                }
+
+                // Start practice for the new card
+                startPractice()
+            }
+        } else {
+            // Session finished
+            _uiState.update { state ->
+                state.copy(
+                    visibleCards = remainingCards,
+                    removedCards = state.removedCards + word,
+                    currentWord = null,
+                    processedCardsCount = state.processedCardsCount + 1,
+                    sessionStats = updateSessionStats(state.sessionStats, true).copy(
+                        sessionDurationMs = System.currentTimeMillis() - sessionStartTime.get()
+                    ),
+                    cardChangeCounter = state.cardChangeCounter + 1
+                )
+            }
+            finalizeSession() // 🔑 CALL FINALIZATION
+        }
+
+        // Cleanup cache
+        wordProgressCache.remove(word.id)
+    }
+
+    // 🔑 HELPER: Update session stats
+    private fun updateSessionStats(
+        currentStats: SessionStats,
+        isSessionFinished: Boolean
+    ): SessionStats {
+        return if (isSessionFinished) {
+            currentStats.copy(
                 masteredCount = sessionMasteredCount.get(),
                 learningCount = sessionLearningCount.get(),
                 needsReviewCount = sessionNeedsReviewCount.get(),
-                sessionDurationMs = duration
+                sessionDurationMs = System.currentTimeMillis() - sessionStartTime.get()
             )
         } else {
-            currentState.sessionStats.copy(
+            currentStats.copy(
                 masteredCount = sessionMasteredCount.get(),
                 learningCount = sessionLearningCount.get(),
                 needsReviewCount = sessionNeedsReviewCount.get()
             )
         }
+    }
 
-        _uiState.update { state ->
-            state.copy(
-                visibleCards = remainingCards,
-                removedCards = state.removedCards + word,
-                currentWord = nextWord,
-                processedCardsCount = state.processedCardsCount + 1,
-                isFlipped = false,
-                isHintRevealed = false,
-                showPowerTip = false,
-                isSheetOpen = false,
-                isBookmarked = nextWordProgress.isBookmarked,
-                flipRotation = 0f,
-                currentWordProgress = nextWordProgress,
-                sessionStats = updatedSessionStats
-            )
-        }
+    // 🔑 HELPER: Finalize session when all cards are done
+    private fun finalizeSession() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val userId = identityRepository.getCurrentUserId()
+                val startTime = sessionStartTime.get()
+                val duration = if (startTime > 0) System.currentTimeMillis() - startTime else 0L
+                activityRepository.recordSessionComplete(userId, duration)
 
-        if (isSessionFinished) {
-            viewModelScope.launch(Dispatchers.IO) {
-                try {
-                    val userId = identityRepository.getCurrentUserId()
-                    val startTime = sessionStartTime.get()
-                    val duration = if (startTime > 0) System.currentTimeMillis() - startTime else 0L
-                    activityRepository.recordSessionComplete(userId, duration)
+                reloadUserProgress(userId)
 
-                    if (sessionNeedsReviewCount.get() == 0 && cardsSwipedInSession.get() > 0) {
-                        activityRepository.recordPerfectSession(userId)
-                    }
-
-                    reloadUserProgress(userId)
-
-                    val dashboard = activityRepository.getDashboardData(userId)
-                    val wordStats = progressRepository.getSessionStats(userId)
-                    _uiState.update { state ->
-                        state.copy(
-                            sessionStats = state.sessionStats.copy(
-                                todayXpEarned = dashboard.todayXp,
-                                totalXp = dashboard.totalXp,
-                                levelProgress = dashboard.levelProgress,
-                                xpToNextLevel = dashboard.xpToNextLevel,
-                                totalSessionCount = dashboard.totalSessionCount,
-                                totalTimeMs = dashboard.totalTimeMs,
-                                totalDaysActive = dashboard.totalDaysActive,
-                                bestStreak = dashboard.bestStreak,
-                                currentStreak = dashboard.currentStreak,
-                                totalWordsLearned = wordStats.totalWordsLearned,
-                                totalWordsMastered = dashboard.totalWordsMastered
-                            )
+                val dashboard = activityRepository.getDashboardData(userId)
+                _uiState.update { state ->
+                    state.copy(
+                        sessionStats = state.sessionStats.copy(
+                            todayXpEarned = dashboard.todayXp,
+                            totalXp = dashboard.totalXp,
+                            levelProgress = dashboard.levelProgress,
+                            xpToNextLevel = dashboard.xpToNextLevel,
+                            totalSessionCount = dashboard.totalSessionCount,
+                            totalTimeMs = dashboard.totalTimeMs,
+                            totalDaysActive = dashboard.totalDaysActive,
+                            bestStreak = dashboard.bestStreak,
+                            currentStreak = dashboard.currentStreak,
+                            totalWordsLearned = dashboard.totalWordsLearned,
+                            totalWordsMastered = dashboard.totalWordsMastered
                         )
-                    }
-                } catch (e: Exception) {
-                    if (e !is CancellationException) {
-                        crashlyticsManager.logNonFatalException(e, "Failed to finalize session")
-                    }
+                    )
                 }
-            }
-        } else {
-            if (nextWord != null) {
-                prefetchWordProgress(nextWord.id)
-                remainingCards.getOrNull(1)?.let { secondNext ->
-                    prefetchWordProgress(secondNext.id)
+            } catch (e: Exception) {
+                if (e !is CancellationException) {
+                    crashlyticsManager.logNonFatalException(e, "Failed to finalize session")
                 }
             }
         }
@@ -482,7 +533,7 @@ class WordMasteryViewModel @Inject constructor(
 
         viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
             val userId = identityRepository.getCurrentUserId()
-            dbOperationChannel.send(DbOperation.RecordSwipeLeft(userId, word.id))
+            dbOperationChannel.send(DbOperation.RecordRecallFail(userId, word.id))
         }
 
         analyticsManager.logFlashcardSwipe(
@@ -498,7 +549,7 @@ class WordMasteryViewModel @Inject constructor(
 
         viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
             val userId = identityRepository.getCurrentUserId()
-            dbOperationChannel.send(DbOperation.RecordSwipeRight(userId, word.id))
+            dbOperationChannel.send(DbOperation.RecordRecallSuccess(userId, word.id))
         }
 
         analyticsManager.logFlashcardSwipe(
@@ -509,7 +560,7 @@ class WordMasteryViewModel @Inject constructor(
         crashlyticsManager.logBreadcrumb("Swiped remember: ${word.wordEn}")
     }
 
-    private fun prefetchWordProgress(wordId: Int) {
+    fun prefetchWordProgress(wordId: Int) {
         if (wordProgressCache.containsKey(wordId)) return
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -614,7 +665,7 @@ class WordMasteryViewModel @Inject constructor(
     }
 
     private suspend fun loadSrsWords(userId: String): List<WordMaster> {
-        val reviewLimit = 5
+        val reviewLimit = 15
         val reviewWords = progressRepository.getWordsDueForReview(userId, reviewLimit)
         val newNeeded = reviewLimit - reviewWords.size
 
@@ -659,6 +710,8 @@ class WordMasteryViewModel @Inject constructor(
             )
         }
 
+        startPractice()
+
         words.drop(1).take(2).forEach { word ->
             prefetchWordProgress(word.id)
         }
@@ -690,7 +743,6 @@ class WordMasteryViewModel @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val dashboard = activityRepository.getDashboardData(userId)
-                val wordStats = progressRepository.getSessionStats(userId)
                 SessionStats(
                     totalCards = 0,
                     masteredCount = 0,
@@ -706,7 +758,7 @@ class WordMasteryViewModel @Inject constructor(
                     totalTimeMs = dashboard.totalTimeMs,
                     totalDaysActive = dashboard.totalDaysActive,
                     bestStreak = dashboard.bestStreak,
-                    totalWordsLearned = wordStats.totalWordsLearned,
+                    totalWordsLearned = dashboard.totalWordsLearned,
                     totalWordsMastered = dashboard.totalWordsMastered,
                     sessionDurationMs = 0
                 )
@@ -733,7 +785,7 @@ class WordMasteryViewModel @Inject constructor(
         mode: String,
         baseSessionStats: SessionStats
     ) {
-        val fallbackWords = MockWordData.mockWordList.shuffled().take(5)
+        val fallbackWords = MockWordData.mockWordList.shuffled().take(15)
         val defaultPinnedLanguage = fallbackWords.firstOrNull()?.let {
             getLanguageOptions(it).find { lang -> lang.langName == "Spanish" }
         }
@@ -750,6 +802,8 @@ class WordMasteryViewModel @Inject constructor(
                 sessionStats = baseSessionStats.copy(totalCards = fallbackWords.size)
             )
         }
+
+        startPractice()
 
         analyticsManager.logError(
             errorType = "word_load",
@@ -857,23 +911,22 @@ class WordMasteryViewModel @Inject constructor(
     }
 
     private fun UserWordProgress.toCurrentWordProgress(): CurrentWordProgress {
-        val totalInteractions = recallSuccess + recallFail + productionSuccess
         val successfulInteractions = recallSuccess + productionSuccess
 
         val masteryProgress = when {
-            totalInteractions == 0 -> 0f
+            totalAttempts == 0 -> 0f
             knownState == KnownState.MASTERED -> 1f
             knownState == KnownState.KNOWN -> 0.75f
             knownState == KnownState.LEARNING -> 0.5f
             knownState == KnownState.SEEN -> 0.25f
-            else -> (successfulInteractions.toFloat() / maxOf(totalInteractions, 1))
+            else -> (successfulInteractions.toFloat() / maxOf(totalAttempts, 1))
                 .coerceIn(0f, 1f)
         }
 
         val nextReviewText = calculateNextReviewText(nextReview)
 
         return CurrentWordProgress(
-            repetitions = viewCount,
+            repetitions = totalAttempts,
             nextReviewText = nextReviewText,
             masteryProgress = masteryProgress,
             isBookmarked = bookmarked,
