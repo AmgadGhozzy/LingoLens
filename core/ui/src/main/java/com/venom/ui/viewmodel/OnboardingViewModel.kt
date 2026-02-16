@@ -26,8 +26,8 @@ class OnboardingViewModel @Inject constructor(
             _isSyncing.update { true }
             try {
                 val userId = identityRepository.getCurrentUserId()
-                progressRepository.syncFromCloud(userId)
-                activityRepository.syncFromCloud(userId)
+                // Ensure profile and today's activity exist locally
+                activityRepository.ensureTodayExists(userId)
             } catch (e: Exception) {
                 Log.e("OnboardingVM", "Restore failed: ${e.message}", e)
             } finally {
@@ -51,10 +51,8 @@ class OnboardingViewModel @Inject constructor(
                     activityRepository.migrateLocalData(oldUid, userId)
                 }
 
-                // Sync both directions
-                progressRepository.syncFromCloud(userId)
-                activityRepository.syncFromCloud(userId)
-                activityRepository.syncAllToCloud(userId)
+                // Ensure profile and today's activity exist
+                activityRepository.ensureTodayExists(userId)
 
             } catch (e: Exception) {
                 Log.e("OnboardingVM", "Google sign-in failed: ${e.message}", e)
