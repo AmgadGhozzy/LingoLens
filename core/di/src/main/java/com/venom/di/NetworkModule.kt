@@ -11,6 +11,7 @@ import com.venom.data.api.GroqService
 import com.venom.data.api.GroqTtsService
 import com.venom.data.api.HuggingFaceService
 import com.venom.data.api.OcrService
+import com.venom.data.api.SupabaseSyncService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -133,4 +134,10 @@ object NetworkModule {
     fun provideGson(): Gson = GsonBuilder()
         .setLenient()
         .create()
+
+    @Provides
+    @Singleton
+    fun provideSupabaseSyncService(@Named("AiOkHttpClient") client: OkHttpClient): SupabaseSyncService {
+        return createRetrofit(SupabaseSyncService.BASE_URL, client).create(SupabaseSyncService::class.java)
+    }
 }
