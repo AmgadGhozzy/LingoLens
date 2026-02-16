@@ -26,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -185,7 +184,6 @@ fun StickyNoteCard(
                 .width(80.adp)
                 .height(28.adp)
                 .rotate(-2f)
-                .blur(5.adp)
                 .alpha(0.8f)
                 .align(Alignment.TopCenter)
                 .shadow(2.adp, RoundedCornerShape(2.adp), ambientColor = Color.Black.copy(0.1f))

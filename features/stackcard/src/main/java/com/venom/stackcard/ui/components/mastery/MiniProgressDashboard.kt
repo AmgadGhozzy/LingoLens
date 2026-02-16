@@ -28,8 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.domain.model.AppTheme
+import com.venom.domain.model.DashboardData
 import com.venom.domain.model.UserLevel
-import com.venom.domain.model.UserProgressData
 import com.venom.resources.R
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
@@ -38,7 +38,7 @@ import com.venom.ui.theme.LingoLensTheme
 
 @Composable
 fun MiniProgressDashboard(
-    data: UserProgressData,
+    data: DashboardData,
     modifier: Modifier = Modifier
 ) {
     GlassSurface(
@@ -79,7 +79,7 @@ fun MiniProgressDashboard(
                     color = BrandColors.Purple500
                 )
                 MiniStat(
-                    value = data.masteredCount.toString(),
+                    value = data.totalWordsMastered.toString(),
                     label = "Mastered",
                     icon = R.drawable.ic_seal_check,
                     color = BrandColors.Green500
@@ -201,14 +201,14 @@ private fun MiniStat(
 private fun MiniProgressDashboardPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         MiniProgressDashboard(
-            data = UserProgressData(
+            data = DashboardData(
                 totalXp = 2450,
                 todayXp = 85,
                 level = UserLevel.ADEPT,
                 levelProgress = 0.68f,
                 xpToNextLevel = 350,
                 totalWordsLearned = 156,
-                masteredCount = 42,
+                totalWordsMastered = 42,
                 currentStreak = 7,
                 totalSessionCount = 23,
                 totalDaysActive = 15

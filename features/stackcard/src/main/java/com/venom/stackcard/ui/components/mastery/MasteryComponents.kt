@@ -42,14 +42,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStoreOwner
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.getFrequencyLabel
 import com.venom.resources.R
@@ -59,18 +56,18 @@ import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.theme.tokens.getDifficultyTheme
-import com.venom.ui.viewmodel.TTSViewModel
 
 @Composable
 fun InteractiveText(
     text: String,
     modifier: Modifier = Modifier,
     languageTag: String? = null,
+    onTtsToggle: (text: String, languageTag: String?) -> Unit = { _, _ -> },
+    onTtsSpeakSlow: (text: String, languageTag: String?) -> Unit = { _, _ -> },
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    val ttsViewModel: TTSViewModel = hiltViewModel(LocalContext.current as ViewModelStoreOwner)
     val haptic = rememberHapticFeedback()
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -87,12 +84,12 @@ fun InteractiveText(
                 indication = null,
                 onClick = {
                     haptic(HapticStrength.LIGHT)
-                    ttsViewModel.toggle(text, languageTag)
+                    onTtsToggle(text, languageTag)
                     onClick()
                 },
                 onLongClick = {
                     haptic(HapticStrength.LIGHT)
-                    ttsViewModel.speakSlow(text, languageTag)
+                    onTtsSpeakSlow(text, languageTag)
                     onLongClick()
                 }
             )
@@ -554,6 +551,8 @@ private fun InteractiveTextPreview() {
     LingoLensTheme {
         InteractiveText(
             text = "Hello World",
+            onTtsToggle = { _, _ -> },
+            onTtsSpeakSlow = { _, _ -> },
             modifier = Modifier.padding(16.adp)
         ) {
             Text(
