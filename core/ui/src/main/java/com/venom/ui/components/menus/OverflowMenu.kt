@@ -22,8 +22,8 @@ enum class ButtonType { FILLED_ICON, OUTLINED }
 @Composable
 fun OverflowMenu(
     options: List<ActionItem.Action>,
-    modifier: Modifier = Modifier,
-    buttonType: ButtonType = ButtonType.FILLED_ICON
+    buttonType: ButtonType = ButtonType.FILLED_ICON,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val desc = stringResource(R.string.action_more_options)

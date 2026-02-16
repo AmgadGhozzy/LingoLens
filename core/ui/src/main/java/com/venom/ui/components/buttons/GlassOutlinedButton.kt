@@ -1,4 +1,4 @@
-package com.venom.stackcard.ui.components.mastery
+package com.venom.ui.components.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
