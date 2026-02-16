@@ -23,9 +23,9 @@ val LightQuoteColors = QuoteColors(
     tagText = B.Blue600,
     gradient = Brush.linearGradient(
         colors = listOf(
-            B.Purple700.copy(0.7f),
-            B.Blue500.copy(0.7f),
-            B.Indigo600.copy(0.7f)
+            B.Purple500,
+            B.Blue500,
+            B.Indigo600
         )
     )
 )

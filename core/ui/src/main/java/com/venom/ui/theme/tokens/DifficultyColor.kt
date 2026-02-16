@@ -23,37 +23,39 @@ data class DifficultyColors(
 
 val DarkDifficultyColors = DifficultyColors(
     easy = DifficultyTheme(
-        text = B.Emerald300,
-        background = B.Emerald400.copy(alpha = 0.15f),
-        border = B.Emerald400.copy(alpha = 0.3f)
+        text = B.Green300,
+        background = B.Green400.copy(alpha = 0.15f),
+        border = B.Green400.copy(alpha = 0.3f)
     ),
+
     medium = DifficultyTheme(
         text = B.Amber300,
         background = B.Amber400.copy(alpha = 0.14f),
         border = B.Amber500.copy(alpha = 0.35f)
     ),
+
     hard = DifficultyTheme(
-        text = B.Purple300,
-        background = B.Purple400.copy(alpha = 0.15f),
-        border = B.Purple400.copy(alpha = 0.4f)
+        text = B.Red300,
+        background = B.Red400.copy(alpha = 0.15f),
+        border = B.Red400.copy(alpha = 0.4f)
     )
 )
 
 val LightDifficultyColors = DifficultyColors(
     easy = DifficultyTheme(
-        text = B.Emerald700,
-        background = B.Emerald50,
-        border = B.Emerald300
+        text = B.Green700,
+        background = B.Green100.copy(alpha = 0.45f),
+        border = B.Green300
     ),
     medium = DifficultyTheme(
         text = B.Amber700,
-        background = B.Amber50,
+        background = B.Amber100.copy(alpha = 0.45f),
         border = B.Amber300
     ),
     hard = DifficultyTheme(
-        text = B.Purple700,
-        background = B.Purple50,
-        border = B.Purple300
+        text = B.Red700,
+        background = B.Red100.copy(alpha = 0.45f),
+        border = B.Red300
     )
 )
 
@@ -63,6 +65,7 @@ val LocalDifficultyColors = staticCompositionLocalOf { LightDifficultyColors }
 @ReadOnlyComposable
 fun getDifficultyTheme(score: Int): DifficultyTheme {
     val colors = LocalDifficultyColors.current
+
     return when (score) {
         in 1..3 -> colors.easy
         in 4..7 -> colors.medium
