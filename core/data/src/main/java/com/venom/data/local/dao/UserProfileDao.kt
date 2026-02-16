@@ -16,10 +16,10 @@ interface UserProfileDao {
 
     @Query("""
         UPDATE userProfile 
-        SET totalXp = totalXp + :xp, level = :level, updatedAt = :now 
+        SET totalXp = totalXp + :xp, updatedAt = :now 
         WHERE userId = :userId
     """)
-    suspend fun addXpAndUpdateLevel(userId: String, xp: Int, level: Int, now: Long)
+    suspend fun addXpAtomic(userId: String, xp: Int, now: Long)
 
     @Query("""
         UPDATE userProfile 
@@ -39,35 +39,22 @@ interface UserProfileDao {
 
     @Query("""
         UPDATE userProfile 
-        SET totalWordsMastered = totalWordsMastered + 1, updatedAt = :now 
-        WHERE userId = :userId
-    """)
-    suspend fun incrementMastered(userId: String, now: Long)
-
-    @Query("""
-        UPDATE userProfile 
         SET dailyGoalXp = :goal, updatedAt = :now 
         WHERE userId = :userId
     """)
     suspend fun updateDailyGoal(userId: String, goal: Int, now: Long)
 
-    @Query("""
-        UPDATE userProfile 
-        SET totalWordsViewed = :wordsViewed, totalWordsMastered = :mastered, 
-            totalSessionCount = :sessions, totalTimeMs = :timeMs, 
-            totalDaysActive = :daysActive, updatedAt = :now 
-        WHERE userId = :userId
-    """)
-    suspend fun updateAggregates(
-        userId: String,
-        wordsViewed: Int,
-        mastered: Int,
-        sessions: Int,
-        timeMs: Long,
-        daysActive: Int,
-        now: Long
-    )
-
     @Query("UPDATE userProfile SET userId = :toUserId WHERE userId = :fromUserId")
     suspend fun migrateUserId(fromUserId: String, toUserId: String)
+
+    @Query("""
+        UPDATE userProfile 
+        SET placementUnit = :unit, placementCefr = :cefr, 
+            placementTakenAt = :takenAt, updatedAt = :now 
+        WHERE userId = :userId
+    """)
+    suspend fun updatePlacement(userId: String, unit: Int, cefr: String, takenAt: Long, now: Long)
+
+    @Query("SELECT placementUnit FROM userProfile WHERE userId = :userId")
+    suspend fun getPlacementUnit(userId: String): Int?
 }
