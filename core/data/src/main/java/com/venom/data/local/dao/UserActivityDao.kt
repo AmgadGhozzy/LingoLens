@@ -38,20 +38,6 @@ interface UserActivityDao {
 
     @Query("""
         UPDATE userActivity 
-        SET wordsSwipedRight = wordsSwipedRight + 1, updatedAt = :now 
-        WHERE userId = :userId AND dateKey = :dateKey
-    """)
-    suspend fun incrementSwipeRight(userId: String, dateKey: String, now: Long)
-
-    @Query("""
-        UPDATE userActivity 
-        SET wordsSwipedLeft = wordsSwipedLeft + 1, updatedAt = :now 
-        WHERE userId = :userId AND dateKey = :dateKey
-    """)
-    suspend fun incrementSwipeLeft(userId: String, dateKey: String, now: Long)
-
-    @Query("""
-        UPDATE userActivity 
         SET recallSuccess = recallSuccess + 1, totalXpEarned = totalXpEarned + :xp, updatedAt = :now 
         WHERE userId = :userId AND dateKey = :dateKey
     """)
@@ -81,13 +67,6 @@ interface UserActivityDao {
 
     @Query("""
         UPDATE userActivity 
-        SET perfectSessions = perfectSessions + 1, updatedAt = :now 
-        WHERE userId = :userId AND dateKey = :dateKey
-    """)
-    suspend fun incrementPerfectSessions(userId: String, dateKey: String, now: Long)
-
-    @Query("""
-        UPDATE userActivity 
         SET totalXpEarned = totalXpEarned + :xp, updatedAt = :now 
         WHERE userId = :userId AND dateKey = :dateKey
     """)
@@ -96,7 +75,6 @@ interface UserActivityDao {
     @Query("""
         UPDATE userActivity 
         SET totalTimeMs = totalTimeMs + :durationMs, 
-            longestSessionMs = CASE WHEN :durationMs > longestSessionMs THEN :durationMs ELSE longestSessionMs END,
             updatedAt = :now 
         WHERE userId = :userId AND dateKey = :dateKey
     """)
