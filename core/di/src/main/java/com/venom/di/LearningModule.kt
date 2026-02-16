@@ -2,11 +2,14 @@ package com.venom.di
 
 import android.content.Context
 import androidx.room.Room
+import com.venom.data.local.dao.QuizAttemptDao
+import com.venom.data.local.dao.UsageDailyDao
 import com.venom.data.local.dao.UserActivityDao
 import com.venom.data.local.dao.UserIdentityDao
 import com.venom.data.local.dao.UserProfileDao
 import com.venom.data.local.dao.UserWordProgressDao
 import com.venom.data.local.dao.WordMasterDao
+import com.venom.data.local.dao.XpEventDao
 import com.venom.data.local.database.LearningDatabase
 import com.venom.data.repo.EnrichmentRepositoryImpl
 import com.venom.data.repo.WordMasterRepositoryImpl
@@ -33,6 +36,7 @@ object LearningModule {
             "WordsMaster.db"
         )
             .createFromAsset("WordsMaster.db")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -51,13 +55,24 @@ object LearningModule {
 
     @Provides
     @Singleton
-    fun provideUserActivityDao(database: LearningDatabase): UserActivityDao {
-        return database.userActivityDao()
-    }
+    fun provideUserActivityDao(database: LearningDatabase): UserActivityDao =
+        database.userActivityDao()
 
     @Provides
     @Singleton
     fun provideUserProfileDao(db: LearningDatabase): UserProfileDao = db.userProfileDao()
+
+    @Provides
+    @Singleton
+    fun provideXpEventDao(db: LearningDatabase): XpEventDao = db.xpEventDao()
+
+    @Provides
+    @Singleton
+    fun provideQuizAttemptDao(db: LearningDatabase): QuizAttemptDao = db.quizAttemptDao()
+
+    @Provides
+    @Singleton
+    fun provideUsageDailyDao(db: LearningDatabase): UsageDailyDao = db.usageDailyDao()
 
     @Provides
     @Singleton
@@ -71,4 +86,3 @@ object LearningModule {
     @Singleton
     fun provideEnrichmentRepository(impl: EnrichmentRepositoryImpl): IEnrichmentRepository = impl
 }
-
