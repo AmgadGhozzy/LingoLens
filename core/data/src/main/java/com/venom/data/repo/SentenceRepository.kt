@@ -1,5 +1,6 @@
 package com.venom.data.repo
 
+import com.venom.data.BuildConfig
 import com.venom.data.api.SentenceService
 import com.venom.data.cache.SentenceCacheManager
 import com.venom.data.remote.respnod.NetworkResult
@@ -12,7 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class SentenceRepository @Inject constructor(
     private val sentenceService: SentenceService,
-    private val cacheManager: SentenceCacheManager
+    private val cacheManager: SentenceCacheManager,
+    private val sessionManager: SupabaseSessionManager
 ) {
     fun getSentences(
         word: String,
@@ -30,8 +32,20 @@ class SentenceRepository @Inject constructor(
 
         emit(NetworkResult.Loading())
 
+        val token = sessionManager.getBearerToken()
+        if (token == null) {
+            emit(NetworkResult.Error("User authentication required"))
+            return@flow
+        }
+
         runCatching {
-            sentenceService.getSentences(normalizedWord, limit, normalizedSource)
+            sentenceService.getSentences(
+                word = normalizedWord,
+                limit = limit,
+                source = normalizedSource,
+                authToken = token,
+                apiKey = BuildConfig.SUPABASE_API_KEY
+            )
         }.onSuccess { response ->
             response.body()?.let { sentenceResponse ->
                 cacheManager.cacheResponse(cacheKey, sentenceResponse)
