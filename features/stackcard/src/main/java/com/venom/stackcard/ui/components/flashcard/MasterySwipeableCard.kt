@@ -23,8 +23,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.venom.domain.model.LanguageOption
-import com.venom.domain.model.WordMaster
 import com.venom.ui.components.common.adp
 import kotlin.math.abs
 import kotlin.math.min
@@ -33,23 +31,17 @@ import kotlin.math.sqrt
 
 @Composable
 fun MasterySwipeableCard(
-    word: WordMaster,
     animState: CardAnimationState?,
     stackPosition: StackPosition,
     isTopCard: Boolean,
     isFlipped: Boolean,
     flipRotation: Float,
     swipeThresholdPx: Float,
-    isBookmarked: Boolean,
-    isHintRevealed: Boolean,
-    pinnedLanguage: LanguageOption?,
     onFlip: () -> Unit,
     onDrag: (Float, Float) -> Unit,
     onDragEnd: () -> Unit,
-    onBookmark: () -> Unit,
-    onSpeak: (String) -> Unit,
-    onRevealHint: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable (showFront: Boolean) -> Unit
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -60,16 +52,15 @@ fun MasterySwipeableCard(
     val screenWidthDp = configuration.screenWidthDp.adp
     val elevationDp = 0.adp
 
-    // Shape — remembered with cornerRadius as key
     val cardShape = remember(cornerRadiusDp) { RoundedCornerShape(cornerRadiusDp) }
 
-    // Flip animation via Animatable — read only in graphicsLayer, zero recomposition
+    // Flip animation — read only in graphicsLayer, zero recomposition
     val flipAnimatable = remember { Animatable(0f) }
     LaunchedEffect(flipRotation) {
         flipAnimatable.animateTo(flipRotation, OptimizedCardAnimations.FlipAnimationSpec)
     }
 
-    // Derive showFront — recomposes only at 90° and 270° (2x per flip, not 20-30x)
+    // Derive showFront — recomposes only at 90°/270° thresholds
     val showFront by remember {
         derivedStateOf {
             val rot = flipAnimatable.value % 360f
@@ -78,7 +69,6 @@ fun MasterySwipeableCard(
         }
     }
 
-    // Cache card dimensions
     val (cardWidth, cardHeight) = remember(screenWidthDp, paddingDp, limitDp, density) {
         val maxWidthPx = with(density) { screenWidthDp.toPx() }
         val paddingPx = with(density) { paddingDp.toPx() }
@@ -88,7 +78,6 @@ fun MasterySwipeableCard(
         Pair(cardWidthDp, cardWidthDp * 1.8f)
     }
 
-    // Pre-compute stack offsets in pixels for graphicsLayer
     val stackOffsetXDp = stackPosition.offsetXDp.adp
     val stackOffsetYDp = stackPosition.offsetYDp.adp
 
@@ -101,23 +90,16 @@ fun MasterySwipeableCard(
 
     val cameraDistance = remember(density) { 12f * density.density }
 
-    // Pre-compute border values — adp evaluated outside, px computed inside
     val borderCornerRadiusPx = remember(cornerRadiusDp, density) {
         with(density) { cornerRadiusDp.toPx() }
     }
-    val borderWidthThinPx = remember(density) {
-        with(density) { 1.dp.toPx() }
-    }
-    val borderWidthThickPx = remember(density) {
-        with(density) { 2.dp.toPx() }
-    }
+    val borderWidthThinPx = remember(density) { with(density) { 1.dp.toPx() } }
+    val borderWidthThickPx = remember(density) { with(density) { 2.dp.toPx() } }
 
     Card(
         modifier = modifier
             .size(cardWidth, cardHeight)
             .graphicsLayer {
-                // ALL dynamic animation values read here — no recomposition
-
                 if (isTopCard && animState != null) {
                     val currentOffsetX = animState.offsetX.value
                     val currentOffsetY = animState.offsetY.value
@@ -125,7 +107,6 @@ fun MasterySwipeableCard(
 
                     translationX = currentOffsetX + stackOffsetXPx
                     translationY = currentOffsetY + stackOffsetYPx
-
                     rotationZ = if (isFlipped) -currentRotation else currentRotation
                     rotationY = flipAnimatable.value
 
@@ -148,20 +129,15 @@ fun MasterySwipeableCard(
                 clip = false
             }
             .clip(cardShape)
-            // Border drawn in draw scope — reads animState without recomposition
             .drawWithContent {
                 drawContent()
                 val progress = if (animState != null && isTopCard) {
                     (animState.offsetX.value / swipeThresholdPx).coerceIn(-1f, 1f)
-                } else {
-                    0f
-                }
+                } else 0f
                 val borderColor = CardColors.getBorderColor(progress)
                 val strokeWidth = if (abs(progress) > CardColors.PROGRESS_THRESHOLD) {
                     borderWidthThickPx
-                } else {
-                    borderWidthThinPx
-                }
+                } else borderWidthThinPx
                 drawRoundRect(
                     color = borderColor,
                     cornerRadius = CornerRadius(borderCornerRadiusPx),
@@ -183,9 +159,7 @@ fun MasterySwipeableCard(
                             }
                         }
                         .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = { onFlip() }
-                            )
+                            detectTapGestures(onTap = { onFlip() })
                         }
                 } else Modifier
             ),
@@ -193,15 +167,6 @@ fun MasterySwipeableCard(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = elevationDp)
     ) {
-        WordCard(
-            word = word,
-            showFront = if (isTopCard) showFront else true,
-            isBookmarked = isBookmarked,
-            isHintRevealed = isHintRevealed,
-            pinnedLanguage = pinnedLanguage,
-            onSpeak = onSpeak,
-            onBookmarkToggle = onBookmark,
-            onRevealHint = onRevealHint
-        )
+        content(if (isTopCard) showFront else true)
     }
 }
