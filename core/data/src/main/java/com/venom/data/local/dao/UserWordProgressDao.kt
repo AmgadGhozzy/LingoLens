@@ -4,20 +4,18 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.venom.data.local.entity.UserWordProgressEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserWordProgressDao {
-    
+
     @Query("SELECT * FROM userWordProgress WHERE userId = :userId AND wordId = :wordId")
     suspend fun getProgress(userId: String, wordId: Int): UserWordProgressEntity?
-    
+
     @Query("SELECT * FROM userWordProgress WHERE userId = :userId")
     fun getAllProgress(userId: String): Flow<List<UserWordProgressEntity>>
-    
-    // SRS: Get due words for review
+
     @Query("""
         SELECT * FROM userWordProgress 
         WHERE userId = :userId 
@@ -27,8 +25,7 @@ interface UserWordProgressDao {
         LIMIT :limit
     """)
     suspend fun getDueWords(userId: String, now: Long, limit: Int = 20): List<UserWordProgressEntity>
-    
-    // Get high-lapse words needing reinforcement
+
     @Query("""
         SELECT * FROM userWordProgress 
         WHERE userId = :userId 
@@ -38,12 +35,10 @@ interface UserWordProgressDao {
         LIMIT :limit
     """)
     suspend fun getHighLapseWords(userId: String, limit: Int = 10): List<UserWordProgressEntity>
-    
-    // Get bookmarked words
+
     @Query("SELECT * FROM userWordProgress WHERE userId = :userId AND bookmarked = 1")
     fun getBookmarkedWords(userId: String): Flow<List<UserWordProgressEntity>>
-    
-    // Get word IDs user has seen
+
     @Query("SELECT * FROM userWordProgress WHERE userId = :userId")
     suspend fun getAllProgressSnapshot(userId: String): List<UserWordProgressEntity>
 
@@ -61,19 +56,7 @@ interface UserWordProgressDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(progressList: List<UserWordProgressEntity>)
-    
-    @Update
-    suspend fun update(progress: UserWordProgressEntity)
-    
-    // Increment view count
-    @Query("""
-        UPDATE userWordProgress 
-        SET viewCount = viewCount + 1, lastViewed = :timestamp 
-        WHERE userId = :userId AND wordId = :wordId
-    """)
-    suspend fun incrementViewCount(userId: String, wordId: Int, timestamp: Long)
-    
-    // Toggle bookmark
+
     @Query("UPDATE userWordProgress SET bookmarked = :bookmarked WHERE userId = :userId AND wordId = :wordId")
     suspend fun setBookmarked(userId: String, wordId: Int, bookmarked: Boolean)
 
@@ -85,4 +68,51 @@ interface UserWordProgressDao {
     """)
     suspend fun getSeenCountInRange(userId: String, minRank: Int, maxRank: Int): Int
 
+    @Query("SELECT COUNT(*) FROM userWordProgress WHERE userId = :userId AND knownState = 'MASTERED'")
+    suspend fun getMasteredCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM userWordProgress WHERE userId = :userId AND knownState IN ('LEARNING', 'KNOWN')")
+    suspend fun getLearningCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM userWordProgress WHERE userId = :userId AND nextReview <= :now")
+    suspend fun getNeedsReviewCount(userId: String, now: Long): Int
+
+    @Query("""
+        UPDATE userWordProgress 
+        SET recallSuccess = recallSuccess + 1, totalAttempts = totalAttempts + 1 
+        WHERE userId = :userId AND wordId = :wordId
+    """)
+    suspend fun incrementRecallSuccess(userId: String, wordId: Int)
+
+    @Query("""
+        UPDATE userWordProgress 
+        SET productionSuccess = productionSuccess + 1, totalAttempts = totalAttempts + 1 
+        WHERE userId = :userId AND wordId = :wordId
+    """)
+    suspend fun incrementProductionSuccess(userId: String, wordId: Int)
+
+    @Query("""
+        UPDATE userWordProgress 
+        SET totalAttempts = totalAttempts + 1 
+        WHERE userId = :userId AND wordId = :wordId
+    """)
+    suspend fun incrementTotalAttempts(userId: String, wordId: Int)
+
+    @Query("""
+        UPDATE userWordProgress 
+        SET stability = :stability, difficulty = :difficulty, 
+            knownState = :knownState, lastReview = :lastReview, nextReview = :nextReview,
+            lapsesCount = :lapsesCount
+        WHERE userId = :userId AND wordId = :wordId
+    """)
+    suspend fun updateSrsFields(
+        userId: String,
+        wordId: Int,
+        stability: Float,
+        difficulty: Int,
+        knownState: String,
+        lastReview: Long,
+        nextReview: Long,
+        lapsesCount: Int
+    )
 }
