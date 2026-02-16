@@ -62,13 +62,14 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.venom.domain.model.AppTheme
-import com.venom.domain.model.UserProgressData
+import com.venom.domain.model.DashboardData
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.MiniProgressDashboard
 import com.venom.ui.components.buttons.CustomFilledIconButton
 import com.venom.ui.components.buttons.GradientActionButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
+import com.venom.ui.components.dialogs.PlacementChoiceDialog
 import com.venom.ui.components.onboarding.GoogleSignInButton
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
@@ -81,14 +82,16 @@ fun WelcomeScreen(
     onBack: () -> Unit = {},
     onGoogleSignIn: () -> Unit = {},
     onOpenProgress: () -> Unit = {},
+    onTakePlacement: () -> Unit = {},
     isLoading: Boolean = false,
     isSignedIn: Boolean = false,
     userName: String? = null,
-    userProgress: UserProgressData? = null,
+    userProgress: DashboardData? = null,
     modifier: Modifier = Modifier
 ) {
     var topic by remember { mutableStateOf("") }
     var isVisible by remember { mutableStateOf(false) }
+    var showPlacementDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { delay(100); isVisible = true }
 
@@ -142,7 +145,13 @@ fun WelcomeScreen(
         ) {
             GradientActionButton(
                 text = "Start Learning",
-                onClick = { onStart(topic) },
+                onClick = {
+                    if (userProgress == null || userProgress.totalWordsLearned == 0) {
+                        showPlacementDialog = true
+                    } else {
+                        onStart(topic)
+                    }
+                },
                 enabled = !isLoading,
                 leadingIcon = R.drawable.icon_play,
                 maxWidth = 360
@@ -169,13 +178,27 @@ fun WelcomeScreen(
             }
         }
 
+        if (showPlacementDialog) {
+            PlacementChoiceDialog(
+                onStartFromBeginning = {
+                    showPlacementDialog = false
+                    onStart(topic)
+                },
+                onTakePlacementTest = {
+                    showPlacementDialog = false
+                    onTakePlacement()
+                },
+                onDismiss = { showPlacementDialog = false }
+            )
+        }
+
         Spacer(modifier = Modifier.height(32.adp))
     }
 }
 
 @Composable
 private fun DashboardSection(
-    userProgress: UserProgressData?,
+    userProgress: DashboardData?,
     onOpenProgress: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -196,7 +219,7 @@ private fun DashboardSection(
                 verticalArrangement = Arrangement.spacedBy(6.adp)
             ) {
                 MiniProgressDashboard(
-                    data = userProgress ?: UserProgressData(),
+                    data = userProgress ?: DashboardData(),
                     modifier = Modifier.widthIn(max = 360.adp)
                 )
                 Text(
@@ -505,8 +528,8 @@ private fun WelcomeScreenSignedInPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         WelcomeScreen(
             isSignedIn = true,
-            userProgress = UserProgressData(
-                totalWordsLearned = 156, masteredCount = 42, currentStreak = 7, todayXp = 85
+            userProgress = DashboardData(
+                totalWordsLearned = 156, totalWordsMastered = 42, currentStreak = 7, todayXp = 85
             )
         )
     }
