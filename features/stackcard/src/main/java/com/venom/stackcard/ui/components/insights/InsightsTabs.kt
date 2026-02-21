@@ -1,7 +1,8 @@
 package com.venom.stackcard.ui.components.insights
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,16 +16,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import com.venom.domain.model.AppTheme
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
-import com.venom.ui.theme.LingoLensTheme
 
 /**
  * Tab navigation bar for the Insights bottom sheet.
@@ -48,12 +47,14 @@ fun InsightsTabs(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         InsightsTab.entries.forEach { tab ->
-            TabItem(
-                tab = tab,
-                isActive = activeTab == tab,
-                onClick = { onTabChange(tab) },
-                modifier = Modifier.weight(1f)
-            )
+            key(tab) {
+                TabItem(
+                    tab = tab,
+                    isActive = activeTab == tab,
+                    onClick = { onTabChange(tab) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
@@ -65,23 +66,23 @@ private fun TabItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor by animateColorAsState(
-        targetValue = if (isActive) {
-            MaterialTheme.colorScheme.surfaceContainerHighest
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerHigh
-        },
-        animationSpec = tween(durationMillis = 150)
+    val transition = updateTransition(
+        targetState = isActive
     )
 
-    val textColor by animateColorAsState(
-        targetValue = if (isActive) {
-            MaterialTheme.colorScheme.onSurface
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
-        animationSpec = tween(durationMillis = 150)
-    )
+    val backgroundColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 150) }
+    ) { active ->
+        if (active) MaterialTheme.colorScheme.surfaceContainerHighest
+        else MaterialTheme.colorScheme.surfaceContainerHigh
+    }
+
+    val textColor by transition.animateColor(
+        transitionSpec = { tween(durationMillis = 150) }
+    ) { active ->
+        if (active) MaterialTheme.colorScheme.onSurface
+        else MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Box(
         modifier = modifier
@@ -107,34 +108,9 @@ private fun TabItem(
     }
 }
 
-
 enum class InsightsTab(val title: String) {
     OVERVIEW("Overview"),
     RELATIONS("Relations"),
     USAGE("Usage"),
     LANGUAGES("Languages")
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF0F172A)
-@Composable
-private fun InsightsTabsPreview() {
-    LingoLensTheme(appTheme = AppTheme.DARK) {
-        InsightsTabs(
-            activeTab = InsightsTab.OVERVIEW,
-            onTabChange = {},
-            modifier = Modifier.padding(16.adp)
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF1F5F9)
-@Composable
-private fun InsightsTabsPreviewLight() {
-    LingoLensTheme(appTheme = AppTheme.LIGHT) {
-        InsightsTabs(
-            activeTab = InsightsTab.OVERVIEW,
-            onTabChange = {},
-            modifier = Modifier.padding(16.adp)
-        )
-    }
 }
