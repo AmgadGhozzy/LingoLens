@@ -286,13 +286,16 @@ private fun ContextualExamplesSection(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(10.adp)) {
-            examples.entries.zip(CefrLevel.entries).forEach { (example, level) ->
-                ExampleAccordionItem(
-                    level = level,
-                    example = example.value,
-                    targetWord = targetWord,
-                    isUserLevel = level == userCefrLevel
-                )
+            CefrLevel.entries.forEach { level ->
+                val example = examples[level]
+                if (example != null) {
+                    ExampleAccordionItem(
+                        level = level,
+                        example = example,
+                        targetWord = targetWord,
+                        isUserLevel = level == userCefrLevel
+                    )
+                }
             }
         }
     }
@@ -459,43 +462,52 @@ private fun HighlightedExampleText(
 
     val annotatedString = remember(example, targetWord) {
         buildAnnotatedString {
+            if (targetWord.isBlank()) {
+                append(example)
+                return@buildAnnotatedString
+            }
+
             val lowerExample = example.lowercase()
             val lowerTarget = targetWord.lowercase()
 
-            // Find all occurrences of the word (with word boundary checking)
-            var lastIndex = 0
-            var currentIndex = lowerExample.indexOf(lowerTarget, lastIndex)
+            var lastIndex = 0      // tracks how far we've appended
+            var searchFrom = 0     // tracks where to search next (independent!)
+            var currentIndex = lowerExample.indexOf(lowerTarget, searchFrom)
 
             while (currentIndex != -1) {
-                // Check word boundaries: character before and after should not be a letter
-                val isWordStart = currentIndex == 0 || !lowerExample[currentIndex - 1].isLetter()
-                val isWordEnd = currentIndex + lowerTarget.length >= lowerExample.length ||
-                        !lowerExample[currentIndex + lowerTarget.length].isLetter()
+                val endIndex = currentIndex + lowerTarget.length
+
+                // Check word boundaries
+                val charBefore = if (currentIndex > 0) lowerExample[currentIndex - 1] else ' '
+                val charAfter = if (endIndex < lowerExample.length) lowerExample[endIndex] else ' '
+                val isWordStart = charBefore == ' ' || !charBefore.isLetterOrDigit()
+                val isWordEnd = charAfter == ' ' || !charAfter.isLetterOrDigit()
 
                 if (isWordStart && isWordEnd) {
-                    // Append text before match
+                    // Append all plain text from lastIndex up to this match
                     append(example.substring(lastIndex, currentIndex))
 
-                    // Append highlighted match
+                    // Append highlighted match (preserve original casing)
                     withStyle(
                         style = SpanStyle(
                             fontWeight = FontWeight.ExtraBold,
                             color = primaryColor
                         )
                     ) {
-                        append(example.substring(currentIndex, currentIndex + lowerTarget.length))
+                        append(example.substring(currentIndex, endIndex))
                     }
 
-                    lastIndex = currentIndex + lowerTarget.length
+                    lastIndex = endIndex
+                    searchFrom = endIndex
                 } else {
-                    // Skip this match as it's part of another word
-                    lastIndex = currentIndex + 1
+                    // NOT a whole-word match — skip but do NOT touch lastIndex
+                    searchFrom = currentIndex + 1
                 }
 
-                currentIndex = lowerExample.indexOf(lowerTarget, lastIndex)
+                currentIndex = lowerExample.indexOf(lowerTarget, searchFrom)
             }
 
-            // Append remaining text
+            // Append any remaining text after the last match
             if (lastIndex < example.length) {
                 append(example.substring(lastIndex))
             }

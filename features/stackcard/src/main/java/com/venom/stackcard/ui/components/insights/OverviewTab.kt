@@ -3,6 +3,7 @@ package com.venom.stackcard.ui.components.insights
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
@@ -125,6 +126,7 @@ fun OverviewTab(
             cefrColors = cefrColors,
             category = word.category,
             register = word.register,
+            wordRank = word.rank,
             showPowerTip = showPowerTip,
             onTogglePowerTip = onTogglePowerTip
         )
@@ -144,8 +146,7 @@ private fun YourProgressCard(
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = masteryProgress,
-        animationSpec = tween(durationMillis = 1000),
-        label = "progress"
+        animationSpec = tween(durationMillis = 1000)
     )
 
     Column(
@@ -255,8 +256,7 @@ private fun CircularProgressRing(
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
-        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
-        label = "ring"
+        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing)
     )
 
     val strokeWidthDp = 8.adp
@@ -368,7 +368,7 @@ private fun OxfordCoreBadge(modifier: Modifier = Modifier) {
 @Composable
 private fun SemanticCloudSection(
     tags: List<String>,
-    scrollState: androidx.compose.foundation.ScrollState,
+    scrollState: ScrollState,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -421,6 +421,7 @@ private fun StatsGrid(
     cefrColors: CefrColorScheme,
     category: String?,
     register: String,
+    wordRank: Int,
     showPowerTip: Boolean,
     onTogglePowerTip: () -> Unit,
     modifier: Modifier = Modifier
@@ -472,6 +473,7 @@ private fun StatsGrid(
             PowerCell(
                 showPowerTip = showPowerTip,
                 onTogglePowerTip = onTogglePowerTip,
+                wordRank = wordRank,
                 modifier = Modifier.weight(1f)
             )
         }
