@@ -250,10 +250,12 @@ private fun WordFamilySection(
                     verticalArrangement = Arrangement.spacedBy(10.adp)
                 ) {
                     columnItems.forEach { (pos, term) ->
-                        WordFamilyCard(
-                            partOfSpeech = pos,
-                            term = term
-                        )
+                        if (term.isNotBlank()) {
+                            WordFamilyCard(
+                                partOfSpeech = pos,
+                                term = term
+                            )
+                        }
                     }
                 }
             }
