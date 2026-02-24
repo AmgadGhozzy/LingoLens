@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.zIndex
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.WordMaster
@@ -39,33 +41,41 @@ fun WordCard(
     onRevealHint: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // adp evaluated in composable scope, then remembered
     val cornerRadiusDp = 32.adp
     val cardShape = remember(cornerRadiusDp) { RoundedCornerShape(cornerRadiusDp) }
 
     Box(modifier = modifier.clip(cardShape)) {
-        // Front face
-        Box(
+
+                                Box(
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(if (showFront) 1f else 0f)
-                .graphicsLayer {
-                    alpha = if (showFront) 1f else 0f
+                .graphicsLayer { alpha = if (showFront) 1f else 0f }
+                .pointerInput(showFront) {
+                    // Block ALL touches on this face when it's hidden
+                    if (!showFront) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent(PointerEventPass.Initial)
+                                    .changes.forEach { it.consume() }
+                            }
+                        }
+                    }
                 }
         ) {
-            if (showFront) {
-                CardFront(
-                    word = word,
-                    isBookmarked = isBookmarked,
-                    isHintRevealed = isHintRevealed,
-                    onSpeak = onSpeak,
-                    onBookmarkToggle = onBookmarkToggle,
-                    onRevealHint = onRevealHint
-                )
-            }
+            CardFront(
+                word = word,
+                isBookmarked = isBookmarked,
+                isHintRevealed = isHintRevealed,
+                onSpeak = onSpeak,
+                onBookmarkToggle = onBookmarkToggle,
+                onRevealHint = onRevealHint
+            )
         }
 
-        // Back face
+        // ── Back face ───────────────────────────────────────────────────────────
+        // rotationY = 180f so it reads correctly when parent card flips to 180°
+        // Same strategy: block touches when hidden
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,16 +84,25 @@ fun WordCard(
                     alpha = if (!showFront) 1f else 0f
                     rotationY = 180f
                 }
+                .pointerInput(showFront) {
+                    // Block ALL touches on this face when it's hidden
+                    if (showFront) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent(PointerEventPass.Initial)
+                                    .changes.forEach { it.consume() }
+                            }
+                        }
+                    }
+                }
         ) {
-            if (!showFront) {
-                CardBack(
-                    word = word,
-                    isBookmarked = isBookmarked,
-                    pinnedLanguage = pinnedLanguage,
-                    onSpeak = onSpeak,
-                    onBookmarkToggle = onBookmarkToggle
-                )
-            }
+            CardBack(
+                word = word,
+                isBookmarked = isBookmarked,
+                pinnedLanguage = pinnedLanguage,
+                onSpeak = onSpeak,
+                onBookmarkToggle = onBookmarkToggle
+            )
         }
     }
 }
