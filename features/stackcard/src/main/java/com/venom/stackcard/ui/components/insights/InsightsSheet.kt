@@ -1,17 +1,15 @@
 package com.venom.stackcard.ui.components.insights
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableDefaults
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -31,25 +28,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.util.lerp
 import com.venom.domain.model.CefrLevel
 import com.venom.domain.model.LanguageOption
@@ -61,7 +50,10 @@ import com.venom.ui.components.common.CustomDragHandle
 import com.venom.ui.components.common.adp
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
+
+private enum class SheetValue { Hidden, Expanded }
+
+private const val SHEET_FRACTION = 0.88f
 
 @Composable
 fun InsightsSheet(
@@ -78,62 +70,101 @@ fun InsightsSheet(
     onTogglePowerTip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var savedPageIndex by rememberSaveable { mutableIntStateOf(activeTab.ordinal) }
+    val scope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState(
-        initialPage = savedPageIndex,
+        initialPage = activeTab.ordinal,
         pageCount = { InsightsTab.entries.size }
     )
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }
-            .collect { page ->
-                savedPageIndex = page
-                val tab = InsightsTab.entries.getOrNull(page) ?: return@collect
-                onTabChange(tab)
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            InsightsTab.entries.getOrNull(page)?.let { tab ->
+                if (tab != activeTab) onTabChange(tab)
             }
+        }
     }
 
-    AnimatedVisibility(
-        visible = isOpen && word != null,
-        enter = fadeIn(tween(250, easing = FastOutSlowInEasing)) +
-                slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = tween(350, easing = FastOutSlowInEasing)
-                ),
-        exit = fadeOut(tween(200)) +
-                slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(280, easing = FastOutSlowInEasing)
+    // Seed approximate anchors so the open animation works before onSizeChanged fires.
+    val windowInfo = LocalWindowInfo.current
+    val approximateHiddenPx = remember(windowInfo) {
+        windowInfo.containerSize.height * SHEET_FRACTION
+    }
+
+    val sheetState = remember {
+        AnchoredDraggableState(initialValue = SheetValue.Hidden).also { s ->
+            s.updateAnchors(DraggableAnchors {
+                SheetValue.Expanded at 0f
+                SheetValue.Hidden at approximateHiddenPx
+            })
+        }
+    }
+
+    // React to caller-driven open/close.
+    LaunchedEffect(isOpen, word) {
+        when {
+            isOpen && word != null -> sheetState.animateTo(SheetValue.Expanded)
+            sheetState.currentValue != SheetValue.Hidden -> sheetState.animateTo(SheetValue.Hidden)
+        }
+    }
+
+    // Notify parent only after the dismiss animation fully completes, which fixes
+    // the reopen glitch where onClose() fired before the offset had finished resetting.
+    LaunchedEffect(sheetState.currentValue) {
+        if (sheetState.currentValue == SheetValue.Hidden && isOpen) onClose()
+    }
+
+    val isVisible by remember {
+        derivedStateOf {
+            sheetState.currentValue != SheetValue.Hidden ||
+                    sheetState.targetValue != SheetValue.Hidden
+        }
+    }
+    if (!isVisible) return
+
+    val scrimAlpha by remember {
+        derivedStateOf {
+            val hiddenAnchor = sheetState.anchors.positionOf(SheetValue.Hidden)
+            if (hiddenAnchor <= 0f) return@derivedStateOf 0f
+            val offset = sheetState.offset.takeUnless { it.isNaN() } ?: hiddenAnchor
+            (1f - offset / hiddenAnchor).coerceIn(0f, 1f) * 0.6f
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = scrimAlpha }
+                .background(MaterialTheme.colorScheme.scrim)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {
+                        scope.launch { sheetState.animateTo(SheetValue.Hidden) }
+                    }
                 )
-    ) {
-        Box(modifier = modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.3f))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClose
-                    )
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            SheetContent(
+                word = word,
+                currentWordProgress = currentWordProgress,
+                userCefrLevel = userCefrLevel,
+                pagerState = pagerState,
+                sheetState = sheetState,
+                pinnedLanguage = pinnedLanguage,
+                showPowerTip = showPowerTip,
+                onClose = {
+                    scope.launch { sheetState.animateTo(SheetValue.Hidden) }
+                },
+                onPinLanguage = onPinLanguage,
+                onTogglePowerTip = onTogglePowerTip
             )
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                SheetContent(
-                    word = word,
-                    currentWordProgress = currentWordProgress,
-                    userCefrLevel = userCefrLevel,
-                    pagerState = pagerState,
-                    pinnedLanguage = pinnedLanguage,
-                    showPowerTip = showPowerTip,
-                    onClose = onClose,
-                    onPinLanguage = onPinLanguage,
-                    onTogglePowerTip = onTogglePowerTip
-                )
-            }
         }
     }
 }
@@ -144,79 +175,55 @@ private fun SheetContent(
     currentWordProgress: CurrentWordProgress,
     userCefrLevel: CefrLevel,
     pagerState: PagerState,
+    sheetState: AnchoredDraggableState<SheetValue>,
     pinnedLanguage: LanguageOption?,
     showPowerTip: Boolean,
     onClose: () -> Unit,
     onPinLanguage: (LanguageOption) -> Unit,
-    onTogglePowerTip: () -> Unit
+    onTogglePowerTip: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var dragOffsetY by remember { mutableFloatStateOf(0f) }
-    val dismissThreshold = 300f
-    val dismissNestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                return if (available.y > 0f && source == NestedScrollSource.UserInput) {
-                    val consumed = available.y
-                    dragOffsetY = (dragOffsetY + consumed).coerceAtLeast(0f)
-                    Offset(x = 0f, y = consumed)
-                } else {
-                    Offset.Zero
-                }
-            }
 
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                if (available.y < 0f && source == NestedScrollSource.UserInput) {
-                    dragOffsetY = (dragOffsetY + available.y).coerceAtLeast(0f)
-                    return Offset(x = 0f, y = available.y)
-                }
-                return Offset.Zero
-            }
-
-            override suspend fun onPreFling(available: Velocity): Velocity {
-                return if (dragOffsetY > 0f) {
-                    if (dragOffsetY > dismissThreshold) onClose()
-                    dragOffsetY = 0f
-                    available
-                } else {
-                    Velocity.Zero
-                }
-            }
-        }
+    // offset is NaN before the first layout pass sets real anchors.
+    val sheetOffsetY by remember {
+        derivedStateOf { sheetState.offset.takeUnless { it.isNaN() } ?: 0f }
     }
 
-    val pagerScrollEnabled by remember { derivedStateOf { dragOffsetY == 0f } }
-
-    val draggableState = rememberDraggableState { delta ->
-        dragOffsetY = (dragOffsetY + delta).coerceAtLeast(0f)
+    // HorizontalPager swipe disabled while a vertical dismiss drag is active.
+    // Only recomposes when the boolean flips, not on every drag pixel.
+    val pagerScrollEnabled by remember {
+        derivedStateOf { sheetOffsetY < 1f }
     }
+
+    val flingBehavior = AnchoredDraggableDefaults.flingBehavior(
+        state = sheetState,
+        positionalThreshold = { total -> total * 0.35f },
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
+    )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.88f)
-            .offset { IntOffset(x = 0, y = dragOffsetY.roundToInt()) }
+            .fillMaxHeight(SHEET_FRACTION)
+            .onSizeChanged { size ->
+                sheetState.updateAnchors(DraggableAnchors {
+                    SheetValue.Expanded at 0f
+                    SheetValue.Hidden at size.height.toFloat()
+                })
+            }
+            .graphicsLayer { translationY = sheetOffsetY }
             .clip(RoundedCornerShape(topStart = 28.adp, topEnd = 28.adp))
             .background(MaterialTheme.colorScheme.surface)
-            .nestedScroll(dismissNestedScrollConnection)
+            .anchoredDraggable(
+                state = sheetState,
+                orientation = Orientation.Vertical,
+                flingBehavior = flingBehavior
+            )
     ) {
-        // Drag handle
-        CustomDragHandle(
-            modifier = Modifier
-                .fillMaxWidth()
-                .draggable(
-                    state = draggableState,
-                    orientation = Orientation.Vertical,
-                    onDragStopped = {
-                        if (dragOffsetY > dismissThreshold) onClose()
-                        dragOffsetY = 0f
-                    }
-                )
-        )
+        CustomDragHandle(modifier = Modifier.fillMaxWidth())
 
         Row(
             modifier = Modifier
@@ -230,9 +237,10 @@ private fun SheetContent(
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)
             )
-            CloseButton(onClick = onClose, size = 40.adp)
+            CloseButton(onClose)
         }
 
+        // pagerState is the single source of truth — tabs read from it, not from the parent prop.
         val activeTabFromPager by remember {
             derivedStateOf {
                 InsightsTab.entries.getOrElse(pagerState.currentPage) { InsightsTab.OVERVIEW }
@@ -242,12 +250,7 @@ private fun SheetContent(
         InsightsTabs(
             activeTab = activeTabFromPager,
             onTabChange = { tab ->
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(
-                        page = tab.ordinal,
-                        animationSpec = tween(300, easing = FastOutSlowInEasing)
-                    )
-                }
+                coroutineScope.launch { pagerState.animateScrollToPage(tab.ordinal) }
             },
             modifier = Modifier.padding(horizontal = 24.adp, vertical = 8.adp)
         )
