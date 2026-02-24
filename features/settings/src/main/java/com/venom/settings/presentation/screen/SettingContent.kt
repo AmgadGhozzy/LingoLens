@@ -35,7 +35,6 @@ import com.venom.ui.components.common.SettingsScaffold
 import com.venom.ui.navigation.Screen
 import com.venom.ui.viewmodel.SettingsUiState
 import com.venom.ui.viewmodel.SettingsViewModel
-import com.venom.utils.PLAY_STORE
 import com.venom.utils.openUrl
 
 @Composable
@@ -52,7 +51,7 @@ fun SettingsContent(
         item { AnimationSettings(viewModel, uiState) }
         item { LanguageSettings(uiState, onDialogTypeChange = { dialogType = it }) }
         item { SpeechSettings(uiState, viewModel) }
-        item { AboutSettings({ dialogType = it }, navController, onDismiss) }
+        item { AboutSettings(viewModel, { dialogType = it }, navController, onDismiss) }
     }
 
     SettingsDialogController(
@@ -209,6 +208,7 @@ private fun SpeechSettings(
 
 @Composable
 private fun AboutSettings(
+    viewModel: SettingsViewModel,
     onDialogTypeChange: (SettingsDialog) -> Unit,
     navController: NavHostController,
     onDismiss: () -> Unit
@@ -223,7 +223,7 @@ private fun AboutSettings(
         SettingsItem(
             title = R.string.rate_app,
             leadingContent = { SettingsIcon(Icons.Rounded.Star) },
-            onClick = { context.openUrl(PLAY_STORE) }
+            onClick = { context.openUrl(viewModel.playStoreUrl) }
         )
         SettingsItem(
             title = R.string.onboarding,

@@ -54,7 +54,7 @@ fun AppHeader() {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = BuildConfig.APP_VERSION_NAME + BuildConfig.APP_VERSION_CODE,
+                text = "Version ${BuildConfig.APP_VERSION_NAME} (Build ${BuildConfig.APP_VERSION_CODE})",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary
             )

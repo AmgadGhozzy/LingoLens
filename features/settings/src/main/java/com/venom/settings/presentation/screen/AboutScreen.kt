@@ -20,26 +20,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.venom.resources.R
 import com.venom.settings.presentation.components.AppHeader
 import com.venom.settings.presentation.components.SettingsCard
 import com.venom.settings.presentation.components.SettingsIcon
 import com.venom.settings.presentation.components.SettingsItem
+import com.venom.settings.presentation.viewmodel.AboutViewModel
 import com.venom.ui.components.common.SettingsScaffold
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.dialogs.WebViewDialog
-import com.venom.utils.EMAIL
 import com.venom.utils.Extensions.shareText
-import com.venom.utils.GITHUB
-import com.venom.utils.LINKEDIN
-import com.venom.utils.PLAY_STORE
 import com.venom.utils.openUrl
 import com.venom.utils.sendEmail
 
 @Composable
 fun AboutScreen(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: AboutViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     var showTermsDialog by remember { mutableStateOf(false) }
@@ -51,7 +50,7 @@ fun AboutScreen(
         onDismiss = onDismiss
     ) {
         item { AppHeader() }
-        item { SocialSection(context) }
+        item { SocialSection(context, viewModel) }
         item {
             LegalSection(
                 onTermsClick = { showTermsDialog = true },
@@ -85,7 +84,7 @@ fun AboutScreen(
 }
 
 @Composable
-private fun SocialSection(context: Context) {
+private fun SocialSection(context: Context, viewModel: AboutViewModel) {
     SettingsCard(title = R.string.connect_with_us) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.adp)
@@ -93,30 +92,30 @@ private fun SocialSection(context: Context) {
             SettingsItem(
                 leadingContent = { SettingsIcon(R.drawable.ic_github) },
                 title = R.string.github,
-                onClick = { context.openUrl(GITHUB) }
+                onClick = { context.openUrl(viewModel.github) }
             )
             SettingsItem(
                 leadingContent = { SettingsIcon(R.drawable.ic_linkedin) },
                 title = R.string.linkedin,
-                onClick = { context.openUrl(LINKEDIN) }
+                onClick = { context.openUrl(viewModel.linkedin) }
             )
             SettingsItem(
                 leadingContent = { SettingsIcon(Icons.Rounded.MailOutline) },
                 title = R.string.report_issue,
                 subtitle = stringResource(R.string.report_issue_desc),
-                onClick = { context.sendEmail(EMAIL) }
+                onClick = { context.sendEmail(viewModel.email) }
             )
             SettingsItem(
                 leadingContent = { SettingsIcon(R.drawable.icon_share) },
                 title = R.string.share_app,
                 subtitle = stringResource(R.string.share_app_desc),
-                onClick = { context.shareText(PLAY_STORE) }
+                onClick = { context.shareText(viewModel.playStore) }
             )
             SettingsItem(
                 leadingContent = { SettingsIcon(Icons.Rounded.Star) },
                 title = R.string.rate_app,
                 subtitle = stringResource(R.string.rate_app_desc),
-                onClick = { context.openUrl(PLAY_STORE) }
+                onClick = { context.openUrl(viewModel.playStore) }
             )
         }
     }
