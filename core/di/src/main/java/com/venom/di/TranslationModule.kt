@@ -11,6 +11,7 @@ import com.venom.data.repo.OfflineTranslationRepositoryImpl
 import com.venom.data.repo.OnlineTranslationRepositoryImpl
 import com.venom.data.repo.TranslationHistoryRepositoryImpl
 import com.venom.data.repo.TranslationRepositoryImpl
+import com.venom.domain.provider.AppConfigProvider
 import com.venom.domain.repo.IOfflineTranslation
 import com.venom.domain.repo.IOnlineTranslation
 import com.venom.domain.repo.ITranslationHistory
@@ -33,14 +34,16 @@ object TranslationModule {
         geminiService: GeminiService,
         groqService: GroqService,
         deepSeekService: DeepSeekService,
-        huggingFaceService: HuggingFaceService
+        huggingFaceService: HuggingFaceService,
+        appConfigProvider: AppConfigProvider
     ): IOnlineTranslation = OnlineTranslationRepositoryImpl(
         translationService,
         chatGPTService,
         geminiService,
         groqService,
         deepSeekService,
-        huggingFaceService
+        huggingFaceService,
+        appConfigProvider
     )
 
     @Provides
