@@ -1,5 +1,6 @@
 package com.venom.stackcard.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -19,10 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +34,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.domain.model.AppTheme
@@ -47,7 +44,7 @@ import com.venom.stackcard.ui.components.mastery.GlassStatCard
 import com.venom.stackcard.ui.components.mastery.GlassSurface
 import com.venom.stackcard.ui.components.mastery.StreakIndicator
 import com.venom.stackcard.ui.viewmodel.WordMasteryViewModel
-import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
@@ -74,6 +71,11 @@ private fun ProgressScreenContent(
 ) {
     val level = UserLevel.fromXp(data.totalXp)
 
+    BackHandler(
+        enabled = true,
+        onBack = onBack
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -92,16 +94,7 @@ private fun ProgressScreenContent(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            CustomFilledIconButton(
-                icon = Icons.Rounded.ArrowForwardIos,
-                onClick = onBack,
-                contentDescription = stringResource(R.string.action_close),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                size = 44.adp
-            )
+            CloseButton(onBack)
         }
 
         LevelCard(
