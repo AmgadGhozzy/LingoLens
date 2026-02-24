@@ -1,8 +1,10 @@
 package com.venom.domain.model
 
 import androidx.compose.runtime.Immutable
+import com.squareup.moshi.JsonClass
 
 @Immutable
+@JsonClass(generateAdapter = true)
 data class TranslationResult(
     val id: Long = 0,
     val sourceText: String = "",
@@ -29,6 +31,7 @@ data class TranslationResult(
 ) : IHistoryEntry
 
 @Immutable
+@JsonClass(generateAdapter = true)
 data class TranslationSentence(
     val original: String,
     val translated: String,

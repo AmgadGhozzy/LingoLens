@@ -1,6 +1,7 @@
 package com.venom.domain.model
 
 import androidx.compose.runtime.Immutable
+import com.squareup.moshi.JsonClass
 import com.venom.domain.model.CefrLevel.A1
 import com.venom.domain.model.CefrLevel.A2
 import com.venom.domain.model.CefrLevel.B1
@@ -12,6 +13,7 @@ import com.venom.domain.model.CefrLevel.C2
  * Data class representing a word with all its linguistic information.
  */
 @Immutable
+@JsonClass(generateAdapter = true)
 data class WordMaster(
     val id: Int,
     val wordEn: String,
@@ -54,7 +56,9 @@ data class WordMaster(
     val portuguesePt: String? = null,
     val japaneseJa: String? = null,
     val italianIt: String? = null,
-    val turkishTr: String? = null
+    val turkishTr: String? = null,
+
+    val unitId: String? = null
 )
 
 enum class CefrLevel(val displayName: String) {
@@ -73,6 +77,7 @@ fun CefrLevel.getDifficulty(): String = when (this) {
 }
 
 @Immutable
+@JsonClass(generateAdapter = true)
 data class WordFamily(
     val noun: String? = null,
     val verb: String? = null,
@@ -81,6 +86,7 @@ data class WordFamily(
 )
 
 @Immutable
+@JsonClass(generateAdapter = true)
 data class RelatedWords(
     val english: List<String>,
     val arabic: List<String>

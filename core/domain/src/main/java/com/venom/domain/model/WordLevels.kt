@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.venom.resources.R
 
 sealed class WordLevels(
-    val range: LevelRange,
+    val cefrLevel: CefrLevel,
     val titleRes: Int,
     val descRes: Int,
     val id: String,
@@ -12,7 +12,7 @@ sealed class WordLevels(
     val color: Color
 ) {
     object Beginner : WordLevels(
-        range = LevelRange(1, 1000),
+        cefrLevel = CefrLevel.A1,
         titleRes = R.string.level_beginner,
         descRes = R.string.desc_beginner,
         id = "beginner",
@@ -21,7 +21,7 @@ sealed class WordLevels(
     )
 
     object Elementary : WordLevels(
-        range = LevelRange(1001, 2000),
+        cefrLevel = CefrLevel.A2,
         titleRes = R.string.level_elementary,
         descRes = R.string.desc_elementary,
         id = "elementary",
@@ -30,7 +30,7 @@ sealed class WordLevels(
     )
 
     object Intermediate : WordLevels(
-        range = LevelRange(2001, 3000),
+        cefrLevel = CefrLevel.B1,
         titleRes = R.string.level_intermediate,
         descRes = R.string.desc_intermediate,
         id = "intermediate",
@@ -39,7 +39,7 @@ sealed class WordLevels(
     )
 
     object UpperIntermediate : WordLevels(
-        range = LevelRange(3001, 4000),
+        cefrLevel = CefrLevel.B2,
         titleRes = R.string.level_upper_intermediate,
         descRes = R.string.desc_upper_intermediate,
         id = "upper_intermediate",
@@ -48,7 +48,7 @@ sealed class WordLevels(
     )
 
     object Advanced : WordLevels(
-        range = LevelRange(4001, 5000),
+        cefrLevel = CefrLevel.C1,
         titleRes = R.string.level_advanced,
         descRes = R.string.desc_advanced,
         id = "advanced",
@@ -57,7 +57,7 @@ sealed class WordLevels(
     )
 
     object Mastery : WordLevels(
-        range = LevelRange(5001, 6000),
+        cefrLevel = CefrLevel.C2,
         titleRes = R.string.level_mastery,
         descRes = R.string.desc_mastery,
         id = "mastery",
@@ -65,11 +65,18 @@ sealed class WordLevels(
         color = Color(0xFF6366F1)
     )
 
-    data class LevelRange(val start: Int, val end: Int)
-
     companion object {
         fun values() = listOf(
             Beginner, Elementary, Intermediate, UpperIntermediate, Advanced, Mastery
         )
+
+        fun fromCefr(cefrLevel: CefrLevel): WordLevels = when (cefrLevel) {
+            CefrLevel.A1 -> Beginner
+            CefrLevel.A2 -> Elementary
+            CefrLevel.B1 -> Intermediate
+            CefrLevel.B2 -> UpperIntermediate
+            CefrLevel.C1 -> Advanced
+            CefrLevel.C2 -> Mastery
+        }
     }
 }
