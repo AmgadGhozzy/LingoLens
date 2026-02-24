@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.venom.data.remote.respnod.DeepSeekResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -26,16 +27,18 @@ interface DeepSeekService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class DeepSeekMessage(
     val role: String,
     val content: String
 )
 
+@JsonClass(generateAdapter = true)
 data class DeepSeekRequestBody(
     val model: String = DeepSeekService.DEFAULT_MODEL,
     val messages: List<DeepSeekMessage>,
     val temperature: Double = 0.2,
-    @SerializedName("max_tokens")
+    @Json(name = "max_tokens")
     val maxTokens: Int = 500,
     val stream: Boolean = false
 )

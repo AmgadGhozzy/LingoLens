@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -20,10 +21,11 @@ interface GroqTtsService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class GroqTtsRequest(
     val model: String,
     val input: String,
     val voice: String,
-    @SerializedName("response_format")
+    @Json(name = "response_format")
     val responseFormat: String = "wav"
 )

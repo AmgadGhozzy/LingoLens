@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.venom.data.remote.respnod.GroqResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -29,16 +30,18 @@ interface GroqService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class GroqMessage(
     val role: String,
     val content: String
 )
 
+@JsonClass(generateAdapter = true)
 data class GroqRequestBody(
     val model: String = GroqService.LLAMA_MODEL_4,
     val messages: List<GroqMessage>,
     val temperature: Double = 0.2,
-    @SerializedName("max_tokens")
+    @Json(name = "max_tokens")
     val maxTokens: Int = 500,
     val stream: Boolean = false
 )

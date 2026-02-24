@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.venom.data.remote.respnod.ChatGPTResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -25,15 +26,17 @@ interface ChatGPTService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class ChatGPTMessage(
     val role: String,
     val content: String
 )
 
+@JsonClass(generateAdapter = true)
 data class ChatGPTRequestBody(
     val model: String = "gpt-3.5-turbo",
     val messages: List<ChatGPTMessage>,
     val temperature: Double = 0.2,
-    @SerializedName("max_tokens")
+    @Json(name = "max_tokens")
     val maxTokens: Int = 500
 )
