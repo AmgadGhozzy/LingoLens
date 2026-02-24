@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -40,4 +41,8 @@ dependencies {
     implementation(project(":core:resources"))
 
     implementation(libs.androidx.core.ktx)
+    
+    api(libs.moshi)
+    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.javax.inject)
 }
