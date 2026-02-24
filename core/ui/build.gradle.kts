@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 android {
@@ -52,7 +51,7 @@ dependencies {
     api(libs.lottie.compose)
     api("nl.dionsegijn:konfetti-compose:2.0.5")
     implementation(libs.accompanist.permissions)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
 
@@ -69,7 +68,7 @@ dependencies {
     // Networking
     api(libs.okhttp)
     api(libs.retrofit)
-    api(libs.converter.gson)
+    api(libs.converter.moshi)
 
     implementation(libs.androidx.media3.exoplayer)
 

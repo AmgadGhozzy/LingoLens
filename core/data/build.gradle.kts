@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 val versionFile = rootProject.file("version.properties")
@@ -37,6 +36,7 @@ android {
         buildConfigField("String", "GROQ_API_KEY", localProperties.getProperty("GROQ_API_KEY"))
         buildConfigField("String", "DEEPSEEK_API_KEY", localProperties.getProperty("DEEPSEEK_API_KEY"))
         buildConfigField("String", "HUGGINGFACE_API_KEY", localProperties.getProperty("HUGGINGFACE_API_KEY"))
+        buildConfigField("String", "SUPABASE_API_KEY", localProperties.getProperty("SUPABASE_API_KEY"))
 
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -80,7 +80,7 @@ dependencies {
     implementation(libs.firebase.crashlytics.buildtools)
 
 
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
     implementation(libs.androidx.datastore)
@@ -90,7 +90,9 @@ dependencies {
     api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    api(libs.converter.gson)
+    api(libs.converter.moshi)
+    api(libs.moshi)
+    ksp(libs.moshi.kotlin.codegen)
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.json)
 
@@ -101,11 +103,6 @@ dependencies {
 //    implementation("com.google.mlkit:text-recognition:16.0.0")
 //    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
     api(libs.androidx.credentials)
     api(libs.androidx.credentials.play.services.auth)
     api(libs.googleid)

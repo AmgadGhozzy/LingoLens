@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
@@ -29,24 +28,28 @@ android {
     compileSdk = 35
     lint {
         disable.add("NullSafeMutableLiveData")
-    checkReleaseBuilds = true
+        checkReleaseBuilds = true
     }
     defaultConfig {
         applicationId = "com.venom.lingolens"
         minSdk = 24
         targetSdk = 34
         versionCode = localVersionCode
-        versionName = "4.1.${localVersionCode}"
+        versionName = "4.4.${localVersionCode}"
         ndk {
             abiFilters.add("arm64-v8a")
+            abiFilters.add("arm-v7a")
         }
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        resourceConfigurations.addAll(listOf("en", "ar"))
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -62,6 +65,16 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    packaging {
+        resources {
+            excludes += setOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "/META-INF/*.version",
+                "/META-INF/kotlin-project-structure-metadata.json",
+                "**/dump_syms*"
+            )
+        }
     }
     android {
         lint {
@@ -137,13 +150,14 @@ dependencies {
     api(libs.hilt.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.splashscreen)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
     // Networking
     api(libs.okhttp)
     api(libs.retrofit)
-    api(libs.converter.gson)
+    api(libs.converter.moshi)
+    api(libs.moshi)
 
     // Room
     api(libs.androidx.room.runtime)
@@ -182,3 +196,5 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 
 }
+
+
