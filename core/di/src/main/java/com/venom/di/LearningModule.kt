@@ -11,9 +11,7 @@ import com.venom.data.local.dao.UserWordProgressDao
 import com.venom.data.local.dao.WordMasterDao
 import com.venom.data.local.dao.XpEventDao
 import com.venom.data.local.database.LearningDatabase
-import com.venom.data.repo.EnrichmentRepositoryImpl
 import com.venom.data.repo.WordMasterRepositoryImpl
-import com.venom.domain.repo.IEnrichmentRepository
 import com.venom.domain.repo.IWordMasterRepository
 import com.venom.domain.srs.SrsEngine
 import dagger.Module
@@ -82,7 +80,4 @@ object LearningModule {
     @Singleton
     fun provideWordMasterRepository(impl: WordMasterRepositoryImpl): IWordMasterRepository = impl
 
-    @Provides
-    @Singleton
-    fun provideEnrichmentRepository(impl: EnrichmentRepositoryImpl): IEnrichmentRepository = impl
 }

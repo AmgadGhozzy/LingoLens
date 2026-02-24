@@ -1,7 +1,6 @@
 package com.venom.di
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Moshi
 import com.venom.data.BuildConfig
 import com.venom.data.api.ChatGPTService
 import com.venom.data.api.DeepSeekService
@@ -19,7 +18,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -64,11 +63,11 @@ object NetworkModule {
             .build()
     }
 
-    fun createRetrofit(baseUrl: String, client: OkHttpClient): Retrofit {
+    fun createRetrofit(baseUrl: String, client: OkHttpClient, moshi: Moshi = Moshi.Builder().build()): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
 
@@ -131,9 +130,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson = GsonBuilder()
-        .setLenient()
-        .create()
+    fun provideMoshi(): Moshi = Moshi.Builder().build()
 
     @Provides
     @Singleton
