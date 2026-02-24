@@ -371,13 +371,29 @@ fun StatCell(
     }
 }
 
+/**
+ * Returns a human-readable frequency band label and sublabel based on word rank.
+ * Rank is 1-indexed (rank=1 is the most common word in the database).
+ */
+private fun rankBand(rank: Int): Pair<String, String> = when {
+    rank <= 0    -> "Power Word" to "Essential vocabulary"
+    rank <= 1000 -> "Top 1000" to "Most essential words"
+    rank <= 2000 -> "Top 2000" to "Essential words"
+    rank <= 3000 -> "Top 3000" to "High-frequency words"
+    rank <= 5000 -> "Top 5000" to "Common vocabulary"
+    else         -> "Extended" to "Advanced vocabulary"
+}
+
 @Composable
 fun PowerCell(
     showPowerTip: Boolean,
     onTogglePowerTip: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** Pass word.rank from WordMaster; 0 or negative = unknown rank */
+    wordRank: Int = 0
 ) {
     val semanticColors = MaterialTheme.lingoLens.semantic
+    val (bandLabel, bandSub) = remember(wordRank) { rankBand(wordRank) }
 
     Box(
         modifier = modifier
@@ -432,14 +448,14 @@ fun PowerCell(
                 ) {
                     Column {
                         Text(
-                            text = stringResource(R.string.mastery_top_2000),
+                            text = bandLabel,
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold
                             ),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = stringResource(R.string.mastery_essential_words),
+                            text = bandSub,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -458,6 +474,7 @@ private fun PowerCellFlippedPreview() {
         Box(modifier = Modifier.padding(16.adp)) {
             PowerCell(
                 showPowerTip = true,
+                wordRank = 1450,
                 onTogglePowerTip = {},
                 modifier = Modifier.aspectRatio(1.8f)
             )
@@ -472,6 +489,7 @@ private fun PowerCellPreviewLight() {
         Box(modifier = Modifier.padding(16.adp)) {
             PowerCell(
                 showPowerTip = false,
+                wordRank = 850,
                 onTogglePowerTip = {},
                 modifier = Modifier.aspectRatio(1.8f)
             )

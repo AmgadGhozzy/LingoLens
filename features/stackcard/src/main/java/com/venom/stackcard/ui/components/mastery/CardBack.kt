@@ -226,7 +226,7 @@ private fun TransliterationRow(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_speaker_high),
+                    painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = stringResource(R.string.mastery_speak),
                     modifier = Modifier.size(16.adp),
                     tint = MaterialTheme.colorScheme.primary

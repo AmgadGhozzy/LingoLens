@@ -158,11 +158,11 @@ private fun PracticeButton(
             contentAlignment = Alignment.Center
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.adp),
+                horizontalArrangement = Arrangement.spacedBy(6.adp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_pencil_simple),
+                    painter = painterResource(R.drawable.ic_feather),
                     contentDescription = null,
                     modifier = Modifier.size(20.adp),
                     tint = Color.White
