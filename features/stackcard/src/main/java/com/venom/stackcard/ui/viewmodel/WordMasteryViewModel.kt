@@ -1,6 +1,9 @@
 package com.venom.stackcard.ui.viewmodel
 
 import androidx.compose.runtime.Immutable
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom.analytics.AnalyticsEvent
@@ -8,21 +11,23 @@ import com.venom.analytics.AnalyticsManager
 import com.venom.analytics.AnalyticsParam
 import com.venom.analytics.CrashlyticsManager
 import com.venom.analytics.ext.logFlashcardSwipe
+import com.venom.data.local.PreferencesKeys
 import com.venom.data.mock.MockWordData
 import com.venom.data.repo.UserActivityRepository
 import com.venom.data.repo.UserIdentityRepository
 import com.venom.data.repo.UserWordProgressRepository
+import com.venom.domain.model.CefrLevel
 import com.venom.domain.model.DashboardData
 import com.venom.domain.model.KnownState
 import com.venom.domain.model.LanguageOption
 import com.venom.domain.model.QuizInput
 import com.venom.domain.model.QuizResult
+import com.venom.domain.model.UserLevel
 import com.venom.domain.model.UserWordProgress
 import com.venom.domain.model.WordMaster
 import com.venom.domain.model.getLanguageOptions
-import com.venom.domain.repo.IEnrichmentRepository
+import com.venom.domain.repo.IWordMasterRepository
 import com.venom.stackcard.ui.components.insights.InsightsTab
-import com.venom.stackcard.ui.mapper.toQuizInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
@@ -33,6 +38,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -96,15 +103,18 @@ data class WordMasteryUiState(
     val isSignedIn: Boolean = true,
     val userName: String? = null,
     val userProgress: DashboardData? = null,
+    val userCefrLevel: CefrLevel = CefrLevel.B1,
     val currentWordProgress: CurrentWordProgress = CurrentWordProgress(),
     val sessionStats: SessionStats = SessionStats(),
     val initialCardCount: Int = 0,
     val nextWordProgressCache: CurrentWordProgress? = null,
     val quizInput: QuizInput? = null,
-    val cardChangeCounter: Int = 0
+    val cardChangeCounter: Int = 0,
+    val showPlacementModal: Boolean = false
 )
 
 sealed class WordMasteryEvent {
+    object DismissPlacementModal : WordMasteryEvent()
     object FlipCard : WordMasteryEvent()
     object OpenSheet : WordMasteryEvent()
     object CloseSheet : WordMasteryEvent()
@@ -138,9 +148,10 @@ class WordMasteryViewModel @Inject constructor(
     private val progressRepository: UserWordProgressRepository,
     private val identityRepository: UserIdentityRepository,
     private val activityRepository: UserActivityRepository,
-    private val enrichmentRepository: IEnrichmentRepository,
+    private val wordMasterRepository: IWordMasterRepository,
     private val analyticsManager: AnalyticsManager,
-    private val crashlyticsManager: CrashlyticsManager
+    private val crashlyticsManager: CrashlyticsManager,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WordMasteryUiState())
@@ -219,7 +230,8 @@ class WordMasteryViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    userProgress = dashboard
+                    userProgress = dashboard,
+                    userCefrLevel = dashboard.level.toCefrLevel()
                 )
             }
         } catch (e: Exception) {
@@ -299,7 +311,20 @@ class WordMasteryViewModel @Inject constructor(
 
     fun onEvent(event: WordMasteryEvent) {
         when (event) {
-            is WordMasteryEvent.FlipCard -> flipCard()
+            is WordMasteryEvent.DismissPlacementModal -> {
+                viewModelScope.launch {
+                    dataStore.edit { it[PreferencesKeys.PLACEMENT_COMPLETED] = true }
+                    _uiState.update { it.copy(showPlacementModal = false) }
+                }
+            }
+            is WordMasteryEvent.FlipCard -> {
+                _uiState.update {
+                    it.copy(
+                        isFlipped = !it.isFlipped,
+                        flipRotation = if (it.isFlipped) 0f else 180f
+                    )
+                }
+            }
             is WordMasteryEvent.OpenSheet -> openSheet()
             is WordMasteryEvent.CloseSheet -> closeSheet()
             is WordMasteryEvent.ChangeTab -> changeTab(event.tab)
@@ -307,7 +332,7 @@ class WordMasteryViewModel @Inject constructor(
             is WordMasteryEvent.PinLanguage -> pinLanguage(event.language)
             is WordMasteryEvent.RevealHint -> revealHint()
             is WordMasteryEvent.TogglePowerTip -> togglePowerTip()
-            is WordMasteryEvent.StartPractice -> startPractice()
+            is WordMasteryEvent.StartPractice -> startSpellPractice()
             is WordMasteryEvent.PracticeHandled -> practiceHandled()
             is WordMasteryEvent.PracticeResult -> handlePracticeResult(event.result)
             is WordMasteryEvent.PracticeSkipped -> handlePracticeSkipped(event.wordId)
@@ -317,17 +342,6 @@ class WordMasteryViewModel @Inject constructor(
             is WordMasteryEvent.RegenerateWords -> loadData(isGenerative = true)
             is WordMasteryEvent.BackToWelcome -> resetToWelcome()
             is WordMasteryEvent.Initialize -> loadData(event.isGenerative, event.topic)
-        }
-    }
-
-    private fun flipCard() {
-        _uiState.update { state ->
-            val newFlipped = !state.isFlipped
-            state.copy(
-                isFlipped = newFlipped,
-                // Alternate between 0f and 180f — keeps animation work constant
-                flipRotation = if (newFlipped) 180f else 0f
-            )
         }
     }
 
@@ -351,7 +365,8 @@ class WordMasteryViewModel @Inject constructor(
         _uiState.update { it.copy(showPowerTip = !it.showPowerTip) }
     }
 
-    private fun startPractice() {
+    /*
+    private fun startQuizPractice() {
         val state = _uiState.value
         val word = state.currentWord ?: return
         if (state.isPracticeMode && state.quizInput?.wordId == word.id) return
@@ -374,7 +389,11 @@ class WordMasteryViewModel @Inject constructor(
 
         _uiState.update { it.copy(isPracticeMode = true, quizInput = quizInput) }
     }
+     */
 
+    private fun startSpellPractice() {
+        _uiState.update { it.copy(isPracticeMode = true) }
+    }
     private fun practiceHandled() {
         _uiState.update { it.copy(isPracticeMode = false, quizInput = null) }
     }
@@ -416,59 +435,64 @@ class WordMasteryViewModel @Inject constructor(
         val nextWord = remainingCards.firstOrNull()
         val isSessionFinished = remainingCards.isEmpty()
 
-        // 🔑 LOAD NEXT WORD'S DATA BEFORE UPDATING STATE
+        val cachedProgress = nextWord?.let { wordProgressCache[it.id] }
+
+        _uiState.update { state ->
+            state.copy(
+                visibleCards = remainingCards,
+                removedCards = state.removedCards + word,
+                currentWord = nextWord,
+                processedCardsCount = state.processedCardsCount + 1,
+                isFlipped = false,
+                isHintRevealed = false,
+                showPowerTip = false,
+                isSheetOpen = false,
+                flipRotation = 0f,
+                isBookmarked = cachedProgress?.isBookmarked ?: false,
+                currentWordProgress = cachedProgress ?: CurrentWordProgress(),
+                sessionStats = updateSessionStats(state.sessionStats, isSessionFinished),
+                cardChangeCounter = state.cardChangeCounter + 1
+            )
+        }
+        wordProgressCache.remove(word.id)
+
         if (nextWord != null) {
-            viewModelScope.launch {
-                // Load progress synchronously
-                val nextWordProgress = loadWordProgressDirect(nextWord.id)
-
-                // Prefetch the card after the next one
-                remainingCards.getOrNull(1)?.let { prefetchWordProgress(it.id) }
-
-                // Update state with CORRECT data
-                _uiState.update { state ->
-                    state.copy(
-                        visibleCards = remainingCards,
-                        removedCards = state.removedCards + word,
-                        currentWord = nextWord,
-                        processedCardsCount = state.processedCardsCount + 1,
-                        isFlipped = false,
-                        isHintRevealed = false, // 🔑 RESET HINT FOR NEW CARD!
-                        showPowerTip = false,
-                        isSheetOpen = false,
-                        isBookmarked = nextWordProgress.isBookmarked,       // ✅ CORRECT DATA
-                        flipRotation = 0f,
-                        currentWordProgress = nextWordProgress,             // ✅ CORRECT DATA
-                        sessionStats = updateSessionStats(state.sessionStats, isSessionFinished),
-                        cardChangeCounter = state.cardChangeCounter + 1
-                    )
+            if (cachedProgress == null) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        val freshProgress = loadWordProgressDirect(nextWord.id)
+                        wordProgressCache[nextWord.id] = freshProgress
+                        if (_uiState.value.currentWord?.id == nextWord.id) {
+                            _uiState.update { state ->
+                                state.copy(
+                                    isBookmarked = freshProgress.isBookmarked,
+                                    currentWordProgress = freshProgress
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        if (e !is CancellationException) {
+                            crashlyticsManager.logNonFatalException(e, "Failed to load word progress")
+                        }
+                    }
                 }
-
-                // Start practice for the new card
-                startPractice()
             }
+
+            remainingCards.getOrNull(1)?.let { prefetchWordProgress(it.id) }
+
+            //startPractice()
         } else {
-            // Session finished
             _uiState.update { state ->
                 state.copy(
-                    visibleCards = remainingCards,
-                    removedCards = state.removedCards + word,
-                    currentWord = null,
-                    processedCardsCount = state.processedCardsCount + 1,
-                    sessionStats = updateSessionStats(state.sessionStats, true).copy(
+                    sessionStats = state.sessionStats.copy(
                         sessionDurationMs = System.currentTimeMillis() - sessionStartTime.get()
-                    ),
-                    cardChangeCounter = state.cardChangeCounter + 1
+                    )
                 )
             }
-            finalizeSession() // 🔑 CALL FINALIZATION
+            finalizeSession()
         }
-
-        // Cleanup cache
-        wordProgressCache.remove(word.id)
     }
 
-    // 🔑 HELPER: Update session stats
     private fun updateSessionStats(
         currentStats: SessionStats,
         isSessionFinished: Boolean
@@ -489,7 +513,6 @@ class WordMasteryViewModel @Inject constructor(
         }
     }
 
-    // 🔑 HELPER: Finalize session when all cards are done
     private fun finalizeSession() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -653,29 +676,26 @@ class WordMasteryViewModel @Inject constructor(
     }
 
     private suspend fun loadGenerativeWords(topic: String?): List<WordMaster> {
-        val prompt = if (!topic.isNullOrBlank()) {
-            "Generate words related to category: $topic"
-        } else {
-            "Generate interesting words"
-        }
-
-        return enrichmentRepository.generateWords(prompt).getOrElse {
-            throw it
+        return withContext(Dispatchers.IO) {
+            wordMasterRepository.getRandomWords(15)
         }
     }
 
     private suspend fun loadSrsWords(userId: String): List<WordMaster> {
-        val reviewLimit = 15
-        val reviewWords = progressRepository.getWordsDueForReview(userId, reviewLimit)
-        val newNeeded = reviewLimit - reviewWords.size
+        return withContext(Dispatchers.IO) {
+            val reviewLimit = 15
+            val reviewWords = progressRepository.getWordsDueForReview(userId, reviewLimit)
+            val newNeeded = reviewLimit - reviewWords.size
 
-        val newWords = if (newNeeded > 0) {
-            enrichmentRepository.enrichAndGetWords(newNeeded)
-        } else {
-            emptyList()
+            val newWords = if (newNeeded > 0) {
+                val seenIds = reviewWords.map { it.id }
+                wordMasterRepository.getNewWords(seenIds, newNeeded)
+            } else {
+                emptyList()
+            }
+
+            reviewWords + newWords
         }
-
-        return reviewWords + newWords
     }
 
     private suspend fun initializeWithWords(
@@ -710,8 +730,7 @@ class WordMasteryViewModel @Inject constructor(
             )
         }
 
-        startPractice()
-
+        //startPractice()
         words.drop(1).take(2).forEach { word ->
             prefetchWordProgress(word.id)
         }
@@ -774,6 +793,12 @@ class WordMasteryViewModel @Inject constructor(
             try {
                 val userId = identityRepository.getCurrentUserId()
                 reloadUserProgress(userId)
+
+                val placementCompleted = dataStore.data
+                    .map { it[PreferencesKeys.PLACEMENT_COMPLETED] ?: false }
+                    .firstOrNull() ?: false
+
+                _uiState.update { it.copy(showPlacementModal = !placementCompleted) }
             } catch (_: Exception) {
             }
         }
@@ -803,7 +828,7 @@ class WordMasteryViewModel @Inject constructor(
             )
         }
 
-        startPractice()
+        //startPractice()
 
         analyticsManager.logError(
             errorType = "word_load",
@@ -828,6 +853,7 @@ class WordMasteryViewModel @Inject constructor(
                 isSignedIn = it.isSignedIn,
                 userName = it.userName,
                 userProgress = it.userProgress,
+                userCefrLevel = it.userCefrLevel,
                 isGenerativeMode = it.isGenerativeMode
             )
         }
@@ -949,5 +975,17 @@ class WordMasteryViewModel @Inject constructor(
             diff < TimeUnit.DAYS.toMillis(30) -> "${TimeUnit.MILLISECONDS.toDays(diff) / 7} weeks"
             else -> "${TimeUnit.MILLISECONDS.toDays(diff) / 30} months"
         }
+    }
+
+    /**
+     * Maps UserLevel to corresponding CEFR level for performance optimization
+     */
+    private fun UserLevel.toCefrLevel(): CefrLevel = when (this) {
+        UserLevel.NEWCOMER, UserLevel.EXPLORER -> CefrLevel.A1
+        UserLevel.LEARNER, UserLevel.APPRENTICE -> CefrLevel.A2
+        UserLevel.SCHOLAR, UserLevel.ADEPT -> CefrLevel.B1
+        UserLevel.EXPERT, UserLevel.MASTER -> CefrLevel.B2
+        UserLevel.CHAMPION, UserLevel.LEGEND -> CefrLevel.C1
+        UserLevel.POLYGLOT, UserLevel.SAGE -> CefrLevel.C2
     }
 }
