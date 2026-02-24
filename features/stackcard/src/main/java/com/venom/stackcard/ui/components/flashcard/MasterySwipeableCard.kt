@@ -54,17 +54,16 @@ fun MasterySwipeableCard(
 
     val cardShape = remember(cornerRadiusDp) { RoundedCornerShape(cornerRadiusDp) }
 
-    // Flip animation — read only in graphicsLayer, zero recomposition
-    val flipAnimatable = remember { Animatable(0f) }
-    LaunchedEffect(flipRotation) {
+            val flipAnimatable = remember { Animatable(0f) }
+
+        LaunchedEffect(flipRotation) {
         flipAnimatable.animateTo(flipRotation, OptimizedCardAnimations.FlipAnimationSpec)
     }
 
-    // Derive showFront — recomposes only at 90°/270° thresholds
-    val showFront by remember {
+                val showFront by remember(flipAnimatable) {
         derivedStateOf {
-            val rot = flipAnimatable.value % 360f
-            val effective = if (rot < 0) rot + 360f else rot
+            val raw = flipAnimatable.value % 360f
+            val effective = if (raw < 0f) raw + 360f else raw
             effective <= 90f || effective >= 270f
         }
     }
@@ -108,7 +107,8 @@ fun MasterySwipeableCard(
                     translationX = currentOffsetX + stackOffsetXPx
                     translationY = currentOffsetY + stackOffsetYPx
                     rotationZ = if (isFlipped) -currentRotation else currentRotation
-                    rotationY = flipAnimatable.value
+
+                                        rotationY = flipAnimatable.value
 
                     val dragDistance = sqrt(
                         currentOffsetX.pow(2) + currentOffsetY.pow(2)

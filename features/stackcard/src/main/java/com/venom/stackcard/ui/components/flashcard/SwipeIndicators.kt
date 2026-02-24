@@ -28,6 +28,8 @@ fun SwipeIndicators(
     swipeThresholdPx: Float,
     modifier: Modifier = Modifier
 ) {
+    val appearThreshold = 0.15f
+
     Row(
         modifier = modifier.fillMaxHeight(),
         verticalAlignment = Alignment.CenterVertically
@@ -38,8 +40,8 @@ fun SwipeIndicators(
                     val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(-1f, 0f)
                     val absProgress = abs(progress)
 
-                    alpha = if (absProgress > 0.2f) {
-                        ((absProgress - 0.2f) / 0.8f).coerceIn(0f, 1f)
+                    alpha = if (absProgress > appearThreshold) {
+                        ((absProgress - appearThreshold) / (1f - appearThreshold)).coerceIn(0f, 1f)
                     } else 0f
 
                     scaleX = 0.5f + (absProgress * 0.5f)
@@ -66,8 +68,8 @@ fun SwipeIndicators(
                 .graphicsLayer {
                     val progress = (animState.offsetX.value / swipeThresholdPx).coerceIn(0f, 1f)
 
-                    alpha = if (progress > 0.2f) {
-                        ((progress - 0.2f) / 0.8f).coerceIn(0f, 1f)
+                    alpha = if (progress > appearThreshold) {
+                        ((progress - appearThreshold) / (1f - appearThreshold)).coerceIn(0f, 1f)
                     } else 0f
 
                     scaleX = 0.5f + (progress * 0.5f)

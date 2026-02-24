@@ -52,7 +52,6 @@ fun CardSwiperStack(
     }
 
     val topCard = state.visibleCards.firstOrNull()
-    // In CardSwiperStack.kt — change the LaunchedEffect key to include cardChangeCounter
     val cardChangeCounter = state.cardChangeCounter
 
     LaunchedEffect(topCard, cardChangeCounter) {
@@ -63,7 +62,6 @@ fun CardSwiperStack(
     }
 
     LaunchedEffect(state.visibleCards) {
-        // Prefetch progress for the top 3 cards
         state.visibleCards.take(3).forEach { word ->
             viewModel.prefetchWordProgress(word.id)
         }
@@ -89,13 +87,12 @@ fun CardSwiperStack(
         }
     }
 
-    val onDragCallback = remember(cardAnimState) {
+        val onDragCallback = remember(cardAnimState) {
         { deltaX: Float, deltaY: Float ->
             cardAnimState.updateDragPosition(deltaX, deltaY)
         }
     }
 
-    // Stabilize external callbacks
     val currentOnFlip by rememberUpdatedState(onFlip)
     val currentOnRememberWord by rememberUpdatedState(onRememberWord)
     val currentOnForgotWord by rememberUpdatedState(onForgotWord)
@@ -114,7 +111,9 @@ fun CardSwiperStack(
                         cardAnimState.offsetX.velocity
                     )
                     cardAnimState.animateSwipeOff(targetX) {
-                        if (currentOffset > 0) {
+                        cardAnimState.resetValues()
+
+                                                if (currentOffset > 0) {
                             viewModel.onEvent(WordMasteryEvent.SwipeRemember(word))
                             currentOnRememberWord(word)
                         } else {
@@ -124,7 +123,6 @@ fun CardSwiperStack(
                         viewModel.onEvent(WordMasteryEvent.RemoveCard(word))
                     }
                 }
-
                 else -> cardAnimState.animateReturnToCenter()
             }
         }
@@ -152,7 +150,6 @@ fun CardSwiperStack(
                         flipRotation = if (isTopCard) state.flipRotation else 0f,
                         swipeThresholdPx = swipeThresholdPx,
                         onFlip = {
-                            // Guard: no flip during quiz — decision from WordMasteryScreen via showQuiz
                             if (!showQuiz) {
                                 viewModel.onEvent(WordMasteryEvent.FlipCard)
                                 currentOnFlip()
@@ -161,15 +158,13 @@ fun CardSwiperStack(
                         onDrag = onDragCallback,
                         onDragEnd = { onDragEndCallback(word) },
                     ) { showFront ->
-                        // ── Content decision ──
-                        // showQuiz is driven by WordMasteryScreen — no independent logic here
                         if (isTopCard && showQuiz && quizState != null) {
                             AdaptiveQuizCard(
                                 state = quizState,
                                 onSelect = currentOnQuizSelect,
                                 onSkip = currentOnQuizSkip,
-                                onBack = {},       // No back when embedded
-                                embedded = true     // Uses mini/card-front styling
+                                onBack = {},
+                                embedded = true
                             )
                         } else {
                             WordCard(

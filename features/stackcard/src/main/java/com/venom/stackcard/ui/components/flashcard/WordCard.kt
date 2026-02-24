@@ -52,8 +52,7 @@ fun WordCard(
                 .zIndex(if (showFront) 1f else 0f)
                 .graphicsLayer { alpha = if (showFront) 1f else 0f }
                 .pointerInput(showFront) {
-                    // Block ALL touches on this face when it's hidden
-                    if (!showFront) {
+                                        if (!showFront) {
                         awaitPointerEventScope {
                             while (true) {
                                 awaitPointerEvent(PointerEventPass.Initial)
@@ -73,10 +72,7 @@ fun WordCard(
             )
         }
 
-        // ── Back face ───────────────────────────────────────────────────────────
-        // rotationY = 180f so it reads correctly when parent card flips to 180°
-        // Same strategy: block touches when hidden
-        Box(
+                                Box(
             modifier = Modifier
                 .fillMaxSize()
                 .zIndex(if (showFront) 0f else 1f)
@@ -85,8 +81,7 @@ fun WordCard(
                     rotationY = 180f
                 }
                 .pointerInput(showFront) {
-                    // Block ALL touches on this face when it's hidden
-                    if (showFront) {
+                                        if (showFront) {
                         awaitPointerEventScope {
                             while (true) {
                                 awaitPointerEvent(PointerEventPass.Initial)
