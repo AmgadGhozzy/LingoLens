@@ -5,32 +5,27 @@ import com.venom.domain.model.WordLevels
 import com.venom.domain.model.WordMaster
 
 interface IWordMasterRepository {
-    
+
     suspend fun getWordById(id: Int): WordMaster?
-    
+
     suspend fun getWordsByIds(ids: List<Int>): List<WordMaster>
-    
+
     suspend fun getWordsByLevel(level: CefrLevel, limit: Int = 50): List<WordMaster>
-    
-    suspend fun getWordsByRankRange(minRank: Int, maxRank: Int, limit: Int = 10): List<WordMaster>
-    
+
+    /** Get random words for a specific CEFR level. */
+    suspend fun getWordsByCefr(cefrLevel: CefrLevel, limit: Int = 20): List<WordMaster>
+
     suspend fun getLevelProgress(level: WordLevels): Float
-    
+
     suspend fun getLevelsProgress(): Map<String, Float>
-    
+
     suspend fun getWordCount(): Int
-    
+
     suspend fun insertWords(words: List<WordMaster>)
 
-    suspend fun getEnrichedWords(limit: Int = 100): List<WordMaster>
+    /** Get new unseen words for SRS session, ordered by rank. */
+    suspend fun getNewWords(seenIds: List<Int>, limit: Int = 15): List<WordMaster>
 
-    suspend fun getEnrichedWordsByRankRange(
-        minRank: Int,
-        maxRank: Int,
-        limit: Int = 10
-    ): List<WordMaster>
-
-    suspend fun hasEnrichedWords(minCount: Int = 10): Boolean
+    /** Get random words (for fallback / topic-based loading). */
+    suspend fun getRandomWords(limit: Int = 15): List<WordMaster>
 }
-
-
