@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 android {
@@ -22,7 +21,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -50,6 +48,7 @@ dependencies {
     implementation(project(":core:analytics"))
     implementation(project(":features:phrase"))
     implementation(project(":features:lingospell"))
+    implementation(project(":features:quiz"))
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
@@ -57,7 +56,7 @@ dependencies {
     // Hilt
     api(libs.hilt.android)
     implementation(libs.androidx.activity.ktx)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
     // Room
