@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -51,22 +51,16 @@ fun MasteryDialog(
     val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        scale.animateTo(
-            targetValue = 1f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        )
-        alpha.animateTo(targetValue = 1f, animationSpec = tween(500))
+        scale.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
+        alpha.animateTo(1f, tween(500))
     }
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black.copy(0.7f))
+            .background(Color.Black.copy(alpha = 0.7f))
             .alpha(alpha.value),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         ConfettiView()
 
@@ -79,45 +73,43 @@ fun MasteryDialog(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                painter = painterResource(R.drawable.icon_trophy),
+                painter = painterResource(R.drawable.ic_trophy),
                 contentDescription = null,
                 modifier = Modifier.size(80.adp),
                 tint = MaterialTheme.lingoLens.feature.spelling.mastery
             )
 
-            Spacer(modifier = Modifier.height(16.adp))
+            Spacer(Modifier.height(16.adp))
 
             Text(
                 text = "MASTERED!",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 36.asp
+                    fontSize = 36.asp,
                 ),
                 color = MaterialTheme.lingoLens.feature.spelling.mastery,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.adp))
+            Spacer(Modifier.height(8.adp))
 
             Text(
                 text = "You've spelled this word correctly 3 times!",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
-            Spacer(modifier = Modifier.height(32.adp))
+            Spacer(Modifier.height(32.adp))
 
             Text(
                 text = arabicWord,
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.adp))
+            Spacer(Modifier.height(8.adp))
 
             Text(
                 text = word.uppercase(),
@@ -129,7 +121,7 @@ fun MasteryDialog(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(40.adp))
+            Spacer(Modifier.height(40.adp))
 
             Button(
                 onClick = onContinue,
@@ -146,12 +138,10 @@ fun MasteryDialog(
                 ) {
                     Text(
                         text = "Continue to Next Word",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Icon(
-                        imageVector = Icons.Rounded.ArrowForward,
+                        imageVector = Icons.Rounded.ArrowForwardIos,
                         contentDescription = null,
                         modifier = Modifier.size(20.adp)
                     )

@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.venom.domain.model.AppTheme
-import com.venom.lingospell.domain.MAX_STREAK
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.theme.LingoLensTheme
@@ -39,9 +38,10 @@ import com.venom.ui.theme.lingoLens
 fun StreakBar(
     streak: Int,
     isMastered: Boolean,
+    maxStreak: Int,
     modifier: Modifier = Modifier
 ) {
-    val isComplete = streak >= MAX_STREAK
+    val isComplete = streak >= maxStreak
 
     Row(
         modifier = modifier,
@@ -58,7 +58,7 @@ fun StreakBar(
             horizontalArrangement = Arrangement.spacedBy(8.adp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            repeat(MAX_STREAK) { index ->
+            repeat(maxStreak) { index ->
                 val isActive = index < streak
 
                 StreakBarSegment(
@@ -148,7 +148,8 @@ private fun StreakBarLightPreview() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         StreakBar(
             streak = 2,
-            isMastered = false
+            isMastered = false,
+            maxStreak = 3
         )
     }
 }

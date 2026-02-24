@@ -52,15 +52,14 @@ fun LetterBank(
     var rotationTrigger by remember { mutableIntStateOf(0) }
     val rotation by animateFloatAsState(
         targetValue = rotationTrigger * -180f,
-        animationSpec = tween(500),
-        label = "resetRotation"
+        animationSpec = tween(500)
     )
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 48.adp,
+                elevation = 68.adp,
                 shape = RoundedCornerShape(
                     topStart = 40.adp,
                     topEnd = 40.adp
@@ -74,7 +73,7 @@ fun LetterBank(
                     topEnd = 40.adp
                 )
             )
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(horizontal = 24.adp, vertical = 24.adp)
     ) {
         // Controls Bar
