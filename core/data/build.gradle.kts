@@ -78,6 +78,9 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.firebase.crashlytics.buildtools)
+    api(platform(libs.firebase.bom))
+    api(libs.firebase.config)
+    api(libs.firebase.config.ktx)
 
 
     ksp(libs.hilt.android.compiler)
