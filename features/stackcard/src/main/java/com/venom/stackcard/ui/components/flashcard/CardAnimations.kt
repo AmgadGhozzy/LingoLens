@@ -4,7 +4,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
@@ -29,21 +31,20 @@ object OptimizedCardAnimations {
     private const val VELOCITY_THROW_MULTIPLIER = 0.3f
     private const val VELOCITY_THROW_CLAMP = 400f
 
-    val SwipeAnimationSpec: AnimationSpec<Float> = spring(
-        dampingRatio = 0.75f,
+    val SwipeAnimationSpec: AnimationSpec<Float> = tween(
+        durationMillis = 160,
+        easing = androidx.compose.animation.core.FastOutLinearInEasing
+    )
+
+    val ReturnAnimationSpec: SpringSpec<Float> = spring(
+        dampingRatio = 0.55f,
         stiffness = Spring.StiffnessMediumLow,
-        visibilityThreshold = 1f
+        visibilityThreshold = 0.1f
     )
 
-    val ReturnAnimationSpec: AnimationSpec<Float> = spring(
-        dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessLow,
-        visibilityThreshold = 0.01f
-    )
-
-    val FlipAnimationSpec: AnimationSpec<Float> = spring(
-        dampingRatio = 0.65f,
-        stiffness = Spring.StiffnessMediumLow
+    val FlipAnimationSpec: AnimationSpec<Float> = tween(
+        durationMillis = 380,
+        easing = androidx.compose.animation.core.LinearOutSlowInEasing
     )
 
     fun calculateRotation(offsetX: Float, velocity: Float = 0f): Float {
@@ -71,12 +72,42 @@ class CardAnimationState(
     private val currentJob = AtomicReference<Job?>(null)
 
     @Volatile
+    private var lastDragVelocityX: Float = 0f
+
+    @Volatile
+    private var lastDragVelocityY: Float = 0f
+
+    @Volatile
+    private var lastDragTimestamp: Long = 0L
+
+    @Volatile
+    private var prevDeltaX: Float = 0f
+
+    @Volatile
+    private var prevDeltaY: Float = 0f
+
+    @Volatile
     private var isDisposed = false
 
+    /**
+     * Synchronous snap — no coroutine launch per frame.
+     * Called from drag gesture which is already on Main.
+     */
     fun updateDragPosition(deltaX: Float, deltaY: Float) {
         if (isDisposed) return
 
         currentJob.getAndSet(null)?.cancel()
+
+        val now = System.nanoTime()
+        val dtMs = if (lastDragTimestamp > 0) (now - lastDragTimestamp) / 1_000_000f else 16f
+        lastDragTimestamp = now
+        if (dtMs > 0f) {
+            val alpha = 0.4f
+            lastDragVelocityX = alpha * (deltaX / dtMs * 1000f) + (1 - alpha) * lastDragVelocityX
+            lastDragVelocityY = alpha * (deltaY / dtMs * 1000f) + (1 - alpha) * lastDragVelocityY
+        }
+        prevDeltaX = deltaX
+        prevDeltaY = deltaY
 
         val newX = offsetX.value + deltaX
         val newY = offsetY.value + deltaY
@@ -87,7 +118,6 @@ class CardAnimationState(
                 offsetY.snapTo(newY)
                 rotation.snapTo(OptimizedCardAnimations.calculateRotation(newX))
             } catch (_: CancellationException) {
-                // Ignored
             }
         }
     }
@@ -111,27 +141,53 @@ class CardAnimationState(
                 }
                 onComplete()
             } catch (_: CancellationException) {
-                // Ignored
             }
         }
 
         currentJob.getAndSet(newJob)?.cancel()
     }
 
+    /**
+     * Return to center with slight momentum from drag velocity,
+     * then smooth spring settle.
+     */
     fun animateReturnToCenter() {
         if (isDisposed) return
 
         val spec = OptimizedCardAnimations.ReturnAnimationSpec
 
+        val velX = lastDragVelocityX
+        val velY = lastDragVelocityY
+
+        lastDragVelocityX = 0f
+        lastDragVelocityY = 0f
+        lastDragTimestamp = 0L
+
         val newJob = scope.launch {
             try {
                 coroutineScope {
-                    launch { offsetX.animateTo(0f, spec) }
-                    launch { offsetY.animateTo(0f, spec) }
-                    launch { rotation.animateTo(0f, spec) }
+                    launch {
+                        offsetX.animateTo(
+                            targetValue = 0f,
+                            animationSpec = spec,
+                            initialVelocity = velX * 0.5f // enough momentum to feel natural
+                        )
+                    }
+                    launch {
+                        offsetY.animateTo(
+                            targetValue = 0f,
+                            animationSpec = spec,
+                            initialVelocity = velY * 0.5f
+                        )
+                    }
+                    launch {
+                        rotation.animateTo(
+                            targetValue = 0f,
+                            animationSpec = spec
+                        )
+                    }
                 }
             } catch (_: CancellationException) {
-                // Ignored
             }
         }
 
@@ -140,13 +196,28 @@ class CardAnimationState(
 
     suspend fun resetImmediate() {
         currentJob.getAndSet(null)?.cancel()
+        lastDragVelocityX = 0f
+        lastDragVelocityY = 0f
+        lastDragTimestamp = 0L
 
         try {
             offsetX.snapTo(0f)
             offsetY.snapTo(0f)
             rotation.snapTo(0f)
         } catch (_: CancellationException) {
-            // Ignored
+        }
+    }
+
+    suspend fun resetValues() {
+        lastDragVelocityX = 0f
+        lastDragVelocityY = 0f
+        lastDragTimestamp = 0L
+
+        try {
+            offsetX.snapTo(0f)
+            offsetY.snapTo(0f)
+            rotation.snapTo(0f)
+        } catch (_: CancellationException) {
         }
     }
 
