@@ -13,6 +13,7 @@ import com.venom.data.repo.SettingsRepository
 import com.venom.domain.model.AppTheme
 import com.venom.domain.model.FontStyles
 import com.venom.domain.model.PaletteStyle
+import com.venom.domain.provider.AppConfigProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,8 +37,11 @@ data class SettingsUiState(
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val appConfigProvider: AppConfigProvider
 ) : ViewModel() {
+
+    val playStoreUrl: String get() = appConfigProvider.appPlayStore
 
     val uiState: StateFlow<SettingsUiState> = settingsRepository.settings
         .map { it.toUiState() }
