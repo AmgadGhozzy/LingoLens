@@ -17,11 +17,11 @@ object SpellingUtils {
      * @param targetWord The word to spell (will be converted to uppercase)
      * @return Shuffled list of letters including target chars and random distractors
      */
-    fun generateBank(targetWord: String): List<Letter> {
+    fun generateBank(targetWord: String, distractorCount: Int): List<Letter> {
         val targetChars = targetWord.uppercase().toList()
 
         // Generate random distractor letters
-        val distractors = (1..DISTRACTOR_COUNT).map {
+        val distractors = (1..distractorCount).map {
             ALPHABET.random()
         }
 
