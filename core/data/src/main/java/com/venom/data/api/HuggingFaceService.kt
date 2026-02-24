@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.venom.data.remote.respnod.HuggingFaceTranslationResult
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -34,16 +35,18 @@ interface HuggingFaceService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class HuggingFaceRequestBody(
     val inputs: String,
     val parameters: HuggingFaceParameters = HuggingFaceParameters()
 )
 
+@JsonClass(generateAdapter = true)
 data class HuggingFaceParameters(
-    @SerializedName("src_lang")
+    @Json(name = "src_lang")
     val srcLang: String? = null,
-    @SerializedName("tgt_lang")
+    @Json(name = "tgt_lang")
     val tgtLang: String? = null,
-    @SerializedName("max_length")
+    @Json(name = "max_length")
     val maxLength: Int = 512
 )

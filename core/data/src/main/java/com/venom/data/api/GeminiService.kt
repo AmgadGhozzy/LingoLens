@@ -1,6 +1,7 @@
 package com.venom.data.api
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.venom.data.remote.respnod.GeminiResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -32,11 +33,12 @@ interface GeminiService {
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class GeminiRequest(
     val contents: List<GeminiContent>,
-    @SerializedName("systemInstruction")
+    @Json(name = "systemInstruction")
     val systemInstruction: GeminiContent? = null,
-    @SerializedName("generationConfig")
+    @Json(name = "generationConfig")
     val generationConfig: GeminiConfig = GeminiConfig()
 ) {
     companion object {
@@ -58,27 +60,31 @@ data class GeminiRequest(
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class GeminiContent(
     val role: String = "user",
     val parts: List<GeminiPart>
 )
 
+@JsonClass(generateAdapter = true)
 data class GeminiPart(
     val text: String
 )
 
+@JsonClass(generateAdapter = true)
 data class GeminiConfig(
     val temperature: Double = 1.0,
     val maxOutputTokens: Int = 16384,
     val topP: Double = 0.95,
     val topK: Int = 64,
     val responseMimeType: String = "application/json",
-    @SerializedName("response_schema")
+    @Json(name = "response_schema")
     val responseSchema: Map<String, Any>? = null,
-    @SerializedName("thinkingConfig")
+    @Json(name = "thinkingConfig")
     val thinkingConfig: Map<String, Any>? = null
 )
 
+@JsonClass(generateAdapter = true)
 data class GeminiConfig1(
     val temperature: Double = 0.2,
     val maxOutputTokens: Int = 1024,
