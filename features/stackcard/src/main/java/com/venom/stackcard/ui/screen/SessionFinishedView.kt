@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,12 +34,12 @@ import com.venom.domain.model.AppTheme
 import com.venom.domain.model.WordProgressState
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.AnimatedSuccessIcon
-import com.venom.stackcard.ui.components.mastery.GlassOutlinedButton
 import com.venom.stackcard.ui.components.mastery.GlassSurface
 import com.venom.stackcard.ui.components.mastery.OverallStatItem
 import com.venom.stackcard.ui.components.mastery.SessionProgressCard
 import com.venom.stackcard.ui.viewmodel.SessionStats
-import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.CloseButton
+import com.venom.ui.components.buttons.GlassOutlinedButton
 import com.venom.ui.components.buttons.GradientActionButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
@@ -67,32 +64,18 @@ fun SessionFinishedView(
 
     val scale by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0.8f,
-        animationSpec = tween(500, easing = FastOutSlowInEasing),
-        label = "scale"
+        animationSpec = tween(500, easing = FastOutSlowInEasing)
     )
 
     val alpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
-        animationSpec = tween(600),
-        label = "alpha"
+        animationSpec = tween(600)
     )
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         ConfettiView()
 
-        CustomFilledIconButton(
-            icon = Icons.Rounded.ArrowForwardIos,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(20.adp),
-            onClick = onExit,
-            contentDescription = stringResource(R.string.action_close),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.6f),
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ),
-            size = 44.adp
-        )
+        CloseButton(onExit, Modifier.align(Alignment.TopEnd).padding(20.adp))
 
         Column(
             modifier = Modifier
