@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,11 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -50,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -65,12 +62,13 @@ import com.venom.domain.model.AppTheme
 import com.venom.domain.model.DashboardData
 import com.venom.resources.R
 import com.venom.stackcard.ui.components.mastery.MiniProgressDashboard
-import com.venom.ui.components.buttons.CustomFilledIconButton
+import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.buttons.GradientActionButton
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.common.asp
 import com.venom.ui.components.dialogs.PlacementChoiceDialog
 import com.venom.ui.components.onboarding.GoogleSignInButton
+import com.venom.ui.screen.LeaderboardDialog
 import com.venom.ui.theme.BrandColors
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.theme.lingoLens
@@ -83,6 +81,8 @@ fun WelcomeScreen(
     onGoogleSignIn: () -> Unit = {},
     onOpenProgress: () -> Unit = {},
     onTakePlacement: () -> Unit = {},
+    onDismissPlacementModal: () -> Unit = {},
+    showPlacementModal: Boolean = false,
     isLoading: Boolean = false,
     isSignedIn: Boolean = false,
     userName: String? = null,
@@ -91,7 +91,7 @@ fun WelcomeScreen(
 ) {
     var topic by remember { mutableStateOf("") }
     var isVisible by remember { mutableStateOf(false) }
-    var showPlacementDialog by remember { mutableStateOf(false) }
+    var showLeaderboardDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { delay(100); isVisible = true }
 
@@ -113,10 +113,11 @@ fun WelcomeScreen(
             isSignedIn = isSignedIn,
             userName = displayName,
             isLoading = isLoading,
-            onBack = onBack
+            onBack = onBack,
+            onOpenLeaderboard = { showLeaderboardDialog = true }
         )
 
-        if (userProgress != null && isSignedIn) {
+        if (userProgress != null) {
             DashboardSection(
                 userProgress = userProgress,
                 onOpenProgress = onOpenProgress,
@@ -126,7 +127,7 @@ fun WelcomeScreen(
 
         Column(
             modifier = Modifier
-                .weight(if (userProgress != null && isSignedIn) 0.30f else 0.45f)
+                .weight(if (userProgress != null) 0.30f else 0.45f)
                 .scale(scale),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -145,13 +146,7 @@ fun WelcomeScreen(
         ) {
             GradientActionButton(
                 text = "Start Learning",
-                onClick = {
-                    if (userProgress == null || userProgress.totalWordsLearned == 0) {
-                        showPlacementDialog = true
-                    } else {
-                        onStart(topic)
-                    }
-                },
+                onClick = { onStart(topic) },
                 enabled = !isLoading,
                 leadingIcon = R.drawable.icon_play,
                 maxWidth = 360
@@ -168,8 +163,6 @@ fun WelcomeScreen(
                             .blur(0.5.adp),
                         speed = 0.8f
                     )
-                } else {
-                    null
                 }
             }
 
@@ -178,17 +171,23 @@ fun WelcomeScreen(
             }
         }
 
-        if (showPlacementDialog) {
+        if (showPlacementModal) {
             PlacementChoiceDialog(
                 onStartFromBeginning = {
-                    showPlacementDialog = false
+                    onDismissPlacementModal()
                     onStart(topic)
                 },
                 onTakePlacementTest = {
-                    showPlacementDialog = false
+                    onDismissPlacementModal()
                     onTakePlacement()
                 },
-                onDismiss = { showPlacementDialog = false }
+                onDismiss = onDismissPlacementModal
+            )
+        }
+
+        if (showLeaderboardDialog) {
+            LeaderboardDialog(
+                onDismiss = { showLeaderboardDialog = false }
             )
         }
 
@@ -238,6 +237,7 @@ private fun TopBar(
     userName: String?,
     isLoading: Boolean,
     onBack: () -> Unit,
+    onOpenLeaderboard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -247,29 +247,47 @@ private fun TopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isSignedIn && !isLoading) {
-            SignedInBadge(userName = userName)
+        if (!isLoading) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.adp)
+            ) {
+                SignedInBadge(
+                    isSignedIn = isSignedIn,
+                    userName = userName
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(44.adp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .clickable(onClick = onOpenLeaderboard),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_trophy),
+                        contentDescription = "Leaderboard",
+                        modifier = Modifier.size(28.adp)
+                    )
+                }
+            }
         } else {
             Box(modifier = Modifier.weight(1f))
         }
 
         if (!isLoading) {
-            CustomFilledIconButton(
-                icon = Icons.Rounded.ArrowForwardIos,
-                onClick = onBack,
-                contentDescription = stringResource(R.string.action_close),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(0.5f),
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-                size = 44.adp
-            )
+            CloseButton(onBack)
         }
     }
 }
 
 @Composable
-private fun SignedInBadge(userName: String?, modifier: Modifier = Modifier) {
+private fun SignedInBadge(
+    isSignedIn: Boolean,
+    userName: String?,
+    modifier: Modifier = Modifier
+) {
     val semantic = MaterialTheme.lingoLens.semantic
 
     Row(
@@ -277,9 +295,9 @@ private fun SignedInBadge(userName: String?, modifier: Modifier = Modifier) {
             .clip(RoundedCornerShape(12.adp))
             .background(semantic.success.copy(alpha = 0.1f))
             .border(1.adp, semantic.success.copy(alpha = 0.2f), RoundedCornerShape(12.adp))
-            .padding(horizontal = 12.adp, vertical = 8.adp),
+            .padding(horizontal = 10.adp, vertical = 6.adp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.adp)
+        horizontalArrangement = Arrangement.spacedBy(6.adp)
     ) {
         Box(
             modifier = Modifier
@@ -298,13 +316,13 @@ private fun SignedInBadge(userName: String?, modifier: Modifier = Modifier) {
 
         Column {
             Text(
-                text = "Signed in",
+                text = if (isSignedIn) "Signed in" else "Guest",
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold, fontSize = 10.asp
                 ),
                 color = semantic.success
             )
-            if (!userName.isNullOrBlank()) {
+            if (isSignedIn && !userName.isNullOrBlank()) {
                 Text(
                     text = userName.split(" ").firstOrNull() ?: userName,
                     style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.asp),
@@ -518,7 +536,7 @@ private fun AppTitle() {
 @Composable
 private fun WelcomeScreenPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
-        WelcomeScreen(isSignedIn = false,isLoading = true)
+        WelcomeScreen(isSignedIn = false, isLoading = false)
     }
 }
 
@@ -527,7 +545,7 @@ private fun WelcomeScreenPreview() {
 private fun WelcomeScreenSignedInPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         WelcomeScreen(
-            isSignedIn = true,
+            isSignedIn = false,
             userProgress = DashboardData(
                 totalWordsLearned = 156, totalWordsMastered = 42, currentStreak = 7, todayXp = 85
             )
