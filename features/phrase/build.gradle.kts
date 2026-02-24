@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 android {
@@ -21,7 +20,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -60,13 +58,13 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
     // Networking
     api(libs.okhttp)
     api(libs.retrofit)
-    api(libs.converter.gson)
+    api(libs.converter.moshi)
 
     // Room
     api(libs.androidx.room.runtime)
