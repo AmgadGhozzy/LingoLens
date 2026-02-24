@@ -22,6 +22,7 @@ localProperties.load(FileInputStream(rootProject.file("local.properties")))
 versionProperties.load(FileInputStream(versionFile))
 
 val localVersionCode = versionProperties.getProperty("APP_VERSION_CODE").toInt()
+val localVersionName = versionProperties.getProperty("APP_VERSION_NAME")
 
 android {
     namespace = "com.venom.lingolens"
@@ -35,7 +36,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = localVersionCode
-        versionName = "4.4.${localVersionCode}"
+        versionName = "${localVersionName}${localVersionCode}"
         ndk {
             abiFilters.add("arm64-v8a")
             abiFilters.add("arm-v7a")
@@ -105,12 +106,10 @@ android {
 dependencies {
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
-
-    implementation("com.google.firebase:firebase-config")
-    implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     // Ads
     api(libs.play.services.ads)
