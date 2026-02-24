@@ -34,6 +34,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.domain.model.QuizMode
 import com.venom.lingospell.presentation.SpellingGameScreen
+import com.venom.quiz.placement.PlacementScreen
 import com.venom.quiz.ui.viewmodel.UnifiedQuizViewModel
 import com.venom.stackcard.ui.components.flashcard.CardSwiperStack
 import com.venom.stackcard.ui.components.insights.InsightsSheet
@@ -53,12 +54,38 @@ fun WordMasteryScreen(
     isGenerative: Boolean,
     onBack: () -> Unit = {},
     onGoogleSignIn: () -> Unit = {},
-    onTakePlacement: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: WordMasteryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showPlacementScreen by remember { mutableStateOf(false) }
     var showProgress by remember { mutableStateOf(false) }
+
+    // Handle system back button to return to WelcomeScreen
+    BackHandler(
+        enabled = uiState.visibleCards.isNotEmpty() || uiState.processedCardsCount > 0
+    ) {
+        viewModel.onEvent(WordMasteryEvent.BackToWelcome)
+    }
+
+    if (showPlacementScreen) {
+        Dialog(
+            onDismissRequest = { showPlacementScreen = false },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            PlacementScreen(
+                onComplete = { result ->
+                    showPlacementScreen = false
+                    viewModel.onEvent(WordMasteryEvent.Initialize(isGenerative))
+                },
+                onBack = { showPlacementScreen = false }
+            )
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
@@ -78,7 +105,9 @@ fun WordMasteryScreen(
                     userName = uiState.userName,
                     userProgress = uiState.userProgress,
                     onOpenProgress = { showProgress = true },
-                    onTakePlacement = onTakePlacement,
+                    onTakePlacement = { showPlacementScreen = true },
+                    showPlacementModal = uiState.showPlacementModal,
+                    onDismissPlacementModal = { viewModel.onEvent(WordMasteryEvent.DismissPlacementModal) },
                     onStart = { topic ->
                         viewModel.onEvent(
                             WordMasteryEvent.Initialize(
@@ -214,10 +243,11 @@ private fun MasteryContent(
         InsightsSheet(
             isOpen = uiState.isSheetOpen,
             word = uiState.currentWord,
+            currentWordProgress = uiState.currentWordProgress,
+            userCefrLevel = uiState.userCefrLevel,
             activeTab = uiState.activeTab,
             pinnedLanguage = uiState.pinnedLanguage,
             showPowerTip = uiState.showPowerTip,
-            currentWordProgress = uiState.currentWordProgress,
             onClose = { onEvent(WordMasteryEvent.CloseSheet) },
             onTabChange = { tab -> onEvent(WordMasteryEvent.ChangeTab(tab)) },
             onPinLanguage = { lang -> onEvent(WordMasteryEvent.PinLanguage(lang)) },
