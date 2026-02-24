@@ -10,8 +10,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -40,7 +37,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom.domain.model.WordMaster
 import com.venom.lingospell.domain.FeedbackState
-import com.venom.lingospell.domain.MAX_STREAK
 import com.venom.lingospell.presentation.components.HintButton
 import com.venom.lingospell.presentation.components.LetterBank
 import com.venom.lingospell.presentation.components.MasteryDialog
@@ -49,7 +45,10 @@ import com.venom.lingospell.presentation.components.WordSlots
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CloseButton
 import com.venom.ui.components.common.adp
+import com.venom.ui.components.other.ConfettiAnimationType
 import com.venom.ui.components.other.ConfettiView
+import com.venom.ui.components.other.KonfettiStyle
+import com.venom.ui.theme.Alexandria
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.viewmodel.TTSViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -57,192 +56,158 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun SpellingGameScreen(
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
     customWord: WordMaster,
+    modifier: Modifier = Modifier,
     viewModel: SpellingGameViewModel = hiltViewModel(),
     ttsViewModel: TTSViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(customWord) {
-        if (customWord.wordEn != state.currentWord.wordEn) {
+        if (customWord.wordEn != state.currentWord?.wordEn) {
             viewModel.setCustomWord(customWord)
         }
     }
 
-    // Handle events side-effects
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
-                is SpellingGameEvent.PlayTts -> { ttsViewModel.toggle(event.text, event.languageTag) }
+                is SpellingGameEvent.PlayTts -> ttsViewModel.toggle(event.text, event.languageTag)
                 SpellingGameEvent.NavigateBack -> onNavigateBack()
             }
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { viewModel.onScreenTapDuringSuccess() }
-        ) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(Modifier.fillMaxSize()) {
 
-            // Celebration effects for SUCCESS (not MASTERED, as mastered shows dialog)
-            if (state.feedback == FeedbackState.MASTERED) {
-                ConfettiView()
-            }
-
-            // Top Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
                     .padding(horizontal = 24.adp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                val maxStreak = viewModel.appConfigProvider.spellingMaxStreak
                 StreakBar(
                     streak = state.streak,
-                    isMastered = state.streak >= MAX_STREAK
+                    isMastered = state.streak >= maxStreak,
+                    maxStreak = maxStreak
                 )
-                CloseButton(
-                    onClick = viewModel::onCloseClick
-                )
+                CloseButton(viewModel::onCloseClick)
             }
 
-            // Main content area
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
-                // Arabic word prompt
                 AnimatedContent(
-                    targetState = state.currentWord.arabicAr,
+                    targetState = state.currentWord?.arabicAr ?: "",
                     transitionSpec = {
                         (fadeIn() + scaleIn(initialScale = 0.95f)) togetherWith
                                 (fadeOut() + scaleOut(targetScale = 0.95f))
-                    }
+                    },
                 ) { arabic ->
                     val scale by animateFloatAsState(
                         targetValue = 1f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
+                        animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow),
                     )
-
                     Text(
                         text = arabic,
-                        style = MaterialTheme.typography.displayMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .scale(scale)
-                            .padding(horizontal = 32.adp)
+                        fontFamily = Alexandria,
+                        style = MaterialTheme.typography.displayMedium,
+                        modifier = Modifier.scale(scale).padding(horizontal = 32.adp),
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.adp))
+                Spacer(Modifier.height(24.adp))
 
-                // Feedback / Instructions area
                 Box(
-                    modifier = Modifier
-                        .height(48.adp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.height(48.adp).fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
                 ) {
                     AnimatedContent(
                         targetState = state.feedback,
                         transitionSpec = {
                             (fadeIn() + scaleIn(initialScale = 0.8f)) togetherWith
                                     (fadeOut() + scaleOut(targetScale = 0.8f))
-                        }
+                        },
                     ) { feedback ->
                         when (feedback) {
-                            FeedbackState.MASTERED -> {
-                                // Don't show inline mastered message, dialog will handle it
-                                Spacer(modifier = Modifier.height(48.adp))
-                            }
-
-                            FeedbackState.SUCCESS -> {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.adp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.icon_circle_check),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(28.adp),
-                                        tint = MaterialTheme.lingoLens.semantic.success
-                                    )
-                                    Text(
-                                        text = "PERFECT!",
-                                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                                        color = MaterialTheme.lingoLens.semantic.success
-                                    )
-                                }
-                            }
-
-                            else -> {
+                            FeedbackState.SUCCESS -> Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.adp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_seal_check1),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(28.adp),
+                                    tint = MaterialTheme.lingoLens.semantic.success,
+                                )
                                 Text(
-                                    text = "Translate to English",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    text = "PERFECT!",
+                                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.lingoLens.semantic.success,
                                 )
                             }
+                            else -> Text(
+                                text = "Translate to English",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.adp))
+                Spacer(Modifier.height(32.adp))
 
-                // Word slots
                 WordSlots(
                     slots = state.slots,
                     onSlotClick = viewModel::onSlotClick,
                     shakeTrigger = state.shakeTrigger,
-                    feedback = state.feedback
+                    feedback = state.feedback,
                 )
 
-                Spacer(modifier = Modifier.height(24.adp))
+                Spacer(Modifier.height(24.adp))
 
-            // Hint button
-            Box(modifier = Modifier.height(48.adp), contentAlignment = Alignment.Center) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = state.showHintButton,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    HintButton(
-                        hintLevel = state.hintLevel,
-                        onHintClick = viewModel::onHintRequest,
-                        enabled = true
-                    )
+                Box(modifier = Modifier.height(48.adp), contentAlignment = Alignment.Center) {
+                    androidx.compose.animation.AnimatedVisibility(visible = state.showHintButton, enter = fadeIn(), exit = fadeOut()) {
+                        HintButton(
+                            hintLevel = state.hintLevel,
+                            onHintClick = viewModel::onHintRequest,
+                            enabled = true,
+                        )
+                    }
                 }
             }
-        }
 
-            // Letter bank at bottom
             LetterBank(
                 letters = state.bank,
                 onLetterClick = viewModel::onLetterClick,
-                onClear = viewModel::onClearAll
+                onClear = viewModel::onClearAll,
             )
         }
 
-        // Mastery Dialog - appears on top of everything
+        if (state.feedback == FeedbackState.SUCCESS) {
+            ConfettiView(
+                animationType = ConfettiAnimationType.KONFETTI,
+                konfettiStyle = KonfettiStyle.FESTIVE_BOTTOM,
+            )
+        }
+
         if (state.showMasteryDialog) {
             MasteryDialog(
-                word = state.currentWord.wordEn,
-                arabicWord = state.currentWord.arabicAr,
-                onContinue = viewModel::onContinueAfterMastery
+                word = state.currentWord?.wordEn ?: "",
+                arabicWord = state.currentWord?.arabicAr ?: "",
+                onContinue = viewModel::onContinueAfterMastery,
             )
         }
     }
