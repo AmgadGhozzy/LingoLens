@@ -74,7 +74,7 @@ import com.venom.ui.theme.tokens.getCefrColorScheme
 fun UsageTab(
     word: WordMaster,
     modifier: Modifier = Modifier,
-    userCefrLevel: CefrLevel = CefrLevel.B1 // TODO: Get from user profile
+    userCefrLevel: CefrLevel
 ) {
     val scrollState = rememberScrollState()
 
@@ -529,7 +529,8 @@ private fun HighlightedExampleText(
 private fun UsageTabPreview() {
     LingoLensTheme(appTheme = AppTheme.DARK) {
         UsageTab(
-            word = MockWordData.journeyWord
+            word = MockWordData.journeyWord,
+            userCefrLevel = CefrLevel.A2
         )
     }
 }
@@ -539,7 +540,8 @@ private fun UsageTabPreview() {
 private fun UsageTabPreviewLight() {
     LingoLensTheme(appTheme = AppTheme.LIGHT) {
         UsageTab(
-            word = MockWordData.journeyWord
+            word = MockWordData.journeyWord,
+            userCefrLevel = CefrLevel.C2
         )
     }
 }
