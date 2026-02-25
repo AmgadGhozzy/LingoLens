@@ -1,7 +1,7 @@
 package com.venom.data.mapper
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import com.venom.data.local.entity.WordMasterEntity
 import com.venom.data.remote.respnod.RelatedWordsDto
 import com.venom.data.remote.respnod.WordFamilyDto
@@ -16,7 +16,7 @@ import com.venom.domain.model.WordMaster
  */
 object WordMasterEntityMapper {
     
-    private val gson = Gson()
+    private val moshi = Moshi.Builder().build()
     
     fun toDomain(entity: WordMasterEntity): WordMaster {
         val cefrLevel = try {
@@ -77,7 +77,8 @@ object WordMasterEntityMapper {
             portuguesePt = entity.portuguesePt,
             japaneseJa = entity.japaneseJa,
             italianIt = entity.italianIt,
-            turkishTr = entity.turkishTr
+            turkishTr = entity.turkishTr,
+            unitId = entity.unitId
         )
 
     }
@@ -185,6 +186,9 @@ object WordMasterEntityMapper {
     }
     
     fun toEntity(domain: WordMaster): WordMasterEntity {
+        val listType = Types.newParameterizedType(List::class.java, String::class.java)
+        val mapType = Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+        
         return WordMasterEntity(
             id = domain.id,
             wordEn = domain.wordEn,
@@ -204,15 +208,15 @@ object WordMasterEntityMapper {
             usageNote = domain.usageNote,
             category = domain.category,
             primarySense = domain.primarySense,
-            semanticTags = gson.toJson(domain.semanticTags),
+            semanticTags = moshi.adapter<List<String>>(listType).toJson(domain.semanticTags),
             register = domain.register,
             mnemonicAr = domain.mnemonicAr,
-            wordFamily = gson.toJson(domain.wordFamily),
-            synonyms = gson.toJson(domain.synonyms),
-            antonyms = gson.toJson(domain.antonyms),
-            examples = gson.toJson(domain.examples.mapKeys { it.key.name }),
-            collocations = gson.toJson(domain.collocations),
-            relatedWords = gson.toJson(domain.relatedWords),
+            wordFamily = moshi.adapter(WordFamily::class.java).toJson(domain.wordFamily),
+            synonyms = moshi.adapter<List<String>>(listType).toJson(domain.synonyms),
+            antonyms = moshi.adapter<List<String>>(listType).toJson(domain.antonyms),
+            examples = moshi.adapter<Map<String, String>>(mapType).toJson(domain.examples.mapKeys { it.key.name }),
+            collocations = moshi.adapter<List<String>>(listType).toJson(domain.collocations),
+            relatedWords = moshi.adapter(RelatedWords::class.java).toJson(domain.relatedWords),
             arabicAr = domain.arabicAr,
             frenchFr = domain.frenchFr,
             germanDe = domain.germanDe,
@@ -222,18 +226,17 @@ object WordMasterEntityMapper {
             portuguesePt = domain.portuguesePt,
             japaneseJa = domain.japaneseJa,
             italianIt = domain.italianIt,
-            turkishTr = domain.turkishTr
+            turkishTr = domain.turkishTr,
+            unitId = domain.unitId
         )
     }
-    
-    fun toDomainList(entities: List<WordMasterEntity>): List<WordMaster> = entities.map { toDomain(it) }
     
     fun toEntityList(domains: List<WordMaster>): List<WordMasterEntity> = domains.map { toEntity(it) }
     
     private fun parseJsonList(json: String): List<String> {
         return try {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type) ?: emptyList()
+            val type = Types.newParameterizedType(List::class.java, String::class.java)
+            moshi.adapter<List<String>>(type).fromJson(json) ?: emptyList()
         } catch (_: Exception) {
             emptyList()
         }
@@ -241,8 +244,8 @@ object WordMasterEntityMapper {
     
     private fun parseExamples(json: String): Map<CefrLevel, String> {
         return try {
-            val type = object : TypeToken<Map<String, String>>() {}.type
-            val map: Map<String, String> = gson.fromJson(json, type) ?: emptyMap()
+            val type = Types.newParameterizedType(Map::class.java, String::class.java, String::class.java)
+            val map: Map<String, String> = moshi.adapter<Map<String, String>>(type).fromJson(json) ?: emptyMap()
             map.mapNotNull { (key, value) ->
                 try {
                     CefrLevel.valueOf(key.uppercase()) to value
@@ -257,7 +260,7 @@ object WordMasterEntityMapper {
     
     private fun parseWordFamily(json: String): WordFamily {
         return try {
-            gson.fromJson(json, WordFamily::class.java) ?: WordFamily()
+            moshi.adapter(WordFamily::class.java).fromJson(json) ?: WordFamily()
         } catch (e: Exception) {
             WordFamily()
         }
@@ -265,8 +268,8 @@ object WordMasterEntityMapper {
     
     private fun parseRelatedWords(json: String): RelatedWords {
         return try {
-            val type = object : TypeToken<Map<String, List<String>>>() {}.type
-            val map: Map<String, List<String>> = gson.fromJson(json, type) ?: emptyMap()
+            val type = Types.newParameterizedType(Map::class.java, String::class.java, Types.newParameterizedType(List::class.java, String::class.java))
+            val map: Map<String, List<String>> = moshi.adapter<Map<String, List<String>>>(type).fromJson(json) ?: emptyMap()
             RelatedWords(
                 english = map["en"] ?: map["english"] ?: emptyList(),
                 arabic = map["ar"] ?: map["arabic"] ?: emptyList()

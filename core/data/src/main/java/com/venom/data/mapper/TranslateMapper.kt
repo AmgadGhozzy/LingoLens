@@ -12,7 +12,6 @@ import com.venom.domain.model.Synset
 import com.venom.domain.model.SynsetEntry
 import com.venom.domain.model.TranslationResult
 import com.venom.domain.model.TranslationSentence
-import com.venom.utils.Extensions.postprocessText
 
 object TranslateMapper {
 
@@ -21,20 +20,28 @@ object TranslateMapper {
         sourceText: String?
     ): TranslationResult {
         val safeSourceText = sourceText?.takeIf { it.isNotBlank() } ?: ""
-        val sentences = response.sentences?.map { sentence ->
+
+        val sentencesList = response.sentences ?: emptyList()
+        val translationSentences = sentencesList.filter { it.trans != null && it.orig != null }
+
+        val sentences = translationSentences.map { sentence ->
             TranslationSentence(
-                original = sentence.orig?.takeIf { it.isNotBlank() } ?: safeSourceText,
-                translated = sentence.trans?.postprocessText() ?: "",
+                original = sentence.orig ?: "",
+                translated = sentence.trans ?: "",
                 transliteration = sentence.translit
             )
-        } ?: emptyList()
+        }
 
-        val translatedText = response.sentences?.firstOrNull()?.trans?.postprocessText() ?: ""
-        val mainTransliteration = response.sentences?.firstOrNull()?.translit
+        val translatedText = translationSentences.joinToString("") { it.trans ?: "" }
+
+
+        val mainTransliteration =
+            sentencesList.find { it.translit != null && it.trans == null }?.translit
+                ?: sentencesList.find { it.translit != null }?.translit
 
         return TranslationResult(
-            sourceText = safeSourceText.postprocessText(),
-            translatedText = translatedText,
+            sourceText = safeSourceText,
+            translatedText = translatedText.ifBlank { safeSourceText },
             sourceLang = response.src,
             targetLang = "",
             providerId = "google",
@@ -47,7 +54,6 @@ object TranslateMapper {
             dict = mapDictionaryEntries(response.dict ?: emptyList()),
             synsets = mapSynsets(response.synsets ?: emptyList()),
             definitionEntries = mapDefinitions(response.definitions ?: emptyList()),
-            // Extract new fields
             terms = extractAllTerms(response.dict),
             transliteration = mainTransliteration,
             allExamples = extractAllExamples(response.examples),
@@ -104,21 +110,21 @@ object TranslateMapper {
         return definitions.map { definition ->
             Definition(
                 pos = definition.pos,
-                entry = definition.entry.map { entry ->
+                entry = definition.entry?.map { entry ->
                     DefinitionEntry(
                         gloss = entry.gloss,
                         example = entry.example
                     )
-                }
+                } ?: emptyList()
             )
         }
     }
 
     private fun extractAlternatives(alternatives: List<AlternativeTranslation>?): List<String> {
         return alternatives?.flatMap { alternative ->
-            alternative.alternative.mapNotNull { alt ->
+            alternative.alternative?.mapNotNull { alt ->
                 alt.wordPostproc.takeIf { it.isNotBlank() }
-            }
+            } ?: emptyList()
         }?.distinct() ?: emptyList()
     }
 
@@ -132,7 +138,7 @@ object TranslateMapper {
 
     private fun extractDefinitions(definitions: List<com.venom.data.remote.respnod.Definition>?): List<String> {
         return definitions?.flatMap { def ->
-            def.entry.mapNotNull { entry ->
+            def.entry?.mapNotNull { entry ->
                 val gloss = entry.gloss.takeIf { it.isNotBlank() }
                 val pos = def.pos.takeIf { it.isNotBlank() }
 
@@ -145,7 +151,7 @@ object TranslateMapper {
                         }
                     }
                 } else null
-            }
+            } ?: emptyList()
         } ?: emptyList()
     }
 
@@ -154,8 +160,6 @@ object TranslateMapper {
             it.text.takeIf { text -> text.isNotBlank() }
         } ?: emptyList()
     }
-
-    // New extraction methods
 
     private fun extractAllTerms(dict: List<com.venom.data.remote.respnod.DictionaryEntry>?): List<DictionaryTerm> {
         return dict?.flatMap { entry ->
@@ -183,7 +187,6 @@ object TranslateMapper {
         } ?: emptyMap()
     }
 
-    // Updated entity mapping methods with all fields
     fun toEntity(result: TranslationResult): TranslationEntity {
         return TranslationEntity(
             id = result.id,
