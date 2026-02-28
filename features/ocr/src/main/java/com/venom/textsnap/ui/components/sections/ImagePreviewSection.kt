@@ -48,47 +48,32 @@ fun ImagePreviewSection(
 
     if (showImageCropper && uiState.imageBitmap != null) {
         ImageCropperDialog(
-            onDismissRequest = {
-                showImageCropper = false
-                viewModel.reset()
-            },
+            onDismissRequest = { showImageCropper = false; viewModel.reset() },
             imageBitmap = uiState.imageBitmap!!,
-            onImageCropped = { croppedBitmap ->
-                viewModel.processImage(FromBitmap(croppedBitmap), processOcrAfter = true)
+            onImageCropped = {
+                viewModel.processImage(FromBitmap(it), processOcrAfter = true)
                 showImageCropper = false
             }
         )
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-        GlassCard(
-            thickness = GlassThickness.Thin
-        ) {
-            when {
-                uiState.imageBitmap != null -> ZoomableImageWithBoundingBoxes(
-                    viewModel = viewModel,
-                    imageBitmap = uiState.imageBitmap!!,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                else -> EmptyState(
+    Box(modifier = modifier.fillMaxSize()) {
+        GlassCard(thickness = GlassThickness.Thin) {
+            if (uiState.imageBitmap != null) {
+                ZoomableImageWithBoundingBoxes(viewModel, uiState.imageBitmap!!, Modifier.fillMaxSize())
+            } else {
+                EmptyState(
                     icon = R.drawable.icon_ocr_mode,
                     title = stringResource(R.string.ocr_empty_state_title),
                     subtitle = stringResource(R.string.ocr_empty_state_description)
                 )
             }
-
             if (uiState.isLoading) OcrLoadingOverlay()
             if (uiState.hasError) ErrorOverlay(onRetry = onRetry)
         }
 
         Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(8.adp),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(8.adp),
             horizontalArrangement = Arrangement.spacedBy(16.adp),
             verticalAlignment = Alignment.Bottom
         ) {
@@ -100,47 +85,36 @@ fun ImagePreviewSection(
                         description = R.string.action_hide_paragraphs,
                         onClick = onToggleParagraphs,
                         selected = uiState.isParagraphMode,
-                        enabled = uiState.currentRecognizedText.isNotEmpty()
+                        enabled = uiState.hasContent
                     ),
                     ActionItem.Action(
                         icon = if (uiState.showLabels) R.drawable.ic_labels_hidden else R.drawable.ic_labels_shown,
                         description = R.string.action_hide_labels,
                         onClick = onToggleLabels,
                         selected = uiState.showLabels,
-                        enabled = uiState.currentRecognizedText.isNotEmpty()
+                        enabled = uiState.hasContent
                     ),
                     ActionItem.Action(
-                        icon = if (uiState.isSelected) R.drawable.ic_deselect else R.drawable.ic_select_all,
+                        icon = if (uiState.isAllSelected) R.drawable.ic_deselect else R.drawable.ic_select_all,
                         description = R.string.action_select_all,
                         onClick = onToggleSelected,
-                        selected = uiState.isSelected,
-                        enabled = uiState.currentRecognizedText.isNotEmpty()
+                        selected = uiState.isAllSelected,
+                        enabled = uiState.hasContent
                     ),
                     ActionItem.Action(
                         icon = R.drawable.icon_translate,
                         description = R.string.action_translate,
                         onClick = onTranslate,
                         selected = uiState.showTranslation,
-                        enabled = uiState.currentRecognizedText.isNotEmpty()
+                        enabled = uiState.hasContent
                     )
                 )
             )
 
             ExpandableFAB(
-                onCameraClick = {
-                    onCameraClick()
-                    viewModel.reset()
-                    showImageCropper = true
-                },
-                onGalleryClick = {
-                    onGalleryClick()
-                    viewModel.reset()
-                },
-                onFileClick = {
-                    onFileClick()
-                    viewModel.reset()
-                    showImageCropper = true
-                }
+                onCameraClick = { onCameraClick(); viewModel.reset(); showImageCropper = true },
+                onGalleryClick = { onGalleryClick(); viewModel.reset() },
+                onFileClick = { onFileClick(); viewModel.reset(); showImageCropper = true }
             )
         }
     }

@@ -10,7 +10,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
@@ -32,20 +31,19 @@ fun RecognizedTextSection(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    var fullscreenState by remember { mutableStateOf<String?>(null) }
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    var fullscreenText by remember { mutableStateOf<String?>(null) }
 
-    val collapsedHeight = (peekHeight * 0.6f).coerceIn(56.adp, 112.adp)
-    val expandedHeight = (configuration.screenHeightDp.adp * 0.3f).coerceIn(112.adp, 224.adp)
-    val currentHeight = if (isExpanded) expandedHeight else collapsedHeight
-    val maxLines = with(LocalDensity.current) {
-        ((currentHeight.value / 18) * (configuration.densityDpi / 160f)).toInt()
+    val currentHeight = if (isExpanded) {
+        (screenHeight * 0.3f).adp.coerceIn(112.adp, 224.adp)
+    } else {
+        (peekHeight * 0.6f).coerceIn(56.adp, 112.adp)
     }
 
-    fullscreenState?.takeIf { it.isNotEmpty() }?.let { fullscreenText ->
+    fullscreenText?.takeIf { it.isNotEmpty() }?.let {
         FullscreenTextDialog(
-            text = TextFieldValue(fullscreenText).text,
-            onDismiss = { fullscreenState = null },
+            text = it,
+            onDismiss = { fullscreenText = null },
             onCopy = onCopy,
             onShare = onShare,
             onSpeak = onSpeak
@@ -53,14 +51,11 @@ fun RecognizedTextSection(
     }
 
     Box {
-        GlassCard(
-            thickness = GlassThickness.Regular
-        ) {
+        GlassCard(thickness = GlassThickness.Regular) {
             SelectionContainer {
                 CustomTextField(
                     textValue = TextFieldValue(text),
                     placeHolderText = stringResource(R.string.recognized_text_placeholder),
-                    maxLines = maxLines,
                     maxHeight = currentHeight,
                     minHeight = currentHeight,
                     isReadOnly = true
@@ -73,7 +68,7 @@ fun RecognizedTextSection(
                 icon = R.drawable.icon_fullscreen,
                 contentDescription = stringResource(R.string.action_fullscreen),
                 modifier = Modifier.align(Alignment.TopEnd),
-                onClick = { fullscreenState = text },
+                onClick = { fullscreenText = text },
                 showBorder = false
             )
         }
