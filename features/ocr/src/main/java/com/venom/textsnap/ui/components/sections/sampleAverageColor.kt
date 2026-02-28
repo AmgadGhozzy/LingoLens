@@ -9,65 +9,53 @@ import androidx.compose.ui.graphics.toArgb
 
 data class TextColors(val backgroundColor: Color, val textColor: Color)
 
+private val DEFAULT_COLORS = TextColors(Color.White, Color.Black)
+private const val COLOR_DIFF_THRESHOLD = 5000
+private const val MAX_SAMPLES = 64
+
 fun sampleTextColors(imageBitmap: ImageBitmap, rect: Rect): TextColors {
     val bitmap = imageBitmap.asAndroidBitmap()
 
     return try {
-        // Map rect coordinates to bitmap
-        val startX =
-            ((rect.left * bitmap.width) / imageBitmap.width).toInt().coerceIn(0, bitmap.width - 1)
-        val startY =
-            ((rect.top * bitmap.height) / imageBitmap.height).toInt().coerceIn(0, bitmap.height - 1)
-        val endX =
-            ((rect.right * bitmap.width) / imageBitmap.width).toInt().coerceIn(0, bitmap.width - 1)
-        val endY = ((rect.bottom * bitmap.height) / imageBitmap.height).toInt()
-            .coerceIn(0, bitmap.height - 1)
+        val startX = ((rect.left * bitmap.width) / imageBitmap.width).toInt().coerceIn(0, bitmap.width - 1)
+        val startY = ((rect.top * bitmap.height) / imageBitmap.height).toInt().coerceIn(0, bitmap.height - 1)
+        val endX = ((rect.right * bitmap.width) / imageBitmap.width).toInt().coerceIn(0, bitmap.width - 1)
+        val endY = ((rect.bottom * bitmap.height) / imageBitmap.height).toInt().coerceIn(0, bitmap.height - 1)
 
-        // Early exit for tiny areas
-        if (endX - startX < 2 || endY - startY < 2) {
-            return TextColors(Color.White, Color.Black)
+        val w = endX - startX + 1
+        val h = endY - startY + 1
+        if (w < 2 || h < 2) return DEFAULT_COLORS
+
+        val pixels = IntArray(w * h)
+        bitmap.getPixels(pixels, 0, w, startX, startY, w, h)
+
+        val step = maxOf(1, pixels.size / MAX_SAMPLES)
+        val sampled = IntArray(pixels.size / step + 1).also { arr ->
+            var idx = 0
+            for (i in pixels.indices step step) arr[idx++] = pixels[i]
         }
 
-        // Sample all pixels in the bounding box
-        val pixels = IntArray((endX - startX + 1) * (endY - startY + 1))
-        var pixelIndex = 0
-        for (x in startX..endX) {
-            for (y in startY..endY) {
-                pixels[pixelIndex++] = bitmap.getPixel(x, y)
-            }
-        }
+        val bgColor = sampled.toList()
+            .groupingBy { it }.eachCount()
+            .maxByOrNull { it.value }?.key ?: sampled[0]
 
-        // Find most frequent background color
-        val backgroundColor =
-            pixels.groupBy { it }.maxByOrNull { it.value.size }?.key ?: pixels.first()
+        val textColor = sampled
+            .filter { colorDifference(it, bgColor) > COLOR_DIFF_THRESHOLD }
+            .maxByOrNull { contrastRatio(Color(it), Color(bgColor)) }
+            ?: if (Color(bgColor).luminance() > 0.5f) Color.Black.toArgb() else Color.White.toArgb()
 
-        // Text color detection
-        val textColorCandidates = pixels.filter { pixel ->
-            // Filter for pixels significantly different from background
-            colorDifference(pixel, backgroundColor) > 5000
-        }
-
-        // Select text color with highest contrast
-        val textColor = textColorCandidates.maxByOrNull { pixel ->
-            calculateColorContrast(Color(pixel), Color(backgroundColor))
-        } ?: (if (Color(backgroundColor).luminance() > 0.5) Color.Black.toArgb() else Color.White.toArgb())
-
-        TextColors(
-            backgroundColor = Color(backgroundColor), textColor = Color(textColor)
-        )
+        TextColors(Color(bgColor), Color(textColor))
     } catch (_: Exception) {
-        TextColors(Color.White, Color.Black)
+        DEFAULT_COLORS
     }
 }
 
-// Calculate color contrast ratio
-private fun calculateColorContrast(c1: Color, c2: Color): Float {
+private fun contrastRatio(c1: Color, c2: Color): Float {
     val l1 = c1.luminance()
     val l2 = c2.luminance()
     return if (l1 > l2) (l1 + 0.05f) / (l2 + 0.05f) else (l2 + 0.05f) / (l1 + 0.05f)
 }
 
-// Calculate color difference
 private fun colorDifference(c1: Int, c2: Int): Int {
     val r = (c1 shr 16 and 0xFF) - (c2 shr 16 and 0xFF)
     val g = (c1 shr 8 and 0xFF) - (c2 shr 8 and 0xFF)
