@@ -24,7 +24,7 @@ fun SelectedTextItem(
     actions: List<ActionItem.Action>,
     expanded: Boolean = false,
     maxActionsVisible: Int = 2,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     GlassCard(
         modifier = modifier.fillMaxWidth(),
@@ -32,9 +32,7 @@ fun SelectedTextItem(
         shape = MaterialTheme.shapes.large
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 8.adp, start = 16.adp),
+            modifier = Modifier.fillMaxWidth().padding(end = 8.adp, start = 16.adp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -45,7 +43,6 @@ fun SelectedTextItem(
                 maxLines = if (expanded) Int.MAX_VALUE else 2,
                 overflow = TextOverflow.Ellipsis
             )
-
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.adp),
                 verticalAlignment = Alignment.CenterVertically
@@ -58,12 +55,8 @@ fun SelectedTextItem(
                         showBorder = false
                     )
                 }
-
                 if (actions.size > maxActionsVisible) {
-                    OverflowMenu(
-                        actions.drop(maxActionsVisible),
-                        buttonType = ButtonType.OUTLINED
-                    )
+                    OverflowMenu(actions.drop(maxActionsVisible), buttonType = ButtonType.OUTLINED)
                 }
             }
         }

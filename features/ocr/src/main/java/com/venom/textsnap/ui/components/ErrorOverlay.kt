@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,59 +24,39 @@ import com.venom.resources.R
 import com.venom.ui.components.common.adp
 
 @Composable
-fun ErrorOverlay(
-    modifier: Modifier = Modifier, onRetry: () -> Unit
-) {
+fun ErrorOverlay(modifier: Modifier = Modifier, onRetry: () -> Unit) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface.copy(0.9f))
-            .padding(32.adp)
+            .padding(32.adp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_error),
-                contentDescription = null,
-                modifier = Modifier.size(48.adp),
-                tint = MaterialTheme.colorScheme.error
+                painterResource(R.drawable.ic_error), null,
+                Modifier.size(48.adp), MaterialTheme.colorScheme.error
             )
-
-            Spacer(modifier = Modifier.height(16.adp))
-
+            Spacer(Modifier.height(16.adp))
             Text(
-                text = "Failed to process image",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                stringResource(R.string.error_title),
+                style = MaterialTheme.typography.titleMedium
             )
-
-            Spacer(modifier = Modifier.height(8.adp))
-
+            Spacer(Modifier.height(8.adp))
             Text(
-                text = stringResource(id = R.string.error_message),
+                stringResource(R.string.error_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            Spacer(modifier = Modifier.height(24.adp))
-
-            Button(
-                onClick = onRetry, colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_retry),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.adp)
-                )
-                Spacer(modifier = Modifier.width(8.adp))
-                Text(text = stringResource(id = R.string.retry))
+            Spacer(Modifier.height(24.adp))
+            Button(onClick = onRetry) {
+                Icon(painterResource(R.drawable.ic_retry), null, Modifier.size(16.adp))
+                Spacer(Modifier.width(8.adp))
+                Text(stringResource(R.string.retry))
             }
         }
     }

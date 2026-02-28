@@ -24,9 +24,7 @@ fun SelectedTextList(
     if (texts.isEmpty()) return
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(),
+        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
         verticalArrangement = Arrangement.spacedBy(12.adp)
     ) {
         items(texts) { text ->
@@ -34,26 +32,10 @@ fun SelectedTextList(
                 text = text,
                 expanded = isSingleSelection,
                 actions = listOf(
-                    ActionItem.Action(
-                        icon = R.drawable.icon_copy,
-                        description = R.string.action_copy,
-                        onClick = { onCopy(text) }
-                    ),
-                    ActionItem.Action(
-                        icon = R.drawable.icon_sound,
-                        description = R.string.action_speak,
-                        onClick = { onSpeak(text) }
-                    ),
-                    ActionItem.Action(
-                        icon = R.drawable.icon_translate,
-                        description = R.string.action_translate,
-                        onClick = { onTranslate(text) }
-                    ),
-                    ActionItem.Action(
-                        icon = R.drawable.icon_share,
-                        description = R.string.action_share,
-                        onClick = { onShare(text) }
-                    )
+                    ActionItem.Action(R.drawable.icon_copy, R.string.action_copy, { onCopy(text) }),
+                    ActionItem.Action(R.drawable.icon_sound, R.string.action_speak, { onSpeak(text) }),
+                    ActionItem.Action(R.drawable.icon_translate, R.string.action_translate, { onTranslate(text) }),
+                    ActionItem.Action(R.drawable.icon_share, R.string.action_share, { onShare(text) })
                 )
             )
         }
