@@ -2,17 +2,14 @@ package com.venom.lingospell.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.venom.data.mock.MockWordData
-
 import com.venom.data.repo.UserIdentityRepository
 import com.venom.data.repo.UserWordProgressRepository
 import com.venom.domain.model.WordMaster
-import com.venom.lingospell.domain.AUTO_ADVANCE_DELAY
+import com.venom.domain.provider.AppConfigProvider
 import com.venom.lingospell.domain.FeedbackState
 import com.venom.lingospell.domain.HintLevel
 import com.venom.lingospell.domain.Letter
 import com.venom.lingospell.domain.LetterStatus
-import com.venom.lingospell.domain.MAX_STREAK
 import com.venom.lingospell.domain.SlotStatus
 import com.venom.lingospell.domain.SpellingUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SpellingGameViewModel @Inject constructor(
     private val progressRepository: UserWordProgressRepository,
-    private val identityRepository: UserIdentityRepository
+    private val identityRepository: UserIdentityRepository,
+    val appConfigProvider: AppConfigProvider
 ) : ViewModel() {
 
 
@@ -60,11 +58,9 @@ class SpellingGameViewModel @Inject constructor(
     }
 
     fun clearCustomWord() {
-
-        val defaultWord = MockWordData.journeyWord
         _state.update { state ->
             state.copy(
-                overrideWord = defaultWord,
+                overrideWord = null,
                 streak = 0,
                 mistakes = 0,
                 hintLevel = HintLevel.NONE,
@@ -73,8 +69,6 @@ class SpellingGameViewModel @Inject constructor(
                 showMasteryDialog = false
             )
         }
-        // Pass defaultWord directly
-        initializeWord(resetStreak = true, wordData = defaultWord)
     }
 
     /**
@@ -84,11 +78,11 @@ class SpellingGameViewModel @Inject constructor(
      */
     private fun initializeWord(resetStreak: Boolean, wordData: WordMaster? = null) {
         val currentState = _state.value
-        val currentWord = wordData ?: currentState.overrideWord
+        val currentWord = wordData ?: currentState.overrideWord ?: return
 
         val target = currentWord.wordEn.uppercase()
         val newSlots = SpellingUtils.createSlots(target)
-        val newBank = SpellingUtils.generateBank(target)
+        val newBank = SpellingUtils.generateBank(target, appConfigProvider.spellingDistractors)
 
         _state.update { state ->
             state.copy(
@@ -113,7 +107,7 @@ class SpellingGameViewModel @Inject constructor(
 
         // Play Arabic TTS after short delay
 //        viewModelScope.launch {
-//            delay(TTS_INITIAL_DELAY)
+//            delay(appConfigProvider.spellingTtsInitialDelay)
 //            _events.send(SpellingGameEvent.PlayTts(currentWord.arabicAr, "ar-SA"))
 //        }
     }
@@ -200,8 +194,9 @@ class SpellingGameViewModel @Inject constructor(
         if (!currentState.hintLevel.canUseHint) return
         if (currentState.feedback != FeedbackState.IDLE) return
 
+        val word = currentState.currentWord ?: return
         val newLevel = currentState.hintLevel.next()
-        val target = currentState.currentWord.wordEn.uppercase()
+        val target = word.wordEn.uppercase()
 
         when (newLevel) {
             HintLevel.LEVEL_1 -> applyHintLevel1(target)
@@ -373,7 +368,7 @@ class SpellingGameViewModel @Inject constructor(
         if (currentState.feedback != FeedbackState.IDLE) return
 
         val currentSpelling = currentState.slots.mapNotNull { it.letter?.char }.joinToString("")
-        val target = currentState.currentWord.wordEn.uppercase()
+        val target = currentState.currentWord?.wordEn?.uppercase() ?: return
 
         if (currentSpelling == target) {
             handleSuccess()
@@ -384,7 +379,7 @@ class SpellingGameViewModel @Inject constructor(
 
     private fun handleSuccess() {
         val newStreak = _state.value.streak + 1
-        val isMastered = newStreak >= MAX_STREAK
+        val isMastered = newStreak >= appConfigProvider.spellingMaxStreak
 
         // Mark all slots as correct
         _state.update { state ->
@@ -393,25 +388,27 @@ class SpellingGameViewModel @Inject constructor(
                 slots = newSlots,
                 streak = newStreak,
                 feedback = if (isMastered) FeedbackState.MASTERED else FeedbackState.SUCCESS,
-                showMasteryDialog = isMastered // Show dialog when mastered
+                showMasteryDialog = isMastered
             )
         }
 
         // Record progress
         viewModelScope.launch {
+            val wordId = _state.value.overrideWord?.id ?: return@launch
             progressRepository.recordProductionSuccess(
                 identityRepository.getCurrentUserId(),
-                _state.value.overrideWord.id
+                wordId
             )
         }
 
 
         // Play TTS
         viewModelScope.launch {
+            val wordEn = _state.value.currentWord?.wordEn ?: ""
             val text = if (isMastered) {
-                "Perfect! ${_state.value.currentWord.wordEn}"
+                "Perfect! $wordEn"
             } else {
-                _state.value.currentWord.wordEn
+                wordEn
             }
             _events.send(SpellingGameEvent.PlayTts(text, "en-US"))
         }
@@ -419,7 +416,7 @@ class SpellingGameViewModel @Inject constructor(
         // Auto-advance only if NOT mastered
         if (!isMastered) {
             viewModelScope.launch {
-                delay(AUTO_ADVANCE_DELAY)
+                delay(appConfigProvider.spellingAutoAdvanceMs)
                 initializeWord(resetStreak = false)
             }
         }
@@ -450,13 +447,15 @@ class SpellingGameViewModel @Inject constructor(
                 slots = newSlots,
                 mistakes = state.mistakes + 1,
                 feedback = FeedbackState.ERROR,
-                shakeTrigger = state.shakeTrigger + 1
+                shakeTrigger = state.shakeTrigger + 1,
+                // Using a potential animation duration tracker if needed, otherwise just updating state.
+                // We'll keep the logic simple as originally requested.
             )
         }
 
         // Reset incorrect letters after delay
         viewModelScope.launch {
-            delay(AUTO_ADVANCE_DELAY)
+            delay(appConfigProvider.spellingAutoAdvanceMs)
 
             _state.update { state ->
                 val returningIds = mutableListOf<String>()
@@ -492,15 +491,6 @@ class SpellingGameViewModel @Inject constructor(
     fun onCloseClick() {
         viewModelScope.launch {
             _events.send(SpellingGameEvent.NavigateBack)
-        }
-    }
-
-    /**
-     * Skip to next word on tap during success state.
-     */
-    fun onScreenTapDuringSuccess() {
-        if (_state.value.feedback == FeedbackState.SUCCESS) {
-            initializeWord(resetStreak = false)
         }
     }
 }
