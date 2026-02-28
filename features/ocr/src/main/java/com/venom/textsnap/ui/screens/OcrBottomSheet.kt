@@ -33,20 +33,19 @@ fun OcrBottomSheet(
     onSpeak: (String) -> Unit,
     onTranslate: (String) -> Unit
 ) {
+    val text = uiState.currentRecognizedText
+    val selectedTexts = uiState.selectedBoxes.map { it.text }
+
     GlassCard(
-        modifier = Modifier
-            .fillMaxSize()
-            .heightIn(max = maxHeight),
+        modifier = Modifier.fillMaxSize().heightIn(max = maxHeight),
         thickness = GlassThickness.UltraThin,
         contentPadding = 18.adp,
         showBorder = false,
         showShadow = false
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.adp)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.adp)) {
             RecognizedTextSection(
-                text = uiState.recognizedText,
+                text = text,
                 peekHeight = peekHeight,
                 isExpanded = sheetState.currentValue == SheetValue.Expanded,
                 onCopy = onCopy,
@@ -54,41 +53,22 @@ fun OcrBottomSheet(
                 onSpeak = onSpeak
             )
 
-            if (uiState.recognizedText.isNotEmpty()) {
-                GlassCard(
-                    thickness = GlassThickness.Thick,
-                    shape = MaterialTheme.shapes.medium
-                ) {
+            if (text.isNotEmpty()) {
+                GlassCard(thickness = GlassThickness.Thick, shape = MaterialTheme.shapes.medium) {
                     TextActionBar(
                         actions = listOf(
-                            ActionItem.Action(
-                                icon = R.drawable.icon_share,
-                                description = R.string.action_share,
-                                onClick = { onShare(uiState.recognizedText) }
-                            ),
-                            ActionItem.Action(
-                                icon = R.drawable.icon_sound,
-                                description = R.string.action_speak,
-                                onClick = { onSpeak(uiState.recognizedText) }
-                            ),
-                            ActionItem.Action(
-                                icon = R.drawable.icon_translate,
-                                description = R.string.action_translate,
-                                onClick = { onTranslate(uiState.recognizedText) }
-                            ),
-                            ActionItem.Action(
-                                icon = R.drawable.icon_copy,
-                                description = R.string.action_copy,
-                                onClick = { onCopy(uiState.recognizedText) }
-                            )
+                            ActionItem.Action(R.drawable.icon_share, R.string.action_share, { onShare(text) }),
+                            ActionItem.Action(R.drawable.icon_sound, R.string.action_speak, { onSpeak(text) }),
+                            ActionItem.Action(R.drawable.icon_translate, R.string.action_translate, { onTranslate(text) }),
+                            ActionItem.Action(R.drawable.icon_copy, R.string.action_copy, { onCopy(text) })
                         )
                     )
                 }
             }
 
             SelectedTextList(
-                texts = uiState.selectedBoxes.map { it.text },
-                isSingleSelection = uiState.selectedBoxes.map { it.text }.size == 1,
+                texts = selectedTexts,
+                isSingleSelection = selectedTexts.size == 1,
                 onCopy = onCopy,
                 onShare = onShare,
                 onSpeak = onSpeak,
