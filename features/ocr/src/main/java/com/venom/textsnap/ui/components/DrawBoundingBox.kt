@@ -34,56 +34,42 @@ fun DrawBoundingBox(
     showLabels: Boolean,
     onSelect: () -> Unit
 ) {
+    if (!showLabels) return
+
     val density = LocalDensity.current
     val textSize = if (isParagraphMode) box.avgWordHeight * 1.2f else rect.height * 0.7f
 
-    // Get coordinates from bounding block
     val vertices = box.boundingBlock.vertices
-    val boxRect = remember(vertices) {
-        Rect(
-            left = vertices[0].x.toFloat(),
-            top = vertices[0].y.toFloat(),
-            right = vertices[2].x.toFloat(),
-            bottom = vertices[2].y.toFloat()
+    val colors = remember(imageBitmap, vertices) {
+        sampleTextColors(
+            imageBitmap,
+            Rect(
+                vertices[0].x.toFloat(), vertices[0].y.toFloat(),
+                vertices[2].x.toFloat(), vertices[2].y.toFloat()
+            )
         )
     }
 
-    val colors = remember(imageBitmap, boxRect) {
-        sampleTextColors(imageBitmap, boxRect)
-    }
-    if (showLabels) {
-        Box(
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        rect.left
-                            .toDp()
-                            .roundToPx(),
-                        rect.top
-                            .toDp()
-                            .roundToPx()
-                    )
-                }
-                .size(
-                    width = with(density) { rect.width.toDp() },
-                    height = with(density) { rect.height.toDp() })
-                .pointerInput(Unit) { detectTapGestures(onTap = { onSelect() }) }
-
-                .background(
-                    if (isSelected) MaterialTheme.colorScheme.primary.copy(0.5f)
-                    else colors.backgroundColor, RoundedCornerShape(6.adp)
-                )) {
-
-            SelectionContainer {
-                Text(
-                    text = box.text,
-                    color = colors.textColor,
-                    fontSize = with(density) { textSize.toSp() },
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxSize(),
-                    textAlign = TextAlign.Center,
-                    lineHeight = with(density) { textSize.toSp() })
-            }
+    Box(
+        modifier = Modifier
+            .offset { IntOffset(rect.left.toDp().roundToPx(), rect.top.toDp().roundToPx()) }
+            .size(with(density) { rect.width.toDp() }, with(density) { rect.height.toDp() })
+            .pointerInput(Unit) { detectTapGestures { onSelect() } }
+            .background(
+                if (isSelected) MaterialTheme.colorScheme.primary.copy(0.5f) else colors.backgroundColor,
+                RoundedCornerShape(6.adp)
+            )
+    ) {
+        SelectionContainer {
+            Text(
+                text = box.text,
+                color = colors.textColor,
+                fontSize = with(density) { textSize.toSp() },
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center,
+                lineHeight = with(density) { textSize.toSp() }
+            )
         }
     }
 }
