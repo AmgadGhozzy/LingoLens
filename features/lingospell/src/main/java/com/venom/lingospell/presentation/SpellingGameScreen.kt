@@ -29,7 +29,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,11 +43,11 @@ import com.venom.lingospell.presentation.components.StreakBar
 import com.venom.lingospell.presentation.components.WordSlots
 import com.venom.resources.R
 import com.venom.ui.components.buttons.CloseButton
+import com.venom.ui.components.common.DynamicStyledText
 import com.venom.ui.components.common.adp
 import com.venom.ui.components.other.ConfettiAnimationType
 import com.venom.ui.components.other.ConfettiView
 import com.venom.ui.components.other.KonfettiStyle
-import com.venom.ui.theme.Alexandria
 import com.venom.ui.theme.lingoLens
 import com.venom.ui.viewmodel.TTSViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -118,13 +117,15 @@ fun SpellingGameScreen(
                         targetValue = 1f,
                         animationSpec = spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow),
                     )
-                    Text(
+                    DynamicStyledText(
                         text = arabic,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontFamily = Alexandria,
-                        style = MaterialTheme.typography.displayMedium,
-                        modifier = Modifier.scale(scale).padding(horizontal = 32.adp),
+                        maxFontSize = 40,
+                        minFontSize = 30,
+                        lineHeight = 45,
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
