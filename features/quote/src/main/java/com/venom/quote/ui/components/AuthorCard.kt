@@ -269,8 +269,7 @@ fun AuthorInfoDialog(
                                 onClick = {
                                     isVisible = false
                                     onClose()
-                                },
-                                size = 40.adp
+                                }
                             )
                         }
 

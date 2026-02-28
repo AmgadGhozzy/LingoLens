@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom.domain.model.Author
 import com.venom.domain.model.Quote
 import com.venom.domain.model.Tag
+import com.venom.domain.provider.AppConfigProvider
 import com.venom.domain.repo.IQuoteRepository
 import com.venom.quote.ui.components.FilterOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuoteViewModel @Inject constructor(
-    private val repository: IQuoteRepository
+    private val repository: IQuoteRepository,
+    private val appConfigProvider: AppConfigProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QuoteUiState())
@@ -39,6 +41,10 @@ class QuoteViewModel @Inject constructor(
     }
 
     private fun loadInitialData() {
+        if (!appConfigProvider.isQuoteEnabled) {
+            _uiState.update { it.copy(isLoading = false, error = "Quotes feature is currently disabled.") }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
@@ -96,7 +102,7 @@ class QuoteViewModel @Inject constructor(
 
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            delay(300)
+            delay(appConfigProvider.quoteSearchDebounceMs)
             performSearch(trimmedQuery)
         }
     }

@@ -189,8 +189,7 @@ fun FilterDialog(
                                 )
 
                                 CloseButton(
-                                    onClick = onDismiss,
-                                    size = 40.adp
+                                    onClick = onDismiss
                                 )
                             }
 
