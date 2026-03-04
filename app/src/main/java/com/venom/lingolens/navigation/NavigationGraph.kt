@@ -1,7 +1,10 @@
 package com.venom.lingolens.navigation
 
 import android.net.Uri
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -17,6 +20,7 @@ import com.venom.quiz.ui.screen.LevelScreen
 import com.venom.quiz.ui.screen.QuizMainScreen
 import com.venom.quiz.ui.screen.QuizScreen
 import com.venom.quiz.ui.screen.TestsScreen
+import com.venom.quiz.ui.viewmodel.QuizViewModel
 import com.venom.quote.ui.screen.QuoteScreen
 import com.venom.stackcard.ui.screen.WordMasteryScreen
 import com.venom.textsnap.ui.screens.OcrScreen
@@ -33,11 +37,11 @@ fun NavigationGraph(
     startCamera: ((Uri?) -> Unit) -> Unit,
     imageSelector: ((Uri?) -> Unit) -> Unit,
     fileSelector: ((Uri?) -> Unit) -> Unit,
-    onGoogleSignIn: () -> Unit = {}
+    onGoogleSignIn: () -> Unit = {},
 ) {
     AnimatedNavHost(
         navController = navController,
-        startDestination = Screen.Translation.route
+        startDestination = Screen.Translation.route,
     ) {
         composable(
             route = "${Screen.Translation.route}?${Screen.Translation.ARG_TEXT}={${Screen.Translation.ARG_TEXT}}",
@@ -46,47 +50,64 @@ fun NavigationGraph(
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
-                }
+                },
             ),
             deepLinks = listOf(
                 navDeepLink {
-                    uriPattern = "lingolens://translation?text={${Screen.Translation.ARG_TEXT}}"
-                }
-            )
+                    uriPattern =
+                        "lingolens://translation?text={${Screen.Translation.ARG_TEXT}}"
+                },
+            ),
         ) { backStackEntry ->
             val text = backStackEntry.arguments?.getString(Screen.Translation.ARG_TEXT)
             TranslationScreen(
                 onNavigateToOcr = { navController.navigate(Screen.Ocr.route) },
-                onNavigateToSentence = { text ->
-                    navController.navigate(Screen.Sentence.createRoute(text))
+                onNavigateToSentence = { word ->
+                    navController.navigate(Screen.Sentence.createRoute(word))
                 },
-                initialText = text?.takeUnless { it == "null" || it == "{text}" }
+                initialText = text?.takeUnless { it == "null" || it == "{text}" },
             )
         }
 
         composable(
-            route = Screen.StackCard.route
+            route = Screen.StackCard.route,
+            enterTransition = NavTransitions.fadeThroughEnter(),
+            exitTransition = NavTransitions.fadeThroughExit(),
+            popEnterTransition = NavTransitions.fadeThroughEnter(),
+            popExitTransition = NavTransitions.fadeThroughExit(),
         ) {
             WordMasteryScreen(
                 isGenerative = false,
                 onBack = { navController.popBackStack() },
-                onGoogleSignIn = onGoogleSignIn
+                onGoogleSignIn = onGoogleSignIn,
             )
         }
 
-        composable(Screen.Ocr.route) {
+        composable(
+            route = Screen.Ocr.route,
+            enterTransition = NavTransitions.verticalEnter(),
+            exitTransition = NavTransitions.verticalExit(),
+            popEnterTransition = NavTransitions.verticalPopEnter(),
+            popExitTransition = NavTransitions.verticalPopExit(),
+        ) {
             OcrScreen(
                 onNavigateToTranslation = { text ->
                     navController.navigate(Screen.Translation.createRoute(text))
                 },
                 onFileClick = fileSelector,
                 onCameraClick = startCamera,
-                onGalleryClick = imageSelector
+                onGalleryClick = imageSelector,
             )
         }
 
-        composable(Screen.Onboarding.route) {
-            val viewModel: com.venom.ui.viewmodel.OnboardingViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+        composable(
+            route = Screen.Onboarding.route,
+            enterTransition = NavTransitions.fadeThroughEnter(),
+            exitTransition = NavTransitions.fadeThroughExit(),
+            popEnterTransition = NavTransitions.fadeThroughEnter(),
+            popExitTransition = NavTransitions.fadeThroughExit(),
+        ) {
+            val viewModel: com.venom.ui.viewmodel.OnboardingViewModel = hiltViewModel()
             OnboardingScreens(
                 onGetStarted = {
                     viewModel.restoreUserProgress {
@@ -101,11 +122,11 @@ fun NavigationGraph(
                             popUpTo(Screen.Onboarding.route) { inclusive = true }
                         }
                     }
-                }
+                },
             )
         }
 
-        composable(Screen.Phrases.route) {
+        composable(route = Screen.Phrases.route) {
             PhrasebookScreen()
         }
 
@@ -114,16 +135,26 @@ fun NavigationGraph(
             arguments = listOf(navArgument("word") {
                 type = NavType.StringType
                 nullable = true
-            })
+            }),
+            enterTransition = NavTransitions.verticalEnter(),
+            exitTransition = NavTransitions.verticalExit(),
+            popEnterTransition = NavTransitions.verticalPopEnter(),
+            popExitTransition = NavTransitions.verticalPopExit(),
         ) { backStackEntry ->
             val word = backStackEntry.arguments?.getString("word")
             SentenceScreen(
                 word = word,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
             )
         }
 
-        composable(Screen.Dialog.route) {
+        composable(
+            route = Screen.Dialog.route,
+            enterTransition = NavTransitions.verticalEnter(),
+            exitTransition = NavTransitions.verticalExit(),
+            popEnterTransition = NavTransitions.verticalPopEnter(),
+            popExitTransition = NavTransitions.verticalPopExit(),
+        ) {
             DialogScreen()
         }
 
@@ -131,7 +162,7 @@ fun NavigationGraph(
             route = Screen.History.route,
             arguments = listOf(navArgument("contentType") {
                 type = NavType.StringType
-            })
+            }),
         ) { backStackEntry ->
             val contentTypeString =
                 backStackEntry.arguments?.getString("contentType") ?: "TRANSLATION"
@@ -139,12 +170,15 @@ fun NavigationGraph(
             BookmarkHistoryScreen(
                 navController = navController,
                 contentType = contentType,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
             )
         }
 
-        // Main Quiz Hub - Shows both vocab levels and classes
-        composable(Screen.Quiz.route) {
+        composable(route = Screen.Quiz.route) {
+            @Suppress("DEPRECATION")
+            val quizViewModel: QuizViewModel =
+                hiltViewModel(LocalActivity.current as ComponentActivity)
+
             QuizMainScreen(
                 onNavigateToLevels = {
                     navController.navigate(Screen.Quiz.Levels.route)
@@ -157,73 +191,73 @@ fun NavigationGraph(
                 },
                 onNavigateToClass = { classId ->
                     navController.navigate(Screen.QuizCategories.createRoute(classId))
-                }
+                },
             )
         }
 
-        // Detailed vocab levels screen with expandable cards
-        composable(Screen.Quiz.Levels.route) {
+        composable(route = Screen.Quiz.Levels.route) {
             LevelScreen(
                 onNavigateToTest = { level ->
                     navController.navigate(Screen.Quiz.LevelTest.createRoute(level))
                 },
                 onNavigateToLearn = { level ->
                     navController.navigate(Screen.StackCard.createRoute(level))
-                }
+                },
             )
         }
 
-        // Categories for a specific class
         composable(
             route = Screen.QuizCategories.route,
-            arguments = listOf(navArgument("classId") { type = NavType.IntType })
+            arguments = listOf(navArgument("classId") { type = NavType.IntType }),
         ) {
             CategoriesScreen(
                 onBackClick = { navController.navigateUp() },
                 onCategoryClick = { categoryId ->
                     navController.navigate(Screen.QuizTests.createRoute(categoryId))
-                }
+                },
             )
         }
 
-        // Tests within a category
         composable(
             route = Screen.QuizTests.route,
-            arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            arguments = listOf(navArgument("categoryId") { type = NavType.IntType }),
         ) {
             TestsScreen(
                 onBackClick = { navController.navigateUp() },
                 onTestClick = { testId ->
                     navController.navigate(Screen.QuizExam.createRoute(testId))
-                }
+                },
             )
         }
 
-        // Actual exam/test taking screen
         composable(
             route = Screen.QuizExam.route,
-            arguments = listOf(navArgument("testId") { type = NavType.IntType })
+            arguments = listOf(navArgument("testId") { type = NavType.IntType }),
+            enterTransition = NavTransitions.fadeThroughEnter(),
+            exitTransition = NavTransitions.fadeThroughExit(),
+            popEnterTransition = NavTransitions.fadeThroughEnter(),
+            popExitTransition = NavTransitions.fadeThroughExit(),
         ) {
             QuizScreen(
                 mode = QuizMode.Test(
-                    testId = it.arguments?.getInt("testId") ?: 0
+                    testId = it.arguments?.getInt("testId") ?: 0,
                 ),
                 onBack = { navController.navigateUp() },
                 onComplete = { _, _ ->
-                    navController.popBackStack(
-                        Screen.Quiz.route,
-                        false
-                    )
-                }
+                    navController.popBackStack(Screen.Quiz.route, false)
+                },
             )
         }
 
-        // Vocabulary level test
         composable(
             route = Screen.Quiz.LevelTest.route,
             arguments = listOf(navArgument("level") {
                 type = NavType.StringType
-            })
+            }),
+            enterTransition = NavTransitions.fadeThroughEnter(),
+            exitTransition = NavTransitions.fadeThroughExit(),
+            popEnterTransition = NavTransitions.fadeThroughEnter(),
+            popExitTransition = NavTransitions.fadeThroughExit(),
         ) { backStackEntry ->
             val level = WordLevels.values().find {
                 it.id == backStackEntry.arguments?.getString("level")
@@ -241,14 +275,14 @@ fun NavigationGraph(
                         navController.popBackStack()
                     }
                 },
-                onLearnClick = { navController.navigate(Screen.StackCard.createRoute(it)) }
+                onLearnClick = {
+                    navController.navigate(Screen.StackCard.createRoute(it))
+                },
             )
         }
 
-        composable(Screen.WordCraft.route) {
-            WordCraftScreen(
-                onImageSelect = imageSelector
-            )
+        composable(route = Screen.WordCraft.route) {
+            WordCraftScreen(onImageSelect = imageSelector)
         }
 
         composable(Screen.Quote.route) {
