@@ -1,5 +1,6 @@
 package com.venom.lingolens.navigation
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,58 +21,8 @@ class AppState(
     val currentScreen: Screen
         get() = Screen.fromRoute(currentRoute ?: Screen.Translation.route)
 
-    val shouldShowTopBar: Boolean
-        get() = when {
-            // Quiz-related screens - hide top bar (they have custom headers)
-            currentRoute == Screen.StackCard.route -> false
-            currentRoute == Screen.Quiz.route -> false
-            currentRoute == Screen.Quiz.Levels.route -> false
-            currentRoute?.startsWith("quiz/test") == true -> false
-            currentRoute?.startsWith("quiz/exam") == true -> false
-            currentRoute?.startsWith("quiz/categories") == true -> false
-            currentRoute?.startsWith("quiz/tests") == true -> false
-            currentRoute?.startsWith("quiz/tests") == true -> false
-
-            // Other screens - hide top bar
-            currentRoute == Screen.Onboarding.route -> false
-            currentRoute == Screen.Sentence.route -> false
-            currentRoute == Screen.Phrases.route -> false
-            currentRoute == Screen.WordCraft.route -> false
-            currentRoute == Screen.Quote.route -> false
-            currentRoute?.startsWith("history") == true -> false
-
-            // Show top bar for all other screens
-            else -> true
-        }
-
-    val shouldShowBottomBar: Boolean
-        get() = when {
-            // Hide bottom bar for these screens
-            currentRoute == Screen.Ocr.route -> false
-            currentRoute == Screen.StackCard.route -> false
-            currentRoute?.startsWith("quiz/test") == true -> false
-            currentRoute?.startsWith("quiz/exam") == true -> false
-            currentRoute?.startsWith("quiz/categories") == true -> false
-            currentRoute?.startsWith("quiz/tests") == true -> false
-            currentRoute?.startsWith("quiz/tests") == true -> false
-            currentRoute == Screen.Onboarding.route -> false
-            currentRoute == Screen.Sentence.route -> false
-            currentRoute?.startsWith("history") == true -> false
-
-            // Show bottom bar for all other screens (including quiz hub and levels)
-            else -> true
-        }
-
-    fun navigateToScreen(screen: Screen) {
-        when (screen) {
-            is Screen.Translation -> navController.navigate(screen.route) {
-                popUpTo(Screen.Translation.route) { inclusive = true }
-            }
-            else -> navController.navigate(screen.route) {
-                popUpTo(Screen.Translation.route)
-            }
-        }
-    }
+    val barConfig: BarConfig
+        get() = BarConfig.forRoute(currentRoute)
 
     fun navigateToHistory(contentType: String) {
         navController.navigate(Screen.History.createRoute(contentType))
@@ -82,6 +33,38 @@ class AppState(
             showSettings -> showSettings = false
             showAbout -> showAbout = false
             else -> navController.popBackStack()
+        }
+    }
+}
+
+@Immutable
+data class BarConfig(
+    val showTopBar: Boolean,
+    val showBottomBar: Boolean,
+) {
+    companion object {
+        private val BOTH = BarConfig(showTopBar = true, showBottomBar = true)
+        private val NONE = BarConfig(showTopBar = false, showBottomBar = false)
+        private val TOP_ONLY = BarConfig(showTopBar = true, showBottomBar = false)
+        private val BOTTOM_ONLY = BarConfig(showTopBar = false, showBottomBar = true)
+
+        fun forRoute(route: String?): BarConfig = when {
+            route == null -> BOTH
+            route == Screen.Onboarding.route -> NONE
+            route == Screen.StackCard.route -> NONE
+            route == Screen.Sentence.route -> NONE
+            route.startsWith("quiz/test") -> NONE
+            route.startsWith("quiz/exam") -> NONE
+            route.startsWith("quiz/categories") -> NONE
+            route.startsWith("quiz/tests") -> NONE
+            route.startsWith("history") -> NONE
+            route == Screen.Ocr.route -> TOP_ONLY
+            route == Screen.Quiz.route -> BOTTOM_ONLY
+            route == Screen.Quiz.Levels.route -> BOTTOM_ONLY
+            route == Screen.Phrases.route -> BOTTOM_ONLY
+            route == Screen.WordCraft.route -> BOTTOM_ONLY
+            route == Screen.Quote.route -> BOTTOM_ONLY
+            else -> BOTH
         }
     }
 }
