@@ -13,10 +13,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -25,19 +26,16 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
-import com.google.firebase.remoteconfig.ConfigUpdate
-import com.google.firebase.remoteconfig.ConfigUpdateListener
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
-import com.google.firebase.remoteconfig.remoteConfig
-import com.google.firebase.remoteconfig.remoteConfigSettings
+import com.venom.data.repo.SyncManager
+import com.venom.domain.provider.AppConfigProvider
 import com.venom.lingolens.ui.LingoLensApp
-import com.venom.resources.R
+import com.venom.lingolens.viewmodel.LingoLensRootViewModel   // NEW
 import com.venom.ui.screen.OnboardingScreens
 import com.venom.ui.theme.LingoLensTheme
 import com.venom.ui.viewmodel.OnboardingViewModel
@@ -46,22 +44,36 @@ import com.venom.utils.Extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
+
+// REMOVED:
+//   import androidx.compose.runtime.collectAsState       ← use collectAsStateWithLifecycle
+//   import androidx.compose.runtime.mutableStateOf       ← replaced by StateFlow in ViewModel
+//   import androidx.compose.runtime.remember             ← no longer needed for showOnboarding
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    // ── ViewModels ──────────────────────────────────────────────────
+
+    // NEW: owns showOnboarding as StateFlow (survives rotation)
+    // OLD: private val showOnboarding = mutableStateOf(false)
+    //      └─ recreated on every rotation → onboarding resets mid-flow
+    private val rootViewModel:       LingoLensRootViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
-    private val onboardingViewModel: OnboardingViewModel by viewModels()
+    private val onboardingViewModel: OnboardingViewModel    by viewModels()
 
-    private val showOnboarding = mutableStateOf(false)
+    @Inject lateinit var syncManager:       SyncManager
+    @Inject lateinit var appConfigProvider: AppConfigProvider
 
-    private var currentPhotoUri: Uri? = null
+    // ── Media launchers ─────────────────────────────────────────────
+
+    private var currentPhotoUri:    Uri?              = null
     private var pendingUriCallback: ((Uri?) -> Unit)? = null
-    private lateinit var remoteConfig: FirebaseRemoteConfig
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -75,8 +87,7 @@ class MainActivity : ComponentActivity() {
     ) { uri ->
         uri?.let {
             contentResolver.takePersistableUriPermission(
-                uri,
-                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
         }
         pendingUriCallback?.invoke(uri)
@@ -89,75 +100,83 @@ class MainActivity : ComponentActivity() {
         val resultUri = if (success) currentPhotoUri else null
         pendingUriCallback?.invoke(resultUri)
         pendingUriCallback = null
-        currentPhotoUri = null
+        currentPhotoUri   = null
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (!isGranted) {
-            showToast("Notification permission denied. Your app will not show notifications.")
-        }
+    ) { isGranted ->
+        if (!isGranted) showToast("Notification permission denied.")
     }
 
+    // ── onCreate ────────────────────────────────────────────────────
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         super.onCreate(savedInstanceState)
 
+        lifecycle.addObserver(syncManager)
 
-        showOnboarding.value = intent.getBooleanExtra("show_onboarding", false)
+        // Replaces: showOnboarding.value = intent.getBooleanExtra(...)
+        // ViewModel reads intent once; StateFlow survives rotation.
+        rootViewModel.checkOnboarding(intent)
 
-        setupRemoteConfig()
+        lifecycleScope.launch { appConfigProvider.initialize() }
 
         setContent {
-            val userPrefs = settingsViewModel.uiState.collectAsState().value
+            val userPrefs  = settingsViewModel.uiState.collectAsStateWithLifecycle().value
             val themePrefs = userPrefs.themePrefs
-            val shouldShowOnboarding = remember { showOnboarding }
+
+            // NEW: observe StateFlow — no more `remember { showOnboarding }`
+            val showOnboarding by rootViewModel.showOnboarding.collectAsStateWithLifecycle()
 
             ApplySelectedLanguage(userPrefs.appLanguage.code)
 
+            val windowSizeClass = calculateWindowSizeClass(this)
+            @Suppress("UNUSED_VARIABLE")
+            val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
+
             LingoLensTheme(
-                primaryColor = Color(themePrefs.primaryColor.color),
-                isAmoledBlack = themePrefs.isAmoledBlack,
-                materialYou = themePrefs.materialYou,
-                appTheme = themePrefs.appTheme,
-                colorStyle = themePrefs.colorStyle,
-                fontFamilyStyle = themePrefs.fontFamily
+                primaryColor    = Color(themePrefs.primaryColor.color),
+                isAmoledBlack   = themePrefs.isAmoledBlack,
+                materialYou     = themePrefs.materialYou,
+                appTheme        = themePrefs.appTheme,
+                colorStyle      = themePrefs.colorStyle,
+                fontFamilyStyle = themePrefs.fontFamily,
             ) {
-                if (shouldShowOnboarding.value) {
+                if (showOnboarding) {
                     OnboardingScreens(
                         onGetStarted = {
                             onboardingViewModel.restoreUserProgress {
-                                shouldShowOnboarding.value = false
+                                rootViewModel.completeOnboarding()
                             }
                         },
                         onSkip = {
                             onboardingViewModel.restoreUserProgress {
-                                shouldShowOnboarding.value = false
+                                rootViewModel.completeOnboarding()
                             }
                         },
                         onGoogleSignIn = {
                             startGoogleSignIn(isFromOnboarding = true)
-                        }
+                        },
                     )
                 } else {
                     LingoLensApp(
-                        startCamera = ::startCamera,
-                        imageSelector = ::selectImageFromGallery,
-                        fileSelector = ::selectDocumentFromFileManager,
-                        onGoogleSignIn = {
-                            startGoogleSignIn(isFromOnboarding = false)
-                        }
+                        startCamera    = ::startCamera,
+                        imageSelector  = ::selectImageFromGallery,
+                        fileSelector   = ::selectDocumentFromFileManager,
+                        onGoogleSignIn = { startGoogleSignIn(isFromOnboarding = false) },
                     )
                     setupPermissions()
                 }
             }
         }
     }
+
+    // ── Helpers ─────────────────────────────────────────────────────
 
     @Composable
     private fun ApplySelectedLanguage(languageCode: String) {
@@ -181,42 +200,18 @@ class MainActivity : ComponentActivity() {
     private fun startCamera(callback: (Uri?) -> Unit) {
         pendingUriCallback = callback
         val photoFile = createImageCacheFile()
-        val photoUri = FileProvider.getUriForFile(
-            this, "${packageName}.provider", photoFile
-        )
+        val photoUri  = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
         currentPhotoUri = photoUri
         cameraLauncher.launch(photoUri)
     }
 
     private fun createImageCacheFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile("PHOTO_${timeStamp}_", ".jpg", storageDir).apply {
-            deleteOnExit()
-        }
+        val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val dir   = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("PHOTO_${stamp}_", ".jpg", dir).apply { deleteOnExit() }
     }
 
-    private fun setupPermissions() {
-        askNotificationPermission()
-    }
-
-    private fun setupRemoteConfig() {
-        remoteConfig = Firebase.remoteConfig
-
-        val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = 3600
-            fetchTimeoutInSeconds = 10
-        }
-
-        remoteConfig.apply {
-            setConfigSettingsAsync(configSettings)
-            setDefaultsAsync(R.xml.remote_config_defaults)
-        }
-
-        fetchAndActivateRemoteConfig()
-        runtimeEnableAutoInit()
-        addConfigUpdateListener()
-    }
+    private fun setupPermissions() { askNotificationPermission() }
 
     private fun runtimeEnableAutoInit() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -232,84 +227,39 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                }
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> Unit
 
-                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) ->
                     showToast("This app needs notification permission for important updates")
-                }
 
-                else -> {
-                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
+                else -> requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
-    }
-
-    private fun fetchAndActivateRemoteConfig() {
-        lifecycleScope.launch(Dispatchers.IO) {  // background thread
-            try {
-                val task = remoteConfig.fetchAndActivate().await()  // coroutine
-                if (task) {
-                    val message = remoteConfig.getString("welcome_message")
-                    Log.d("RemoteConfig", "Config fetched successfully: $message")
-                } else {
-                    Log.e("RemoteConfig", "Fetch failed")
-                }
-            } catch (e: Exception) {
-                Log.e("RemoteConfig", "Error fetching config", e)
-            }
-        }
-    }
-
-    private fun addConfigUpdateListener() {
-        remoteConfig.addOnConfigUpdateListener(object : ConfigUpdateListener {
-            override fun onUpdate(configUpdate: ConfigUpdate) {
-                Log.d("RemoteConfig", "Updated keys: ${configUpdate.updatedKeys}")
-
-                if (configUpdate.updatedKeys.contains("welcome_message")) {
-                    remoteConfig.activate().addOnCompleteListener {
-                        val message = remoteConfig.getString("welcome_message")
-                        Log.d("RemoteConfig", "New Welcome Message: $message")
-                    }
-                }
-            }
-
-            override fun onError(error: FirebaseRemoteConfigException) {
-                Log.w("RemoteConfig", "Config update error: ${error.code}", error)
-            }
-        })
     }
 
     private fun startGoogleSignIn(isFromOnboarding: Boolean = false) {
         val credentialManager = CredentialManager.create(this)
 
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+        val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId("482771743461-er7fil93cgv5tcf9t6m28c2sahb2iium.apps.googleusercontent.com")
             .setAutoSelectEnabled(true)
             .build()
 
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
+        val request = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
         lifecycleScope.launch {
             try {
-                val result = credentialManager.getCredential(
-                    request = request,
-                    context = this@MainActivity,
-                )
-
+                val result     = credentialManager.getCredential(request = request, context = this@MainActivity)
                 val credential = result.credential
                 if (credential is GoogleIdTokenCredential) {
                     val idToken = credential.idToken
-
                     if (isFromOnboarding) {
                         onboardingViewModel.onGoogleSignInResult(idToken) {
-                            showOnboarding.value = false
+                            rootViewModel.completeOnboarding()
                         }
                     } else {
                         onboardingViewModel.onGoogleSignInResult(idToken) {}
