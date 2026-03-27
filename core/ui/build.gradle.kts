@@ -31,8 +31,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -80,7 +83,9 @@ dependencies {
     api(libs.compose.material3)
     api(libs.compose.animation)
     api(libs.coil.compose)
+    api(libs.vico.compose.m3)
     api(libs.m3color)
+
     api(libs.compose.material.icons.extended) {
         exclude(group = "androidx.compose.material.icons", module = "filled")
         exclude(group = "androidx.compose.material.icons", module = "outlined")
@@ -102,6 +107,7 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.tooling.data)
     debugImplementation(libs.compose.ui.test.manifest)
 
 }

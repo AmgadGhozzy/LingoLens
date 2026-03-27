@@ -30,8 +30,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -41,6 +44,10 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:utils"))
+
+    // Supabase
+    implementation(libs.supabase.client)
+    implementation(libs.supabase.postgrest)
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)

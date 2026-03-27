@@ -26,7 +26,7 @@ val localVersionName = versionProperties.getProperty("APP_VERSION_NAME")
 
 android {
     namespace = "com.venom.lingolens"
-    compileSdk = 35
+    compileSdk = 36
     lint {
         disable.add("NullSafeMutableLiveData")
         checkReleaseBuilds = true
@@ -44,7 +44,9 @@ android {
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        resourceConfigurations.addAll(listOf("en", "ar"))
+        androidResources {
+            localeFilters += listOf("en", "ar")
+        }
     }
 
     buildTypes {
@@ -59,9 +61,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -94,11 +93,15 @@ android {
     tasks.whenTaskAdded {
         if (name == "assembleDebug") {
             doLast {
-                exec {
-                    commandLine("cmd", "/c", "D:\\Amgad\\unlock_device.bat")
-                }
+                Runtime.getRuntime().exec("cmd /c D:\\Amgad\\unlock_device.bat")
             }
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -138,6 +141,7 @@ dependencies {
 
     // Android Jetpack
     api(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     api(libs.androidx.lifecycle.runtime.ktx)
     api(platform(libs.compose.bom))
     api(libs.androidx.lifecycle.runtime.compose)
@@ -149,6 +153,7 @@ dependencies {
     api(libs.hilt.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.material3.window.size.class1)
     ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 

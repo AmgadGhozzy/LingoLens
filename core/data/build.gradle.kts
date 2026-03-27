@@ -28,8 +28,8 @@ android {
     defaultConfig {
         minSdk = 24
 
-        buildConfigField("String", "APP_VERSION_NAME", "\"${localVersionName}\"")
-        buildConfigField("String", "APP_VERSION_CODE", "\"${localVersionCode}\"")
+        buildConfigField("String", "APP_VERSION_NAME", "\"${localVersionName}${localVersionCode}\"")
+        buildConfigField("int", "APP_VERSION_CODE", localVersionCode)
         buildConfigField("String", "OCR_API_KEY", localProperties.getProperty("OCR_API_KEY"))
         buildConfigField("String", "OPENAI_API_KEY", localProperties.getProperty("OPENAI_API_KEY"))
         buildConfigField("String", "GEMINI_API_KEY", localProperties.getProperty("GEMINI_API_KEY"))
@@ -37,6 +37,8 @@ android {
         buildConfigField("String", "DEEPSEEK_API_KEY", localProperties.getProperty("DEEPSEEK_API_KEY"))
         buildConfigField("String", "HUGGINGFACE_API_KEY", localProperties.getProperty("HUGGINGFACE_API_KEY"))
         buildConfigField("String", "SUPABASE_API_KEY", localProperties.getProperty("SUPABASE_API_KEY"))
+        buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+        buildConfigField("String", "SUPABASE_ANON_KEY", localProperties.getProperty("SUPABASE_ANON_KEY"))
 
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -54,12 +56,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 
     buildFeatures {
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -75,18 +80,14 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
-    implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.firebase.crashlytics.buildtools)
     api(platform(libs.firebase.bom))
-    api(libs.firebase.config)
     api(libs.firebase.config.ktx)
 
 
     ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
-
-    implementation(libs.androidx.datastore)
 
     // Room
     api(libs.androidx.room.runtime)
@@ -95,20 +96,28 @@ dependencies {
 
     api(libs.converter.moshi)
     api(libs.moshi)
+    api(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
-    implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preferences)
     // ML Kit
     implementation(libs.translate)
     implementation(libs.kotlinx.coroutines.play.services) // Added for ML Kit Task.await()
-//    implementation("com.google.mlkit:language-id:17.0.5")
-//    implementation("com.google.mlkit:text-recognition:16.0.0")
-//    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // OkHttp — used by AIRepositoryImpl for Gemini REST calls
+    implementation(libs.okhttp)
 
     api(libs.androidx.credentials)
     api(libs.androidx.credentials.play.services.auth)
     api(libs.googleid)
+
+    // Supabase
+    implementation(libs.supabase.client)
+    implementation(libs.supabase.postgrest)
+    implementation("io.ktor:ktor-client-okhttp:3.1.3")
 
     // Testing
     androidTestImplementation(libs.androidx.espresso.core)

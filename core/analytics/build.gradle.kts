@@ -8,20 +8,22 @@ plugins {
 }
 
 android {
-    namespace = "com.venom.lingopro"
+    namespace = "com.venom.analytics"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -32,6 +34,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+    lint {
+        disable += "NullSafeMutableLiveData"
+    }
 }
 
 kotlin {
@@ -41,21 +47,23 @@ kotlin {
 }
 
 dependencies {
-
-    // Core Modules
-    implementation(project(":core:data"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:di"))
+    // Firebase - using BOM for version management
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 
     // Hilt
     api(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
-    // Room
-    api(libs.androidx.room.runtime)
-    api(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    // Compose (for screen tracking)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
+    // Android Core
+    implementation(libs.androidx.core.ktx)
 }

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     id("dagger.hilt.android.plugin")
-    id("kotlin-kapt")
 }
 
 android {
@@ -22,7 +21,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
@@ -32,11 +30,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -52,7 +53,7 @@ dependencies {
 
     // Hilt
     api(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     api(libs.hilt.navigation.compose)
 
     // Room
